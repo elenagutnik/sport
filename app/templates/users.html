@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "_user.html" as macros %}
+
+{% block title %}{{ _('User list') }}{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+  {% for user in users %}
+    {{ macros.user_item(user,current_user,moment) }}
+  {% endfor %}
+</div>
+{% endblock %}

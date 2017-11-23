@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Gender List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Gender</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>#id</td>
+      <td>FIS Code</td>
+      <td>Название</td>
+      <td>Title</td>
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for gender in genders %}
+    <tr>
+      <td>{{ gender.id }}</td>
+      <td>{{ gender.fiscode }}</td>
+      <td>{{ gender.ru_name }}</td>
+      <td>{{ gender.en_name }}</td>
+      <td>
+        <a href="{{ gender.id }}/edit">edit</a>
+        |
+        <a href="{{ gender.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-default" href="{{ url_for('.gender_add') }}">Add</a>
+
+{% endblock %}

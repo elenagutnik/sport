@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Race {{ race.eventname }} {{ race.racedate }}{% endblock %}
+{% block page_content %}
+
+<div class="page-header">
+    <h1>{{ race.eventname }} {{ race.racedate }}</h1>
+    <h4>{{ _('Basic properties') }}</h4>
+    <table class="table table-striped">
+      <tbody>
+        <tr><td>{{ _('Event Name') }}</td><td>{{ race.eventname}}</td></tr>
+        <tr><td>{{ _('Race date') }}</td><td>{{ race.racedate}}</td></tr>
+        <tr><td>{{ _('Gender') }}</td><td>{{ race.gender}}</td></tr>
+        <tr><td>{{ _('Place') }}</td><td>{{ race.place}}</td></tr>
+        <tr><td>{{ _('Nation') }}</td><td>{{ race.nation}}</td></tr>
+        <tr><td>{{ _('Category') }}</td><td>{{ race.category}}</td></tr>
+        <tr><td>{{ _('Discipline') }}</td><td>{{ race.discipline }}</td></tr>
+        <tr><td>{{ _('Season') }}</td><td>{{ race.season }}</td></tr>
+        <tr><td>{{ _('Sector (AL)') }}</td><td>{{ race.sector }}</td></tr>
+        <tr><td>{{ _('Codex') }}</td><td>{{ race.codex }}</td></tr>
+        <tr><td>{{ _('Speed codex') }}</td><td>{{ race.speedcodex }}</td></tr>
+        <tr><td>{{ _('Number of Training') }}</td><td>{{ race.training }}</td></tr>
+      </tbody>
+    </table>
+    <h4>{{ _('Jury') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/jury">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+
+    <h4>{{ _('Technical Delegates') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/td">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+
+    <h4>{{ _('Competitors') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/competitors">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+
+    <h4>{{ _('Course') }}</h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+
+    <h4>{{ _('Additional Parameters') }}</h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+
+</div>
+{% endblock %}

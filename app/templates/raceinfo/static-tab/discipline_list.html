@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Discipline List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Disciplines</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>#id</td>
+      <td>FIS Code</td>
+      <td>Название дисциплины</td>
+      <td>Discipline Title</td>
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for discipline in disciplines %}
+    <tr>
+      <td>{{ discipline.id }}</td>
+      <td>{{ discipline.fiscode }}</td>
+      <td>{{ discipline.ru_name }}</td>
+      <td>{{ discipline.en_name }}</td>
+      <td>
+        <a href="{{ discipline.id }}/edit">edit</a>
+        |
+        <a href="{{ discipline.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-default" href="{{ url_for('.discipline_add') }}">Add</a>
+{% endblock %}

@@ -1,0 +1,51 @@
+# Translations template for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-08-29 04:56+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.0\n"
+
+#: app/raceinfo/views.py:197
+msgid "The td has been updated."
+msgstr ""
+
+#: app/raceinfo/views.py:216
+msgid "The td  has been deleted."
+msgstr ""
+
+#: app/templates/base.html:25
+msgid "Home"
+msgstr ""
+
+#: app/templates/base.html:33
+msgid "Account"
+msgstr ""
+
+#: app/templates/base.html:35
+msgid "Change Password"
+msgstr ""
+
+#: app/templates/base.html:36
+msgid "Change Email"
+msgstr ""
+
+#: app/templates/base.html:37
+msgid "Log Out"
+msgstr ""
+
+#: app/templates/base.html:41
+msgid "Log In"
+msgstr ""
+

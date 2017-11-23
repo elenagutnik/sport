@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Races List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Races</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>#id</td>
+      <td>Date</td>
+      <td>Event Name</td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td>{{ item.id }}</td>
+      <td>{{ item.racedate }}</td>
+      <td>{{ item.eventname }}</td>
+      <td>
+        <a href="{{ item.id }}">edit</a>
+        |
+        <a href="{{ item.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-default" href="{{ url_for('.race_add') }}">Add</a>
+
+{% endblock %}

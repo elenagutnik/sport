@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import "_user.html" as macros %}
+
+{% block title %}{{ _('User profile') }} - {{ user.username }}{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+  {{ macros.user_item(user,current_user,moment) }}
+</div>
+{% endblock %}

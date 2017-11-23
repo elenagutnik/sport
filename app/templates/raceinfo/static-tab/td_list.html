@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - TD List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>TD</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>#id</td>
+      <td>#eventid</td>
+      <td>Role</td>
+      <td>TD Number</td>
+      <td>Фамилия Имя</td>
+      <td>First Name, Last Name</td>
+      <td>Страна / Nation</td>
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for td in tds %}
+    <tr>
+      <td>{{ td.id }}</td>
+      <td></td>
+      <td>{{ td.tdrole_ref }}</td>
+      <td>{{ td.tdnumber }}</td>
+      <td>{{ td.ru_lastname }} {{ td.ru_firstname }}</td>
+      <td>{{ td.en_firstname }} {{ td.en_lastname }}</td>
+      <td>{{ td.ru_nation }} / {{ td.en_nation }}</td>
+      <td>
+        <a href="{{ td.id }}/edit">edit</a>
+        |
+        <a href="{{ td.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-default" href="{{ url_for('.td_add') }}">Add</a>
+
+{% endblock %}
