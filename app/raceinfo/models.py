@@ -73,6 +73,12 @@ class Jury(db.Model):
     phonenbr = db.Column(db.String)
     email = db.Column(db.String)
 
+class RaceJury(db.Model):
+    __tablename__ = 'race_jury'
+    id = db.Column(db.Integer, primary_key=True)
+    jury_id = db.Column(db.Integer, db.ForeignKey('jury.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+
 class Competitor(db.Model):
     __tablename__ = 'competitor'
     id = db.Column(db.Integer, primary_key=True)
