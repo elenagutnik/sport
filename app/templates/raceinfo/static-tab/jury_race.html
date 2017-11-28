@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ title }} {% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>{{ title }} </h1>
+</div>
+    <table class="table table-striped">
+     <thead>
+        <tr>
+          <td>#id</td>
+          <td>Фамилия Имя</td>
+          <td>First Name, Last Name</td>
+          <td></td>
+        </tr>
+     </thead>
+     <tbody>
+     {% for j in jury %}
+        <tr>
+          <td>{{ j[0].id }}</td>
+          <td>{{ j[1].ru_lastname }} {{ j[1].ru_firstname }}</td>
+          <td>{{ j[1].en_firstname }} {{ j[1].en_lastname }}</td>
+          <td>
+            <a href="{{ j[0].id }}/del">del</a>
+          </td>
+        </tr>
+        {% endfor %}
+     </tbody>
+    </table>
+    <div class="col-md-4">
+    {{ wtf.quick_form(form) }}
+    </div>
+{% endblock %}

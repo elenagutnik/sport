@@ -42,7 +42,11 @@
                       <li><a href="{{ url_for('raceinfo.race_add') }}">{{ _('Create New Race') }}</a></li>
                       <li><a href="">{{ _('Finished Race') }}</a></li>
                       <li><a href="">{{ _('Opened Race') }}</a></li>
+                      <li><a href="{{ url_for('raceinfo.race_list') }}">{{ _('Race list') }}</a></li>
                     </ul>
+                </li>
+                <li>
+                  <a href="{{ url_for('raceinfo.jury_list', username=current_user.username)}}">{{ _('Jury') }}</a>
                 </li>
                 <li>
                   <a href="#reports">{{ _('Reports') }}</a>

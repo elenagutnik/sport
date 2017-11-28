@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    SelectField, DateField
-from wtforms.validators import Required, Length, Email, Regexp, EqualTo
+    SelectField, DateField, SelectMultipleField
+from wtforms.validators import Required, Length, Email, Regexp, EqualTo, InputRequired
 from wtforms import ValidationError
 from ..models import Role, User
 from .models import *
@@ -53,7 +53,7 @@ class EditTDForm(FlaskForm):
     ru_nation = StringField('Страна')
     en_nation = StringField('Nation')
     tdnumber = StringField('TD Number', validators=[Required()])
-    tdrole_ref = SelectField('TDRole',coerce=int)
+    tdrole_ref = SelectField('TDRole', coerce=int)
 #    tdrole_ref = SelectField('TDRole',choices = [(role.id, role.name) for role in TDRole.query.all()])
 #    tdrole_ref.choices = [(role.id, role.name) for role in TDRole.query.all()]
 #    tdrole_ref.choices = [('1', 'C++'), ('2', 'Python')]
@@ -66,8 +66,8 @@ class EditRaceBase(FlaskForm):
     place = StringField('Place')
     gender_ref = SelectField('Gender', coerce=int)
     nation_ref = SelectField('Nation', coerce=int)
-    category_ref = SelectField('Category',coerce=int)
-    discipline_ref = SelectField('Discipline',coerce=int)
+    category_ref = SelectField('Category', coerce=int)
+    discipline_ref = SelectField('Discipline', coerce=int)
     season = StringField('Season')
     sector = StringField('Sector (AL)')
     codex = StringField('Codex')
@@ -76,5 +76,23 @@ class EditRaceBase(FlaskForm):
     submit = SubmitField('Submit')
 
 class EditRaceJury(FlaskForm):
+    jury_ref = SelectField('Jury', coerce=int, validators=[InputRequired()])
+    jury_function_ref = SelectField('Type', coerce=int, validators=[InputRequired()])
 
-        submit = SubmitField('Submit')
+    # phonenbr = StringField('Phone number')
+    # email = StringField('E-mail', validators=[Email()])
+
+    submit = SubmitField('Add')
+
+class EditJuryBase(FlaskForm):
+    ru_lastname = StringField('Russian surname', validators=[InputRequired()])
+    en_lastname = StringField('English surname', validators=[InputRequired()])
+
+    ru_firstname = StringField('Russian name', validators=[InputRequired()])
+    en_firstname = StringField('English name', validators=[InputRequired()])
+
+    nation_ref = SelectField('Nation', coerce=int, validators=[InputRequired()])
+    phonenbr = StringField('Phone number', validators=[InputRequired()])
+    email = StringField('E-mail', validators=[InputRequired(), Email()])
+
+    submit = SubmitField('Submit')

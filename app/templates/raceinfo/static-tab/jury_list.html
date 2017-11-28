@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - TD List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>TD</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>#id</td>
+      <td>Фамилия Имя</td>
+      <td>First Name, Last Name</td>
+        <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for j in jury %}
+    <tr>
+      <td>{{ j.id }}</td>
+      <td>{{ j.ru_lastname }} {{ j.ru_firstname }}</td>
+      <td>{{ j.en_firstname }} {{ j.en_lastname }}</td>
+      <td>
+        <a href="{{ j.id }}/edit">edit</a>
+        |
+        <a href="{{ j.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-default" href="{{ url_for('.jury_add') }}">Add</a>
+
+{% endblock %}

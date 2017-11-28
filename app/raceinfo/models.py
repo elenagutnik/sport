@@ -20,6 +20,34 @@ class Discipline(db.Model):
     def __repr__(self):
         return self.fiscode
 
+    @staticmethod
+    def insert_discipline():
+        disciplines = {
+            'DH': "Downhill",
+            'SL': "Slalom",
+            'GS': "Giant Slalom",
+            'SG': "Super G",
+            'SC': "Super Combined",
+            'TE': "Team",
+            'KOS': "KO Slalom",
+            'KOG': "KO Giant Slalom",
+            'PGS': "Parallel Giant Slalom",
+            'PSL': "Parallel Slalom",
+            'CE': "City Event",
+            'IND': "Indoor",
+            'P': "Parallel",
+            'CAR': "Carving"
+        }
+        for d in disciplines.keys():
+            discipline = Discipline.query.filter_by(fiscode=d).first()
+            if discipline is None:
+                discipline = Discipline(fiscode=d)
+            discipline.en_name = disciplines[d]
+            discipline.ru_name = disciplines[d]
+            db.session.add(discipline)
+        db.session.commit()
+
+
 class TDRole(db.Model):
     __tablename__ = 'tdrole'
     id = db.Column(db.Integer, primary_key=True)
@@ -78,6 +106,10 @@ class RaceJury(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jury_id = db.Column(db.Integer, db.ForeignKey('jury.id'))
     race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    jury_function_id = db.Column(db.Integer, db.ForeignKey('jury_function.id'))
+    phonenbr = db.Column(db.String)
+    email = db.Column(db.String)
+
 
 class Competitor(db.Model):
     __tablename__ = 'competitor'
@@ -180,3 +212,30 @@ class Mark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(4))
     description = db.Column(db.String(100))
+
+class Jury_function(db.Model):
+    __tablename__ = 'jury_function'
+    id = db.Column(db.Integer, primary_key=True)
+    ru_function = db.Column(db.String)
+    en_function = db.Column(db.String)
+    attribute_values = db.Column(db.String)
+
+    @staticmethod
+    def insert_functions():
+        functions = [
+            'ChiefRace',
+            'Referee',
+            'Assistantreferee',
+            'ChiefCourse',
+            'Startreferee',
+            'Finishreferee',
+            'ChiefTiming'
+        ]
+        for d in functions:
+            discipline = Jury_function.query.filter_by(attribute_values=d).first()
+            if discipline is None:
+                discipline = Jury_function(attribute_values=d)
+            discipline.ru_function = d
+            discipline.en_function = d
+            db.session.add(discipline)
+        db.session.commit()
