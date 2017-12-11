@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    SelectField, DateField, SelectMultipleField
+    SelectField, DateField, SelectMultipleField, IntegerField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo, InputRequired
 from wtforms import ValidationError
 from ..models import Role, User
@@ -81,6 +81,38 @@ class EditRaceJury(FlaskForm):
 
     # phonenbr = StringField('Phone number')
     # email = StringField('E-mail', validators=[Email()])
+
+    submit = SubmitField('Add')
+
+
+class EditCompetitorBase(FlaskForm):
+    ru_lastname = StringField('Russian surname', validators=[InputRequired()])
+    en_lastname = StringField('English surname', validators=[InputRequired()])
+
+    ru_firstname = StringField('Russian name', validators=[InputRequired()])
+    en_firstname = StringField('English name', validators=[InputRequired()])
+
+    fis_code = StringField('English name', validators=[InputRequired()])
+
+    gender_ref = SelectField('Gender', coerce=int, validators=[InputRequired()])
+    birth = DateField('Birthday date', format='%d.%m.%Y')
+    nation_code_ref = SelectField('Nation', coerce=int, validators=[InputRequired()])
+    national_code = StringField('national_code')
+
+    NSA = StringField('NSA')
+    category_ref = SelectField('Category', coerce=int, validators=[InputRequired()])
+
+    points = StringField('Points')# Не понятно
+    fis_points = StringField('Points')
+
+    submit = SubmitField('Submit')
+
+class EditRaceCompetitor(FlaskForm):
+    competitor_ref = SelectField('Competitor', coerce=int, validators=[InputRequired()])
+
+    age_class = StringField('Age class')
+    chip = StringField('Chip')
+    bib = IntegerField('Bib')
 
     submit = SubmitField('Add')
 

@@ -599,11 +599,12 @@ def edit_race_jury(id):
         db.session.commit()
 
     return render_template('raceinfo/static-tab/jury_race.html', form=form, jury=race_jury)
-@raceinfo.route('/race/<int:race_id>/<int:jury_id>/del', methods=['GET', 'POST'])
+@raceinfo.route('/race/<int:race_id>/jury/<int:jury_id>/del', methods=['GET', 'POST'])
 @admin_required
 def remove_race_jury(race_id,jury_id):
     db.session.delete(RaceJury.query.filter_by(id=jury_id).one())
     return redirect(url_for('.edit_race_jury', id=race_id))
+
 @raceinfo.route('/jury_list/', methods=['GET', 'POST'])
 @admin_required
 def jury_list():
@@ -636,3 +637,152 @@ def jury_add():
         flash('The  Jury has been added.')
         return redirect(url_for('.jury_list'))
     return render_template('raceinfo/static-tab/jury_add.html', form=form)
+
+
+
+
+@raceinfo.route('/competitor/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def competitor_list():
+    competitor = Competitor.query.all()
+    return render_template('raceinfo/static-tab/competitors_list.html', competitors=competitor)
+
+@raceinfo.route('/competitor/add/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def competitor_add():
+    form = EditCompetitorBase()
+    if (current_user.lang == 'ru'):
+        form.nation_code_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
+                                                  Nation.query.all()]
+        form.gender_ref.choices = [(item.id, item.ru_name) for item in
+                                   Gender.query.all()]
+    else:
+        form.nation_code_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
+                                                  Nation.query.all()]
+        form.gender_ref.choices = [(item.id, item.en_name) for item in
+                                   Gender.query.all()]
+    form.category_ref.choices = [(item.id, item.name) for item in
+                                Category.query.all()]
+    if form.validate_on_submit():
+        competitor = Competitor(
+        fiscode = form.fis_code.data,
+        ru_firstname = form.ru_firstname.data,
+        en_firstname = form.en_firstname.data,
+        ru_lastname = form.ru_lastname.data,
+        en_lastname = form.en_lastname.data,
+        gender_id = form.gender_ref.data,
+
+        birth = form.birth.data,
+        nation_code_id = form.nation_code_ref.data,
+
+        national_code = form.national_code.data,
+        NSA = form.NSA.data,
+        category_id = form.category_ref.data,
+
+        points = form.points.data,
+        fis_points =form.fis_points.data
+        )
+        db.session.add(competitor)
+        flash('The discipline has been added.')
+        return redirect(url_for('.discipline_list'))
+    return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
+
+@raceinfo.route('/competitor/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def competitor_edit(id):
+    competitor = Competitor.query.get_or_404(id)
+    form = EditCompetitorBase(competitor = competitor)
+    if (current_user.lang == 'ru'):
+        form.nation_code_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
+                                                  Nation.query.all()]
+        form.gender_ref.choices = [(item.id, item.ru_name) for item in
+                                   Gender.query.all()]
+    else:
+        form.nation_code_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
+                                                  Nation.query.all()]
+        form.gender_ref.choices = [(item.id, item.en_name) for item in
+                                   Gender.query.all()]
+    form.category_ref.choices = [(item.id, item.name) for item in
+                                Category.query.all()]
+    if form.validate_on_submit():
+        competitor.fiscode=form.fis_code.data
+        competitor.ru_firstname=form.ru_firstname.data
+        competitor.en_firstname=form.en_firstname.data
+        competitor.ru_lastname=form.ru_lastname.data
+        competitor.en_lastname=form.en_lastname.data
+        competitor.gender_id=form.gender_ref.data
+
+        competitor.birth=form.birth.data
+        competitor.nation_code_id=form.nation_code_ref.data
+
+        competitor.national_code=form.national_code.data
+        competitor.NSA=form.NSA.data
+        competitor.category_id=form.category_ref.data
+
+        competitor.points=form.points.data
+        competitor.fis_points=form.fis_points.data
+        db.session.add(competitor)
+        flash('The discipline has been updated.')
+        return redirect(url_for('.competitor_list'))
+    form.fis_code.data = competitor.fiscode
+    form.ru_firstname.data = competitor.ru_firstname
+    form.en_firstname.data = competitor.en_firstname
+    form.ru_lastname.data = competitor.ru_lastname
+    form.en_lastname.data = competitor.en_lastname
+    form.gender_ref.data = competitor.gender_id
+    form.birth.dat = competitor.birth
+    form.nation_code_ref.data = competitor.nation_code_id
+
+    form.national_code.data = competitor.national_code
+    form.NSA.data = competitor.NSA
+    form.category_ref.data = competitor.category_id
+
+    form.points.data = competitor.points
+    form.fis_points.data = competitor.fis_points
+
+    return render_template('raceinfo/static-tab/comptitors_add.html', form=form, competitor=competitor)
+
+@raceinfo.route('/competitor/<int:id>/del/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def competitor_del(id):
+    competitor = Competitor.query.get_or_404(id)
+    db.session.delete(competitor)
+    flash('The competitor ' + competitor.ru_name + ' has been deleted.')
+    return redirect(url_for('.competitor_list'))
+
+
+
+@raceinfo.route('/race/<int:id>/competitors', methods=['GET', 'POST'])
+@admin_required
+def edit_race_competitor(id):
+    race_competitors = db.session.query(RaceCompetitor, Competitor).\
+        outerjoin(Competitor,  RaceCompetitor.competitor_id==Competitor.id).\
+        filter(RaceCompetitor.race_id==id).all()
+    form = EditRaceCompetitor()
+    if current_user.lang =='ru':
+        form.competitor_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Competitor.query.all()]
+    else:
+        form.competitor_ref.choices = [(item.id, item.en_lastname + ' ' + item.en_firstname) for item in Competitor.query.all()]
+    if form.validate_on_submit():
+        selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
+        raceCompetitor = RaceCompetitor(
+            competitor_id= selected_competitor.id,
+            race_id = id,
+            age_class =form.age_class.data,
+            chip = form.chip.data,
+            bib = form.chip.data
+        )
+        db.session.add(raceCompetitor)
+        db.session.commit()
+
+    return render_template('raceinfo/static-tab/competitors_race.html', form=form, competitors=race_competitors)
+
+@raceinfo.route('/race/<int:race_id>/competitor/<int:jury_id>/del', methods=['GET', 'POST'])
+@admin_required
+def remove_race_competitor(race_id,competitor_id):
+    db.session.delete(RaceCompetitor.query.filter_by(id=competitor_id).one())
+    return redirect(url_for('.edit_race_competitor', id=race_id))

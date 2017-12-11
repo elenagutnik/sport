@@ -17,13 +17,13 @@
         </tr>
      </thead>
      <tbody>
-     {% for j in jury %}
+     {% for c in competitors %}
         <tr>
-          <td>{{ j[0].id }}</td>
-          <td>{{ j[1].ru_lastname }} {{ j[1].ru_firstname }}</td>
-          <td>{{ j[1].en_firstname }} {{ j[1].en_lastname }}</td>
+          <td>{{ c[0].id }}</td>
+          <td>{{ c[1].ru_lastname }} {{ c[1].ru_firstname }}</td>
+          <td>{{ c[1].en_firstname }} {{ c[1].en_lastname }}</td>
           <td>
-            <a href="jury/{{ j[0].id }}/del">del</a>
+            <a href="competitor/{{ c[0].id }}/del">del</a>
           </td>
         </tr>
         {% endfor %}

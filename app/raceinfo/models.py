@@ -115,14 +115,35 @@ class Competitor(db.Model):
     __tablename__ = 'competitor'
     id = db.Column(db.Integer, primary_key=True)
     fiscode = db.Column(db.String)
-    ru_name = db.Column(db.String)
-    en_name = db.Column(db.String)
-    ru_fname = db.Column(db.String)
-    en_fname = db.Column(db.String)
-    #gender = db.Column(db.String(1))
+    ru_firstname = db.Column(db.String)
+    en_firstname = db.Column(db.String)
+    ru_lastname = db.Column(db.String)
+    en_lastname = db.Column(db.String)
+    gender_id = db.Column(db.Integer, db.ForeignKey('gender.id'))#справочник
     birth = db.Column(db.Date)
+    nation_code_id = db.Column(db.Integer, db.ForeignKey('nation.id'))#справочник
+    national_code = db.Column(db.String(1))
+    NSA = db.Column(db.String)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))#справочник
+    points = db.Column(db.Float)
+    fis_points = db.Column(db.Float)
 
 
+class RaceCompetitor(db.Model):
+    __tablename__ = 'race_competitor'
+    id = db.Column(db.Integer, primary_key=True)
+    competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    age_class = db.Column(db.String)
+    chip = db.Column(db.String(1))
+    bib = db.Column(db.Integer)
+    classified = db.Column(db.Boolean)
+    rank = db.Column(db.Integer)
+    status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
+    order = db.Column(db.Integer)
+    run = db.Column(db.String)
+    gate = db.Column(db.String)
+    reason = db.Column(db.String)
 
 class Race(db.Model):
     __tablename__ = 'race'
