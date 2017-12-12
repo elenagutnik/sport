@@ -686,7 +686,7 @@ def competitor_add():
         )
         db.session.add(competitor)
         flash('The discipline has been added.')
-        return redirect(url_for('.discipline_list'))
+        return redirect(url_for('.competitor_list'))
     return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
 
 @raceinfo.route('/competitor/<int:id>/edit', methods=['GET', 'POST'])
@@ -761,7 +761,7 @@ def competitor_del(id):
 def edit_race_competitor(id):
     race_competitors = db.session.query(RaceCompetitor, Competitor).\
         outerjoin(Competitor,  RaceCompetitor.competitor_id==Competitor.id).\
-        filter(RaceCompetitor.race_id==id).all()
+        filter(RaceCompetitor.race_id == id).all()
     form = EditRaceCompetitor()
     if current_user.lang =='ru':
         form.competitor_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Competitor.query.all()]

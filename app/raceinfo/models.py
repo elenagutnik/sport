@@ -135,7 +135,7 @@ class RaceCompetitor(db.Model):
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
     race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
     age_class = db.Column(db.String)
-    chip = db.Column(db.String(1))
+    chip = db.Column(db.String)
     bib = db.Column(db.Integer)
     classified = db.Column(db.Boolean)
     rank = db.Column(db.Integer)

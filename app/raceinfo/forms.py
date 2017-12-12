@@ -86,18 +86,18 @@ class EditRaceJury(FlaskForm):
 
 
 class EditCompetitorBase(FlaskForm):
-    ru_lastname = StringField('Russian surname', validators=[InputRequired()])
-    en_lastname = StringField('English surname', validators=[InputRequired()])
-
+    ru_lastname = StringField('Russian lastname', validators=[InputRequired()])
     ru_firstname = StringField('Russian name', validators=[InputRequired()])
+
+    en_lastname = StringField('English lastname', validators=[InputRequired()])
     en_firstname = StringField('English name', validators=[InputRequired()])
 
-    fis_code = StringField('English name', validators=[InputRequired()])
+    fis_code = StringField('FIS', validators=[InputRequired()])
 
     gender_ref = SelectField('Gender', coerce=int, validators=[InputRequired()])
     birth = DateField('Birthday date', format='%d.%m.%Y')
     nation_code_ref = SelectField('Nation', coerce=int, validators=[InputRequired()])
-    national_code = StringField('national_code')
+    national_code = StringField('National code')
 
     NSA = StringField('NSA')
     category_ref = SelectField('Category', coerce=int, validators=[InputRequired()])
@@ -117,10 +117,10 @@ class EditRaceCompetitor(FlaskForm):
     submit = SubmitField('Add')
 
 class EditJuryBase(FlaskForm):
-    ru_lastname = StringField('Russian surname', validators=[InputRequired()])
-    en_lastname = StringField('English surname', validators=[InputRequired()])
-
+    ru_lastname = StringField('Russian lastname', validators=[InputRequired()])
     ru_firstname = StringField('Russian name', validators=[InputRequired()])
+
+    en_lastname = StringField('English lastname', validators=[InputRequired()])
     en_firstname = StringField('English name', validators=[InputRequired()])
 
     nation_ref = SelectField('Nation', coerce=int, validators=[InputRequired()])
