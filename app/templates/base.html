@@ -46,10 +46,11 @@
                     </ul>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Competitors') }} <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Team') }} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                      <li><a href="{{ url_for('raceinfo.competitor_add') }}">{{ _('Create New Competitor') }}</a></li>
                       <li><a href="{{ url_for('raceinfo.competitor_list') }}">{{ _('Competitors list') }}</a></li>
+                      <li><a href="{{ url_for('raceinfo.coursetter_list') }}">{{ _('Coursetters list') }}</a></li>
+                      <li><a href="{{ url_for('raceinfo.forerunner_list') }}">{{ _('Forerunner list') }}</a></li>
                     </ul>
                 </li>
                 <li>

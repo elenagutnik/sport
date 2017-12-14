@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Race - Course {% endblock %}
+{% block page_content %}
+
+<div class="page-header">
+    <h1>{{ race.eventname }} {{ race.racedate }}</h1>
+    <h4>{{ _('Course list') }}</h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <td>#id</td>
+          <td>Фамилия Имя</td>
+          <td>First Name, Last Name</td>
+            <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for course in race_course %}
+        <tr>
+          <td>{{ course.id }}</td>
+          <td>{{ course.ru_name }} </td>
+          <td>{{ course.en_name }} </td>
+          <td>
+            <a href="course/{{ course.id }}/edit">edit</a>
+            |
+            <a href="course/{{ course.id }}/del">del</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h4>{{ _('Course') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/add">add</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+
+    <h4>{{ _('Course forerunner') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/forerunner">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+
+
+</div>
+{% endblock %}

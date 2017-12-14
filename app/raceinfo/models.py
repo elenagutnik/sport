@@ -90,6 +90,50 @@ class Nation(db.Model):
     def __repr__(self):
         return self.name
 
+class Course(db.Model):
+    __tablename__ = 'course'
+    id = db.Column(db.Integer, primary_key=True)
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    course_coursetter_id = db.Column(db.Integer, db.ForeignKey('coursetter.id'))
+    run = db.Column(db.Integer)
+    ru_name = db.Column(db.String)
+    en_name = db.Column(db.String)
+    homologation = db.Column(db.Integer)
+    length = db.Column(db.Integer)
+    gates = db.Column(db.Integer)
+    tuminggates = db.Column(db.Integer)
+    startelev = db.Column(db.Integer)
+    finishelev = db.Column(db.Integer)
+
+
+class CourseForerunner(db.Model):
+    __tablename__ = 'course_forerunner'
+    id = db.Column(db.Integer, primary_key=True)
+    order = db.Column(db.Integer)
+    forerunner_id = db.Column(db.Integer, db.ForeignKey('forerunner.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+
+
+class Forerunner(db.Model):
+    __tablename__ = 'forerunner'
+    id = db.Column(db.Integer, primary_key=True)
+    ru_lastname = db.Column(db.String)
+    ru_firstname = db.Column(db.String)
+    en_lastname = db.Column(db.String)
+    en_firstname = db.Column(db.String)
+    nation_id = db.Column(db.Integer, db.ForeignKey('nation.id'))
+
+
+class Coursetter(db.Model):
+    __tablename__ = 'coursetter'
+    id = db.Column(db.Integer, primary_key=True)
+    ru_lastname = db.Column(db.String)
+    ru_firstname = db.Column(db.String)
+    en_lastname = db.Column(db.String)
+    en_firstname = db.Column(db.String)
+    nation_id = db.Column(db.Integer, db.ForeignKey('nation.id'))
+
+
 class Jury(db.Model):
     __tablename__ = 'jury'
     id = db.Column(db.Integer, primary_key=True)

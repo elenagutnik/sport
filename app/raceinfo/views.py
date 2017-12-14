@@ -429,6 +429,8 @@ def race(id):
     race.category=Category.query.get(race.category_id)
     race.discipline=Discipline.query.get(race.discipline_id)
     race.nation=Nation.query.get(race.nation_id)
+
+
     return render_template('raceinfo/race_view.html', race=race)
 
 @raceinfo.route('/race/add', methods=['GET', 'POST'])
@@ -786,3 +788,253 @@ def edit_race_competitor(id):
 def remove_race_competitor(race_id,competitor_id):
     db.session.delete(RaceCompetitor.query.filter_by(id=competitor_id).one())
     return redirect(url_for('.edit_race_competitor', id=race_id))
+
+@raceinfo.route('/forerunner/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def forerunner_list():
+    forerunners = Forerunner.query.all()
+    return render_template('raceinfo/static-tab/forerunner_list.html', forerunners=forerunners)
+
+@raceinfo.route('/forerunner/add/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def forerunner_add():
+    form = EditForerunnerBase()
+    if (current_user.lang == 'ru'):
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
+                                                  Nation.query.all()]
+    else:
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
+                                                  Nation.query.all()]
+    if form.validate_on_submit():
+        forerunner = Forerunner(
+            ru_lastname = form.ru_lastname.data,
+            ru_firstname = form.ru_firstname.data,
+            en_lastname = form.en_lastname.data,
+            en_firstname = form.en_firstname.data,
+            nation_id = form.nation_ref.data
+        )
+
+        db.session.add(forerunner)
+        db.session.commit()
+        flash('The forerunner has been added.')
+        return redirect(url_for('.forerunner_list'))
+    return render_template('raceinfo/static-tab/form_page.html', form=form, title="Forerunner add")
+
+@raceinfo.route('/forerunner/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def forerunner_edit(id):
+    form = EditForerunnerBase()
+    forerunner = Forerunner.query.get_or_404(id)
+    if form.validate_on_submit():
+        forerunner.ru_lastname  = form.ru_lastname.data,
+        forerunner.ru_firstname = form.ru_firstname.data,
+        forerunner.en_lastname = form.en_lastname.data,
+        forerunner.en_firstname = form.en_firstname.data,
+        forerunner.nation_id = form.nation_ref.data
+        db.session.add(forerunner)
+        flash('The discipline has been updated.')
+        return redirect(url_for('.competitor_list'))
+    form.ru_lastname.data = forerunner.ru_lastname
+    form.ru_firstname.data = forerunner.ru_firstname
+    form.en_lastname.data = forerunner.en_lastname
+    form.en_firstname.data = forerunner.en_firstname
+    form.nation_ref.data = forerunner.nation_id
+    return render_template('raceinfo/static-tab/form_page.html', form=form, forerunner=forerunner)
+
+@raceinfo.route('/forerunner/<int:id>/del/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def forerunner_del(id):
+    forerunner = Forerunner.query.get_or_404(id)
+    db.session.delete(forerunner)
+    flash('The forerunner ' + forerunner.ru_firstname + ' has been deleted.')
+    return redirect(url_for('.forerunner_list'))
+
+
+@raceinfo.route('/coursetter/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def coursetter_list():
+    coursetter = Coursetter.query.all()
+    return render_template('raceinfo/static-tab/coursetter_list.html', coursetters=coursetter)
+
+@raceinfo.route('/coursetter/add/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def coursetter_add():
+    form = EditCoursetterBase()
+    if (current_user.lang == 'ru'):
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
+                                                  Nation.query.all()]
+    else:
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
+                                                  Nation.query.all()]
+    if form.validate_on_submit():
+        coursetter = Coursetter(
+            ru_lastname=form.ru_lastname.data,
+            ru_firstname=form.ru_firstname.data,
+            en_lastname=form.en_lastname.data,
+            en_firstname=form.en_firstname.data,
+            nation_id=form.nation_ref.data
+        )
+        db.session.add(coursetter)
+        db.session.commit()
+        flash('The coursetter has been added.')
+        return redirect(url_for('.coursetter_list'))
+    return render_template('raceinfo/static-tab/form_page.html',  form=form, title="Coursetter add")
+
+@raceinfo.route('/coursetter/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def coursetter_edit(id):
+    form = EditCoursetterBase()
+    coursetter = Coursetter.query.get_or_404(id)
+    if form.validate_on_submit():
+        coursetter.ru_lastname = form.ru_lastname.data,
+        coursetter.ru_firstname = form.ru_firstname.data,
+        coursetter.en_lastname = form.en_lastname.data,
+        coursetter.en_firstname = form.en_firstname.data,
+        coursetter.nation_id = form.nation_ref.data
+        db.session.add(coursetter)
+        flash('The discipline has been updated.')
+        return redirect(url_for('.competitor_list'))
+    form.ru_lastname.data = coursetter.ru_lastname
+    form.ru_firstname.data = coursetter.ru_firstname
+    form.en_lastname.data = coursetter.en_lastname
+    form.en_firstname.data = coursetter.en_firstname
+    form.nation_ref.data = coursetter.nation_id
+    return render_template('raceinfo/static-tab/form_page.html', form=form, coursetter=coursetter)
+
+@raceinfo.route('/coursetter/<int:id>/del/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def coursetter_del(id):
+    coursetter = Coursetter.query.get_or_404(id)
+    db.session.delete(coursetter)
+    flash('The forerunner ' + coursetter.ru_firstname + ' has been deleted.')
+    return redirect(url_for('.coursetter_list'))
+
+
+@raceinfo.route('/race/<int:id>/course', methods=['GET', 'POST'])
+@admin_required
+def race_сourse_list(id):
+    race = Race.query.filter_by(id=id).one()
+    race_course = Course.query.filter_by(race_id=id)
+    return render_template('raceinfo/course_view.html', race =race, race_course=race_course)
+
+@raceinfo.route('/race/<int:id>/course/add', methods=['GET', 'POST'])
+@admin_required
+def race_сourse_add(id):
+    form = EditCourseBase()
+    if current_user.lang =='ru':
+        form.course_coursetter_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Coursetter.query.all()]
+    else:
+        form.course_coursetter_ref.choices = [(item.id, item.en_lastname + ' ' + item.en_firstname) for item in Coursetter.query.all()]
+    if form.validate_on_submit():
+        course = Course(
+            race_id= id,
+            course_coursetter_id = form.course_coursetter_ref.data,
+            run = form.run.data,
+            ru_name = form.ru_name.data,
+            en_name =form.en_name.data,
+            homologation = form.homologation.data,
+            length = form.length.data,
+            gates = form.gates.data,
+            tuminggates = form.tuminggates.data,
+            startelev = form.startelev.data,
+            finishelev = form.finishelev.data
+        )
+        db.session.add(course)
+        db.session.commit()
+        flash('The course has been added.')
+        return redirect(url_for('.race_сourse_list', id=id))
+    return render_template('raceinfo/static-tab/course_edit.html', form = form)
+
+@raceinfo.route('/race/<int:id>/course/<int:course_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def race_сourse_edit(id, course_id):
+    сourse = Course.query.get_or_404(course_id)
+    form = EditCourseBase()
+    if current_user.lang =='ru':
+        form.course_coursetter_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Coursetter.query.all()]
+    else:
+        form.course_coursetter_ref.choices = [(item.id, item.en_lastname + ' ' + item.en_firstname) for item in Coursetter.query.all()]
+    if form.validate_on_submit():
+        сourse.race_id= id
+        сourse.course_coursetter_id = form.course_coursetter_ref.data
+        сourse.run = form.run.data
+        сourse.ru_name = form.ru_name.data
+        сourse.en_name =form.en_name.data
+        сourse.homologation = form.homologation.data
+        сourse.length = form.length.data
+        сourse.gates = form.gates.data
+        сourse.tuminggates = form.tuminggates.data
+        сourse.startelev = form.startelev.data
+        сourse.finishelev = form.finishelev.data
+        db.session.add(сourse)
+        db.session.commit()
+        flash('The course has been updated.')
+        return redirect(url_for('.race_сourse_list', id=id))
+    form.course_coursetter_ref.data = сourse.course_coursetter_id
+    form.run.data = сourse.run
+    form.ru_name.data = сourse.ru_name
+    form.en_name.data = сourse.en_name
+    form.homologation.data = сourse.homologation
+    form.length.data = сourse.length
+    form.gates.data = сourse.gates
+    form.tuminggates.data = сourse .tuminggates
+    form.startelev.data = сourse.startelev
+    form.finishelev.data = сourse.finishelev
+    return render_template('raceinfo/static-tab/course_edit.html', form = form)
+
+@raceinfo.route('/race/<int:id>/course/<int:course_id>/del', methods=['GET', 'POST'])
+@admin_required
+def race_сourse_del(id, course_id):
+    сourse = Course.query.get_or_404(course_id)
+    db.session.delete(сourse)
+    flash('The сourse ' + сourse.ru_name + ' has been deleted.')
+    return redirect(url_for('.race_сourse_list', id=id))
+
+
+@raceinfo.route('/race/<int:id>/course/forerunner', methods=['GET', 'POST'])
+@admin_required
+def race_сourse_forerunner(id):
+    form = EditCourseForerunnerBase()
+    # course_forerunners = db.session.query(CourseForerunner, Forerunner, Course). \
+    #     outerjoin(Forerunner, CourseForerunner.forerunner_id == Forerunner.id).all(). \
+    #     outerjoin(Course, CourseForerunner.course_id == Course.id). \
+    #     filter(Course.id == id).all()
+    course_forerunners = (db.session.query(CourseForerunner, Forerunner, Course). \
+        join(Forerunner).join(Course).filter(Course.race_id == id)).all()
+    if current_user.lang == 'ru':
+        form.forerunner_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in
+                                       Forerunner.query.all()]
+        form.course_ref.choices = [(item.id, item.ru_name ) for item in
+                                   Course.query.filter_by(race_id=id).all()]
+    else:
+        form.forerunner_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in
+                                       Forerunner.query.all()]
+        form.course_ref.choices = [(item.id, item.ru_name ) for item in
+                                   Course.query.filter_by(race_id=id).all()]
+    if form.validate_on_submit():
+        course_forerunner = CourseForerunner(
+            order=form.order.data,
+            forerunner_id=form.forerunner_ref.data,
+            course_id=form.course_ref.data
+        )
+        db.session.add(course_forerunner)
+        db.session.commit()
+        flash('The course forerunner has been added.')
+        return redirect(url_for('.race_сourse_forerunner', id=id))
+    return render_template('raceinfo/static-tab/cource_forerunner_list.html', course_forerunners=course_forerunners, form = form)
+
+@raceinfo.route('/race/<int:id>/course/forerunner/<int:forerunner_id>/del', methods=['GET', 'POST'])
+@admin_required
+def race_сourse_forerunner_del(id,forerunner_id):
+    course_forerunner = CourseForerunner.query.get_or_404(forerunner_id)
+    db.session.delete(course_forerunner)
+    flash('The forerunner has been deleted.')
+    return redirect(url_for('.race_сourse_forerunner', id=id))

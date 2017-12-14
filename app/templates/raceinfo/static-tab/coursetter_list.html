@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Coursetter List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Coursetters</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>#id</td>
+      <td>Russia name</td>
+      <td>English name</td>
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for coursetter in coursetters %}
+    <tr>
+      <td>{{ coursetter.id }}</td>
+      <td>{{ coursetter.ru_firstname }} {{ coursetter.ru_lastname }}</td>
+      <td>{{ coursetter.en_firstname }} {{ coursetter.en_lastname }}</td>
+        <td>
+        <a href="{{ coursetter.id }}/edit">edit</a>
+        |
+        <a href="{{ coursetter.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-default" href="{{ url_for('.coursetter_add') }}">Add</a>
+{% endblock %}

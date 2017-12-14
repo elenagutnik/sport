@@ -128,3 +128,48 @@ class EditJuryBase(FlaskForm):
     email = StringField('E-mail', validators=[InputRequired(), Email()])
 
     submit = SubmitField('Submit')
+
+
+class EditCourseBase(FlaskForm):
+    course_coursetter_ref = SelectField('Coursetter', coerce=int, validators=[InputRequired()])
+    run = IntegerField('Finishelev')
+    ru_name = StringField('Russian name', validators=[InputRequired()])
+    en_name = StringField('English name', validators=[InputRequired()])
+    homologation =IntegerField('Homologation')
+    length = IntegerField('Length')
+    gates = IntegerField('Gates')
+    tuminggates = IntegerField('Tuminggates')
+    startelev = IntegerField('Startelev')
+    finishelev = IntegerField('Finishelev')
+    submit = SubmitField('Submit')
+
+
+class EditCourseForerunnerBase(FlaskForm):
+    order = IntegerField('Order')
+    forerunner_ref = SelectField('Forerunner', coerce=int, validators=[InputRequired()])
+    course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
+
+class EditForerunnerBase(FlaskForm):
+    ru_lastname = StringField('Russian lastname', validators=[InputRequired()])
+    ru_firstname = StringField('Russian name', validators=[InputRequired()])
+
+    en_lastname = StringField('English lastname', validators=[InputRequired()])
+    en_firstname = StringField('English name', validators=[InputRequired()])
+
+    nation_ref = SelectField('Nation', coerce=int, validators=[InputRequired()])
+
+    submit = SubmitField('Submit')
+
+
+class EditCoursetterBase(FlaskForm):
+    ru_lastname = StringField('Russian lastname', validators=[InputRequired()])
+    ru_firstname = StringField('Russian name', validators=[InputRequired()])
+
+    en_lastname = StringField('English lastname', validators=[InputRequired()])
+    en_firstname = StringField('English name', validators=[InputRequired()])
+
+    nation_ref = SelectField('Nation', coerce=int, validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
