@@ -5,44 +5,79 @@
 {% block page_content %}
 
 <div class="page-header">
-    <h1>{{ race.eventname }} {{ race.racedate }}</h1>
-    <h4>{{ _('Course list') }}</h4>
+    <h1>{{ _(' Course') }}</h1>
+    <h4>{{ _(' Parameters') }}  <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/{{course.id}}/base/edit">edit</a></h4>
+
+    <table class="table table-striped">
+      <tbody>
+        <tr><td>{{ _('Run') }}</td><td>{{ course.run}}</td></tr>
+        <tr><td>{{ _('Russian name') }}</td><td>{{ course.ru_name}}</td></tr>
+        <tr><td>{{ _('English name') }}</td><td>{{ course.en_name}}</td></tr>
+        <tr><td>{{ _('Homologation') }}</td><td>{{ course.homologation}}</td></tr>
+        <tr><td>{{ _('Length') }}</td><td>{{ course.length}}</td></tr>
+        <tr><td>{{ _('Gates') }}</td><td>{{ course.gates}}</td></tr>
+        <tr><td>{{ _('Tuminggates') }}</td><td>{{ course.tuminggates }}</td></tr>
+        <tr><td>{{ _('Startelev') }}</td><td>{{ course.startelev }}</td></tr>
+        <tr><td>{{ _('Finishelev') }}</td><td>{{ course.finishelev }}</td></tr>
+
+      </tbody>
+    </table>
+
+    <h4>{{ _('Course forerunner') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/{{course.id}}/forerunner/add">edit</a></h4>
     <table class="table table-striped">
       <thead>
         <tr>
           <td>#id</td>
-          <td>Фамилия Имя</td>
-          <td>First Name, Last Name</td>
-            <td></td>
+          <td>Russia name</td>
+          <td>English name</td>
+          <td>Order</td>
+          <td></td>
         </tr>
       </thead>
       <tbody>
-        {% for course in race_course %}
+        {% for course_forerunner in course_forerunners %}
         <tr>
-          <td>{{ course.id }}</td>
-          <td>{{ course.ru_name }} </td>
-          <td>{{ course.en_name }} </td>
-          <td>
-            <a href="course/{{ course.id }}/edit">edit</a>
+          <td>{{ course_forerunner[0].id }}</td>
+          <td>{{ course_forerunner[1].ru_firstname }} {{ course_forerunner[1].ru_lastname }}</td>
+          <td>{{ course_forerunner[1].en_firstname }} {{ course_forerunner[1].en_lastname }}</td>
+           <td>{{ course_forerunner[0].order }}</td>
+           <td>
+            <a href="forerunner/{{ course_forerunner[0].id }}/edit">edit</a>
             |
-            <a href="course/{{ course.id }}/del">del</a>
+            <a href="forerunner/{{ course_forerunner[0].id }}/del">del</a>
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-    <h4>{{ _('Course') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/add">add</a></h4>
+
+
+    <h4>{{ _('Intermediate dev') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/{{course.id}}/dev/add">add</a></h4>
     <table class="table table-striped">
+      <thead>
+        <tr>
+          <td>#id</td>
+          <td>Course</td>
+          <td>Order</td>
+          <td>Distance</td>
+          <td></td>
+        </tr>
+      </thead>
       <tbody>
+        {% for item in race_inter_dev %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.order }} </td>
+          <td>{{ item.distance }} </td>
+          <td>
+            <a href="dev/{{ item.id }}/edit">edit</a>
+            |
+            <a href="dev/{{ item.id }}/del">del</a>
+          </td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
-
-    <h4>{{ _('Course forerunner') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/forerunner">edit</a></h4>
-    <table class="table table-striped">
-      <tbody>
-      </tbody>
-    </table>
-
 
 </div>
 {% endblock %}

@@ -34,20 +34,31 @@
       <tbody>
       </tbody>
     </table>
-
-    <h4>{{ _('Competitors') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/competitors">edit</a></h4>
-    <table class="table table-striped">
-      <tbody>
-      </tbody>
-    </table>
-
+    {% if race.isTeam %}
+        <h4>{{ _('Team') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/team">edit</a></h4>
+        <table class="table table-striped">
+          <tbody>
+          </tbody>
+        </table>
+    {% else %}
+        <h4>{{ _('Competitors') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/competitors">edit</a></h4>
+        <table class="table table-striped">
+          <tbody>
+          </tbody>
+        </table>
+    {% endif %}
     <h4>{{ _('Course') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course">edit</a></h4>
     <table class="table table-striped">
       <tbody>
       </tbody>
     </table>
+    <h4>{{ _('Runs') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/run">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
 
-    <h4>{{ _('Additional Parameters') }}</h4>
+    <h4>{{ _('Additional Parameters') }}  <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/additional">edit</a></h4>
     <table class="table table-striped">
       <tbody>
       </tbody>

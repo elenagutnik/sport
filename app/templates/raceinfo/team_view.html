@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Race - Team {% endblock %}
+{% block page_content %}
+
+<div class="page-header">
+    <h1>{{ race.eventname }} {{ race.racedate }}</h1>
+    <h4>{{ _('Team list') }}</h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <td>#id</td>
+          <td>Team name</td>
+            <td>Team name</td>
+            <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in race_team %}
+        <tr>
+          <td>{{ team[0].id }}</td>
+          <td>{{ team[1].ru_teamname }} </td>
+          <td>{{ team[1].en_teanname }} </td>
+          <td>
+            <a href="course/{{ course.id }}/edit">edit</a>
+            |
+            <a href="course/{{ course.id }}/del">del</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h4>{{ _('Team') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/team/add">add</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+    <h4>{{ _('Competitors') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/competitors">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+</div>
+{% endblock %}

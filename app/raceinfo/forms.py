@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    SelectField, DateField, SelectMultipleField, IntegerField
+    SelectField, DateField, SelectMultipleField, IntegerField, DateTimeField
+from wtforms_components import TimeField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo, InputRequired
 from wtforms import ValidationError
 from ..models import Role, User
@@ -45,6 +46,18 @@ class EditCategoryForm(FlaskForm):
     level = StringField('Level (Integer 0-4)')
     submit = SubmitField('Submit')
 
+class EditWeatherForm(FlaskForm):
+    race_ref = SelectField('Race', coerce=int)
+    time = DateTimeField('Time')
+    place = StringField('Description')
+    weather = StringField('Description')
+    snow = StringField('Description')
+    temperatureair = IntegerField('Bib')
+    temperaturesnow = IntegerField('Bib')
+    humiditystart = IntegerField('Bib')
+    windspeed = IntegerField('Bib')
+
+
 class EditTDForm(FlaskForm):
     ru_firstname = StringField('Имя', validators=[Required()])
     en_firstname = StringField('First Name')
@@ -62,6 +75,7 @@ class EditTDForm(FlaskForm):
 
 class EditRaceBase(FlaskForm):
     eventname = StringField('Event Name (in FIS Calendar)', validators=[Required()])
+    race_type = SelectField('Race type', choices=[('True', 'Team competition'), ('False', 'Individual competition')])
     racedate = DateField('Race date', format='%d.%m.%Y')
     place = StringField('Place')
     gender_ref = SelectField('Gender', coerce=int)
@@ -74,6 +88,21 @@ class EditRaceBase(FlaskForm):
     speedcodex = StringField('Race codex of speed race for Super Combined')
     training = StringField('Number of Training')
     submit = SubmitField('Submit')
+
+class EditRaceAdditional(FlaskForm):
+    usedfislist = StringField('Used fis list')
+    appliedpenalty = StringField('Applied penalty')
+    calculatedpenalty = IntegerField('Calculated penalty')
+    fvalue = IntegerField('Fvalue')
+    # - - Course
+    # - - Weather
+    timingby = StringField('Timing by')
+    dataprocessingby = StringField('Data processing by')
+    softwarecompany = StringField('Software company')
+    softwarename = StringField('Software name')
+    softwareversion = StringField('Software version')
+    submit = SubmitField('Submit')
+
 
 class EditRaceJury(FlaskForm):
     jury_ref = SelectField('Jury', coerce=int, validators=[InputRequired()])
@@ -107,6 +136,8 @@ class EditCompetitorBase(FlaskForm):
 
     submit = SubmitField('Submit')
 
+
+
 class EditRaceCompetitor(FlaskForm):
     competitor_ref = SelectField('Competitor', coerce=int, validators=[InputRequired()])
 
@@ -115,6 +146,9 @@ class EditRaceCompetitor(FlaskForm):
     bib = IntegerField('Bib')
 
     submit = SubmitField('Add')
+
+class EditRaceCompetitorTeamForm(EditRaceCompetitor):
+    team_ref = SelectField('Team', coerce=int, validators=[InputRequired()])
 
 class EditJuryBase(FlaskForm):
     ru_lastname = StringField('Russian lastname', validators=[InputRequired()])
@@ -147,7 +181,7 @@ class EditCourseBase(FlaskForm):
 class EditCourseForerunnerBase(FlaskForm):
     order = IntegerField('Order')
     forerunner_ref = SelectField('Forerunner', coerce=int, validators=[InputRequired()])
-    course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
+    # course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
     submit = SubmitField('Submit')
 
 
@@ -173,3 +207,33 @@ class EditCoursetterBase(FlaskForm):
     nation_ref = SelectField('Nation', coerce=int, validators=[InputRequired()])
     submit = SubmitField('Submit')
 
+class EditTeamForm(FlaskForm):
+
+    fis_code = StringField('fis code', validators=[InputRequired()])
+    en_teamname = StringField('English name', validators=[InputRequired()])
+    ru_teamname = StringField('Russian name', validators=[InputRequired()])
+    nation_ref = SelectField('Nation', coerce=int)
+
+    submit = SubmitField('Submit')
+
+
+class EditRaceTeamForm(FlaskForm):
+    team_ref = SelectField('Team', coerce=int, validators=[InputRequired()])
+    bib = IntegerField('Bib', validators=[InputRequired()])
+    # classified = BooleanField('Classified', validators=[InputRequired()])
+
+    submit = SubmitField('Submit')
+
+class EditRunInfoForm(FlaskForm):
+    course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
+    number = IntegerField('Number', validators=[InputRequired()])
+
+    starttime = TimeField('Start time', format='%H:%M:%S', validators=[InputRequired()])
+    endtime = TimeField('End time', format='%H:%M:%S',validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
+class EditIntermediateDevForm(FlaskForm):
+    # course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
+    order = IntegerField('Order', validators=[InputRequired()])
+    distance = IntegerField('Distance', validators=[InputRequired()])
+    submit = SubmitField('Submit')

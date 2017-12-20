@@ -11,6 +11,20 @@ class Gender(db.Model):
     def __repr__(self):
         return self.fiscode
 
+    @staticmethod
+    def insert_genders():
+        genders = ['Male', "Female"]
+        for d in genders:
+            gender = Gender.query.filter_by(fiscode=d).first()
+            if gender is None:
+                gender = Gender(fiscode=d)
+            gender.en_name = d
+            gender.ru_name = d
+            gender.fiscode = d
+            db.session.add(gender)
+        db.session.commit()
+
+
 class Discipline(db.Model):
     __tablename__ = 'discipline'
     id = db.Column(db.Integer, primary_key=True)
@@ -186,8 +200,12 @@ class RaceCompetitor(db.Model):
     status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
     order = db.Column(db.Integer)
     run = db.Column(db.String)
+    # переделать в связь с run_info, team_id
     gate = db.Column(db.String)
     reason = db.Column(db.String)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+
+
 
 class Race(db.Model):
     __tablename__ = 'race'
@@ -243,6 +261,9 @@ class Race(db.Model):
     softwareversion = db.Column(db.String)
     # - AL_classified
     # - AL_notclassified
+
+
+    isTeam = db.Column(db.Boolean)
 
     def __repr__(self):
         return self.name
@@ -304,3 +325,41 @@ class Jury_function(db.Model):
             discipline.en_function = d
             db.session.add(discipline)
         db.session.commit()
+
+class RunInfo(db.Model):
+    __tablename__ = 'run_info'
+    id = db.Column(db.Integer, primary_key=True)
+
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+
+    number = db.Column(db.Integer)
+    starttime = db.Column(db.Time)
+    endtime = db.Column(db.Time)
+
+class Team(db.Model):
+    __tablename__ = 'team'
+    id = db.Column(db.Integer, primary_key=True)
+    fis_code = db.Column(db.String)
+    en_teamname = db.Column(db.String)
+    ru_teamname = db.Column(db.String)
+    nation_id = db.Column(db.Integer, db.ForeignKey('nation.id'))
+
+class RaceTeam(db.Model):
+    __tablename__ = 'race_team'
+    id = db.Column(db.Integer, primary_key=True)
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    bib = db.Column(db.Integer)
+    classified = db.Column(db.Boolean)
+    en_teamname = db.Column(db.String)
+    ru_teamname = db.Column(db.String)
+
+class Intermediate_dev(db.Model):
+    __tablename__ = 'intermediate_dev'
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    order = db.Column(db.Integer)
+    distance = db.Column(db.Integer)
+
