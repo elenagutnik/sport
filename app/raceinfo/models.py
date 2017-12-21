@@ -356,10 +356,38 @@ class RaceTeam(db.Model):
     en_teamname = db.Column(db.String)
     ru_teamname = db.Column(db.String)
 
-class Intermediate_dev(db.Model):
-    __tablename__ = 'intermediate_dev'
+class CourseDevice(db.Model):
+    __tablename__ = 'course_device'
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     order = db.Column(db.Integer)
     distance = db.Column(db.Integer)
+    device_id = db.Column(db.Integer, db.ForeignKey('device.id'))
+    course_device_type_id = db.Column(db.Integer, db.ForeignKey('course_device_type.id'))
 
+class Device(db.Model):
+    __tablename__ = 'device'
+    id = db.Column(db.Integer, primary_key=True)
+    src_dev = db.Column(db.String)
+    name = db.Column(db.String)
+    type_id = db.Column(db.Integer, db.ForeignKey('device_type.id'))
+
+class DeviceType(db.Model):
+    __tablename__ = 'device_type'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+
+class CourseDeviceType(db.Model):
+    __tablename__ = 'course_device_type'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+
+    @staticmethod
+    def insert_types():
+        course_device_types = ['Start', 'Finish', 'Point']
+        for d in course_device_types:
+            device_type = CourseDeviceType.query.filter_by(name=d).first()
+            if device_type is None:
+                device_type = CourseDeviceType(name=d)
+            db.session.add(device_type)
+        db.session.commit()

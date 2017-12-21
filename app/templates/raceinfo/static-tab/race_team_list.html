@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Team{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>{{ race.eventname }} {{ race.racedate }}</h1>
+</div>
+    <h4>{{ _('Team list') }} <a class="btn btn-default" href="{{ url_for('.race_team_add', id=race.id) }}">Add</a></h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <td>#id</td>
+          <td>Team name</td>
+            <td>Team name</td>
+            <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in race_team %}
+        <tr>
+          <td>{{ team[0].id }}</td>
+          <td>{{ team[1].ru_teamname }} </td>
+          <td>{{ team[1].en_teanname }} </td>
+          <td>
+            <a href="team/{{ team[0].id }}/edit">edit</a>
+            |
+            <a href="team/{{ team[0].id }}/del">del</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+{% endblock %}

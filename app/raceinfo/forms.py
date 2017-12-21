@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    SelectField, DateField, SelectMultipleField, IntegerField, DateTimeField
+    SelectField, DateField, SelectMultipleField, IntegerField, DateTimeField, HiddenField
 from wtforms_components import TimeField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo, InputRequired
 from wtforms import ValidationError
@@ -148,7 +148,7 @@ class EditRaceCompetitor(FlaskForm):
     submit = SubmitField('Add')
 
 class EditRaceCompetitorTeamForm(EditRaceCompetitor):
-    team_ref = SelectField('Team', coerce=int, validators=[InputRequired()])
+    team_ref = HiddenField('Team', validators=[InputRequired()])
 
 class EditJuryBase(FlaskForm):
     ru_lastname = StringField('Russian lastname', validators=[InputRequired()])
@@ -221,7 +221,6 @@ class EditRaceTeamForm(FlaskForm):
     team_ref = SelectField('Team', coerce=int, validators=[InputRequired()])
     bib = IntegerField('Bib', validators=[InputRequired()])
     # classified = BooleanField('Classified', validators=[InputRequired()])
-
     submit = SubmitField('Submit')
 
 class EditRunInfoForm(FlaskForm):
@@ -232,8 +231,23 @@ class EditRunInfoForm(FlaskForm):
     endtime = TimeField('End time', format='%H:%M:%S',validators=[InputRequired()])
     submit = SubmitField('Submit')
 
-class EditIntermediateDevForm(FlaskForm):
+class EditCourseDeviceForm(FlaskForm):
     # course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
     order = IntegerField('Order', validators=[InputRequired()])
+    course_device_type_ref = SelectField('Device type', coerce=int, validators=[InputRequired()])
+    device_ref = SelectField('Device', coerce=int, validators=[InputRequired()])
     distance = IntegerField('Distance', validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
+
+class EditDeviceForm(FlaskForm):
+    src_dev = StringField('src dev', validators=[InputRequired()])
+    name = StringField('Name', validators=[InputRequired()])
+    type_ref = SelectField('Type', coerce=int,  validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
+
+
+class EditDeviceTypeForm(FlaskForm):
+    name = StringField('Name', validators=[InputRequired()])
     submit = SubmitField('Submit')

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Devices types List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Devices types list</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>#id</td>
+      <td>Name</td>
+
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for device in devices %}
+    <tr>
+      <td>{{ device.id }}</td>
+      <td>{{ device.name }}</td>
+       <td>
+        <a href="{{ device.id }}/edit">edit</a>
+        |
+        <a href="{{ device.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h4>{{ _('Add new device') }}</h4>
+
+<div class="col-md-4">
+    {{ wtf.quick_form(form) }}
+</div>
+{% endblock %}
