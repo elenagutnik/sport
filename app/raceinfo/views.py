@@ -1236,9 +1236,10 @@ def race_run_add(id):
             race_id=id,
             course_id=form.course_ref.data,
             number=form.number.data,
-            starttime=form.starttime.data,
-            endtime=form.endtime.data
+
         )
+        run_info.starttime = form.starttime.data
+        run_info.endtime = form.endtime.data
         db.session.add(run_info)
         db.session.commit()
         flash('The run has been added.')
@@ -1249,7 +1250,7 @@ def race_run_add(id):
 @admin_required
 def race_run_edit(id,run_id):
     form = EditRunInfoForm()
-    run_info = RunInfo.query.filter(id==run_id).one()
+    run_info = RunInfo.query.filter_by(id=run_id).one()
     if current_user.lang == 'ru':
         form.course_ref.choices = [(item.id, item.ru_name ) for item in
                                    Course.query.filter_by(race_id=id).all()]
@@ -1323,12 +1324,12 @@ def race_сourse_dev_edit(id,course_id, dev_id):
         dev.device_id = form.device_ref.data,
         dev.course_device_type_id = form.course_device_type_ref.data
 
-        db.session.add(intermediate_dev)
-        flash('The intermediate dev has been added.')
+        db.session.add(dev)
+        flash('The device has been added.')
         return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id))
-    form.course_ref.data = intermediate_dev.course_id
-    form.order.data = intermediate_dev.order
-    form.distance.data = intermediate_dev.distance
+    form.course_ref.data = dev.course_id
+    form.order.data = dev.order
+    form.distance.data = dev.distance
     form.device_ref.data = dev.device_id
     form.course_device_type_ref.data=dev.course_device_type_id
 
@@ -1508,4 +1509,23 @@ def device_type_del(id):
     db.session.delete(device)
     flash('The device has been deleted.')
     return redirect(url_for('.device_type'))
+
+
+@raceinfo.route('/race/<int:id>/order_list/buld', methods=['GET', 'POST'])
+@admin_required
+def race_order_list(id):
+    race=Race.query.filter_by(id=id).one()
+    run = RunInfo.query.filter_by(race_id=id, number=1).one()
+    orders_list = db.session.query(Competitor,RaceCompetitor,RunOrder).join(RaceCompetitor).join(RunOrder).filter(RunOrder.run_id==run.id).all()
+    race_competitors = db.session.query(RaceCompetitor, RunInfo).join(RunInfo).filter(RaceCompetitor.race_id==id, RunInfo.number==1).all()
+    if len(orders_list)== 0:
+        for i in range(len(race_competitors)):
+            run_order = RunOrder(
+                race_competitor_id = race_competitors[i][0].id,
+                run_id= race_competitors[i][0].run_id,
+                order= i+1
+            )
+            db.session.add(run_order)
+
+    return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=orders_list)
 

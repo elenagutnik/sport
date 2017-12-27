@@ -1,0 +1,82 @@
+<html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+</html>
+<script>
+var startlist=["1","2","4","6","8","10"]; //стартовый список
+var devlist=[  //список устройств
+		{
+			src_sys:'sys0001',
+			src_dev:'start0001',
+		},
+		{
+			src_sys:'sys0001',
+			src_dev:'int0002',
+		},
+		{
+			src_sys:'sys0001',
+			src_dev:'int0003',
+		},
+		{
+			src_sys:'sys0001',
+			src_dev:'int0004',
+		},
+		{
+			src_sys:'sys0001',
+			src_dev:'int0005',
+		},
+		{
+			src_sys:'sys0001',
+			src_dev:'finish0006',
+		}
+	];
+
+reqSend(0,0,0);
+function reqSend(snum,devnum,starttime){
+	var t=new Date().getTime() ; // 12.850 - 12.859
+	if(starttime==0)
+		starttime= new Date().getTime();
+	$("#data").append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+t+"</td></tr>");
+	$.ajax({
+		  url: "/raceinfo/input/data",
+		  dataType: 'json',
+		  data: { data: JSON.stringify({
+			  'src_sys':devlist[devnum].src_sys,
+			  'src_dev':devlist[devnum].src_dev,
+			  'bib':startlist[snum],
+			  'eventcode':'x3',
+			  'time':t,
+			  'reserved':''
+			  })}
+		}).done(function() {
+//			  $( this ).addClass( "done" );
+		});
+
+	var sectordelay=1000; //1sec
+//	console.log(snum,devnum,starttime);
+
+	if(devnum==devlist.length-1){
+		devnum=0;
+		snum++;
+		starttime=0;
+	}
+	else devnum++;
+	if(snum<=startlist.length-1)
+		setTimeout(reqSend, sectordelay+(Math.random()*1000), snum, devnum,starttime);
+
+
+}
+
+</script>
+<!--
+<input type="button" onclick="clearInterval(intervalID);" value="stop"> |
+<input type="text" id="delay_val" value="100"><input type="button" value="change delay" onclick="delay=$('#delay_val').val();clearInterval(intervalID);intervalID = window.setInterval(reqSend, delay);">
+ -->
+<HR>
+<table id="data" style="width:49%; float:left">
+<tr><td>bib</td><td>src_dev</td><td>src_sys</td><td>timedif ()</td><td>current timestamp (ms)</td></tr>
+</table>
+<!-- <table id="log" style="width:49%; margin-left:1%; float:left">
+<tr><td>#</td><td>delay</td><td>time s.ms</td></tr>
+</table>
+ -->
+ </html>

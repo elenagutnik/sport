@@ -7,6 +7,7 @@ from flask_login import LoginManager
 from config import config
 from flask_babel import Babel
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_socketio import SocketIO
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -14,6 +15,8 @@ moment = Moment()
 db = SQLAlchemy()
 babel = Babel()
 dtb = DebugToolbarExtension()
+socketio = SocketIO()
+
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
@@ -32,6 +35,7 @@ def create_app(config_name):
     db.init_app(app)
     login_manager.init_app(app)
     dtb.init_app(app)
+    socketio.init_app(app)
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)

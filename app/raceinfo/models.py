@@ -199,7 +199,7 @@ class RaceCompetitor(db.Model):
     rank = db.Column(db.Integer)
     status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
     order = db.Column(db.Integer)
-    run = db.Column(db.String)
+    run_id =db.Column(db.Integer, db.ForeignKey('run_info.id'))
     # переделать в связь с run_info, team_id
     gate = db.Column(db.String)
     reason = db.Column(db.String)
@@ -391,3 +391,41 @@ class CourseDeviceType(db.Model):
                 device_type = CourseDeviceType(name=d)
             db.session.add(device_type)
         db.session.commit()
+
+
+class DataIn(db.Model):
+    __tablename__ = 'data_in'
+    id = db.Column(db.Integer, primary_key=True)
+    dt = db.Column(db.DateTime)
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+
+    src_sys = db.Column(db.String)
+    src_dev = db.Column(db.String)
+    bib = db.Column(db.Integer)
+    event_code = db.Column(db.String)
+    time = db.Column(db.BigInteger)
+    reserved = db.Column(db.String)
+
+class ResultDetail(db.Model):
+    __tablename__ = 'result_detail'
+    id = db.Column(db.Integer, primary_key=True)
+    course_device_id = db.Column(db.Integer, db.ForeignKey('course_device.id'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    diff = db.Column(db.BigInteger)
+    time = db.Column(db.BigInteger)
+    rank = db.Column(db.Integer)
+    speed = db.Column(db.Float)
+    sectortime = db.Column(db.BigInteger)
+    sectordiff = db.Column(db.BigInteger)
+    sectorrank = db.Column(db.Integer)
+
+    absolut_time = db.Column(db.BigInteger)
+    is_start = db.Column(db.Boolean)
+
+class RunOrder(db.Model):
+    __tablename__ = 'run_order'
+    id = db.Column(db.Integer, primary_key=True)
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    order = db.Column(db.Integer)

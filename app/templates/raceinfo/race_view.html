@@ -23,12 +23,14 @@
         <tr><td>{{ _('Number of Training') }}</td><td>{{ race.training }}</td></tr>
       </tbody>
     </table>
-    <h4>{{ _('Jury') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/jury">edit</a></h4>
-    <table class="table table-striped">
-      <tbody>
-      </tbody>
-    </table>
-
+    <div class="row">
+        <div class="col-lg-6">
+            <h4>{{ _('Jury') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/jury">edit</a></h4>
+        </div>
+        <div class="col-lg-6">
+            <h4>{{ _('Order list') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/order_list/buld">build</a></h4>
+        </div>
+    </div>
     <h4>{{ _('Technical Delegates') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/td">edit</a></h4>
     <table class="table table-striped">
       <tbody>

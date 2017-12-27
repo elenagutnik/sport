@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Gender List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <a href="/raceinfo/race/{{ race.id }}" class="pull-right">Race page</a>
+    <h1>Order list {{ race.eventname }}</h1>
+    <h2>Run number: {{ run.number }}</h2>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>#id</td>
+      <td>Name</td>
+      <td>Order</td>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for competitor in competitors %}
+    <tr>
+      <td>{{ competitor[2].id }}</td>
+      <td>{{ competitor[0].en_firstname }} {{ competitor[0].en_lastname }}</td>
+      <td>{{ competitor[2].order }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

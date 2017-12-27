@@ -20,3 +20,4 @@ itsdangerous==0.24
 python-editor==1.0.3
 wtforms-components==0.10.3
 uWSGI==2.0.15
+flask_socketio==1.8.4
