@@ -28,7 +28,6 @@ def load_data():
         filter(CourseDevice.device_id==device.id,
                CourseDevice.course_id==run.course_id).one()
 
-
     competitor = RaceCompetitor.query.filter_by(bib=data['bib']).one()
 
 
@@ -82,7 +81,8 @@ def load_data():
             result.sectordiff = result.sectortime - best_result.sectortime
     db.session.add(result)
 
-    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor).join(RaceCompetitor).join(Competitor).filter(ResultDetail.course_device_id == course_device[0].id).all()
+    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType).join(RaceCompetitor).join(Competitor).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.course_device_id == course_device[0].id).all()
+
     tmp=json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
     socketio.emit("newData", tmp)
     input_data = DataIn(
@@ -110,3 +110,6 @@ def emulation():
 @raceinfo.route('/receiver')
 def receiver():
     return render_template('receiver.html')
+@raceinfo.route('/receiver_jury')
+def receiver_jury():
+    return render_template('receiver_jury.html')
