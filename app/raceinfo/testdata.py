@@ -2,6 +2,7 @@ from . import raceinfo
 from .models import *
 from datetime import datetime
 import random
+from ..models import Role
 @raceinfo.route('/test_data/', methods=['GET', 'POST'])
 def insert_test_data():
     strings=['name', 'surname']
@@ -16,7 +17,7 @@ def insert_test_data():
             en_firstname = strings[0]+str(i),
             ru_lastname = strings[1]+str(i),
             en_lastname = strings[1]+str(i),
-            gender_id = random.randint(5,6),
+            gender_id = random.randint(3,4),
 
             birth = birth_date,
             nation_code_id = 1,

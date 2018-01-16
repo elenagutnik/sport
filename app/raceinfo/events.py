@@ -2,6 +2,7 @@ from .. import socketio
 from .models import *
 from . import raceinfo
 from .. import db
+
 from . import jsonencoder
 import json
 from sqlalchemy import cast, TIME
@@ -31,13 +32,7 @@ def load_data():
 
     competitor = RaceCompetitor.query.filter_by(bib=data['bib']).one()
 
-
-
-
-
     results = ResultDetail.query.filter(ResultDetail.course_device_id==course_device[0].id).all()
-
-
 
     result = ResultDetail(
         course_device_id=course_device[0].id,
@@ -82,8 +77,8 @@ def load_data():
             result.sectordiff = result.sectortime - best_result.sectortime
     db.session.add(result)
 
-    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor).join(RaceCompetitor).join(Competitor).filter(ResultDetail.course_device_id == course_device[0].id).all()
-    tmp=json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
+    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor,CourseDevice,CourseDeviceType).join(RaceCompetitor).join(Competitor).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.course_device_id == course_device[0].id).all()
+    tmp = json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
     socketio.emit("newData", tmp)
     input_data = DataIn(
         src_sys=data['src_sys'],
@@ -110,3 +105,5 @@ def emulation():
 @raceinfo.route('/receiver')
 def receiver():
     return render_template('receiver.html')
+
+
