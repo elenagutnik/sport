@@ -50,8 +50,8 @@ function reqSend(snum,devnum,starttime){
 		}).done(function() {
 //			  $( this ).addClass( "done" );
 		});
-
-	var sectordelay=1000; //1sec
+	alert("dev=" + devlist[devnum].src_dev + " bib=" + startlist[snum] + " time="+t);
+	var sectordelay=250; //1sec
 //	console.log(snum,devnum,starttime);
 
 	if(devnum==devlist.length-1){
@@ -61,7 +61,7 @@ function reqSend(snum,devnum,starttime){
 	}
 	else devnum++;
 	if(snum<=startlist.length-1)
-		setTimeout(reqSend, sectordelay+(Math.random()*1000), snum, devnum,starttime);
+		setTimeout(reqSend, sectordelay+(Math.random()*240), snum, devnum,starttime);
 
 
 }
