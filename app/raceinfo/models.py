@@ -293,6 +293,35 @@ class Status(db.Model):
     name = db.Column(db.String(4))
     description = db.Column(db.String(100))
 
+    @staticmethod
+    def insert():
+        status = {
+            'QLF': "Qualified",
+            'DNS': "Did not start ",
+            'DNS1': "Did not start run 1",
+            'DNS2': "Did not start run 2",
+            'DSQ': "Disqualified",
+            'DSQ1': "Disqualified run 1",
+            'DSQ2': "Disqualified run 2",
+            'DNF': "Did not finish ",
+            'DNF1': "Did not finish run 1",
+            'DNF2': "Did not finish run 2",
+            'DNQ': "Did not qualify",
+            'DNQ1': "Did not qualify run 1",
+            'DPO': "Doping offense ",
+            'NPS': "Not permitted to start ",
+            'DQB': "Disqualification for unsportsmanlike behavior",
+            'DQO': "Disqualified for over quota"
+        }
+        for d in status.keys():
+            stts = Status.query.filter_by(name=d).first()
+            if stts is None:
+                stts = Status(name=d)
+                stts.description = status[d]
+            db.session.add(stts)
+        db.session.commit()
+
+
 class Mark(db.Model):
     __tablename__ = 'mark'
     id = db.Column(db.Integer, primary_key=True)
@@ -422,6 +451,22 @@ class ResultDetail(db.Model):
 
     absolut_time = db.Column(db.BigInteger)
     is_start = db.Column(db.Boolean)
+
+class Result(db.Model):
+    __tablename__ = 'result'
+    id = db.Column(db.Integer, primary_key=True)
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
+    approve_time = db.Column(db.DateTime)
+    timerun1 = db.Column(db.BigInteger)
+    timerun2 = db.Column(db.BigInteger)
+    timerun3 = db.Column(db.BigInteger)
+    diff = db.Column(db.BigInteger)
+    racepoints = db.Column(db.BigInteger)
+    level = db.Column(db.Integer)
+    approve_user = db.Column(db.Integer, db.ForeignKey('users.id'))
+    is_manuale = db.Column(db.Boolean)
+
 
 class RunOrder(db.Model):
     __tablename__ = 'run_order'

@@ -8,8 +8,8 @@ import json
 from sqlalchemy import cast, TIME
 import time
 from operator import attrgetter
-
-
+from flask_login import current_user
+from datetime import datetime
 from flask import request, abort, render_template
 
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
@@ -98,7 +98,27 @@ def load_data():
     # except:
     #     abort(500)
 
-
+@raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
+def approve_manual(run_id, competitor_id):
+    data = json.loads(request.args['data'])
+    status = Status.query.filter_by(name='QLF').one()
+    run = RunInfo.query.filter_by(id=run_id).one()
+    result = Result(
+        is_manuale=False,
+        approve_user=current_user.id,
+        approve_time=datetime.now(),
+        race_competitor_id=competitor_id,
+        status_id=status.id
+    )
+    if run.number == 1:
+        result.timerun1 = data['absolut_time']
+    elif run.number == 2:
+        result.timerun2 = data['absolut_time']
+    else:
+        result.timerun3 = data['absolut_time']
+    db.session.add(result)
+    db.session.commit()
+    return '', 200
 
 @raceinfo.route('/emulation')
 def emulation():
@@ -110,4 +130,3 @@ def receiver():
 @raceinfo.route('/receiver_jury')
 def receiver_jury():
     return render_template('receiver_jury.html')
-
