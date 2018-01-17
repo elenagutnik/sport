@@ -79,7 +79,7 @@ def load_data():
 
     final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType).join(RaceCompetitor).join(Competitor).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.course_device_id == course_device[0].id).all()
 
-    tmp=json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
+    tmp = json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
     socketio.emit("newData", tmp)
     input_data = DataIn(
         src_sys=data['src_sys'],
@@ -129,4 +129,7 @@ def receiver():
 
 @raceinfo.route('/receiver_jury')
 def receiver_jury():
-    return render_template('receiver_jury.html')
+    run = RunInfo.query.filter(cast(RunInfo.starttime, TIME) < datetime.now().time()).one()
+    devices = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == run.course_id).all()
+
+    return render_template('receiver_jury.html', devices=json.dumps(devices, cls=jsonencoder.AlchemyEncoder), run=json.dumps(run, cls=jsonencoder.AlchemyEncoder))
