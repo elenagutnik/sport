@@ -5,7 +5,7 @@ from .. import db
 
 from . import jsonencoder
 import json
-from sqlalchemy import cast, TIME
+from sqlalchemy import cast, TIME, DATE
 import time
 from operator import attrgetter
 from flask_login import current_user
@@ -23,7 +23,7 @@ def load_data():
     course_devices = db.session.query(CourseDevice.course_id).filter_by(device_id=device.id)
     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
     # Заезд с пришли данные
-    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), cast(RunInfo.starttime, TIME) < datetime.now().time()).one()
+    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now()).one()
     # Сам девайс с которого пришли данные
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
         filter(CourseDevice.device_id==device.id,
@@ -129,7 +129,20 @@ def receiver():
 
 @raceinfo.route('/receiver_jury')
 def receiver_jury():
-    run = RunInfo.query.filter(cast(RunInfo.starttime, TIME) < datetime.now().time()).one()
-    devices = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == run.course_id).all()
+    return render_template('receiver_jury.html')
 
-    return render_template('receiver_jury.html', devices=json.dumps(devices, cls=jsonencoder.AlchemyEncoder), run=json.dumps(run, cls=jsonencoder.AlchemyEncoder))
+@raceinfo.route('/run/get')
+def run_get():
+    if 'race_id' in request.args:
+        race_id = request.args['race_id']
+        return json.dumps(RunInfo.query.filter(RunInfo.race_id == race_id).all(), cls=jsonencoder.AlchemyEncoder)
+    return json.dumps(RunInfo.query.filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).all(), cls=jsonencoder.AlchemyEncoder)
+
+
+@raceinfo.route('/device/get')
+def device_get():
+    return json.dumps(db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == request.args['course_id']).all())
+    
+
+
+

@@ -14,8 +14,6 @@ var finish_res= new Array();
         socket.emit('my event', {data: 'I\'m connected!'});
     });
     socket.on('newData', function(data) {
-      var run ={{ run }};
-      var devices ={{ devices }};
       var i;
       var data_arr=JSON.parse(data);
       var list = new Array(data_arr.length);
