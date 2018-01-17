@@ -363,8 +363,8 @@ class RunInfo(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
 
     number = db.Column(db.Integer)
-    starttime = db.Column(db.Time)
-    endtime = db.Column(db.Time)
+    starttime = db.Column(db.DateTime)
+    endtime = db.Column(db.DateTime)
 
 class Team(db.Model):
     __tablename__ = 'team'
