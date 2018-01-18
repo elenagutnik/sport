@@ -226,9 +226,6 @@ class EditRaceTeamForm(FlaskForm):
 class EditRunInfoForm(FlaskForm):
     course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
     number = IntegerField('Number', validators=[InputRequired()])
-
-    starttime = TimeField('Start time', format='%H:%M:%S')
-    endtime = TimeField('End time', format='%H:%M:%S')
     submit = SubmitField('Submit')
 
 class EditCourseDeviceForm(FlaskForm):

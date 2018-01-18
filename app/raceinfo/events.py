@@ -142,7 +142,7 @@ def run_get():
 @raceinfo.route('/device/get')
 def device_get():
     return json.dumps(db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == request.args['course_id']).all())
-    
+
 
 
 
