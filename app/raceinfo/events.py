@@ -24,6 +24,7 @@ def load_data():
     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
     # Заезд с пришли данные
     run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now()).one()
+    #
     # Сам девайс с которого пришли данные
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
         filter(CourseDevice.device_id==device.id,
@@ -102,21 +103,22 @@ def load_data():
 def approve_manual(run_id, competitor_id):
     data = json.loads(request.args['data'])
     status = Status.query.filter_by(name='QLF').one()
-    run = RunInfo.query.filter_by(id=run_id).one()
-    result = Result(
-        is_manuale=False,
+    result = Result.query.filter_by(race_competitor_id=competitor_id).one()
+    if result is None:
+        result = Result()
+        db.session.add(result)
+        db.session.commit()
+    resultDetail = ResultAppreoved(
+        is_manual=False,
         approve_user=current_user.id,
         approve_time=datetime.now(),
         race_competitor_id=competitor_id,
-        status_id=status.id
+        run_id=run_id,
+        status_id=status.id,
+        timerun=data['absolut_time'],
+        result_id=result.id
     )
-    if run.number == 1:
-        result.timerun1 = data['absolut_time']
-    elif run.number == 2:
-        result.timerun2 = data['absolut_time']
-    else:
-        result.timerun3 = data['absolut_time']
-    db.session.add(result)
+    db.session.add(resultDetail)
     db.session.commit()
     return '', 200
 
@@ -142,7 +144,7 @@ def run_get():
 @raceinfo.route('/device/get')
 def device_get():
     return json.dumps(db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == request.args['course_id']).all())
-    
+
 
 
 

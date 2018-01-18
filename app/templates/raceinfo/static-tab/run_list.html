@@ -18,6 +18,7 @@
       <td>Start time</td>
       <td>End time</td>
       <td></td>
+      <td></td>
     </tr>
   </thead>
   <tbody>
@@ -28,6 +29,11 @@
       <td>{{ run[1].en_name }}</td>
       <td>{{ run[0].starttime }}</td>
       <td>{{ run[0].endtime }}</td>
+      <td>
+        <a href="run/{{ run[0].id }}/start" class="btn btn-success">start</a>
+        |
+        <a href="run/{{ run[0].id }}/stop" class="btn btn-danger">stop</a>
+      </td>
       <td>
         <a href="run/{{ run[0].id }}/edit">edit</a>
         |

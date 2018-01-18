@@ -1219,6 +1219,26 @@ def race_course_run_del(id,run_id):
     flash('The run has been deleted.')
     return redirect(url_for('.race_run', id=id))
 
+
+
+@raceinfo.route('/race/<int:id>/run/<int:run_id>/start', methods=['GET', 'POST'])
+@admin_required
+def race_course_run_start(id,run_id):
+    run_info = RunInfo.query.get_or_404(run_id)
+    run_info.starttime = datetime.now()
+    db.session.add(run_info)
+    flash('The run has been  started.')
+    return redirect(url_for('.race_run', id=id))
+
+@raceinfo.route('/race/<int:id>/run/<int:run_id>/stop', methods=['GET', 'POST'])
+@admin_required
+def race_course_run_stop(id,run_id):
+    run_info = RunInfo.query.get_or_404(run_id)
+    run_info.endtime = datetime.now()
+    db.session.add(run_info)
+    flash('The run has been finishd.')
+    return redirect(url_for('.race_run', id=id))
+
 @raceinfo.route('/race/<int:id>/run/add', methods=['GET', 'POST'])
 @admin_required
 def race_run_add(id):
@@ -1238,8 +1258,6 @@ def race_run_add(id):
             number=form.number.data,
 
         )
-        run_info.starttime = form.starttime.data
-        run_info.endtime = form.endtime.data
         db.session.add(run_info)
         db.session.commit()
         flash('The run has been added.')
@@ -1262,8 +1280,6 @@ def race_run_edit(id,run_id):
         run_info.race_id=id
         run_info.course_id=form.course_ref.data
         run_info.number=form.number.data
-        run_info.starttime=form.starttime.data
-        run_info.endtime=form.endtime.data
         db.session.add(run_info)
         db.session.commit()
         flash('The run has been updated.')
