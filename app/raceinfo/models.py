@@ -452,6 +452,19 @@ class ResultDetail(db.Model):
     absolut_time = db.Column(db.BigInteger)
     is_start = db.Column(db.Boolean)
 
+class ResultAppreoved(db.Model):
+    __tablename__ = 'result_appreoved'
+    id = db.Column(db.Integer, primary_key=True)
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    result_id = db.Column(db.Integer, db.ForeignKey('result.id'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    approve_user = db.Column(db.Integer, db.ForeignKey('users.id'))
+    status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
+    approve_time = db.Column(db.DateTime)
+    timerun = db.Column(db.BigInteger)
+    is_manual = db.Column(db.Boolean)
+
+
 class Result(db.Model):
     __tablename__ = 'result'
     id = db.Column(db.Integer, primary_key=True)
