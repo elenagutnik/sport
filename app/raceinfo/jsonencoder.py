@@ -21,5 +21,4 @@ class AlchemyEncoder(json.JSONEncoder):
             # a json-encodable dict
             return fields
 
-
         return json.JSONEncoder.default(self, obj)

@@ -12,6 +12,11 @@ from flask_login import current_user
 from datetime import datetime
 from flask import request, abort, render_template
 
+@raceinfo.route('/d')
+def device_1get():
+    db.create_all()
+    return ''
+
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
 def load_data():
     # try:
@@ -23,7 +28,9 @@ def load_data():
     course_devices = db.session.query(CourseDevice.course_id).filter_by(device_id=device.id)
     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
     # Заезд с пришли данные
-    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None ).all()
+
+    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None ).one()
+
     #
     # Сам девайс с которого пришли данные
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
@@ -122,7 +129,8 @@ def approve_manual(run_id, competitor_id):
     )
     db.session.add(resultDetail)
     db.session.commit()
-    return ''
+
+    return 'huy', 200
 
 @raceinfo.route('/emulation')
 def emulation():
@@ -147,7 +155,3 @@ def run_get():
 @raceinfo.route('/device/get')
 def device_get():
     return json.dumps(db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == request.args['course_id']).all())
-
-
-
-
