@@ -59,12 +59,13 @@ def load_data():
         start_device = db.session.query(CourseDevice.id).filter(CourseDevice.course_id == run.course_id,
                                                                 CourseDevice.course_device_type_id == 1)
         start_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == competitor.id,
-                                                         ResultDetail.course_device_id == start_device).one()
+                                                         ResultDetail.course_device_id == start_device,
+                                                         ResultDetail.run_id==run.id).one()
 
         previous_course_device = CourseDevice.query.filter_by(order=course_device[0].order - 1, course_id=run.course_id).one()
 
         previous_device_results = db.session.query(ResultDetail).filter(ResultDetail.course_device_id==previous_course_device.id,
-            ResultDetail.race_competitor_id == competitor.id).one()
+            ResultDetail.race_competitor_id == competitor.id,  ResultDetail.run_id==run.id).one()
 
         result.time = data['time'] - start_result.absolut_time
         result.sectortime = data['time'] - previous_device_results.absolut_time
@@ -85,7 +86,7 @@ def load_data():
     db.session.add(result)
 
 
-    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType).join(RaceCompetitor).join(Competitor).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.course_device_id == course_device[0].id).all()
+    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType).join(RaceCompetitor).join(Competitor).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id==run.id).all()
 
     tmp = json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
     socketio.emit("newData", tmp)
