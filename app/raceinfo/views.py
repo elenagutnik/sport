@@ -1256,7 +1256,6 @@ def race_run_add(id):
             race_id=id,
             course_id=form.course_ref.data,
             number=form.number.data,
-
         )
         db.session.add(run_info)
         db.session.commit()

@@ -452,8 +452,8 @@ class ResultDetail(db.Model):
     absolut_time = db.Column(db.BigInteger)
     is_start = db.Column(db.Boolean)
 
-class ResultAppreoved(db.Model):
-    __tablename__ = 'result_appreoved'
+class ResultApproved(db.Model):
+    __tablename__ = 'result_approved'
     id = db.Column(db.Integer, primary_key=True)
     race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
     result_id = db.Column(db.Integer, db.ForeignKey('result.id'))

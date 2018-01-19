@@ -23,7 +23,7 @@ def load_data():
     course_devices = db.session.query(CourseDevice.course_id).filter_by(device_id=device.id)
     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
     # Заезд с пришли данные
-    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now()).one()
+    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None ).all()
     #
     # Сам девайс с которого пришли данные
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
@@ -103,12 +103,14 @@ def load_data():
 def approve_manual(run_id, competitor_id):
     data = json.loads(request.args['data'])
     status = Status.query.filter_by(name='QLF').one()
-    result = Result.query.filter_by(race_competitor_id=competitor_id).one()
-    if result is None:
-        result = Result()
+    try:
+        result = Result.query.filter_by(race_competitor_id=competitor_id).one()
+    except:
+        result = Result(race_competitor_id=competitor_id)
         db.session.add(result)
         db.session.commit()
-    resultDetail = ResultAppreoved(
+
+    resultDetail = ResultApproved(
         is_manual=False,
         approve_user=current_user.id,
         approve_time=datetime.now(),
@@ -120,7 +122,7 @@ def approve_manual(run_id, competitor_id):
     )
     db.session.add(resultDetail)
     db.session.commit()
-    return '', 200
+    return ''
 
 @raceinfo.route('/emulation')
 def emulation():
@@ -133,11 +135,12 @@ def receiver():
 def receiver_jury():
     return render_template('receiver_jury.html')
 
-@raceinfo.route('/run/get')
+@raceinfo.route('/run/get/', methods=['POST', 'GET'])
 def run_get():
     if 'race_id' in request.args:
         race_id = request.args['race_id']
-        return json.dumps(RunInfo.query.filter(RunInfo.race_id == race_id).all(), cls=jsonencoder.AlchemyEncoder)
+        data = json.dumps(RunInfo.query.filter(RunInfo.race_id == race_id).all(), cls=jsonencoder.AlchemyEncoder)
+        return data
     return json.dumps(RunInfo.query.filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).all(), cls=jsonencoder.AlchemyEncoder)
 
 
