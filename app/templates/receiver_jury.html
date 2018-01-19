@@ -125,6 +125,19 @@
 
 </script>
 <div>
+  <h1>Runs / Current run <span id="run_current"></span></h1>
+  <table style="width:100%;" class="table table-bordered">
+    <thead>
+      <tr>
+        <th>№</th>
+        <th>Start time</th>
+        <th>End time</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="run_list">
+    </tbody>
+  </table>
   <h2>Competitor data</h2>
   <b>
     NAME: <span id="compname">-</span>
@@ -230,25 +243,88 @@
 {% block scripts %}
 {{ super() }}
 <script type="text/javascript">
+var huy='';
+
+var race_id=1; // пока задаем вручную
+var run={'id':null,'number':null}; // активный заезд
+var run_list=new Array(); // список всех заездов для race_id
+
 $(document).ready(function () {
+  // подтверждение заезда спортсмена со статусом QLF
   $("body").on("click", ".approveQLF", function () {
     console.log($(this).attr('competitor_id'));
     console.log($(this).attr('run_id'));
     console.log($(this).attr('absolut_time'));
 
-    $.ajax({
-  		  url: "/raceinfo/approve/run/"+$(this).attr('run_id')+"/competitor/"+$(this).attr('competitor_id'),
-  		  dataType: 'json',
-  		  data: { data: JSON.stringify({
-  			  'absolut_time':$(this).attr('absolut_time')
-  			  })}
-  		}).done(function() {
-        alert("Approved");
-  //			  $( this ).addClass( "done" );
-  		});
+      $.ajax({
+        url: "/raceinfo/approve/run/"+$(this).attr('run_id')+"/competitor/"+$(this).attr('competitor_id'),
+        dataType: 'json',
+        data: {
+          data: JSON.stringify({
+            'absolut_time':$(this).attr('absolut_time')}
+          )},
+          success:function(data) {alert(data);},
+          error: function (error) {alert('ХУЙ'); }
+      });
 
   });
 
+  runinfo_get();
+
+  // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
+  function runinfo_get(){
+    $.ajax({
+      type: "GET",
+      url: "/raceinfo/run/get/",
+      data: {
+        'race_id': race_id
+        }
+    })
+      .done(function(data) {
+        if ( console && console.log ) {
+          var btn='';
+          $("#run_list").html(''); // очищаем таблицу
+          run_list = JSON.parse(data);
+          run_list.sort(function(a,b){return a['number'] == b['number'] ? a > b : a['number'] > b['number']}); // сортируем заезды по порядку number
+          run={'id':null,'number':'-'};
+          for(var i=0; i<run_list.length; i++){ // заполняем таблицу #run_list
+            btn=''; // код кнопки старта/финиша заезда
+            if(run_list[i]['endtime']) //заезд завершен - ничего
+              btn='';
+            else if(run_list[i]['starttime']){ //заезд начат - завершить заезд
+              btn='<button class="run_finish" run_id="'+run_list[i]['id']+'">Finish</button>';
+              run={'id':run_list[i]['id'],'number':run_list[i]['number']}; // данные активного(текущего) заезда
+            }else if(!run.id){ // заезд не начат - начать заезд
+              btn='<button class="run_start" run_id="'+run_list[i]['id']+'">Start</button>';
+            }
+            $("#run_list").append('<tr><td>'+run_list[i]['number']+'</td><td>'+run_list[i]['starttime']+'</td><td>'+run_list[i]['endtime']+'</td><td>'+btn+'</td></tr>');
+          }
+          $("#run_current").html(run.number);
+        }
+      });
+  }
+
+  // обработка кнопки финиш заезда
+  $("body").on("click", ".run_finish", function () {
+    $.ajax({
+      type: "GET",
+      url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/stop",
+    })
+      .done(function(data) {
+        runinfo_get();
+      });
+  });
+
+  // обработка кнопки старт заезда
+  $("body").on("click", ".run_start", function () {
+    $.ajax({
+      type: "GET",
+      url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/start",
+    })
+      .done(function(data) {
+        runinfo_get();
+      });
+  });
 });
 </script>
 {% endblock %}

@@ -12,6 +12,11 @@ from flask_login import current_user
 from datetime import datetime
 from flask import request, abort, render_template
 
+@raceinfo.route('/d')
+def device_1get():
+    db.create_all()
+    return ''
+
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
 def load_data():
     # try:
@@ -23,7 +28,8 @@ def load_data():
     course_devices = db.session.query(CourseDevice.course_id).filter_by(device_id=device.id)
     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
     # Заезд с пришли данные
-    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now()).one()
+    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None ).one()
+
     #
     # Сам девайс с которого пришли данные
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
@@ -103,9 +109,10 @@ def load_data():
 def approve_manual(run_id, competitor_id):
     data = json.loads(request.args['data'])
     status = Status.query.filter_by(name='QLF').one()
-    result = Result.query.filter_by(race_competitor_id=competitor_id).one()
-    if result is None:
-        result = Result()
+    try:
+        result = Result.query.filter_by(race_competitor_id=competitor_id).one()
+    except:
+        result = Result(race_competitor_id=competitor_id)
         db.session.add(result)
         db.session.commit()
     resultDetail = ResultAppreoved(
@@ -120,7 +127,7 @@ def approve_manual(run_id, competitor_id):
     )
     db.session.add(resultDetail)
     db.session.commit()
-    return '', 200
+    return 'huy', 200
 
 @raceinfo.route('/emulation')
 def emulation():
@@ -133,7 +140,7 @@ def receiver():
 def receiver_jury():
     return render_template('receiver_jury.html')
 
-@raceinfo.route('/run/get')
+@raceinfo.route('/run/get/', methods=['POST', 'GET'])
 def run_get():
     if 'race_id' in request.args:
         race_id = request.args['race_id']
@@ -144,7 +151,3 @@ def run_get():
 @raceinfo.route('/device/get')
 def device_get():
     return json.dumps(db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == request.args['course_id']).all())
-
-
-
-
