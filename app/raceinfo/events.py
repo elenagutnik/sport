@@ -108,7 +108,7 @@ def load_data():
     #     abort(500)
 
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
-def approve_manual(run_id, competitor_id):
+def approve_automate(run_id, competitor_id):
     data = json.loads(request.args['data'])
     status = Status.query.filter_by(name='QLF').one()
     try:
@@ -127,6 +127,33 @@ def approve_manual(run_id, competitor_id):
         status_id=status.id,
         timerun=data['absolut_time'],
         result_id=result.id
+    )
+    db.session.add(resultDetail)
+    db.session.commit()
+
+    return 'huy', 200
+
+@raceinfo.route('/approve/edit/run/<int:run_id>/competitor/<int:competitor_id>')
+def approve_manual(run_id, competitor_id):
+    data = json.loads(request.args['data'])
+    try:
+        result = Result.query.filter_by(race_competitor_id=competitor_id).one()
+    except:
+        result = Result(race_competitor_id=competitor_id)
+        db.session.add(result)
+        db.session.commit()
+
+    resultDetail = ResultApproved(
+        is_manual=True,
+        approve_user=current_user.id,
+        approve_time=datetime.now(),
+        race_competitor_id=competitor_id,
+        run_id=run_id,
+        status_id=data['status_id'],
+        timerun=data['absolut_time'],
+        result_id=result.id,
+        gate =  data['gate'],
+        reason =data['reason']
     )
     db.session.add(resultDetail)
     db.session.commit()

@@ -7,6 +7,10 @@ from ..models import *
 from ..decorators import admin_required
 from .forms import *
 from flask_babel import gettext
+import json
+
+from . import jsonencoder
+
 
 @raceinfo.route('/discipline/', methods=['GET', 'POST'])
 @login_required
@@ -1544,3 +1548,7 @@ def race_order_list(id):
 
     return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=orders_list)
 
+@raceinfo.route('/status/get', methods=['GET', 'POST'])
+@admin_required
+def status_get_list():
+    return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)

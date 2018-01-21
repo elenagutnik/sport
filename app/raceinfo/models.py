@@ -463,6 +463,9 @@ class ResultApproved(db.Model):
     approve_time = db.Column(db.DateTime)
     timerun = db.Column(db.BigInteger)
     is_manual = db.Column(db.Boolean)
+    gate = db.Column(db.String)
+    reason = db.Column(db.String)
+
 
 
 class Result(db.Model):
