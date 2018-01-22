@@ -72,7 +72,7 @@
         $("#compname").html(lastcomp[2].en_lastname+" "+lastcomp[2].en_firstname);
         $("#compbib").html(lastcomp[1].bib);
         $("#tabcomp").html('');
-        $("#tabfinish").append("<tr id='fintr"+lastcomp[1].bib+"'><td>"+data_arr.length+"</td><td class='rank'>-</td><td class='time'>"+lastcomp[0].time+"</td><td class='diff'>-</td><td>"+lastcomp[1].bib+"</td><td>"+ lastcomp[2].en_lastname+" "+lastcomp[2].en_firstname+"</td><td class='status'>Started</td><td class='action'><button value=''>edit</button></td></tr>");
+        $("#tabfinish").append("<tr id='fintr"+lastcomp[1].bib+"'><td>"+data_arr.length+"</td><td class='rank'>-</td><td class='time'>"+lastcomp[0].time+"</td><td class='diff'>-</td><td>"+lastcomp[1].bib+"</td><td>"+ lastcomp[2].en_lastname+" "+lastcomp[2].en_firstname+"</td><td class='status'>Started</td><td class='action' id='action"+lastcomp[1].run_id+"_"+lastcomp[0].race_competitor_id+"'><button value='' class='editresult' run_id='"+lastcomp[1].run_id+"' competitor_id='"+lastcomp[0].race_competitor_id+"'>edit</button></td></tr>");
       }else{
         if (lastcomp[4].name=="Finish") {
           finish_res.push([lastcomp[1].bib,lastcomp[2].en_firstname, lastcomp[2].en_lastname,lastcomp[0].time]);
@@ -121,121 +121,181 @@
       //$("#tab").append(list+"<br>");
     });
 </script>
-<script type="text/javascript">
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#tab_runs" data-toggle="tab">Заезды</a></li>
+  <li><a href="#tab_startlist" data-toggle="tab">Стартовые списки</a></li>
+  <li><a href="#tab_curcompetitor" data-toggle="tab">Текущие результаты</a></li>
+  <li><a href="#tab_summarytable" data-toggle="tab">Все результаты</a></li>
+</ul>
+<div class="tab-content">
 
-</script>
-<div>
-  <h1>Runs / Current run <span id="run_current"></span></h1>
-  <table style="width:100%;" class="table table-bordered">
-    <thead>
-      <tr>
-        <th>№</th>
-        <th>Start time</th>
-        <th>End time</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="run_list">
-    </tbody>
-  </table>
-  <h2>Competitor data</h2>
-  <b>
-    NAME: <span id="compname">-</span>
-    <br>
-    BIB: <span id="compbib">-</span>
-    <br><br>
-  </b>
-  <table style="width:100%;" class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Device</th>
-        <th>Speed</th>
+    <div id="tab_runs" class="tab-pane fade in active">
+      <h2>Заезды</h2>
+      <h3>Current run <span id="run_current"></span></h3>
+      <table style="width:100%;" class="table table-bordered">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Start time</th>
+            <th>End time</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="run_list">
+        </tbody>
+      </table>
+    </div>
 
-        <th>Rank</th>
-        <th>Diff</th>
-        <th>Time</th>
+    <div id="tab_startlist" class="tab-pane fade">
+      <h2>Start lists</h2>
 
-        <th>Sector Rank</th>
-        <th>Sector Diff</th>
-        <th>Sector Time</th>
-      </tr>
-    </thead>
-    <tbody id="tabcomp">
-    </tbody>
-  </table>
+    </div>
+
+    <div id="tab_summarytable" class="tab-pane fade">
+      <h2>Summary tab</h2>
+      <table style="width:100%;" class="table table-bordered" id="tabsummary">
+        <thead>
+          <tr>
+            <th>bib/dev</th>
+            <th>Start</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>Finish</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="tab_curcompetitor" class="tab-pane fade">
+      <h2>Competitor data</h2>
+      <h3>
+        NAME: <span id="compname">-</span>
+        <br>
+        BIB: <span id="compbib">-</span>
+      </h3>
+      <br><br>
+      <table style="width:100%;" class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Speed</th>
+
+            <th>Rank</th>
+            <th>Diff</th>
+            <th>Time</th>
+
+            <th>Sector Rank</th>
+            <th>Sector Diff</th>
+            <th>Sector Time</th>
+          </tr>
+        </thead>
+        <tbody id="tabcomp">
+        </tbody>
+      </table>
+
+      <h2>Sector data (for current dev)</h2>
+      <table style="width:100%;" class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Time</th>
+            <th>Diff</th>
+            <th>Bib</th>
+            <th>Name</th>
+          </tr>
+        </thead>
+        <tbody id="tabsector">
+        </tbody>
+      </table>
+
+      <h2>Course data (for current dev)</h2>
+      <table style="width:100%;" class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Time</th>
+            <th>Diff</th>
+            <th>Bib</th>
+            <th>Name</th>
+          </tr>
+        </thead>
+        <tbody id="tabcourse">
+        </tbody>
+      </table>
+
+      <h2>Finish data</h2>
+      <table style="width:100%;" class="table table-bordered">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Rank</th>
+            <th>Time</th>
+            <th>Diff</th>
+            <th>Bib</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Aprove</th>
+          </tr>
+        </thead>
+        <tbody id="tabfinish">
+        </tbody>
+      </table>
+    </div>
+
 </div>
 
-<div>
-  <h2>Sector data (for current dev)</h2>
-  <table style="width:100%;" class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Time</th>
-        <th>Diff</th>
-        <th>Bib</th>
-        <th>Name</th>
-      </tr>
-    </thead>
-    <tbody id="tabsector">
-    </tbody>
-  </table>
-</div>
 
-<div>
-  <h2>Course data (for current dev)</h2>
-  <table style="width:100%;" class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Time</th>
-        <th>Diff</th>
-        <th>Bib</th>
-        <th>Name</th>
-      </tr>
-    </thead>
-    <tbody id="tabcourse">
-    </tbody>
-  </table>
-</div>
 
-<div>
-  <h2>Finish data</h2>
-  <table style="width:100%;" class="table table-bordered">
-    <thead>
-      <tr>
-        <th>№</th>
-        <th>Rank</th>
-        <th>Time</th>
-        <th>Diff</th>
-        <th>Bib</th>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Aprove</th>
-      </tr>
-    </thead>
-    <tbody id="tabfinish">
-    </tbody>
-  </table>
-</div>
 
-<div>
-  <h2>Summary tab</h2>
-  <table style="width:100%;" class="table table-bordered" id="tabsummary">
-    <thead>
-      <tr>
-        <th>bib/dev</th>
-        <th>Start</th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th>Finish</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
+
+
+
+
+<!-- HTML-код модального окна -->
+<div id="popup_editresult" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="" name="form_editresult" id="form_editresult">
+      <!-- Заголовок модального окна -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Ручной ввод результатов:
+          <BR>Спортсмен: <span id="form_txt_competitor"></span>
+          <BR>Заезд: <span id="form_txt_run"></span>
+        </h4>
+      </div>
+      <!-- Основное содержимое модального окна -->
+      <div class="modal-body">
+        <div class="container-fluid">
+          <!-- Контейнер, в котором можно создавать классы системы сеток -->
+          <div class="row">
+            <div class="col-md-2">Status:</div><div class="col-md-10"><select name="status" id="form_status"></select></div>
+          </div>
+          <div class="row">
+            <div class="col-md-2">Time</div><div class="col-md-10"><input type="text" name="time" id="form_time"></div>
+          </div>
+          <div class="row">
+            <div class="col-md-2">Reason</div><div class="col-md-10"><input type="text" name="reason" id="form_reason" style="width:100%;"></div>
+            <div class="col-md-2">Gate</div><div class="col-md-10"><input type="text" name="gate" id="form_gate" style="width:2em;"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Футер модального окна -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+        <button type="button" class="btn btn-primary editform_approve">Approve</button>
+
+        <input type="hidden" id="form_competitor_id" name="competitor_id" value="">
+        <input type="hidden" id="form_run_id" name="run_id" value="">
+
+      </div>
+    </form>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
@@ -247,62 +307,47 @@ var huy='';
 
 var race_id=1; // пока задаем вручную
 var run={'id':null,'number':null}; // активный заезд
-var run_list=new Array(); // список всех заездов для race_id
+var run_list=new Array(); // список всех заездов для race_id отсортированных по порядку (number)
+var run_list_ids=new Array(); // массив run_list_ids[run_id]=run_list[index] - соответствие id_run элементам в массиве run_list'
+
+var status_list; //список статусов
+var start_list; //стартовые списки на все заезды
 
 $(document).ready(function () {
+
   // подтверждение заезда спортсмена со статусом QLF
   $("body").on("click", ".approveQLF", function () {
-    console.log($(this).attr('competitor_id'));
-    console.log($(this).attr('run_id'));
-    console.log($(this).attr('absolut_time'));
-
       $.ajax({
-        url: "/raceinfo/approve/run/"+$(this).attr('run_id')+"/competitor/"+$(this).attr('competitor_id'),
-        dataType: 'json',
+        url: "/raceinfo/approve/run/"+$(this).attr('run_id')+"/competitor/"+$(this).attr('run_id'),
+        //dataType: 'json',
         data: {
           data: JSON.stringify({
             'absolut_time':$(this).attr('absolut_time')}
           )},
-          success:function(data) {alert(data);},
-          error: function (error) {alert('ХУЙ'); }
+          success: $.proxy(function(json) {
+            console.log("#action"+$(this).attr('run_id')+"_"+$(this).attr('run_id'));
+            $("#action"+$(this).attr('run_id')+"_"+$(this).attr('run_id')).html("Approved");
+          }, this),
+          /*success:function(data) {
+            console.log("#action"+$(this).attr('run_id')+"_"+$(this).attr('run_id'));
+            $("#action"+$(this).attr('run_id')+"_"+$(this).attr('run_id')).html("Approved");
+          },*/
+          error: function (error) {alert('error'); }
       });
 
   });
 
+  // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
   runinfo_get();
 
-  // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
-  function runinfo_get(){
-    $.ajax({
-      type: "GET",
-      url: "/raceinfo/run/get/",
-      data: {
-        'race_id': race_id
-        }
+  // получаем список статусов
+  $.get("/raceinfo/status/get")
+  .done(function(data){
+    status_list=JSON.parse(data);
+    $.each(status_list, function(value) {
+      $("#form_status").append($("<option></option>", {value: this.id, text: this.name+" - "+this.description}));
     })
-      .done(function(data) {
-        if ( console && console.log ) {
-          var btn='';
-          $("#run_list").html(''); // очищаем таблицу
-          run_list = JSON.parse(data);
-          run_list.sort(function(a,b){return a['number'] == b['number'] ? a > b : a['number'] > b['number']}); // сортируем заезды по порядку number
-          run={'id':null,'number':'-'};
-          for(var i=0; i<run_list.length; i++){ // заполняем таблицу #run_list
-            btn=''; // код кнопки старта/финиша заезда
-            if(run_list[i]['endtime']) //заезд завершен - ничего
-              btn='';
-            else if(run_list[i]['starttime']){ //заезд начат - завершить заезд
-              btn='<button class="run_finish" run_id="'+run_list[i]['id']+'">Finish</button>';
-              run={'id':run_list[i]['id'],'number':run_list[i]['number']}; // данные активного(текущего) заезда
-            }else if(!run.id){ // заезд не начат - начать заезд
-              btn='<button class="run_start" run_id="'+run_list[i]['id']+'">Start</button>';
-            }
-            $("#run_list").append('<tr><td>'+run_list[i]['number']+'</td><td>'+run_list[i]['starttime']+'</td><td>'+run_list[i]['endtime']+'</td><td>'+btn+'</td></tr>');
-          }
-          $("#run_current").html(run.number);
-        }
-      });
-  }
+  })
 
   // обработка кнопки финиш заезда
   $("body").on("click", ".run_finish", function () {
@@ -325,6 +370,111 @@ $(document).ready(function () {
         runinfo_get();
       });
   });
+
+  // обработка кнопки ручного ввода результата - модальное окно #popup_editresult
+  $("body").on("click", ".editresult", function () {
+    console.log($(this).attr('run_id'));
+    $("#form_txt_competitor").html($(this).attr('competitor_id'));
+    console.log("num="+run_list[run_list_ids["id"+$(this).attr('run_id')]].number);
+    $("#form_txt_run").html(run_list[run_list_ids["id"+$(this).attr('run_id')]].number);
+
+    $("#form_run_id").val($(this).attr('run_id'));
+    $("#form_competitor_id").val($(this).attr('competitor_id'));
+
+    $("#popup_editresult").modal('show');
+  });
+
+  // ручной ввод результата
+  $("body").on("click", ".editform_approve", function () {
+    $.ajax({
+      type: "GET",
+      url: "/raceinfo/approve/edit/run/"+$("#form_run_id").val()+"/competitor/"+$("#form_competitor_id").val(),
+      //dataType: 'json',
+      data: {
+        data: JSON.stringify({
+          'absolut_time': $("#form_time").val(),
+          'reason': $("#form_reason").val(),
+          'gate': $("#form_gate").val(),
+          'status_id':  $("#form_status").val()
+        })
+      },
+      success:function(data) {
+        $("#action"+$("#form_run_id").val()+"_"+$("#form_competitor_id").val()).html("Approved");
+        $("#popup_editresult").modal('hide');
+      },
+      error: function (error) {alert('error');}
+    })
+
+
+  });
+
 });
+
+// получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
+function runinfo_get(){
+    $.ajax({
+      type: "GET",
+      url: "/raceinfo/run/get/",
+      data: {
+        'race_id': race_id
+        }
+    })
+      .done(function(data) {
+        if ( console && console.log ) {
+          var btn='';
+          $("#run_list").html(''); // очищаем таблицу
+          run_list = JSON.parse(data);
+          run_list.sort(function(a,b){return a['number'] == b['number'] ? a > b : a['number'] > b['number']}); // сортируем заезды по порядку number
+          console.log(run_list);
+          run={'id':null,'number':'-'};
+          for(var i=0; i<run_list.length; i++){ // заполняем таблицу #run_list
+            btn=''; // код кнопки старта/финиша заезда
+            if(run_list[i]['endtime']) //заезд завершен - ничего
+              btn='';
+            else if(run_list[i]['starttime']){ //заезд начат - завершить заезд
+              btn='<button class="run_finish" run_id="'+run_list[i]['id']+'">Finish</button>';
+              run={'id':run_list[i]['id'],'number':run_list[i]['number']}; // данные активного(текущего) заезда
+            }else if(!run.id){ // заезд не начат - начать заезд
+              btn='<button class="run_start" run_id="'+run_list[i]['id']+'">Start</button>';
+            }
+            $("#run_list").append('<tr><td>'+run_list[i]['number']+'</td><td>'+run_list[i]['starttime']+'</td><td>'+run_list[i]['endtime']+'</td><td>'+btn+'</td></tr>');
+            run_list_ids["id"+run_list[i]['id']]=i;
+          }
+          $("#run_current").html(run.number);
+          //подготавливаем таб со стартовыми списками по заездам
+          startlist_tab_prepare();
+          // получаем стартовые списоки для первого заезда, и если возможно для всех остальных
+          startlist_get(1);
+
+          function startlist_tab_prepare(){
+            if(run_list.length){
+              //console.log(run_list);
+              $.each(run_list, function(value){
+                $("#tab_startlist").append("<h3>Заезд "+this.number+"</h3>");
+                $("#tab_startlist").append("<table  style='width:100%;' class='table table-bordered' id='tab_startlist_run"+this.id+"'><thead><tr><th>#</th><th>bib</th><th>Name</th><tr></thead><tbody></tbody></table>");
+              });
+            }else{
+              alert("runlist error");
+            }
+          }
+
+          function startlist_get(run_id){
+            $.get("/raceinfo/startlist/run/"+run_id+"/get/")
+            .done(function(data){
+              start_list=JSON.parse(data);
+              console.log("startlist");
+              console.log(start_list);
+              $.each(start_list, function(value) {
+                $("#tab_startlist_run"+this[2].run_id+" tbody").append("<tr><td>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_laststname+"</td></tr>");
+              })
+            })
+
+          }
+
+
+        }
+      });
+}
+
 </script>
 {% endblock %}
