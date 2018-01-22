@@ -34,8 +34,8 @@ def load_data():
     #
     # Сам девайс с которого пришли данные
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
-        filter(CourseDevice.device_id==device.id,
-               CourseDevice.course_id==run.course_id).one()
+        filter(CourseDevice.device_id == device.id,
+               CourseDevice.course_id == run.course_id).one()
 
     competitor = RaceCompetitor.query.filter_by(bib=data['bib']).one()
 
@@ -192,7 +192,8 @@ def device_get():
 
 @raceinfo.route('/input/data/vol2', methods=['POST', 'GET'])
 def load_data_vol2():
-    # try:
+
+    CashObject = TempCashe.query.all()
 
     data = json.loads(request.args['data'])
     # Девайс с которого пришли данные
@@ -275,5 +276,3 @@ def load_data_vol2():
     db.session.commit()
 
     return '', 200
-    # except:
-    #     abort(500)

@@ -7,7 +7,7 @@
 
 <div class="page-header">
     <a href="/raceinfo/race/{{ race.id }}" class="pull-right">Race page</a>
-    <h1>Order list {{ race.eventname }}</h1>
+    <h1>Order list: {{ race.eventname }}</h1>
     <h2>Run number: {{ run.number }}</h2>
 </div>
 <table class="table table-striped">
@@ -16,7 +16,7 @@
       <td>#id</td>
       <td>Name</td>
       <td>Order</td>
-
+      <td>Points</td>
     </tr>
   </thead>
   <tbody>
@@ -25,6 +25,7 @@
       <td>{{ competitor[2].id }}</td>
       <td>{{ competitor[0].en_firstname }} {{ competitor[0].en_lastname }}</td>
       <td>{{ competitor[2].order }}</td>
+          <td>{{ competitor[3].fispoint }}</td>
     </tr>
     {% endfor %}
   </tbody>

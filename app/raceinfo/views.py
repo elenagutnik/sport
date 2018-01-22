@@ -9,6 +9,8 @@ from .forms import *
 from flask_babel import gettext
 import json
 
+import random
+
 from . import jsonencoder
 
 
@@ -1485,9 +1487,6 @@ def device_del(id):
     flash('The device has been deleted.')
     return redirect(url_for('.device_list'))
 
-
-
-
 @raceinfo.route('/device/type/', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -1535,18 +1534,38 @@ def device_type_del(id):
 def race_order_list(id):
     race = Race.query.filter_by(id=id).one()
     run = RunInfo.query.filter_by(race_id=id, number=1).one()
-    orders_list = db.session.query(Competitor,RaceCompetitor,RunOrder).join(RaceCompetitor).join(RunOrder).filter(RunOrder.run_id==run.id).all()
-    race_competitors = db.session.query(RaceCompetitor, RunInfo).join(RunInfo).filter(RaceCompetitor.race_id==id, RunInfo.number==1).all()
-    if len(orders_list)== 0:
-        for i in range(len(race_competitors)):
-            run_order = RunOrder(
-                race_competitor_id = race_competitors[i][0].id,
-                run_id= race_competitors[i][0].run_id,
-                order= i+1
-            )
-            db.session.add(run_order)
+    RunOrder.query.filter(RunOrder.run_id==run.id).delete()
 
+    race_competitors = db.session.query(RaceCompetitor, FisPoints, RunInfo).\
+        join(FisPoints, FisPoints.competitor_id == RaceCompetitor.competitor_id).\
+        join(RunInfo).\
+        filter(RaceCompetitor.race_id == id, RunInfo.number==1, FisPoints.discipline_id==race.discipline_id).\
+        order_by(FisPoints.fispoint.desc()).all()
+    for competitor in race_competitors:
+        print(competitor[0])
+    for i in range(len(race_competitors)):
+        run_order = RunOrder(
+            race_competitor_id = race_competitors[i][0].id,
+            run_id=race_competitors[i][0].run_id,
+            order=i+1
+        )
+        db.session.add(run_order)
+    db.session.commit()
+    orders_list = db.session.query(Competitor, RaceCompetitor, RunOrder, FisPoints).join(RaceCompetitor).join(RunOrder). join(FisPoints, FisPoints.competitor_id == RaceCompetitor.competitor_id).filter(
+        RunOrder.run_id == run.id).order_by(RunOrder.order.asc()).all()
     return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=orders_list)
+
+@raceinfo.route('/race/order_list/edit', methods=['GET', 'POST'])
+def race_order_list_edit():
+    data = json.loads(request.args['data'])
+    order_list = RunOrder.query.filter(RunOrder.run_id == data['run_id']).all()
+    new_order = data['order_list']
+    for competitor in order_list:
+        competitor.order = new_order[competitor.id]
+        db.session.add(competitor)
+    db.session.commit()
+    return  '',200
+
 
 @raceinfo.route('/status/get', methods=['GET'])
 @admin_required

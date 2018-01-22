@@ -184,7 +184,9 @@ class Competitor(db.Model):
     NSA = db.Column(db.String)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))#справочник
     points = db.Column(db.Float)
+    # fis_points ожидает переноса
     fis_points = db.Column(db.Float)
+
 
 
 class RaceCompetitor(db.Model):
@@ -466,8 +468,6 @@ class ResultApproved(db.Model):
     gate = db.Column(db.String)
     reason = db.Column(db.String)
 
-
-
 class Result(db.Model):
     __tablename__ = 'result'
     id = db.Column(db.Integer, primary_key=True)
@@ -483,10 +483,26 @@ class Result(db.Model):
     approve_user = db.Column(db.Integer, db.ForeignKey('users.id'))
     is_manuale = db.Column(db.Boolean)
 
-
 class RunOrder(db.Model):
     __tablename__ = 'run_order'
     id = db.Column(db.Integer, primary_key=True)
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
     race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
     order = db.Column(db.Integer)
+
+class TempCashe(db.Model):
+    # Вресенный класс,  для кэширования объектов, объекты хранятся в формате JSON
+    __tablename__ = 'CASHE'
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String)
+    data = db.Column(db.String)
+
+class FisPoints(db.Model):
+    __tablename__ = 'fis_points'
+    id = db.Column(db.Integer, primary_key=True)
+    competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
+    discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
+    fispoint = db.Column(db.Float)
+    date_update = db.Column(db.DateTime)
+    date_expired = db.Column(db.DateTime)
+
