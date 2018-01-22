@@ -1533,7 +1533,7 @@ def device_type_del(id):
 @raceinfo.route('/race/<int:id>/order_list/buld', methods=['GET', 'POST'])
 @admin_required
 def race_order_list(id):
-    race=Race.query.filter_by(id=id).one()
+    race = Race.query.filter_by(id=id).one()
     run = RunInfo.query.filter_by(race_id=id, number=1).one()
     orders_list = db.session.query(Competitor,RaceCompetitor,RunOrder).join(RaceCompetitor).join(RunOrder).filter(RunOrder.run_id==run.id).all()
     race_competitors = db.session.query(RaceCompetitor, RunInfo).join(RunInfo).filter(RaceCompetitor.race_id==id, RunInfo.number==1).all()
@@ -1548,7 +1548,7 @@ def race_order_list(id):
 
     return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=orders_list)
 
-@raceinfo.route('/status/get', methods=['GET', 'POST'])
+@raceinfo.route('/status/get', methods=['GET'])
 @admin_required
 def status_get_list():
     return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)
