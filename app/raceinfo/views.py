@@ -499,7 +499,6 @@ def race_add():
             training = form.training.data,
             isTeam=form.race_type.data
         )
-
         db.session.add(race)
         db.session.commit()
 
@@ -1233,6 +1232,13 @@ def race_course_run_start(id,run_id):
     run_info = RunInfo.query.get_or_404(run_id)
     run_info.starttime = datetime.now()
     db.session.add(run_info)
+    db.session.commit()
+    cashe = TempCashe(
+        key='Run',
+        data=json.dumps(run_info, cls=jsonencoder.AlchemyEncoder)
+        )
+    db.session.add(cashe)
+    db.session.commit()
     flash('The run has been  started.')
     return redirect(url_for('.race_run', id=id))
 
@@ -1352,7 +1358,7 @@ def race_сourse_dev_edit(id,course_id, dev_id):
     form.order.data = dev.order
     form.distance.data = dev.distance
     form.device_ref.data = dev.device_id
-    form.course_device_type_ref.data=dev.course_device_type_id
+    form.course_device_type_ref.data = dev.course_device_type_id
 
     return render_template('raceinfo/static-tab/form_page.html', form=form)
 
@@ -1558,13 +1564,12 @@ def race_order_list(id):
 @raceinfo.route('/race/order_list/edit', methods=['GET', 'POST'])
 def race_order_list_edit():
     data = json.loads(request.args['data'])
-    order_list = RunOrder.query.filter(RunOrder.run_id == data['run_id']).all()
     new_order = data['order_list']
-    for competitor in order_list:
-        competitor.order = new_order[competitor.id]
-        db.session.add(competitor)
+    for order in new_order:
+        RunOrder.query.filter(RunOrder.run_id == data['run_id'],
+                              RunOrder.race_competitor_id == order[0]).update(dict(order=order[1]))
     db.session.commit()
-    return  '',200
+    return '',200
 
 
 @raceinfo.route('/status/get', methods=['GET'])
