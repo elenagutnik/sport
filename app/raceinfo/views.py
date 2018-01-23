@@ -1234,8 +1234,8 @@ def race_course_run_start(id,run_id):
     db.session.add(run_info)
     db.session.commit()
     cashe = TempCashe(
-        key='Run',
-        data=json.dumps(run_info, cls=jsonencoder.AlchemyEncoder)
+        key='Current_competitor',
+        data=json.dumps(dict(run=run_id, order=0))
         )
     db.session.add(cashe)
     db.session.commit()
