@@ -1233,11 +1233,11 @@ def race_course_run_start(id,run_id):
     run_info.starttime = datetime.now()
     db.session.add(run_info)
     db.session.commit()
-    cashe = TempCashe(
+    cache = TempCashe(
         key='Current_competitor',
         data=json.dumps(dict(run=run_id, order=0))
         )
-    db.session.add(cashe)
+    db.session.add(cache)
     db.session.commit()
     flash('The run has been  started.')
     return redirect(url_for('.race_run', id=id))
@@ -1248,6 +1248,8 @@ def race_course_run_stop(id,run_id):
     run_info = RunInfo.query.get_or_404(run_id)
     run_info.endtime = datetime.now()
     db.session.add(run_info)
+    cache = TempCashe.query.filter(key='Current_competitor').one()
+    db.session.delete(cache)
     flash('The run has been finishd.')
     return redirect(url_for('.race_run', id=id))
 

@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/events.py" afterPath="$PROJECT_DIR$/app/raceinfo/events.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/models.py" afterPath="$PROJECT_DIR$/app/raceinfo/models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/views.py" afterPath="$PROJECT_DIR$/app/raceinfo/views.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,8 +29,8 @@
           <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="265">
-                  <caret line="1237" column="13" lean-forward="false" selection-start-line="1237" selection-start-column="13" selection-end-line="1237" selection-end-column="50" />
+                <state relative-caret-position="76">
+                  <caret line="1234" column="4" lean-forward="true" selection-start-line="1234" selection-start-column="4" selection-end-line="1234" selection-end-column="4" />
                   <folding>
                     <element signature="e#0#68#0" expanded="true" />
                   </folding>
@@ -69,8 +67,8 @@
           <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="256">
-                  <caret line="237" column="9" lean-forward="true" selection-start-line="237" selection-start-column="9" selection-end-line="237" selection-end-column="9" />
+                <state relative-caret-position="166">
+                  <caret line="234" column="36" lean-forward="true" selection-start-line="234" selection-start-column="36" selection-end-line="234" selection-end-column="36" />
                   <folding>
                     <element signature="e#0#23#0" expanded="true" />
                     <element signature="e#4434#5127#0" expanded="false" />
@@ -157,8 +155,8 @@
         <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/order_list.html" />
         <option value="$PROJECT_DIR$/app/raceinfo/jsonencoder.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/models.py" />
-        <option value="$PROJECT_DIR$/app/raceinfo/views.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/events.py" />
+        <option value="$PROJECT_DIR$/app/raceinfo/views.py" />
       </list>
     </option>
   </component>
@@ -667,7 +665,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/views.py</url>
-          <line>1281</line>
+          <line>1283</line>
           <option name="timeStamp" value="55" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -1045,26 +1043,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="1237" column="13" lean-forward="false" selection-start-line="1237" selection-start-column="13" selection-end-line="1237" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#68#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="237" column="9" lean-forward="true" selection-start-line="237" selection-start-column="9" selection-end-line="237" selection-end-column="9" />
+        <state relative-caret-position="166">
+          <caret line="234" column="36" lean-forward="true" selection-start-line="234" selection-start-column="36" selection-end-line="234" selection-end-column="36" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
             <element signature="e#4434#5127#0" expanded="false" />
             <element signature="e#5257#5965#0" expanded="false" />
             <element signature="e#6776#6994#0" expanded="false" />
             <element signature="e#7049#7205#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="1234" column="4" lean-forward="true" selection-start-line="1234" selection-start-column="4" selection-end-line="1234" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#68#0" expanded="true" />
           </folding>
         </state>
       </provider>
