@@ -294,7 +294,7 @@ class Status(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(4))
     description = db.Column(db.String(100))
-
+    filter_order = db.Column(db.Integer)
     @staticmethod
     def insert():
         status = {
@@ -489,6 +489,7 @@ class RunOrder(db.Model):
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
     race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
     order = db.Column(db.Integer)
+    # course_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
 
 class TempCashe(db.Model):
     # Вресенный класс,  для кэширования объектов, объекты хранятся в формате JSON
