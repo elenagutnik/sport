@@ -294,7 +294,7 @@ class Status(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(4))
     description = db.Column(db.String(100))
-
+    filter_order = db.Column(db.Integer)
     @staticmethod
     def insert():
         status = {

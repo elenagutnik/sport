@@ -1250,6 +1250,24 @@ def race_course_run_stop(id,run_id):
     db.session.add(run_info)
     cache = TempCashe.query.filter(key='Current_competitor').one()
     db.session.delete(cache)
+
+    news_run=db.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
+    race_competitors = db.session.query(RaceCompetitor, RunInfo, ResultApproved, Status).\
+        join(RunInfo).\
+        join(ResultApproved).\
+        join(Status).\
+        filter(RaceCompetitor.race_id == id, RunInfo.number==run_info.number, ResultApproved.run_id==run_id).\
+        order_by(Status.filter_order.desc(),ResultApproved.timerun.desc()).all()
+
+    for i in range(len(race_competitors)):
+        run_order = RunOrder(
+            race_competitor_id=race_competitors[i][0].id,
+            run_id=news_run.id,
+            order=i+1
+        )
+        db.session.add(run_order)
+    db.session.commit()
+
     flash('The run has been finishd.')
     return redirect(url_for('.race_run', id=id))
 
@@ -1549,8 +1567,7 @@ def race_order_list(id):
         join(RunInfo).\
         filter(RaceCompetitor.race_id == id, RunInfo.number==1, FisPoints.discipline_id==race.discipline_id).\
         order_by(FisPoints.fispoint.desc()).all()
-    for competitor in race_competitors:
-        print(competitor[0])
+
     for i in range(len(race_competitors)):
         run_order = RunOrder(
             race_competitor_id = race_competitors[i][0].id,
