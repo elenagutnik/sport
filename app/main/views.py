@@ -15,7 +15,7 @@ def index():
 @main.route('/users/')
 @admin_required
 def userlist():
-    users = User.query.filter_by(username=username).all()
+    users = User.query.all()
     return render_template('users.html', users=users)
 
 @main.route('/user/<username>')
