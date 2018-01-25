@@ -22,23 +22,22 @@
       var sector = new Array(data_arr.length);
       var lastcomp=new Array(data_arr[data_arr.length-1].length);
 
-      lastcomp=data_arr[data_arr.length-1];
+      console.log("data_arr=");
+      console.log(data_arr);
 
+      lastcomp=data_arr[data_arr.length-1];
+      sumtab_set_maininfo(lastcomp);
+      //if(lastcomp[])
       if(data_arr.length<=1 && lastcomp[4].name=="Start"){
-        console.log("data_arr.length=",data_arr.length);
-        console.log("lastcomp[4].name=",lastcomp[4].name);
         // на всякий случай очищаем массив finish_res
         finish_res.length = 0;
         //finiss_res=
       }
-      console.log("finish_res.length="+finish_res.length);
       for (i = 0; i < data_arr.length; i++) {
         list[i]=[i, data_arr[i][1].bib, data_arr[i][0].time, data_arr[i][0].sectortime];
         course[i]=[i, data_arr[i][1].bib, data_arr[i][0].time, data_arr[i][0].sectortime];
         sector[i]=[i, data_arr[i][1].bib, data_arr[i][0].time, data_arr[i][0].sectortime];
       }
-
-      console.log("data_arr="+data_arr);
 
       //сортируем результаты спортсменов по всей трассе (от старта до текущего девайса)
       function sort_course(a, b) {
@@ -120,12 +119,54 @@
 
       //$("#tab").append(list+"<br>");
     });
+function sumtab_set_maininfo(data){
+  //data[0].run_id              - table
+  //data[0].race_competitor_id  - tr
+  //data[0].course_device_id    - td
+
+  // если таблица есть
+  if($("#tab_summarytable .div_run"+data[0].run_id).length){
+    // если нужной строке в таблице нет
+    if(!$("#tab_summarytable .div_run"+data[0].run_id+" tbody tr.comp_"+data[0].race_competitor_id+"_time").length){
+      $("#tab_summarytable .div_run"+data[0].run_id+" tbody").append("<tr class='comp_"+data[0].race_competitor_id+"_time'></tr>");
+      var d = device_list["course_"+data[3].course_id];
+      var arr= new Array("rank", "speed", "diff", "sectortime", "sectorrank", "sectordiff");
+      // tr time
+      $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_time").append("<td rowspan=7>"+data[1].bib+"</td>");
+      $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_time").append("<td rowspan=7>"+data[2].en_firstname+" "+data[2].en_lastname+"</td>");
+
+      $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_time").append("<td class='dev_"+d[0][0].id+"'>time</td>");
+      for(var i=1;i<d.length;i++){
+        $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_time").append("<td class='dev_"+d[i][0].id+"_time'></td>");
+      }
+      for(var j=0; j<arr.length;j++){
+        $("#tab_summarytable .div_run"+data[0].run_id+" tbody").append("<tr class='comp_"+data[0].race_competitor_id+"_"+arr[j]+"'></tr>");
+        $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[0][0].id+"_"+arr[j]+"'>"+arr[j]+"</td>");
+        for(var i=1;i<d.length;i++){
+          $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[i][0].id+"_"+arr[j]+"'></td>");
+        }
+      }
+
+    }else{ // если есть
+      if(data[4].name!="Start"){
+        console.log("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_time td.dev_"+data[3].device_id+"_time = "+nform(data[0].time));
+        console.log("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_sectortime td.dev_"+data[3].device_id+"_sectortime = "+nform(data[0].sectortime));
+        console.log("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_speed td.dev_"+data[3].device_id+"_speed = "+nform(data[0].speed));
+        $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_time td.dev_"+data[3].device_id+"_time").html(tform(data[0].time));
+        $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_sectortime td.dev_"+data[3].device_id+"_sectortime").html(tform(data[0].sectortime));
+        $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+"_speed td.dev_"+data[3].device_id+"_speed").html(nform(data[0].speed));
+      }
+    //    $("#tab_summarytable .div_run"+data[0].run_id+" tr.comp_"+data[0].race_competitor_id+" td.dev_"+data[3].device_id).html(nform(data[0].sectortime)+"<BR>"+nform(data[0].speed)+"<BR>"+nform(data[0].time));
+    }
+  }
+}
 </script>
 <ul class="nav nav-tabs">
   <li class="active"><a href="#tab_runs" data-toggle="tab">Заезды</a></li>
   <li><a href="#tab_startlist" data-toggle="tab">Стартовые списки</a></li>
   <li><a href="#tab_curcompetitor" data-toggle="tab">Текущие результаты</a></li>
   <li><a href="#tab_summarytable" data-toggle="tab">Все результаты</a></li>
+  <li><a href="#tab_device" data-toggle="tab">Девайсы</a></li>
 </ul>
 <div class="tab-content">
 
@@ -149,22 +190,7 @@
     <div id="tab_startlist" class="tab-pane fade"></div>
 
     <div id="tab_summarytable" class="tab-pane fade">
-      <h2>Summary tab</h2>
-      <table style="width:100%;" class="table table-bordered" id="tabsummary">
-        <thead>
-          <tr>
-            <th>bib/dev</th>
-            <th>Start</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th>Finish</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
+      <h2>Summary tables</h2>
     </div>
 
     <div id="tab_curcompetitor" class="tab-pane fade">
@@ -243,6 +269,8 @@
       </table>
     </div>
 
+    <div id="tab_device" class="tab-pane fade"></div>
+
 </div>
 
 
@@ -300,7 +328,6 @@
 {% block scripts %}
 {{ super() }}
 <script type="text/javascript">
-var huy='';
 
 var race_id=1; // пока задаем вручную
 var run={'id':null,'number':null}; // активный заезд
@@ -309,10 +336,19 @@ var run_list_ids=new Array(); // массив run_list_ids[run_id]=run_list[inde
 
 var status_list; //список статусов
 var start_list; //стартовые списки на все заезды
+var course_list=new Array(); // список трасс на гонке
+var device_list=new Array();;
 
 $(document).ready(function () {
-  // подтверждение заезда спортсмена со статусом QLF
-  $("body").on("click", ".approveQLF", function () {
+
+  // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
+  runinfo_get();
+
+/*
+*   обработка кнопок
+*/
+    // обработка кнопки - подтверждение заезда спортсмена со статусом QLF
+    $("body").on("click", ".approveQLF", function () {
       $.ajax({
         url: "/raceinfo/approve/run/"+$(this).attr('run_id')+"/competitor/"+$(this).attr('run_id'),
         //dataType: 'json',
@@ -333,8 +369,121 @@ $(document).ready(function () {
 
   });
 
-  // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
-  runinfo_get();
+    // обработка кнопки финиш заезда
+    $("body").on("click", ".run_finish", function () {
+      $.ajax({
+        type: "GET",
+        url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/stop",
+      })
+        .done(function(data) {
+          runinfo_get();
+          $("#tab_startlist_run"+$(this).attr('run_id')+" .status").html("завершен");
+        });
+    });
+    // обработка кнопки старт заезда
+    $("body").on("click", ".run_start", function () {
+      $.ajax({
+        type: "GET",
+        url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/start",
+      })
+        .done(function(data) {
+          runinfo_get();
+          $("#tab_startlist_run"+$(this).attr('run_id')+" .status").html("активен");
+          add_result_table($(this).attr('run_id')); // создаем таблицу для общих результатов. !!!к этому моменту должны быть уже получены все массивы run_list, course_list, dev_list
+        });
+    });
+
+    // обработка кнопки вызова ручного ввода результата - модальное окно #popup_editresult
+    $("body").on("click", ".editresult", function () {
+      console.log($(this).attr('run_id'));
+      $("#form_txt_competitor").html($(this).attr('competitor_id'));
+      console.log("num="+run_list[run_list_ids["id"+$(this).attr('run_id')]].number);
+      $("#form_txt_run").html(run_list[run_list_ids["id"+$(this).attr('run_id')]].number);
+
+      $("#form_run_id").val($(this).attr('run_id'));
+      $("#form_competitor_id").val($(this).attr('competitor_id'));
+
+      $("#popup_editresult").modal('show');
+    });
+    // обработка кнопки сохранения и апрува для ручного ввода результата
+    $("body").on("click", ".editform_approve", function () {
+        $.ajax({
+          type: "GET",
+          url: "/raceinfo/approve/edit/run/"+$("#form_run_id").val()+"/competitor/"+$("#form_competitor_id").val(),
+          //dataType: 'json',
+          data: {
+            data: JSON.stringify({
+              'absolut_time': $("#form_time").val(),
+              'reason': $("#form_reason").val(),
+              'gate': $("#form_gate").val(),
+              'status_id':  $("#form_status").val()
+            })
+          },
+          success:function(data) {
+            $("#action"+$("#form_run_id").val()+"_"+$("#form_competitor_id").val()).html("Approved");
+            $("#popup_editresult").modal('hide');
+          },
+          error: function (error) {alert('error');}
+        })
+    });
+
+    // обработка кнопки выхова редактирования стартлиста
+    $("body").on("click", ".btn_edit_startlist", function () {
+        var r=$(this).attr('run_id');
+        $("#tab_startlist_run"+r+" table .edit").show();
+        $("#tab_startlist_run"+r+" table .edit").show();
+
+        $("#tab_startlist_run"+r+" .btn_edit_startlist").hide();
+        $("#tab_startlist_run"+r+" .btn_save_startlist").show();
+        $("#tab_startlist_run"+r+" .btn_canceledit_startlist").show();
+    });
+    // обработка кнопки отмены редактирования стартлиста
+    $("body").on("click", ".btn_canceledit_startlist", function () {
+      var r=$(this).attr('run_id');
+      $("#tab_startlist_run"+r+" table .edit").hide();
+      $("#tab_startlist_run"+r+" table .edit").hide();
+
+      $("#tab_startlist_run"+r+" .btn_edit_startlist").show();
+      $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
+      $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
+    });
+    // обработка кнопки сохнанения изменений в стартлисте
+    $("body").on("click", ".btn_save_startlist", function () {
+        var r=$(this).attr('run_id');
+        var arr = [];
+        $("#tab_startlist_run"+r+" table .edit input[type='text']").each(function() {
+          arr.push([this.name, parseInt(this.value)]);
+        });
+        if(arr.length){
+          console.log("sort");
+          arr.sort(function(a,b){if (a[1] > b[1]) return 1; else if (a[1] < b[1]) return -1; else return 0;}); // сортируем список по новому порядку order
+          console.log(arr);
+          for(var i=0;i<arr.length;i++){
+            arr[i][1]=i+1;
+          }
+          console.log(arr);
+          $.ajax({
+            type: "GET",
+            url: "/raceinfo/race/order_list/edit",
+            //dataType: 'json',
+            data: {
+              data: JSON.stringify({
+                'run_id': r,
+                'order_list': arr
+              })
+            },
+            success:function(data) {
+            //  startlist_get(r);
+              alert("ready "+r);
+            },
+            error: function (error) {alert('error');}
+          })
+        }
+    });
+
+    /*
+    *   END // обработка кнопок
+    */
 
   // получаем список статусов
   $.get("/raceinfo/status/get")
@@ -345,126 +494,10 @@ $(document).ready(function () {
     })
   })
 
-  // обработка кнопки финиш заезда
-  $("body").on("click", ".run_finish", function () {
-    $.ajax({
-      type: "GET",
-      url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/stop",
-    })
-      .done(function(data) {
-        runinfo_get();
-        $("#tab_startlist_run"+$(this).attr('run_id')+" .status").html("завершен");
-      });
-  });
 
-  // обработка кнопки старт заезда
-  $("body").on("click", ".run_start", function () {
-    $.ajax({
-      type: "GET",
-      url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/start",
-    })
-      .done(function(data) {
-        runinfo_get();
-        $("#tab_startlist_run"+$(this).attr('run_id')+" .status").html("активен");
-      });
-  });
-
-  // обработка кнопки ручного ввода результата - модальное окно #popup_editresult
-  $("body").on("click", ".editresult", function () {
-    console.log($(this).attr('run_id'));
-    $("#form_txt_competitor").html($(this).attr('competitor_id'));
-    console.log("num="+run_list[run_list_ids["id"+$(this).attr('run_id')]].number);
-    $("#form_txt_run").html(run_list[run_list_ids["id"+$(this).attr('run_id')]].number);
-
-    $("#form_run_id").val($(this).attr('run_id'));
-    $("#form_competitor_id").val($(this).attr('competitor_id'));
-
-    $("#popup_editresult").modal('show');
-  });
-
-  // ручной ввод результата
-  $("body").on("click", ".editform_approve", function () {
-      $.ajax({
-        type: "GET",
-        url: "/raceinfo/approve/edit/run/"+$("#form_run_id").val()+"/competitor/"+$("#form_competitor_id").val(),
-        //dataType: 'json',
-        data: {
-          data: JSON.stringify({
-            'absolut_time': $("#form_time").val(),
-            'reason': $("#form_reason").val(),
-            'gate': $("#form_gate").val(),
-            'status_id':  $("#form_status").val()
-          })
-        },
-        success:function(data) {
-          $("#action"+$("#form_run_id").val()+"_"+$("#form_competitor_id").val()).html("Approved");
-          $("#popup_editresult").modal('hide');
-        },
-        error: function (error) {alert('error');}
-      })
-  });
-
-  $("body").on("click", ".btn_edit_startlist", function () {
-      var r=$(this).attr('run_id');
-      $("#tab_startlist_run"+r+" table .edit").show();
-      $("#tab_startlist_run"+r+" table .edit").show();
-
-      $("#tab_startlist_run"+r+" .btn_edit_startlist").hide();
-      $("#tab_startlist_run"+r+" .btn_save_startlist").show();
-      $("#tab_startlist_run"+r+" .btn_canceledit_startlist").show();
-  });
-  $("body").on("click", ".btn_canceledit_startlist", function () {
-    var r=$(this).attr('run_id');
-    $("#tab_startlist_run"+r+" table .edit").hide();
-    $("#tab_startlist_run"+r+" table .edit").hide();
-
-    $("#tab_startlist_run"+r+" .btn_edit_startlist").show();
-    $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
-    $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
-  });
-  $("body").on("click", ".btn_save_startlist", function () {
-      var r=$(this).attr('run_id');
-      var arr = [];
-      //$("#tab_startlist_run"+r+" table .edit input")
-      $("#tab_startlist_run"+r+" table .edit input[type='text']").each(function() {
-        arr.push([this.name, parseInt(this.value)]);
-      });
-      if(arr.length){
-        console.log("sort");
-        arr.sort(function(a,b){if (a[1] > b[1]) return 1; else if (a[1] < b[1]) return -1; else return 0;}); // сортируем список по новому порядку order
-        console.log(arr);
-        for(var i=0;i<arr.length;i++){
-          arr[i][1]=i+1;
-        }
-        console.log(arr);
-        $.ajax({
-          type: "GET",
-          url: "/raceinfo/race/order_list/edit",
-          //dataType: 'json',
-          data: {
-            data: JSON.stringify({
-              'run_id': r,
-              'order_list': arr
-            })
-          },
-          success:function(data) {
-          //  startlist_get(r);
-            alert("ready "+r);
-          },
-          error: function (error) {alert('error');}
-        })
-      }
-      //console.log(data);
-/*      $("#tab_startlist_run"+r+" table .edit").show();
-      $("#tab_startlist_run"+r+" table .edit").show();
-
-      $("#tab_startlist_run"+r+" .btn_edit_startlist").hide();
-      $("#tab_startlist_run"+r+" .btn_save_startlist").show();
-      $("#tab_startlist_run"+r+" .btn_canceledit_startlist").show();
-*/
-  });
 
 });
+
 
 // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
 function runinfo_get(){
@@ -500,7 +533,6 @@ function runinfo_get(){
           }
           $("#run_current").html(run.number);
 
-          console.log($("#tab_startlist").html()==false);
           //если это первый заезд либо страница только что открыта
           if(run_list[0].id==run.id || $("#tab_startlist").html()==""){
               //подготавливаем таб со стартовыми списками по заездам
@@ -511,6 +543,14 @@ function runinfo_get(){
               }
           }
 
+          // получение и внесение информации для вкладки "Устройства на трассах" (#tab_device)
+          courselist_get();
+          courselist_tab_prepare();
+
+          /*
+          * Functions
+          */
+          //подготовка таба со стартовыми списками по заездам (#tab_startlist)
           function startlist_tab_prepare(){
             if(run_list.length){
               //console.log(run_list);
@@ -531,7 +571,7 @@ function runinfo_get(){
               alert("runlist error");
             }
           }
-
+          // получение стартового списка для заезда run_id
           function startlist_get(run_id){
             $.get("/raceinfo/startlist/run/"+run_id+"/get/")
             .done(function(data){
@@ -558,10 +598,96 @@ function runinfo_get(){
 
           }
 
+          // получение и внесение информации для вкладки "Устройства на трассах" (#tab_device)
+          function courselist_tab_prepare(){
+            if(course_list.length){
+              $("#tab_device").append("<h2>Устройства на трассах</h2>");
+              for(var i=0;i<course_list.length;i++){
+                console.log(this);
+                $("#tab_device").append("<h3>Course "+course_list[i].id+" (runs: "+course_list[i].runs_str.join(", ")+")</div>");
+                $("#tab_device").append("<table id='device_course_"+course_list[i].id+"' style='width:100%;' class='table table-bordered'><thead><tr><th>id</th><th class='edit'>№</th><th>distance</th><th>Type</th><tr></thead><tbody></tbody></table>");
+                // получаем список девайсов для трассы this.id
+                $.get("/raceinfo/device/get/course/"+course_list[i].id)
+                .done(function(data){
+                  var dev_list=JSON.parse(data);
+                  device_list["course_"+dev_list[0][0].course_id]=dev_list;
+                  $.each(dev_list, function(value) {
+                    $("#device_course_"+this[0].course_id+" tbody").append("<tr><td>"+ this[1].id+"</td><td>"+this[0].order+"</td><td>"+this[0].distance+"</td><td>"+this[1].name+"</td>");
+                  });
+                  prepare_result_tables();
+                })
+              }
+            }else{
+              alert("courselist error");
+            }
+          }
+          // формирование список трасс (course) с заездами (runs) на них
+          function courselist_get(){
+            var cid_prev=null;
+            for(var i=0; i<run_list.length; i++){
+              if(run_list[i].course_id!=cid_prev){
+                course_list.push({"id":run_list[i].course_id, "runs":Array(), "runs_str":Array(), "dev":""});
+              }
+              course_list[course_list.length-1].runs.push({"id":run_list[i].id, "number":run_list[i].number});
+              course_list[course_list.length-1].runs_str.push(run_list[i].number);
+              cid_prev=run_list[i].course_id;
+            }
+          }
+          function prepare_result_tables(){
+            var run=run_list[run_list_ids["id"+run_id]];
+            for(var j=0;j<run_list.length;j++){
+              var run=run_list[j];
 
+              var cid=run_list[j].course_id;
+              var run_id=run_list[j].id;
+
+              if(!$("#tab_summarytable .div_run"+run.id).length){
+                $("#tab_summarytable").append("<div class='div_run"+run.id+"'></div>");
+                $("#tab_summarytable .div_run"+run.id).append("<h3>Run: "+run.number+"</h3>");
+                $("#tab_summarytable .div_run"+run.id).append("<table style='width:100%;' class='table table-bordered table_run"+run.id+"'></table>");
+                $("#tab_summarytable .div_run"+run.id+" table").append("<thead><tr></tr></thead>");
+                $("#tab_summarytable .div_run"+run.id+" table").append("<tbody></tbody>");
+
+                $("#tab_summarytable .div_run"+run.id+" table thead tr").append("<th>bib</th><th>Name</th>");
+                var d = device_list["course_"+run.course_id];
+                for(var i=0;i<d.length;i++){
+                  $("#tab_summarytable .div_run"+run.id+" table thead tr").append("<th>"+d[i][1].name+" - "+d[i][0].distance+"</th>");
+                }
+              }
+            }
+          }
+          /*
+          * END // Functions
+          */
         }
       });
 }
-
+function nform(v){
+  return number_format(v, 4, '.', ' ');
+}
+function tform(v){
+  return number_format(v/10000000, 4, '.', ' ');
+}
+function number_format(number, decimals, dec_point, thousands_sep) {
+    number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+    var n = !isFinite(+number) ? 0 : +number,
+        prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+        sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+        dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+        s = '',
+        toFixedFix = function (n, prec) {
+            var k = Math.pow(10, prec);
+            return '' + Math.round(n * k) / k;
+        };
+    s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+    if (s[0].length > 3) {
+        s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+    }
+    if ((s[1] || '').length < prec) {
+        s[1] = s[1] || '';
+        s[1] += new Array(prec - s[1].length + 1).join('0');
+    }
+    return s.join(dec);
+}
 </script>
 {% endblock %}

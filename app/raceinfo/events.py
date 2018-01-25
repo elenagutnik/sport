@@ -184,9 +184,9 @@ def startlist_get(run_id):
     data = json.dumps(db.session.query(Competitor,RaceCompetitor,RunOrder).join(RaceCompetitor).join(RunOrder).filter(RunOrder.run_id==run_id).order_by(RunOrder.order).all(), cls=jsonencoder.AlchemyEncoder)
     return data
 
-@raceinfo.route('/device/get')
-def device_get():
-    return json.dumps(db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == request.args['course_id']).all())
+@raceinfo.route('/device/get/course/<int:course_id>')
+def device_get(course_id):
+    return json.dumps(db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == course_id).all(), cls=jsonencoder.AlchemyEncoder)
 
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
 def load_data_vol2():
