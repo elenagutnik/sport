@@ -29,10 +29,10 @@
                     <ul class="dropdown-menu">
                       <li><a href="{{ url_for('raceinfo.gender_list') }}">{{ _('Gender') }}</a></li>
                       <li><a href="{{ url_for('raceinfo.discipline_list') }}">{{ _('Discipline') }}</a></li>
-                      <li><a href="{{ url_for('raceinfo.tdrole_list') }}">{{ _('TD types') }}</a></li>
+{#                      <li><a href="{{ url_for('raceinfo.tdrole_list') }}">{{ _('TD types') }}</a></li>#}
                       <li><a href="{{ url_for('raceinfo.category_list') }}">{{ _('Category') }}</a></li>
                       <li><a href="{{ url_for('raceinfo.status_list') }}">{{ _('Status') }}</a></li>
-                      <li><a href="{{ url_for('raceinfo.mark_list') }}">{{ _('Marks') }}</a></li>
+{#                      <li><a href="{{ url_for('raceinfo.mark_list') }}">{{ _('Marks') }}</a></li>#}
                       <li><a href="{{ url_for('raceinfo.nation_list') }}">{{ _('Nations') }}</a></li>
                     </ul>
                 </li>
@@ -40,8 +40,8 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Race') }} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                       <li><a href="{{ url_for('raceinfo.race_add') }}">{{ _('Create New Race') }}</a></li>
-                      <li><a href="">{{ _('Finished Race') }}</a></li>
-                      <li><a href="">{{ _('Opened Race') }}</a></li>
+{#                      <li><a href="">{{ _('Finished Race') }}</a></li>#}
+{#                      <li><a href="">{{ _('Opened Race') }}</a></li>#}
                       <li><a href="{{ url_for('raceinfo.race_list') }}">{{ _('Race list') }}</a></li>
                     </ul>
                 </li>
@@ -67,12 +67,12 @@
                 <li>
                   <a href="{{ url_for('raceinfo.team_list', username=current_user.username)}}">{{ _('Team') }}</a>
                 </li>
-                <li>
-                  <a href="#reports">{{ _('Reports') }}</a>
-                </li>
-                <li>
-                  <a href="#log">{{ _('Log') }}</a>
-                </li>
+{#                <li>#}
+{#                  <a href="#reports">{{ _('Reports') }}</a>#}
+{#                </li>#}
+{#                <li>#}
+{#                  <a href="#log">{{ _('Log') }}</a>#}
+{#                </li>#}
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">

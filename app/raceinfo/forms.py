@@ -133,7 +133,7 @@ class EditCompetitorBase(FlaskForm):
 
     points = StringField('Points')# Не понятно
     fis_points = StringField('Points')
-
+    is_ajax = HiddenField('is_ajax')
     submit = SubmitField('Submit')
 
 

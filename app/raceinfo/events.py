@@ -248,10 +248,15 @@ def load_data_vol2():
 
         previous_device_results = db.session.query(ResultDetail).filter(ResultDetail.course_device_id == previous_course_device.id,
             ResultDetail.race_competitor_id == result.race_competitor_id,  ResultDetail.run_id == run.id).one()
-
+        # time
         result.time = data['time'] - start_result.absolut_time
         result.sectortime = data['time'] - previous_device_results.absolut_time
-        result.speed = (course_device[0].distance - previous_course_device.distance) / result.sectortime
+        result.speed = ((course_device[0].distance - previous_course_device.distance)/1000) / (result.sectortime/3600000)
+        # temp_time= datetime.fromtimestamp(result.absolut_time / 1e3)
+        # result.time = data['time'] - start_result.absolut_time
+        # result.sectortime = data['time'] - previous_device_results.absolut_time
+        # result.speed = (course_device[0].distance - previous_course_device.distance) / result.sectortime
+        #
 
         if len(results) == 0:
             result.diff = 0
@@ -286,5 +291,28 @@ def load_data_vol2():
     db.session.add(input_data)
     db.session.add(result)
     db.session.commit()
+
+    # if course_device[1].name == "Finish":
+    # #     временный автоапрув
+    #     status = Status.query.filter_by(name='QLF').one()
+    #     try:
+    #         result = Result.query.filter_by(race_competitor_id=result.race_competitor_id).one()
+    #     except:
+    #         result = Result(race_competitor_id=result.race_competitor_id)
+    #         db.session.add(result)
+    #         db.session.commit()
+    #
+    #     resultDetail = ResultApproved(
+    #         is_manual=False,
+    #         approve_user=current_user.id,
+    #         approve_time=datetime.now(),
+    #         race_competitor_id=result.race_competitor_id,
+    #         run_id=run.id,
+    #         status_id=status.id,
+    #         timerun=data['time'],
+    #         result_id=result.id
+    #     )
+    #     db.session.add(resultDetail)
+    #     db.session.commit()
 
     return '', 200
