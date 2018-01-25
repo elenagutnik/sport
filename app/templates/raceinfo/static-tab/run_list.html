@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}SKI - Forerunners List{% endblock %}
+{% block title %}SKI - Run List{% endblock %}
 
 {% block page_content %}
 
 <div class="page-header">
-    <h1>Course runs <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/run/add">Add</a></h1>
+    <h1> Run list <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/run/add">Add</a></h1>
 </div>
 
 <table class="table table-striped">
@@ -29,11 +29,6 @@
       <td>{{ run[1].en_name }}</td>
       <td>{{ run[0].starttime }}</td>
       <td>{{ run[0].endtime }}</td>
-      <td>
-        <a href="run/{{ run[0].id }}/start" class="btn btn-success">start</a>
-        |
-        <a href="run/{{ run[0].id }}/stop" class="btn btn-danger">stop</a>
-      </td>
       <td>
         <a href="run/{{ run[0].id }}/edit">edit</a>
         |

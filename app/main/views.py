@@ -35,7 +35,7 @@ def edit_profile():
         current_user.lang = form.lang.data
         db.session.add(current_user)
         flash('Your profile has been updated.')
-        return redirect(url_for('.user', username=current_user.username))
+        return redirect(url_for('.user', username=current_user.username, _external=True))
     form.name.data = current_user.name
     form.location.data = current_user.location
     form.about_me.data = current_user.about_me
@@ -60,7 +60,7 @@ def edit_profile_admin(id):
         user.lang = form.lang.data
         db.session.add(user)
         flash('The profile has been updated.')
-        return redirect(url_for('main.edit_profile_admin', id=id))
+        return redirect(url_for('main.edit_profile_admin', id=id, _external=True))
     form.email.data = user.email
     form.username.data = user.username
     form.confirmed.data = user.confirmed

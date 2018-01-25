@@ -32,10 +32,10 @@ def discipline_add():
             en_name = form.en_name.data)
         db.session.add(discipline)
         flash('The discipline has been added.')
-        return redirect(url_for('.discipline_list'))
+        return redirect(url_for('.discipline_list', _external=True))
     return render_template('raceinfo/static-tab/discipline_add.html', form=form)
 
-@raceinfo.route('/discipline/<int:id>/', methods=['GET', 'POST'])
+@raceinfo.route('/discipline/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def discipline_edit(id):
@@ -47,7 +47,7 @@ def discipline_edit(id):
         discipline.en_name = form.en_name.data
         db.session.add(discipline)
         flash('The discipline has been updated.')
-        return redirect(url_for('.discipline_list'))
+        return redirect(url_for('.discipline_list',_external=True))
     form.fiscode.data = discipline.fiscode
     form.ru_name.data = discipline.ru_name
     form.en_name.data = discipline.en_name
@@ -60,7 +60,7 @@ def discipline_del(id):
     discipline = Discipline.query.get_or_404(id)
     db.session.delete(discipline)
     flash('The discipline '+ discipline.ru_name +' has been deleted.')
-    return redirect(url_for('.discipline_list'))
+    return redirect(url_for('.discipline_list',_external=True))
 
 @raceinfo.route('/gender/', methods=['GET', 'POST'])
 @login_required
@@ -80,7 +80,7 @@ def gender_add():
             en_name = form.en_name.data)
         db.session.add(gender)
         flash('The gender has been added.')
-        return redirect(url_for('.gender_list'))
+        return redirect(url_for('.gender_list',_external=True))
     return render_template('raceinfo/static-tab/gender_add.html', form=form)
 
 @raceinfo.route('/gender/<int:id>/', methods=['GET', 'POST'])
@@ -95,7 +95,7 @@ def gender_edit(id):
         gender.en_name = form.en_name.data
         db.session.add(gender)
         flash('The gender has been updated.')
-        return redirect(url_for('.gender_list'))
+        return redirect(url_for('.gender_list',_external=True))
     form.fiscode.data = gender.fiscode
     form.ru_name.data = gender.ru_name
     form.en_name.data = gender.en_name
@@ -108,7 +108,7 @@ def gender_del(id):
     gender = Gender.query.get_or_404(id)
     db.session.delete(gender)
     flash('The gender '+ gender.ru_name +' has been deleted.')
-    return redirect(url_for('.gender_list'))
+    return redirect(url_for('.gender_list',_external=True))
 
 @raceinfo.route('/category/', methods=['GET', 'POST'])
 @login_required
@@ -130,26 +130,26 @@ def category_add():
             )
         db.session.add(category)
         flash('The category has been added.')
-        return redirect(url_for('.category_list'))
+        return redirect(url_for('.category_list',_external=True))
     return render_template('raceinfo/static-tab/simpleform.html', form=form, title='Add category')
 
-@raceinfo.route('/category/<int:id>/', methods=['GET', 'POST'])
+@raceinfo.route('/category/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def category_edit(id):
     category = Category.query.get_or_404(id)
-    form = EditCategoryForm(category = category)
+    form = EditCategoryForm()
     if form.validate_on_submit():
         category.name = form.name.data
         category.description = form.description.data
         category.level = form.level.data
         db.session.add(category)
         flash('The category has been updated.')
-        return redirect(url_for('.category_list'))
+        return redirect(url_for('.category_list',_external=True))
     form.name.data = category.name
     form.description.data = category.description
     form.level.data = category.level
-    return render_template('raceinfo/static-tab/simpleform.html', form=category, category=category, title='Edit category')
+    return render_template('raceinfo/static-tab/simpleform.html', form=form, category=category, title='Edit category')
 
 @raceinfo.route('/category/<int:id>/del/', methods=['GET', 'POST'])
 @login_required
@@ -158,7 +158,7 @@ def category_del(id):
     category = Category.query.get_or_404(id)
     db.session.delete(category)
     flash('The category '+ category.name +' has been deleted.')
-    return redirect(url_for('.category_list'))
+    return redirect(url_for('.category_list',_external=True))
 
 @raceinfo.route('/mark/', methods=['GET', 'POST'])
 @login_required
@@ -179,7 +179,7 @@ def mark_add():
             )
         db.session.add(mark)
         flash('The mark has been added.')
-        return redirect(url_for('.mark_list'))
+        return redirect(url_for('.mark_list',_external=True))
     return render_template('raceinfo/static-tab/simpleform.html', form=form, title='Add Mark')
 
 @raceinfo.route('/mark/<int:id>/', methods=['GET', 'POST'])
@@ -193,7 +193,7 @@ def mark_edit(id):
         mark.description = form.description.data
         db.session.add(mark)
         flash('The mark has been updated.')
-        return redirect(url_for('.mark_list'))
+        return redirect(url_for('.mark_list',_external=True))
     form.name.data = mark.name
     form.description.data = mark.description
     return render_template('raceinfo/static-tab/simpleform.html', form=form, mark=mark, title='Edit Mark')
@@ -205,7 +205,7 @@ def mark_del(id):
     mark = Mark.query.get_or_404(id)
     db.session.delete(mark)
     flash('The mark '+ mark.ru_name +' has been deleted.')
-    return redirect(url_for('.mark_list'))
+    return redirect(url_for('.mark_list',_external=True))
 
 
 @raceinfo.route('/nation/', methods=['GET', 'POST'])
@@ -228,7 +228,7 @@ def nation_add():
             )
         db.session.add(nation)
         flash('The nation has been added.')
-        return redirect(url_for('.nation_list'))
+        return redirect(url_for('.nation_list',_external=True))
     return render_template('raceinfo/static-tab/simpleform.html', form=form, title=gettext('Add Nation'))
 
 
@@ -244,7 +244,7 @@ def nation_edit(id):
         nation.en_description = form.en_description.data
         db.session.add(nation)
         flash('The nation has been updated.')
-        return redirect(url_for('.nation_list'))
+        return redirect(url_for('.nation_list',_external=True))
     form.name.data = nation.name
     form.ru_description.data = nation.ru_description
     form.en_description.data = nation.en_description
@@ -257,7 +257,7 @@ def nation_del(id):
     nation = Nation.query.get_or_404(id)
     db.session.delete(nation)
     flash('The nation '+ nation.ru_name +' has been deleted.')
-    return redirect(url_for('.nation_list'))
+    return redirect(url_for('.nation_list',_external=True))
 
 
 @raceinfo.route('/status/', methods=['GET', 'POST'])
@@ -279,10 +279,10 @@ def status_add():
             )
         db.session.add(status)
         flash('The status has been added.')
-        return redirect(url_for('.status_list'))
+        return redirect(url_for('.status_list',_external=True))
     return render_template('raceinfo/static-tab/status_add.html', form=form)
 
-@raceinfo.route('/status/<int:id>/', methods=['GET', 'POST'])
+@raceinfo.route('/status/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def status_edit(id):
@@ -293,7 +293,7 @@ def status_edit(id):
         status.description = form.description.data
         db.session.add(status)
         flash('The status has been updated.')
-        return redirect(url_for('.status_list'))
+        return redirect(url_for('.status_list',_external=True))
     form.name.data = status.name
     form.description.data = status.description
     return render_template('raceinfo/static-tab/simpleform.html', form=form, obj=status, title=gettext('Edit Status'))
@@ -305,7 +305,7 @@ def status_del(id):
     status = Status.query.get_or_404(id)
     db.session.delete(status)
     flash('The status '+ status.ru_name +' has been deleted.')
-    return redirect(url_for('.status_list'))
+    return redirect(url_for('.status_list',_external=True))
 
 
 @raceinfo.route('/tdrole/', methods=['GET', 'POST'])
@@ -324,7 +324,7 @@ def tdrole_add():
         tdrole = TDRole(name = form.name.data)
         db.session.add(tdrole)
         flash('The tdrole has been added.')
-        return redirect(url_for('.tdrole_list'))
+        return redirect(url_for('.tdrole_list',_external=True))
     return render_template('raceinfo/static-tab/tdrole_add.html', form=form)
 
 @raceinfo.route('/tdrole/<int:id>/', methods=['GET', 'POST'])
@@ -337,7 +337,7 @@ def tdrole_edit(id):
         tdrole.name = form.name.data
         db.session.add(tdrole)
         flash('The tdrole has been updated.')
-        return redirect(url_for('.tdrole_list'))
+        return redirect(url_for('.tdrole_list',_external=True))
     form.name.data = tdrole.name
     return render_template('raceinfo/static-tab/tdrole_edit.html', form=form, tdrole=tdrole)
 
@@ -348,7 +348,7 @@ def tdrole_del(id):
     tdrole = TDRole.query.get_or_404(id)
     db.session.delete(tdrole)
     flash('The tdrole '+ tdrole.ru_name +' has been deleted.')
-    return redirect(url_for('.tdrole_list'))
+    return redirect(url_for('.tdrole_list',_external=True))
 
 @raceinfo.route('/td/', methods=['GET', 'POST'])
 @login_required
@@ -376,7 +376,7 @@ def td_add():
         )
         db.session.add(td)
         flash('The td has been added.')
-        return redirect(url_for('.td_list'))
+        return redirect(url_for('.td_list',_external=True))
     return render_template('raceinfo/static-tab/td_add.html', form=form)
 
 @raceinfo.route('/td/<int:id>/', methods=['GET', 'POST'])
@@ -400,7 +400,7 @@ def td_edit(id):
 
         db.session.add(td)
         flash(gettext('The td has been updated.'))
-        return redirect(url_for('.td_list'))
+        return redirect(url_for('.td_list',_external=True))
     form.ru_firstname.data = td.ru_firstname
     form.en_firstname.data = td.en_firstname
     form.ru_lastname.data = td.ru_lastname
@@ -419,7 +419,7 @@ def td_del(id):
     td = TD.query.get_or_404(id)
     db.session.delete(td)
     flash(gettext('The td '+ td.ru_name +' has been deleted.'))
-    return redirect(url_for('.td_list'))
+    return redirect(url_for('.td_list',_external=True))
 
 @raceinfo.route('/race/', methods=['GET'])
 @admin_required
@@ -457,7 +457,7 @@ def additional_params(id):
         race.softwareversion = form.softwareversion.data
         db.session.add(race)
         db.session.commit()
-        return redirect(url_for('.race', id=id))
+        return redirect(url_for('.race', id=id,_external=True))
     form.usedfislist.data = race.usedfislist
     form.appliedpenalty.data = race.appliedpenalty
     form.calculatedpenalty.data = race.calculatedpenalty
@@ -467,7 +467,7 @@ def additional_params(id):
     form.softwarecompany.data = race.softwarecompany
     form.softwarename.data = race.softwarename
     form.softwareversion.data = race.softwareversion
-    return render_template('raceinfo/static-tab/form_page.html', race=race, form=form)
+    return render_template('raceinfo/static-tab/form_page.html', title='Race additional parameters', race=race, form=form)
 
 
 @raceinfo.route('/race/add', methods=['GET', 'POST'])
@@ -503,7 +503,7 @@ def race_add():
         db.session.commit()
 
         flash('The Race has been added.')
-        return redirect(url_for('.race_list'))
+        return redirect(url_for('.race_list',_external=True))
     return render_template('raceinfo/static-tab/simpleform.html', form=form, title=gettext('Add Race'))
 
 @raceinfo.route('/race/<int:id>/editbase', methods=['GET', 'POST'])
@@ -537,7 +537,7 @@ def race_editbase(id):
         db.session.add(race)
 
         flash('The Race has been changed.')
-        return redirect(url_for('.race_list'))
+        return redirect(url_for('.race_list',_external=True))
     return render_template('raceinfo/static-tab/simpleform.html', form=form, race=race, title=gettext('Edit Race - General properties'))
 #  I have no idea, what do you want!!!!
 # @raceinfo.route('/race/<int:id>/jury', methods=['GET', 'POST'])
@@ -612,6 +612,9 @@ def race_editbase(id):
 #         flash('The Race Jury has been changed.')
 #         return redirect(url_for('.race_list'))
 #     return render_template('raceinfo/jury.html', form=form, race=race, title=gettext('Edit Race - General properties'))
+
+# !!!!!!!!!!!!!!!!!!
+
 @raceinfo.route('/race/<int:id>/jury', methods=['GET', 'POST'])
 @admin_required
 def edit_race_jury(id):
@@ -638,12 +641,13 @@ def edit_race_jury(id):
         db.session.add(raceJury)
         db.session.commit()
 
-    return render_template('raceinfo/static-tab/jury_race.html', form=form, jury=race_jury)
+    return render_template('raceinfo/static-tab/jury_race.html', title='Jury list', form=form, jury=race_jury)
+
 @raceinfo.route('/race/<int:race_id>/jury/<int:jury_id>/del', methods=['GET', 'POST'])
 @admin_required
 def remove_race_jury(race_id,jury_id):
     db.session.delete(RaceJury.query.filter_by(id=jury_id).one())
-    return redirect(url_for('.edit_race_jury', id=race_id))
+    return redirect(url_for('.edit_race_jury', id=race_id,_external=True))
 
 @raceinfo.route('/jury_list/', methods=['GET', 'POST'])
 @admin_required
@@ -675,7 +679,7 @@ def jury_add():
         )
         db.session.add(jury)
         flash('The  Jury has been added.')
-        return redirect(url_for('.jury_list'))
+        return redirect(url_for('.jury_list',_external=True))
     return render_template('raceinfo/static-tab/jury_add.html', form=form)
 
 
@@ -707,26 +711,30 @@ def competitor_add():
                                 Category.query.all()]
     if form.validate_on_submit():
         competitor = Competitor(
-        fiscode = form.fis_code.data,
-        ru_firstname = form.ru_firstname.data,
-        en_firstname = form.en_firstname.data,
-        ru_lastname = form.ru_lastname.data,
-        en_lastname = form.en_lastname.data,
-        gender_id = form.gender_ref.data,
+            fiscode = form.fis_code.data,
+            ru_firstname = form.ru_firstname.data,
+            en_firstname = form.en_firstname.data,
+            ru_lastname = form.ru_lastname.data,
+            en_lastname = form.en_lastname.data,
+            gender_id = form.gender_ref.data,
 
-        birth = form.birth.data,
-        nation_code_id = form.nation_code_ref.data,
+            birth = form.birth.data,
+            nation_code_id = form.nation_code_ref.data,
 
-        national_code = form.national_code.data,
-        NSA = form.NSA.data,
-        category_id = form.category_ref.data,
+            national_code = form.national_code.data,
+            NSA = form.NSA.data,
+            category_id = form.category_ref.data,
 
-        points = form.points.data,
-        fis_points =form.fis_points.data
+            points = form.points.data,
+            fis_points =form.fis_points.data
         )
         db.session.add(competitor)
-        flash('The discipline has been added.')
-        return redirect(url_for('.competitor_list'))
+        if form.is_ajax is False:
+            flash('The competitor has been added.')
+            return redirect(url_for('.competitor_list',_external=True))
+        else:
+            return json.dumps(competitor, cls=jsonencoder.AlchemyEncoder)
+
     return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
 
 @raceinfo.route('/competitor/<int:id>/edit', methods=['GET', 'POST'])
@@ -765,8 +773,8 @@ def competitor_edit(id):
         competitor.points=form.points.data
         competitor.fis_points=form.fis_points.data
         db.session.add(competitor)
-        flash('The discipline has been updated.')
-        return redirect(url_for('.competitor_list'))
+        flash('The competitor has been updated.')
+        return redirect(url_for('.competitor_list',_external=True))
     form.fis_code.data = competitor.fiscode
     form.ru_firstname.data = competitor.ru_firstname
     form.en_firstname.data = competitor.en_firstname
@@ -791,8 +799,8 @@ def competitor_edit(id):
 def competitor_del(id):
     competitor = Competitor.query.get_or_404(id)
     db.session.delete(competitor)
-    flash('The competitor ' + competitor.ru_name + ' has been deleted.')
-    return redirect(url_for('.competitor_list'))
+    flash('The competitor has been deleted.')
+    return redirect(url_for('.competitor_list',_external=True))
 
 
 
@@ -800,6 +808,8 @@ def competitor_del(id):
 @admin_required
 def edit_race_competitor(id):
     race = Race.query.filter_by(id=id).one()
+    add_competitor_form = EditCompetitorBase()
+    add_competitor_form.is_ajax.data = True
     if race.isTeam:
         form = EditRaceCompetitorTeamForm()
 
@@ -814,10 +824,21 @@ def edit_race_competitor(id):
         race_competitors = db.session.query(RaceCompetitor, Competitor). \
             outerjoin(Competitor, RaceCompetitor.competitor_id == Competitor.id). \
             filter(RaceCompetitor.race_id == id).all()
+
     if current_user.lang =='ru':
         form.competitor_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Competitor.query.all()]
+        add_competitor_form.nation_code_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
+                                                  Nation.query.all()]
+        add_competitor_form.gender_ref.choices = [(item.id, item.ru_name) for item in
+                                   Gender.query.all()]
     else:
         form.competitor_ref.choices = [(item.id, item.en_lastname + ' ' + item.en_firstname) for item in Competitor.query.all()]
+        add_competitor_form.nation_code_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
+                                                  Nation.query.all()]
+        add_competitor_form.gender_ref.choices = [(item.id, item.en_name) for item in
+                                   Gender.query.all()]
+    add_competitor_form.category_ref.choices = [(item.id, item.name) for item in
+                                Category.query.all()]
     if form.validate_on_submit():
         # selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
         raceCompetitor = RaceCompetitor(
@@ -831,14 +852,53 @@ def edit_race_competitor(id):
             raceCompetitor.team_id = form.team_ref.data
         db.session.add(raceCompetitor)
         db.session.commit()
+        flash('The competitor has been added')
 
-    return render_template('raceinfo/static-tab/competitors_race.html', form=form, competitors=race_competitors)
+    return render_template('raceinfo/static-tab/competitors_race.html', form=form, competitors=race_competitors, competitor_form=add_competitor_form)
 
 @raceinfo.route('/race/<int:race_id>/competitor/<int:competitor_id>/del', methods=['GET', 'POST'])
 @admin_required
 def remove_race_competitor(race_id,competitor_id):
     db.session.delete(RaceCompetitor.query.filter_by(id=competitor_id).one())
-    return redirect(url_for('.edit_race_competitor', id=race_id))
+    return redirect(url_for('edit_race_competitor', id=race_id,_external=True))
+
+@raceinfo.route('/race/<int:race_id>/competitor/<int:competitor_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def race_competitor_edit(race_id,competitor_id):
+    race = Race.query.filter_by(id=race_id).one()
+    race_competitor = RaceCompetitor.query.filter_by(id=competitor_id).one()
+    if race.isTeam:
+        form = EditRaceCompetitorTeamForm()
+        form.team_ref.data = request.args.get('team_id')
+
+    else:
+        form = EditRaceCompetitor()
+    if current_user.lang == 'ru':
+        form.competitor_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in
+                                       Competitor.query.all()]
+
+    else:
+        form.competitor_ref.choices = [(item.id, item.en_lastname + ' ' + item.en_firstname) for item in
+                                       Competitor.query.all()]
+    if form.validate_on_submit():
+        # selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
+
+        race_competitor.competitor_id=form.competitor_ref.data,
+        race_competitor.age_class=form.age_class.data,
+        race_competitor.chip=form.chip.data,
+        race_competitor.bib=form.chip.data
+        db.session.add(race_competitor)
+        db.session.commit()
+        flash('The competitor has been updated')
+        return redirect(url_for('.edit_race_competitor',_external=True))
+    form.competitor_ref.data = race_competitor.competitor_id
+    form.age_class.data = race_competitor.age_class
+    form.chip.data = race_competitor.chip
+    form.bib.data = race_competitor.bib
+
+    return render_template('raceinfo/static-tab/form_page.html', form=form, title='Edit competitor')
+
+
 
 @raceinfo.route('/forerunner/', methods=['GET', 'POST'])
 @login_required
@@ -870,8 +930,8 @@ def forerunner_add():
         db.session.add(forerunner)
         db.session.commit()
         flash('The forerunner has been added.')
-        return redirect(url_for('.forerunner_list'))
-    return render_template('raceinfo/static-tab/form_page.html', form=form, title="Forerunner add")
+        return redirect(url_for('.forerunner_list',_external=True))
+    return render_template('raceinfo/static-tab/form_page.html', form=form, title="Add forerunner")
 
 @raceinfo.route('/forerunner/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -886,14 +946,14 @@ def forerunner_edit(id):
         forerunner.en_firstname = form.en_firstname.data,
         forerunner.nation_id = form.nation_ref.data
         db.session.add(forerunner)
-        flash('The discipline has been updated.')
-        return redirect(url_for('.competitor_list'))
+        flash('The forerunner has been updated.')
+        return redirect(url_for('.competitor_list',_external=True))
     form.ru_lastname.data = forerunner.ru_lastname
     form.ru_firstname.data = forerunner.ru_firstname
     form.en_lastname.data = forerunner.en_lastname
     form.en_firstname.data = forerunner.en_firstname
     form.nation_ref.data = forerunner.nation_id
-    return render_template('raceinfo/static-tab/form_page.html', form=form, forerunner=forerunner)
+    return render_template('raceinfo/static-tab/form_page.html', title='Edit forerunner', form=form, forerunner=forerunner)
 
 @raceinfo.route('/forerunner/<int:id>/del/', methods=['GET', 'POST'])
 @login_required
@@ -902,7 +962,7 @@ def forerunner_del(id):
     forerunner = Forerunner.query.get_or_404(id)
     db.session.delete(forerunner)
     flash('The forerunner ' + forerunner.ru_firstname + ' has been deleted.')
-    return redirect(url_for('.forerunner_list'))
+    return redirect(url_for('.forerunner_list',_external=True))
 
 
 @raceinfo.route('/coursetter/', methods=['GET', 'POST'])
@@ -934,7 +994,7 @@ def coursetter_add():
         db.session.add(coursetter)
         db.session.commit()
         flash('The coursetter has been added.')
-        return redirect(url_for('.coursetter_list'))
+        return redirect(url_for('.coursetter_list',_external=True))
     return render_template('raceinfo/static-tab/form_page.html',  form=form, title="Coursetter add")
 
 @raceinfo.route('/coursetter/<int:id>/edit', methods=['GET', 'POST'])
@@ -950,8 +1010,8 @@ def coursetter_edit(id):
         coursetter.en_firstname = form.en_firstname.data,
         coursetter.nation_id = form.nation_ref.data
         db.session.add(coursetter)
-        flash('The discipline has been updated.')
-        return redirect(url_for('.competitor_list'))
+        flash('The coursetter has been updated.')
+        return redirect(url_for('.competitor_list',_external=True))
     form.ru_lastname.data = coursetter.ru_lastname
     form.ru_firstname.data = coursetter.ru_firstname
     form.en_lastname.data = coursetter.en_lastname
@@ -965,8 +1025,8 @@ def coursetter_edit(id):
 def coursetter_del(id):
     coursetter = Coursetter.query.get_or_404(id)
     db.session.delete(coursetter)
-    flash('The forerunner ' + coursetter.ru_firstname + ' has been deleted.')
-    return redirect(url_for('.coursetter_list'))
+    flash('The coursetter ' + coursetter.ru_firstname + ' has been deleted.')
+    return redirect(url_for('.coursetter_list',_external=True))
 
 
 @raceinfo.route('/race/<int:id>/course', methods=['GET', 'POST'])
@@ -1002,7 +1062,7 @@ def race_сourse_add(id):
         db.session.add(course)
         db.session.commit()
         flash('The course has been added.')
-        return redirect(url_for('.race_сourse_list', id=id))
+        return redirect(url_for('.race_сourse_list', id=id,_external=True))
     return render_template('raceinfo/static-tab/course_edit.html', form=form)
 
 @raceinfo.route('/race/<int:id>/course/<int:course_id>/base/edit', methods=['GET', 'POST'])
@@ -1029,7 +1089,7 @@ def race_сourse_base_edit(id, course_id):
         db.session.add(сourse)
         db.session.commit()
         flash('The course has been updated.')
-        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id))
+        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id,_external=True))
     form.course_coursetter_ref.data = сourse.course_coursetter_id
     form.run.data = сourse.run
     form.ru_name.data = сourse.ru_name
@@ -1060,7 +1120,7 @@ def race_сourse_del(id, course_id):
     сourse = Course.query.get_or_404(course_id)
     db.session.delete(сourse)
     flash('The сourse ' + сourse.ru_name + ' has been deleted.')
-    return redirect(url_for('.race_сourse_list', id=id))
+    return redirect(url_for('.race_сourse_list', id=id,_external=True))
 
 
 @raceinfo.route('/race/<int:id>/course/<int:course_id>/forerunner/add', methods=['GET', 'POST'])
@@ -1091,7 +1151,7 @@ def race_сourse_forerunner(id, course_id):
         db.session.add(course_forerunner)
         db.session.commit()
         flash('The course forerunner has been added.')
-        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id))
+        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id,_external=True))
     return render_template('raceinfo/static-tab/cource_forerunner_list.html', form = form)
 
 
@@ -1113,7 +1173,7 @@ def race_сourse_forerunner_edit(id, course_id,forerunner_id):
         db.session.add(course_forerunner)
         db.session.commit()
         flash('The course forerunner has been updated.')
-        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id))
+        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id,_external=True))
     form.order.data = course_forerunner.order
     form.forerunner_ref.data = course_forerunner.forerunner_id
     return render_template('raceinfo/static-tab/cource_forerunner_list.html', form = form)
@@ -1125,7 +1185,7 @@ def race_сourse_forerunner_del(id,course_id,forerunner_id):
     course_forerunner = CourseForerunner.query.get_or_404(forerunner_id)
     db.session.delete(course_forerunner)
     flash('The forerunner has been deleted.')
-    return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id))
+    return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id,_external=True))
 
 
 @raceinfo.route('/team/', methods=['GET'])
@@ -1153,8 +1213,8 @@ def team_add():
         )
         db.session.add(team)
         flash('The team has been added.')
-        return redirect(url_for('.team_list'))
-    return render_template('raceinfo/static-tab/form_page.html', form=form)
+        return redirect(url_for('.team_list',_external=True))
+    return render_template('raceinfo/static-tab/form_page.html', title='Add team', form=form)
 
 @raceinfo.route('/team/<int:id>/edit', methods=['GET', 'POST'])
 @admin_required
@@ -1174,12 +1234,12 @@ def team_edit(id):
         team.nation_id=form.nation_ref.data
         db.session.add(team)
         flash('The team has been changed.')
-        return redirect(url_for('.team_list'))
+        return redirect(url_for('.team_list',_external=True))
     form.fis_code.data = team.fis_code
     form.en_teamname.data = team.en_teamname
     form.ru_teamname.data = team.ru_teamname
     form.nation_ref.data = team.nation_id
-    return render_template('raceinfo/static-tab/form_page.html', form=form)
+    return render_template('raceinfo/static-tab/form_page.html', title='Edit team', form=form)
 
 @raceinfo.route('/team/<int:id>/del', methods=['GET', 'POST'])
 @admin_required
@@ -1187,7 +1247,7 @@ def team_remove(id):
     team = Team.query.get_or_404(id)
     db.session.delete(team)
     flash('The team has been deleted.')
-    return redirect(url_for('.team_list'))
+    return redirect(url_for('.team_list',_external=True))
 
 
 @raceinfo.route('/race/<int:id>/run', methods=['GET', 'POST'])
@@ -1222,7 +1282,7 @@ def race_course_run_del(id,run_id):
     run_info = RunInfo.query.get_or_404(run_id)
     db.session.delete(run_info)
     flash('The run has been deleted.')
-    return redirect(url_for('.race_run', id=id))
+    return redirect(url_for('.race_run', id=id,_external=True))
 
 
 
@@ -1240,7 +1300,7 @@ def race_course_run_start(id,run_id):
     db.session.add(cache)
     db.session.commit()
     flash('The run has been  started.')
-    return redirect(url_for('.race_run', id=id))
+    return redirect(url_for('.race_run', id=id,_external=True))
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/stop', methods=['GET', 'POST'])
 @admin_required
@@ -1248,12 +1308,11 @@ def race_course_run_stop(id,run_id):
     run_info = RunInfo.query.get_or_404(run_id)
     run_info.endtime = datetime.now()
     db.session.add(run_info)
-    cache = TempCashe.query.filter(key='Current_competitor').one()
+    cache = TempCashe.query.filter(TempCashe.key=='Current_competitor').one()
     db.session.delete(cache)
 
-    news_run=db.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
-    race_competitors = db.session.query(RaceCompetitor, RunInfo, ResultApproved, Status).\
-        join(RunInfo).\
+    news_run=db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
+    race_competitors = db.session.query(RaceCompetitor, ResultApproved, Status).\
         join(ResultApproved).\
         join(Status).\
         filter(RaceCompetitor.race_id == id, RunInfo.number==run_info.number, ResultApproved.run_id==run_id).\
@@ -1269,7 +1328,7 @@ def race_course_run_stop(id,run_id):
     db.session.commit()
 
     flash('The run has been finishd.')
-    return redirect(url_for('.race_run', id=id))
+    return redirect(url_for('.race_run', id=id,_external=True))
 
 @raceinfo.route('/race/<int:id>/run/add', methods=['GET', 'POST'])
 @admin_required
@@ -1292,8 +1351,8 @@ def race_run_add(id):
         db.session.add(run_info)
         db.session.commit()
         flash('The run has been added.')
-        return redirect(url_for('.race_run', id=id))
-    return render_template('raceinfo/static-tab/form_page.html', form = form)
+        return redirect(url_for('.race_run', id=id,_external=True))
+    return render_template('raceinfo/static-tab/form_page.html',title='Add run', form=form)
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/edit', methods=['GET', 'POST'])
 @admin_required
@@ -1314,13 +1373,11 @@ def race_run_edit(id,run_id):
         db.session.add(run_info)
         db.session.commit()
         flash('The run has been updated.')
-        return redirect(url_for('.race_run', id=id))
+        return redirect(url_for('.race_run', id=id,_external=True))
 
     form.course_ref.data = run_info.course_id
     form.number.data = run_info.number
-    form.starttime.data = run_info.starttime
-    form.endtime.data = run_info.starttime
-    return render_template('raceinfo/static-tab/form_page.html', form = form)
+    return render_template('raceinfo/static-tab/form_page.html', title='Edit run', form=form)
 
 
 
@@ -1348,8 +1405,8 @@ def race_сourse_dev_add(id, course_id):
         )
         db.session.add(dev)
         flash('The device has been added.')
-        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id))
-    return render_template('raceinfo/static-tab/form_page.html', form=form)
+        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id,_external=True))
+    return render_template('raceinfo/static-tab/form_page.html', title='Add device', form=form)
 
 
 @raceinfo.route('/race/<int:id>/course/<int:course_id>/dev/<int:dev_id>/edit', methods=['GET', 'POST'])
@@ -1357,13 +1414,10 @@ def race_сourse_dev_add(id, course_id):
 def race_сourse_dev_edit(id,course_id, dev_id):
     form = EditCourseDeviceForm()
     dev = CourseDevice.query.filter_by(id=dev_id).one()
-    # if current_user.lang == 'ru':
-    #     form.course_ref.choices = [(item.id, item.ru_name) for item in
-    #                                Course.query.filter_by(race_id=id).all()]
-    # else:
-    #
-    #     form.course_ref.choices = [(item.id, item.ru_name) for item in
-    #                                Course.query.filter_by(race_id=id).all()]
+    form.device_ref.choices = [(item.id, item.name) for item in
+                               Device.query.all()]
+    form.course_device_type_ref.choices = [(item.id, item.name) for item in
+                                           CourseDeviceType.query.all()]
     if form.validate_on_submit():
         # intermediate_dev.course_id = form.course_ref.data
         dev.order = form.order.data
@@ -1373,14 +1427,13 @@ def race_сourse_dev_edit(id,course_id, dev_id):
 
         db.session.add(dev)
         flash('The device has been added.')
-        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id))
-    form.course_ref.data = dev.course_id
+        return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id,_external=True))
     form.order.data = dev.order
     form.distance.data = dev.distance
     form.device_ref.data = dev.device_id
     form.course_device_type_ref.data = dev.course_device_type_id
 
-    return render_template('raceinfo/static-tab/form_page.html', form=form)
+    return render_template('raceinfo/static-tab/form_page.html', title='Edit device', form=form)
 
 @raceinfo.route('/race/<int:id>/course/<int:course_id>/dev/<int:dev_id>/del', methods=['GET', 'POST'])
 @admin_required
@@ -1388,7 +1441,7 @@ def race_сourse_dev_del(id,course_id, dev_id):
     intermediate_dev = CourseDevice.query.get_or_404(dev_id)
     db.session.delete(intermediate_dev)
     flash('The device has been deleted.')
-    return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id))
+    return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id,_external=True))
 
 
 # ========================================================================================================================================
@@ -1415,9 +1468,9 @@ def race_team_add(id):
         )
         db.session.add(race_team)
         db.session.commit()
-        flash('The course has been added.')
-        return redirect(url_for('.race_team_list', id=id))
-    return render_template('raceinfo/static-tab/form_page.html', form=form)
+        flash('The team has been added.')
+        return redirect(url_for('.race_team_list', id=id,_external=True))
+    return render_template('raceinfo/static-tab/form_page.html', title='Add team',form=form)
 
 @raceinfo.route('/race/<int:id>/team/<int:team_id>/edit', methods=['GET', 'POST'])
 @admin_required
@@ -1441,11 +1494,11 @@ def race_team_edit_base(id, team_id):
         race_team.team_id = form.team_ref.data
         db.session.add(race_team)
         db.session.commit()
-        flash('The course has been updated.')
-        return redirect(url_for('.race_team_list', id=id))
+        flash('The team has been updated.')
+        return redirect(url_for('.race_team_list', id=id,_external=True))
     form.team_ref.data = race_team.team_id
     form.bib.data = race_team.bib
-    return render_template('raceinfo/static-tab/form_page.html', form=form)
+    return render_template('raceinfo/static-tab/form_page.html', titile='Edit team', form=form)
 
 
 @raceinfo.route('/race/<int:id>/team/<int:team_id>/del', methods=['GET', 'POST'])
@@ -1454,7 +1507,7 @@ def race_team_del(id, team_id):
     race_team = RaceTeam.query.get_or_404(team_id)
     db.session.delete(race_team)
     flash('The team has been deleted.')
-    return redirect(url_for('.race_team_list', id=id))
+    return redirect(url_for('.race_team_list', id=id,_external=True))
 # ========================================================================================================================================
 
 
@@ -1480,9 +1533,9 @@ def device_add():
         )
         db.session.add(device)
         db.session.commit()
-        flash('The forerunner has been added.')
-        return redirect(url_for('.device_list'))
-    return render_template('raceinfo/static-tab/form_page.html', form=form, title="Device add")
+        flash('The device has been added.')
+        return redirect(url_for('.device_list',_external=True))
+    return render_template('raceinfo/static-tab/form_page.html', form=form, title="Add device ")
 
 @raceinfo.route('/device/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -1497,12 +1550,12 @@ def device_edit(id):
         device.name=form.name.data
         device.type_id=form.type_ref.data
         db.session.add(device)
-        flash('The discipline has been updated.')
-        return redirect(url_for('.device_list'))
+        flash('The device has been updated.')
+        return redirect(url_for('.device_list',_external=True))
     form.src_dev.data = device.src_dev
     form.name.data = device.name
     form.type_ref.data = device.type_id
-    return render_template('raceinfo/static-tab/form_page.html', form=form, device=device)
+    return render_template('raceinfo/static-tab/form_page.html', title='Edit device',form=form, device=device)
 
 @raceinfo.route('/device/<int:id>/del/', methods=['GET', 'POST'])
 @login_required
@@ -1511,7 +1564,7 @@ def device_del(id):
     device = Device.query.get_or_404(id)
     db.session.delete(device)
     flash('The device has been deleted.')
-    return redirect(url_for('.device_list'))
+    return redirect(url_for('.device_list',_external=True))
 
 @raceinfo.route('/device/type/', methods=['GET', 'POST'])
 @login_required
@@ -1527,8 +1580,8 @@ def device_type():
         db.session.add(device)
         db.session.commit()
         flash('The device has been added.')
-        return redirect(url_for('.device_type'))
-    return render_template('raceinfo/static-tab/device_type_list.html', form=form, title="Forerunner add", devices=devices)
+        return redirect(url_for('.device_type',_external=True))
+    return render_template('raceinfo/static-tab/device_type_list.html', form=form, title="Add forerunner", devices=devices)
 
 @raceinfo.route('/device/type/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -1541,7 +1594,7 @@ def device_type_edit(id):
 
         db.session.add(device)
         flash('The device has been updated.')
-        return redirect(url_for('.device_type'))
+        return redirect(url_for('.device_type',_external=True))
     form.name.data = device.name
     return render_template('raceinfo/static-tab/form_page.html', form=form, devices=device)
 
@@ -1552,7 +1605,7 @@ def device_type_del(id):
     device = DeviceType.query.get_or_404(id)
     db.session.delete(device)
     flash('The device has been deleted.')
-    return redirect(url_for('.device_type'))
+    return redirect(url_for('.device_type',_external=True))
 
 
 @raceinfo.route('/race/<int:id>/order_list/buld', methods=['GET', 'POST'])
