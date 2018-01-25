@@ -1639,7 +1639,7 @@ def race_order_list_edit():
     new_order = data['order_list']
     for order in new_order:
         RunOrder.query.filter(RunOrder.run_id == data['run_id'],
-                              RunOrder.race_competitor_id == order[0]).update(dict(order=order[1]))
+                              RunOrder.id == order[0]).update(dict(order=order[1]))
     db.session.commit()
     return '',200
 
