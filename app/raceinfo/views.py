@@ -1312,6 +1312,7 @@ def race_course_run_stop(id,run_id):
     db.session.delete(cache)
 
     news_run=db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
+    RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
     race_competitors = db.session.query(RaceCompetitor, ResultApproved, Status).\
         join(ResultApproved).\
         join(Status).\

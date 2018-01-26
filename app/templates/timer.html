@@ -2,7 +2,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
 </html>
 <script>
-var startlist=["1","2","4","6","8","10"]; //стартовый список
+var startlist=["1","2","3","4","5","6"]; //стартовый список
 var devlist=[  //список устройств
 		{
 			src_sys:'sys0001',
@@ -30,7 +30,7 @@ var devlist=[  //список устройств
 		}
 	];
 
-reqSend(0,0,0);
+
 function reqSend(snum,devnum,starttime){
 	var t=new Date().getTime() ; // 12.850 - 12.859
 	if(starttime==0)
@@ -51,7 +51,7 @@ function reqSend(snum,devnum,starttime){
 //			  $( this ).addClass( "done" );
 		});
 {#	alert("dev=" + devlist[devnum].src_dev + " bib=" + startlist[snum] + " time="+t);#}
-	var sectordelay=250; //1sec
+	var sectordelay=100; //1sec
 //	console.log(snum,devnum,starttime);
 
 	if(devnum==devlist.length-1){
@@ -61,7 +61,7 @@ function reqSend(snum,devnum,starttime){
 	}
 	else devnum++;
 	if(snum<=startlist.length-1)
-		setTimeout(reqSend, sectordelay+(Math.random()*240), snum, devnum,starttime);
+		setTimeout(reqSend, sectordelay+(Math.random()*1840), snum, devnum,starttime);
 
 
 }
@@ -71,9 +71,10 @@ function reqSend(snum,devnum,starttime){
 <input type="button" onclick="clearInterval(intervalID);" value="stop"> |
 <input type="text" id="delay_val" value="100"><input type="button" value="change delay" onclick="delay=$('#delay_val').val();clearInterval(intervalID);intervalID = window.setInterval(reqSend, delay);">
  -->
+<input type="button" onclick="reqSend(0,0,0);" value="Run">
 <HR>
 <table id="data" style="width:49%; float:left">
-<tr><td>bib</td><td>src_dev</td><td>src_sys</td><td>timedif ()</td><td>current timestamp (ms)</td></tr>
+<tr><td>№</td><td>src_dev</td><td>src_sys</td><td>timedif ()</td><td>current timestamp (ms)</td></tr>
 </table>
 <!-- <table id="log" style="width:49%; margin-left:1%; float:left">
 <tr><td>#</td><td>delay</td><td>time s.ms</td></tr>
