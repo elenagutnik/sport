@@ -66,10 +66,14 @@
                     data: $('#popup_add_competitor form').serialize(), // serializes the form's elements.
                     success: function (data) {
                         var obj = JSON.parse(data);
-                        $('#competitor_ref').append($("<option></option>")
-                            .attr("value",obj.id)
-                            .text(obj.ru_lastname + ' ' + obj.ru_firstname));
-                        $('#popup_add_competitor').modal('hide');
+                        if(obj.result=='form')
+                             $('#popup_add_competitor form').html(obj.form);
+                        else{
+                            $('#competitor_ref').append($("<option></option>")
+                                .attr("value",obj.id)
+                                .text(obj.ru_lastname + ' ' + obj.ru_firstname));
+                            $('#popup_add_competitor').modal('hide');
+                        }
                     }
                 });
                 e.preventDefault(); // block the traditional submission of the form.
