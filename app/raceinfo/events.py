@@ -109,33 +109,35 @@ def device_1get():
 
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
 def approve_automate(run_id, competitor_id):
-    data = json.loads(request.args['data'])
-    status = Status.query.filter_by(name='QLF').one()
-    try:
-        ResultApproved.query.filtel(ResultApproved.race_competitor_id==competitor_id, ResultApproved.run_id==run_id).one()
-        return 'record allredy exist', 200
-    except:
-        try:
-            result = Result.query.filter_by(race_competitor_id=competitor_id).one()
-        except:
-            result = Result(race_competitor_id=competitor_id)
-            db.session.add(result)
-            db.session.commit()
 
-        resultDetail = ResultApproved(
-            is_manual=False,
-            approve_user=current_user.id,
-            approve_time=datetime.now(),
-            race_competitor_id=competitor_id,
-            run_id=run_id,
-            status_id=status.id,
-            timerun=data['absolut_time'],
-            result_id=result.id
-        )
-        db.session.add(resultDetail)
-        db.session.commit()
+   data = json.loads(request.args['data'])
+   status = Status.query.filter_by(name='QLF').one()
+   try:
+       ResultApproved.query.filtel(ResultApproved.race_competitor_id==competitor_id, ResultApproved.run_id==run_id).one()
+       return 'record allredy exist', 200
+   except:
+       try:
+           result = Result.query.filter_by(race_competitor_id=competitor_id).one()
+       except:
+           result = Result(race_competitor_id=competitor_id)
+           db.session.add(result)
+           db.session.commit()
 
-        return 'huy', 200
+       resultDetail = ResultApproved(
+           is_manual=False,
+           approve_user=current_user.id,
+           approve_time=datetime.now(),
+           race_competitor_id=competitor_id,
+           run_id=run_id,
+           status_id=status.id,
+           timerun=data['absolut_time'],
+           result_id=result.id
+       )
+       db.session.add(resultDetail)
+       db.session.commit()
+
+       return 'ok', 200
+
 
 @raceinfo.route('/approve/edit/run/<int:run_id>/competitor/<int:competitor_id>')
 def approve_manual(run_id, competitor_id):
@@ -166,7 +168,16 @@ def approve_manual(run_id, competitor_id):
 
 @raceinfo.route('/emulation')
 def emulation():
+    db.engine.execute('delete from data_in;')
+    db.engine.execute('delete from result_approved;')
+    db.engine.execute('delete from result_detail; ')
+    db.engine.execute('delete from result;')
+    db.engine.execute('delete from "CASHE";')
+    db.engine.execute('update run_info set endtime=NULL;')
+    db.engine.execute('INSERT INTO "CASHE" (id, key, data) VALUES (1,\'Current_competitor\', \'{"run": 1, "order": 0}\')')
+    db.engine.execute('update run_info set starttime=NULL where number!=1;')
     return render_template('timer.html')
+
 @raceinfo.route('/receiver')
 def receiver():
     return render_template('receiver.html')

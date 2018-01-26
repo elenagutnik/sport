@@ -40,3 +40,5 @@ nosetests.xml
 
 # Virtual environment
 venv
+
+app/templates/receiver_jury.html

@@ -2,8 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/env/Include/site/python3.6/greenlet/greenlet.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ftp.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sport.sql" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/events.py" afterPath="$PROJECT_DIR$/app/raceinfo/events.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/views.py" afterPath="$PROJECT_DIR$/app/raceinfo/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/receiver_jury.html" afterPath="$PROJECT_DIR$/app/templates/receiver_jury.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/timer.html" afterPath="$PROJECT_DIR$/app/templates/timer.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.py" afterPath="$PROJECT_DIR$/config.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/env/pip-selfcheck.json" afterPath="$PROJECT_DIR$/env/pip-selfcheck.json" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,11 +46,18 @@
       <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="596">
-              <caret line="254" column="14" lean-forward="true" selection-start-line="254" selection-start-column="14" selection-end-line="254" selection-end-column="14" />
+            <state relative-caret-position="817">
+              <caret line="242" column="55" lean-forward="true" selection-start-line="242" selection-start-column="55" selection-end-line="242" selection-end-column="55" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
-                <element signature="e#5520#6228#0" expanded="false" />
+                <marker date="1516946236589" expanded="true" signature="6276:6295" ph="delete from " />
+                <marker date="1516946236589" expanded="true" signature="6322:6349" ph="delete from " />
+                <marker date="1516946236589" expanded="true" signature="6376:6401" ph="delete from " />
+                <marker date="1516946236589" expanded="true" signature="6429:6447" ph="delete from " />
+                <marker date="1516946236589" expanded="true" signature="6474:6493" ph="delete from " />
+                <marker date="1516946236589" expanded="true" signature="6520:6552" ph="update run_i... " />
+                <marker date="1516946236589" expanded="true" signature="6579:6676" ph="INSERT INTO &quot;CASHE&quot;... " />
+                <marker date="1516946236589" expanded="true" signature="6702:6752" ph="update run_i... " />
               </folding>
             </state>
           </provider>
@@ -91,8 +106,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2339">
-              <caret line="1316" column="107" lean-forward="false" selection-start-line="1316" selection-start-column="107" selection-end-line="1316" selection-end-column="107" />
+            <state relative-caret-position="412">
+              <caret line="1315" column="0" lean-forward="true" selection-start-line="1315" selection-start-column="0" selection-end-line="1315" selection-end-column="0" />
               <folding>
                 <element signature="e#0#68#0" expanded="true" />
               </folding>
@@ -207,8 +222,8 @@
         <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/form_render.html" />
         <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_race.html" />
         <option value="$PROJECT_DIR$/app/raceinfo/forms.py" />
-        <option value="$PROJECT_DIR$/app/raceinfo/events.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/views.py" />
+        <option value="$PROJECT_DIR$/app/raceinfo/events.py" />
       </list>
     </option>
   </component>
@@ -750,7 +765,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/views.py</url>
-          <line>1364</line>
+          <line>1365</line>
           <option name="timeStamp" value="55" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -760,7 +775,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>174</line>
+          <line>185</line>
           <option name="timeStamp" value="131" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -775,12 +790,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>229</line>
+          <line>240</line>
           <option name="timeStamp" value="163" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/views.py</url>
-          <line>1324</line>
+          <line>1325</line>
           <option name="timeStamp" value="166" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="jinja2-line">
@@ -1186,8 +1201,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2339">
-          <caret line="1316" column="107" lean-forward="false" selection-start-line="1316" selection-start-column="107" selection-end-line="1316" selection-end-column="107" />
+        <state relative-caret-position="412">
+          <caret line="1315" column="0" lean-forward="true" selection-start-line="1315" selection-start-column="0" selection-end-line="1315" selection-end-column="0" />
           <folding>
             <element signature="e#0#68#0" expanded="true" />
           </folding>
@@ -1196,11 +1211,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="596">
-          <caret line="254" column="14" lean-forward="true" selection-start-line="254" selection-start-column="14" selection-end-line="254" selection-end-column="14" />
+        <state relative-caret-position="817">
+          <caret line="242" column="55" lean-forward="true" selection-start-line="242" selection-start-column="55" selection-end-line="242" selection-end-column="55" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
-            <element signature="e#5520#6228#0" expanded="false" />
+            <marker date="1516946236589" expanded="true" signature="6276:6295" ph="delete from " />
+            <marker date="1516946236589" expanded="true" signature="6322:6349" ph="delete from " />
+            <marker date="1516946236589" expanded="true" signature="6376:6401" ph="delete from " />
+            <marker date="1516946236589" expanded="true" signature="6429:6447" ph="delete from " />
+            <marker date="1516946236589" expanded="true" signature="6474:6493" ph="delete from " />
+            <marker date="1516946236589" expanded="true" signature="6520:6552" ph="update run_i... " />
+            <marker date="1516946236589" expanded="true" signature="6579:6676" ph="INSERT INTO &quot;CASHE&quot;... " />
+            <marker date="1516946236589" expanded="true" signature="6702:6752" ph="update run_i... " />
           </folding>
         </state>
       </provider>
