@@ -180,7 +180,7 @@ class Competitor(db.Model):
     gender_id = db.Column(db.Integer, db.ForeignKey('gender.id'))#справочник
     birth = db.Column(db.Date)
     nation_code_id = db.Column(db.Integer, db.ForeignKey('nation.id'))#справочник
-    national_code = db.Column(db.String(1))
+    national_code = db.Column(db.String)
     NSA = db.Column(db.String)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))#справочник
     points = db.Column(db.Float)

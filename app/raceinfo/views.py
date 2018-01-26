@@ -734,8 +734,11 @@ def competitor_add():
             return redirect(url_for('.competitor_list',_external=True))
         else:
             return json.dumps(competitor, cls=jsonencoder.AlchemyEncoder)
-
-    return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
+    if form.is_ajax is False:
+        return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
+    else:
+        form_rener=render_template('raceinfo/static-tab/form_render.html', form=form)
+        return json.dumps(dict(form=form_rener, result='form'))
 
 @raceinfo.route('/competitor/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
