@@ -83,7 +83,7 @@ def gender_add():
         return redirect(url_for('.gender_list',_external=True))
     return render_template('raceinfo/static-tab/gender_add.html', form=form)
 
-@raceinfo.route('/gender/<int:id>/', methods=['GET', 'POST'])
+@raceinfo.route('/gender/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def gender_edit(id):
@@ -256,7 +256,7 @@ def nation_edit(id):
 def nation_del(id):
     nation = Nation.query.get_or_404(id)
     db.session.delete(nation)
-    flash('The nation '+ nation.ru_name +' has been deleted.')
+    flash('The nation has been deleted.')
     return redirect(url_for('.nation_list',_external=True))
 
 
@@ -682,8 +682,47 @@ def jury_add():
         return redirect(url_for('.jury_list',_external=True))
     return render_template('raceinfo/static-tab/jury_add.html', form=form)
 
+@raceinfo.route('/jury_list/<int:id>/edit', methods=['GET', 'POST'])
+@admin_required
+def jury_edit(id):
+    jury=  Jury.query.get_or_404(id)
+    form = EditJuryBase()
+
+    if (current_user.lang == 'ru'):
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
+                                                    Nation.query.all()]
+    else:
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
+                                                  Nation.query.all()]
+    if form.validate_on_submit():
+        jury.ru_lastname=form.ru_lastname.data,
+        jury.ru_firstname=form.ru_firstname.data,
+        jury.en_lastname=form.en_lastname.data,
+        jury.en_firstname=form.en_firstname.data,
+        jury.nation_id=form.nation_ref.data,
+        jury.phonenbr=form.phonenbr.data,
+        jury.email=form.email.data
+
+        db.session.add(jury)
+        flash('The  Jury has been updated.')
+        return redirect(url_for('.jury_list',_external=True))
+    form.ru_lastname.data = jury.ru_lastname
+    form.ru_firstname.data = jury.ru_firstname
+    form.en_lastname.data = jury.en_lastname
+    form.en_firstname.data = jury.en_firstname
+    form.nation_ref.data = jury.nation_id
+    form.phonenbr.data = jury.phonenbr
+    form.email.data = jury.email
+    return render_template('raceinfo/static-tab/form_page.html',title='Edit jury', form=form)
 
 
+@raceinfo.route('/jury_list/<int:id>/del', methods=['GET', 'POST'])
+@admin_required
+def jury_del(id):
+    jury=  Jury.query.get_or_404(id)
+    db.session.delete(jury)
+    flash('The jury has been deleted.')
+    return redirect(url_for('.jury_list', _external=True))
 
 @raceinfo.route('/competitor/', methods=['GET', 'POST'])
 @login_required
@@ -729,12 +768,12 @@ def competitor_add():
             fis_points =form.fis_points.data
         )
         db.session.add(competitor)
-        if form.is_ajax is False:
+        if form.is_ajax is '':
             flash('The competitor has been added.')
             return redirect(url_for('.competitor_list',_external=True))
         else:
             return json.dumps(competitor, cls=jsonencoder.AlchemyEncoder)
-    if form.is_ajax is False:
+    if form.is_ajax.data is None:
         return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
     else:
         form_rener=render_template('raceinfo/static-tab/form_render.html', form=form)
@@ -942,6 +981,12 @@ def forerunner_add():
 def forerunner_edit(id):
     form = EditForerunnerBase()
     forerunner = Forerunner.query.get_or_404(id)
+    if (current_user.lang == 'ru'):
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
+                                                  Nation.query.all()]
+    else:
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
+                                                  Nation.query.all()]
     if form.validate_on_submit():
         forerunner.ru_lastname  = form.ru_lastname.data,
         forerunner.ru_firstname = form.ru_firstname.data,
@@ -1006,6 +1051,12 @@ def coursetter_add():
 def coursetter_edit(id):
     form = EditCoursetterBase()
     coursetter = Coursetter.query.get_or_404(id)
+    if (current_user.lang == 'ru'):
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
+                                                  Nation.query.all()]
+    else:
+        form.nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
+                                                  Nation.query.all()]
     if form.validate_on_submit():
         coursetter.ru_lastname = form.ru_lastname.data,
         coursetter.ru_firstname = form.ru_firstname.data,
