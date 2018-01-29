@@ -485,20 +485,28 @@ def race_add():
     form.category_ref.choices = [(item.id, item.name + ' - ' + item.description) for item in Category.query.all()]
     if form.validate_on_submit():
         race = Race(
-            eventname = form.eventname.data,
-            racedate = form.racedate.data,
-            place = form.place.data,
             gender_id = form.gender_ref.data,
             nation_id = form.nation_ref.data,
+            isTeam = form.race_type.data,
             category_id = form.category_ref.data,
             discipline_id = form.discipline_ref.data,
-            season = form.season.data,
-            sector = form.sector.data,
-            codex = form.codex.data,
-            speedcodex = form.speedcodex.data,
-            training = form.training.data,
-            isTeam=form.race_type.data
         )
+        if form.eventname.data != "":
+            race.eventname = form.eventname.data
+        if form.racedate.data != "":
+            race.racedate = form.racedate.data
+        if form.place.data != "":
+            race.place = form.place.data
+        if form.season.data != "":
+            race.season = form.season.data
+        if form.sector.data != "":
+            race.sector = form.sector.data
+        if form.codex.data != "":
+            race.codex = form.codex.data
+        if form.speedcodex.data != "":
+            race.speedcodex = form.speedcodex.data
+        if form.training.data != "":
+            race.training = form.training.data
         db.session.add(race)
         db.session.commit()
 
@@ -761,22 +769,27 @@ def competitor_add():
             nation_code_id = form.nation_code_ref.data,
 
             national_code = form.national_code.data,
-            NSA = form.NSA.data,
-            category_id = form.category_ref.data,
 
-            points = form.points.data,
-            fis_points =form.fis_points.data
+            category_id=form.category_ref.data,
+
         )
+        if form.NSA.data != "":
+            competitor.NSA = form.NSA.data
+        if form.points.data != "":
+            competitor.points = form.points.data
+        if form.fis_points.data != "":
+            competitor.fis_points = form.fis_points.data
         db.session.add(competitor)
-        if form.is_ajax is '':
+        if form.is_ajax.data is None or form.is_ajax.data == "":
             flash('The competitor has been added.')
             return redirect(url_for('.competitor_list',_external=True))
         else:
             return json.dumps(competitor, cls=jsonencoder.AlchemyEncoder)
-    if form.is_ajax.data is None:
+    tmp = form.is_ajax
+    if form.is_ajax.data is None or form.is_ajax.data =="":
         return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
     else:
-        form_rener=render_template('raceinfo/static-tab/form_render.html', form=form)
+        form_rener = render_template('raceinfo/static-tab/form_render.html', form=form)
         return json.dumps(dict(form=form_rener, result='form'))
 
 @raceinfo.route('/competitor/<int:id>/edit', methods=['GET', 'POST'])

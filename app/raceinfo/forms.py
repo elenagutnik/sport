@@ -128,11 +128,11 @@ class EditCompetitorBase(FlaskForm):
     nation_code_ref = SelectField('Nation', coerce=int, validators=[InputRequired()])
     national_code = StringField('National code')
 
-    NSA = StringField('NSA', validators=[InputRequired()])
+    NSA = StringField('NSA')
     category_ref = SelectField('Category', coerce=int, validators=[InputRequired()])
 
-    points = StringField('Points', validators=[InputRequired()])# Не понятно
-    fis_points = StringField('Points', validators=[InputRequired()])
+    points = StringField('Points')# Не понятно
+    fis_points = StringField('Points')
     is_ajax = HiddenField('is_ajax')
     submit = SubmitField('Submit')
 
