@@ -764,14 +764,10 @@ def competitor_add():
             ru_lastname = form.ru_lastname.data,
             en_lastname = form.en_lastname.data,
             gender_id = form.gender_ref.data,
-
-            birth = form.birth.data,
-            nation_code_id = form.nation_code_ref.data,
-
-            national_code = form.national_code.data,
-
+            birth=form.birth.data,
+            nation_code_id=form.nation_code_ref.data,
+            national_code=form.national_code.data,
             category_id=form.category_ref.data,
-
         )
         if form.NSA.data != "":
             competitor.NSA = form.NSA.data

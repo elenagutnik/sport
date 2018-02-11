@@ -184,7 +184,7 @@ class Competitor(db.Model):
     NSA = db.Column(db.String)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))#справочник
     points = db.Column(db.Float)
-    # fis_points ожидает переноса
+    # fis_points ожидает переноса в RaceCompetitor
     fis_points = db.Column(db.Float)
 
 

@@ -84,8 +84,8 @@ class EditRaceBase(FlaskForm):
     discipline_ref = SelectField('Discipline', coerce=int)
     season = StringField('Season')
     sector = StringField('Sector (AL)')
-    codex = StringField('Codex')
-    speedcodex = StringField('Race codex of speed race for Super Combined')
+    codex = IntegerField('Codex')
+    speedcodex = IntegerField('Race codex of speed race for Super Combined')
     training = StringField('Number of Training')
     submit = SubmitField('Submit')
 

@@ -5,7 +5,7 @@ from .. import db
 
 from . import jsonencoder
 import json
-from sqlalchemy import cast, TIME, DATE
+from sqlalchemy import cast, TIME, DATE, asc
 import time
 from operator import attrgetter
 from flask_login import current_user
@@ -158,8 +158,8 @@ def approve_manual(run_id, competitor_id):
         status_id=data['status_id'],
         timerun=data['absolut_time'],
         result_id=result.id,
-        gate =  data['gate'],
-        reason =data['reason']
+        gate=data['gate'],
+        reason=data['reason']
     )
     db.session.add(resultDetail)
     db.session.commit()
@@ -205,12 +205,12 @@ def device_get(course_id):
 
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
 def load_data_vol2():
-    # Не говнокод, а говнокодище!!!!!!!!!
     #
     CachedObject = TempCashe.query.filter(TempCashe.key=='Current_competitor').one()
     CachedCompetitor = json.loads(CachedObject.data)
     #
-    data = json.loads(request.args['data'])
+    ere =request
+    data = request.json
     # Девайс с которого пришли данные
     device = Device.query.filter_by(src_dev=data['src_dev']).one()
     # Трассы на которых стоит этот девайс
@@ -291,7 +291,7 @@ def load_data_vol2():
         join(Competitor).\
         join(CourseDevice).\
         join(CourseDeviceType).\
-        filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id==run.id).all()
+        filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id==run.id).order_by(asc(RunOrder.order)).all()
 
     tmp = json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
     socketio.emit("newData", tmp)
@@ -331,3 +331,12 @@ def load_data_vol2():
     #     db.session.commit()
 
     return '', 200
+
+
+
+@raceinfo.route('/current_data/get', methods=['POST'])
+def get_current_data():
+    return json.dumps(db.session.query(RaceCompetitor, Competitor, ResultDetail, ResultApproved).join(Competitor)
+                      .join(ResultDetail).join(ResultApproved)\
+                      .filter(RaceCompetitor.race_id == request.args.get['race_id'])\
+                      .all(), cls=jsonencoder.AlchemyEncoder)
