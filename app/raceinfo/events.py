@@ -344,7 +344,7 @@ def get_current_data():
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
 def load_data_vol2():
 
-    data = request.json
+    data = json.loads(request.args['data'])
     # Девайс с которого пришли данные
     device = Device.query.filter_by(src_dev=data['src_dev']).one()
     # Трассы на которых стоит этот девайс
@@ -366,7 +366,7 @@ def load_data_vol2():
                                                      ResultApproved.is_start == True,
                                                      ResultApproved.is_finish != True).one()
     except Exception as e:
-        socketio.emit('errorHandler', dict([('ERROR', '000000'),('TIME', datetime.now().time()),('MESSAGE', 'Ошибка получения компетитора')]))
+        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),('TIME', datetime.now().time()),('MESSAGE', 'Ошибка получения компетитора')])))
         input_data = DataIn(
             src_sys=data['src_sys'],
             src_dev=data['src_dev'],
@@ -376,6 +376,7 @@ def load_data_vol2():
             reserved=data['reserved']
         )
         db.session.add(input_data)
+
         db.session.commit()
         return
     competitor = RaceCompetitor.query.filter_by(resultApproved.race_competitor_id).one()

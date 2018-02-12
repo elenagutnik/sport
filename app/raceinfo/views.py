@@ -1739,3 +1739,18 @@ def competitor_finish():
         return '', 200
     except Exception as err:
         return err
+
+@raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
+def competitor_clear():
+    try:
+        ResultApproved.delete(
+            race_competitor_id=request.args.get('competitor_id'),
+            run_id=request.args.get('run_id')
+        ).execute()
+        ResultDetail.delete(
+            race_competitor_id=request.args.get('competitor_id'),
+            run_id=request.args.get('run_id')
+        ).execute()
+        return '', 200
+    except Exception as err:
+        return err
