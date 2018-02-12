@@ -1716,20 +1716,26 @@ def status_get_list():
 
 @raceinfo.route('/run/competitor/start', methods=['GET', 'POST'])
 def competitor_start():
-    result_approves = ResultApproved(
-        race_competitor_id=request.args.get('competitor_id'),
-        run_id=request.args.get('run_id'),
-        is_start=True)
-    db.session.add(result_approves)
-    db.session.commit()
-    return '', 200
+    try:
+        result_approves = ResultApproved(
+            race_competitor_id=request.args.get('competitor_id'),
+            run_id=request.args.get('run_id'),
+            is_start=True)
+        db.session.add(result_approves)
+        db.session.commit()
+        return '', 200
+    except Exception as err:
+        return err
 
 @raceinfo.route('/run/competitor/finish', methods=['GET', 'POST'])
 def competitor_finish():
-    result_approves = ResultApproved.query.filter_by(
-        race_competitor_id=request.args.get('competitor_id'),
-        run_id=request.args.get('run_id')).one()
-    result_approves.is_finish = True
-    db.session.add(result_approves)
-    db.session.commit()
-    return '', 200
+    try:
+        result_approves = ResultApproved.query.filter_by(
+            race_competitor_id=request.args.get('competitor_id'),
+            run_id=request.args.get('run_id')).one()
+        result_approves.is_finish = True
+        db.session.add(result_approves)
+        db.session.commit()
+        return '', 200
+    except Exception as err:
+        return err
