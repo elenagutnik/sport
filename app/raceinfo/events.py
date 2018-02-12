@@ -343,6 +343,7 @@ def get_current_data():
 
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
 def load_data_vol2():
+
     data = request.json
     # Девайс с которого пришли данные
     device = Device.query.filter_by(src_dev=data['src_dev']).one()
@@ -360,9 +361,23 @@ def load_data_vol2():
 
     results = ResultDetail.query.filter(ResultDetail.course_device_id == course_device[0].id).all()
     # Запущенный пользователь может быть только один, иначе ошибка
-    resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
-                                                 ResultApproved.is_start == True,
-                                                 ResultApproved.is_finish != True).one()
+    try:
+        resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
+                                                     ResultApproved.is_start == True,
+                                                     ResultApproved.is_finish != True).one()
+    except Exception as e:
+        socketio.emit('errorHandler', dict([('ERROR', '000000'),('TIME', datetime.now().time()),('MESSAGE', 'Ошибка получения компетитора')]))
+        input_data = DataIn(
+            src_sys=data['src_sys'],
+            src_dev=data['src_dev'],
+            bib=data['bib'],
+            event_code=data['eventcode'],
+            time=data['time'],
+            reserved=data['reserved']
+        )
+        db.session.add(input_data)
+        db.session.commit()
+        return
     competitor = RaceCompetitor.query.filter_by(resultApproved.race_competitor_id).one()
     result = ResultDetail(
         course_device_id=course_device[0].id,
