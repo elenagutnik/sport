@@ -467,6 +467,8 @@ class ResultApproved(db.Model):
     is_manual = db.Column(db.Boolean)
     gate = db.Column(db.String)
     reason = db.Column(db.String)
+    is_start = db.Column(db.Boolean)
+    is_finish = db.Column(db.Boolean)
 
 class Result(db.Model):
     __tablename__ = 'result'

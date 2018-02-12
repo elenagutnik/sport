@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, abort
 from flask_login import login_required, current_user
 from . import raceinfo
 from .. import db
@@ -1706,10 +1706,30 @@ def race_order_list_edit():
         RunOrder.query.filter(RunOrder.run_id == data['run_id'],
                               RunOrder.id == order[0]).update(dict(order=order[1]))
     db.session.commit()
-    return '',200
+    return '', 200
 
 
 @raceinfo.route('/status/get', methods=['GET'])
 @admin_required
 def status_get_list():
     return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)
+
+@raceinfo.route('/run/competitor/start', methods=['GET', 'POST'])
+def competitor_start():
+    result_approves = ResultApproved(
+        race_competitor_id=request.args.get('competitor_id'),
+        run_id=request.args.get('run_id'),
+        is_start=True)
+    db.session.add(result_approves)
+    db.session.commit()
+    return '', 200
+
+@raceinfo.route('/run/competitor/finish', methods=['GET', 'POST'])
+def competitor_finish():
+    result_approves = ResultApproved.query.filter_by(
+        race_competitor_id=request.args.get('competitor_id'),
+        run_id=request.args.get('run_id')).one()
+    result_approves.is_finish = True
+    db.session.add(result_approves)
+    db.session.commit()
+    return '', 200
