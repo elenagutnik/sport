@@ -1744,12 +1744,12 @@ def competitor_finish():
 def competitor_clear():
     try:
         ResultApproved.delete(
-            race_competitor_id=request.args.get('competitor_id'),
-            run_id=request.args.get('run_id')
+            ResultApproved.race_competitor_id==request.args.get('competitor_id'),
+            ResultApproved.run_id==request.args.get('run_id')
         ).execute()
         ResultDetail.delete(
-            race_competitor_id=request.args.get('competitor_id'),
-            run_id=request.args.get('run_id')
+            ResultDetail.race_competitor_id==request.args.get('competitor_id'),
+            ResultDetail.run_id==request.args.get('run_id')
         ).execute()
         return '', 200
     except Exception as err:
