@@ -1716,16 +1716,14 @@ def status_get_list():
 
 @raceinfo.route('/run/competitor/start', methods=['GET', 'POST'])
 def competitor_start():
-    try:
-        result_approves = ResultApproved(
-            race_competitor_id=request.args.get('competitor_id'),
-            run_id=request.args.get('run_id'),
-            is_start=True)
-        db.session.add(result_approves)
-        db.session.commit()
-        return 'ok', 200
-    except Exception as err:
-        return err
+
+    result_approves = ResultApproved(
+        race_competitor_id=request.args.get('competitor_id'),
+        run_id=request.args.get('run_id'),
+        is_start=True)
+    db.session.add(result_approves)
+    db.session.commit()
+    return 'ok', 200
 
 @raceinfo.route('/run/competitor/finish', methods=['GET', 'POST'])
 def competitor_finish():
@@ -1742,15 +1740,14 @@ def competitor_finish():
 
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
 def competitor_clear():
-    try:
-        ResultApproved.delete(
-            ResultApproved.race_competitor_id==request.args.get('competitor_id'),
-            ResultApproved.run_id==request.args.get('run_id')
-        ).execute()
-        ResultDetail.delete(
-            ResultDetail.race_competitor_id==request.args.get('competitor_id'),
-            ResultDetail.run_id==request.args.get('run_id')
-        ).execute()
-        return '', 200
-    except Exception as err:
-        return err
+
+    ResultApproved.query.filter(
+        ResultApproved.race_competitor_id==request.args.get('competitor_id'),
+        ResultApproved.run_id==request.args.get('run_id')
+    ).delete()
+    ResultDetail.query.filter(
+        ResultDetail.race_competitor_id==request.args.get('competitor_id'),
+        ResultDetail.run_id==request.args.get('run_id')
+    ).delete()
+
+    return '', 200
