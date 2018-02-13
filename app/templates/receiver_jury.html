@@ -4,7 +4,18 @@
 {% block title %} Получатель{% endblock %}
 
 {% block page_content %}
-
+<style>
+#tab_manualcontrol .active td {
+  background-color: #ffd2d1;
+}
+#tab_manualcontrol .finished td {
+  background-color: #efeaea;
+}
+#tab_manualcontrol .approved td {
+  background-color: #bdd2e4;
+}
+.btn {margin-right: 10px;}
+</style>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript" charset="utf-8">
 
@@ -13,6 +24,10 @@
         socket.emit('my event', {data: 'I\'m connected!'});
     });
     var finish_res= new Array();
+    socket.on('errorHandler', function(data) {
+      var data=JSON.parse(data);
+      console.log(data);
+    });
     socket.on('newData', function(data) {
 
       var i;
@@ -243,7 +258,21 @@ function sumtab_set_maininfo(data){
       <h2>Summary tables</h2>
     </div>
 
+    <h2>Controls</h2>
     <div id="tab_curcompetitor" class="tab-pane fade in active">
+      <table id="tab_manualcontrol" class="table table-hover">
+        <thead>
+          <tr>
+              <th>№ п/п</th>
+              <th>bib</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th colspan="3">Controls</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
       <h2>Competitor data</h2>
       <h3>
         NAME: <span id="compname">-</span>
@@ -393,6 +422,7 @@ $(document).ready(function () {
 
   // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
   runinfo_get();
+  //runinfo_get().then(set_list_for_manualcontrol());
 
 /*
 *   обработка кнопок
@@ -531,11 +561,135 @@ $(document).ready(function () {
               $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
               $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
             },
-            error: function (error) {alert('error');}
+            error: function (error) {
+              alert('error');
+            }
           })
         }
     });
+    //---------------------------------
+    $("body").on("click", ".btn_start", function () {
+      var run_id=$(this).attr('run_id');
+      var competitor_id=$(this).attr('competitor_id');
+      $.ajax({
+        type: "GET",
+        url: "/raceinfo/run/competitor/start",
+        data:({
+          'run_id': run_id,
+          'competitor_id': competitor_id
+        }),
+        success:function(data) {
+          console.log('start competitor - run:'+run_id+' competitor:'+competitor_id);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("started");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("danger");
+          $("#tab_manualcontrol tr .btn_start").prop('disabled',true);
+          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn_finish").prop('disabled',false);
+        },
+        error: function(error) {
+          alert('error - start competitor run:'+run_id+' competitor:'+competitor_id);
+        }
+      });
+    });
+    $("body").on("click", ".btn_finish", function () {
+      var run_id=$(this).attr('run_id');
+      var competitor_id=$(this).attr('competitor_id');
+      $.ajax({
+        type: "GET",
+        url: "/raceinfo/run/competitor/finish",
+        data:({
+          'run_id': run_id,
+          'competitor_id': competitor_id
+        }),
+        success:function(data) {
+          console.log('finish competitor - run:'+run_id+' competitor:'+competitor_id);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("finished");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("warning");
+          $("#tab_manualcontrol tr .btn_start").prop('disabled',false);
+          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
 
+        },
+        error: function(error) {
+          alert('error - end competitor run:'+run_id+' competitor:'+competitor_id);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("finished");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("warning");
+          $("#tab_manualcontrol tr .btn_start").prop('disabled',false);
+          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+        }
+      });
+    });
+    $("body").on("click", ".btn_approveqlf", function () {
+      var run_id=$(this).attr('run_id');
+      var competitor_id=$(this).attr('competitor_id');
+      $.ajax({
+        type: "GET",
+        url: "/raceinfo/approve/run/"+run_id+"/competitor/"+competitor_id,
+        data:({
+        }),
+        success:function(data) {
+          console.log('approve competitor - run:'+run_id+' competitor:'+competitor_id);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("approved");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("info");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("success");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").prop('disabled',true);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").hide();
+        },
+        error: function(error) {
+          alert('error - approve competitor run:'+run_id+' competitor:'+competitor_id);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("approved");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("active");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("finish");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("approved");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").prop('disabled',true);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").hide();
+        }
+      });
+    });
+    $("body").on("click", ".btn_editresult", function () {
+      var run_id=$(this).attr('run_id');
+      var competitor_id=$(this).attr('competitor_id');
+      $("#form_txt_competitor").html(competitor_id);
+      $("#form_txt_run").html(run_list[run_list_ids["id"+run_id]].number);
+
+      $("#form_run_id").val(run_id);
+      $("#form_competitor_id").val(competitor_id);
+
+      $("#popup_editresult").modal('show');
+    });
+
+    $("body").on("click", ".btn_clear", function () {
+      var run_id=$(this).attr('run_id');
+      var competitor_id=$(this).attr('competitor_id');
+      $.ajax({
+        type: "GET",
+        url: "/raceinfo/run/competitor/clear",
+        data:({
+          'run_id': run_id,
+          'competitor_id': competitor_id
+        }),
+        success:function(data) {
+          console.log('approve competitor - run:'+run_id+' competitor:'+competitor_id);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("info");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
+          $("#tab_manualcontrol .btn").prop('disabled',false);
+          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+        },
+        error: function(error) {
+          alert('error - approve competitor run:'+run_id+' competitor:'+competitor_id);
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("info");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
+          $("#tab_manualcontrol .btn").prop('disabled',false);
+          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+        }
+      });
+    });
     /*
     *   END // обработка кнопок
     */
@@ -556,6 +710,8 @@ $(document).ready(function () {
 
 // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
 function runinfo_get(){
+    var dfd = new $.Deferred();
+    //dfd.resolve();
     $.ajax({
       type: "GET",
       url: "/raceinfo/run/get/",
@@ -595,6 +751,7 @@ function runinfo_get(){
               for(var i=0; i<run_list.length; i++){
                   // получаем стартовые списоки для первого заезда, и, если возможно, для всех остальных
                   startlist_get(run_list[i]['id']);
+                  console.log("get start_list for run "+run_list[i]['id']);
               }
           }
 
@@ -602,9 +759,12 @@ function runinfo_get(){
           courselist_get();
           courselist_tab_prepare();
 
+
           /*
           * Functions
           */
+          //
+
           //подготовка таба со стартовыми списками по заездам (#tab_startlist)
           function startlist_tab_prepare(){
             if(run_list.length){
@@ -628,12 +788,16 @@ function runinfo_get(){
           }
           // получение стартового списка для заезда run_id
           function startlist_get(run_id){
+            var dfd = new $.Deferred();
+
             $.get("/raceinfo/startlist/run/"+run_id+"/get/")
             .done(function(data){
               start_list=JSON.parse(data);
               for(var i=0;i<run_list.length;i++){
                 if(run_list[i].id==run_id)run_list[i].start_list=start_list;
               }
+              if(run_id==run.id)
+                set_list_for_manualcontrol();
               console.log("run_list");
               console.log(run_list);
               $("#tab_startlist_run"+run_id+" tbody").html(""); //очищаем
@@ -722,7 +886,32 @@ function runinfo_get(){
           */
         }
       });
+      return dfd.promise();
 }
+/*
+* Functions
+*/
+function set_list_for_manualcontrol(){
+  console.log("set_list_for_manualcontrol: ");
+  console.log(run_list[run_list_ids["id"+run.id]].start_list );
+  if(run_list[run_list_ids["id"+run.id]].start_list && run_list[run_list_ids["id"+run.id]].start_list.length){
+    $.each(run_list[run_list_ids["id"+run.id]].start_list, function(value){
+
+      var btn_start="<button class='btn btn-primary btn-sm btn_start' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Start</button>";
+      var btn_finish="<button class='btn btn-success btn-sm btn_finish' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Finish</button>";
+
+      var btn_approveqlf="<button class='btn btn-defaul btn-sm btn_approveqlf' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Approve QLF</button>";
+      var btn_editresult="<button class='btn btn-defaul btn-sm btn_editresult' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Edit Manually</button>";
+
+      var btn_clearresult="<button class='btn btn-danger btn-sm btn_clear' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Clear</button>";
+
+      $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"_"+this[1].competitor_id+"'><td class='order'>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_laststname+"</td><td class='status'></td><td>"+btn_start+btn_finish+"</td><td>"+btn_approveqlf+btn_editresult+"</td><td>"+btn_clearresult+"</td></tr>");
+    });
+  }else{
+    console.log("ERROR! set_list_for_manualcontrol: run_list["+run_list_ids["id"+run.id]+"].start_list.length is false");
+  }
+}
+
 function nform(v){
   return number_format(v, 4, '.', ' ');
 }

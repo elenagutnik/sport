@@ -366,7 +366,7 @@ def load_data_vol2():
                                                      ResultApproved.is_start == True,
                                                      ResultApproved.is_finish != True).one()
     except Exception as e:
-        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),('TIME', datetime.now().time()),('MESSAGE', 'Ошибка получения компетитора')])))
+        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),('TIME', datetime.now().time().__str__()),('MESSAGE', 'Ошибка получения компетитора')])))
         input_data = DataIn(
             src_sys=data['src_sys'],
             src_dev=data['src_dev'],

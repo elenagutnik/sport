@@ -1723,7 +1723,7 @@ def competitor_start():
             is_start=True)
         db.session.add(result_approves)
         db.session.commit()
-        return '', 200
+        return 'ok', 200
     except Exception as err:
         return err
 
