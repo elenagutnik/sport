@@ -5,15 +5,7 @@
 
 {% block page_content %}
 <style>
-#tab_manualcontrol .active td {
-  background-color: #ffd2d1;
-}
-#tab_manualcontrol .finished td {
-  background-color: #efeaea;
-}
-#tab_manualcontrol .approved td {
-  background-color: #bdd2e4;
-}
+
 .btn {margin-right: 10px;}
 </style>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
@@ -33,7 +25,9 @@
       var i;
       var data_arr2=JSON.parse(data);
   //    var data_arr = new Array(data_arr2.length);
-  var data_arr=JSON.parse(data);
+      var data_arr=JSON.parse(data);
+
+
       var list = new Array(data_arr.length);
       var course = new Array(data_arr.length);
       var sector = new Array(data_arr.length);
@@ -64,8 +58,7 @@
         }
       }
       */
-      console.log("33: data_arr");
-      console.log(data_arr.length);
+
       console.log(data_arr);
       //var lastcomp=new Array(data_arr[data_arr.length-1].length);
       /*var last_race_competitor_id=run_list[run_list_ids["id"+run.id]].start_list[data_arr.length-1][2].race_competitor_id;
@@ -81,8 +74,6 @@
       */
       //var lastcomp=new Array(data_arr[data_arr.length-1].length);
 
-      console.log("data_arr=");
-      console.log(data_arr);
 
       lastcomp=data_arr[data_arr.length-1];
       sumtab_set_maininfo(lastcomp);
@@ -414,6 +405,8 @@ var run={'id':null,'number':null}; // активный заезд
 var run_list=new Array(); // список всех заездов для race_id отсортированных по порядку (number)
 var run_list_ids=new Array(); // массив run_list_ids[run_id]=run_list[index] - соответствие id_run элементам в массиве run_list'
 
+var comp_state=new Array();
+
 var status_list; //список статусов
 var start_list; //стартовые списки на все заезды
 var course_list=new Array(); // список трасс на гонке
@@ -580,12 +573,14 @@ $(document).ready(function () {
           'competitor_id': competitor_id
         }),
         success:function(data) {
-          console.log('start competitor - run:'+run_id+' competitor:'+competitor_id);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("started");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("danger");
-          $("#tab_manualcontrol tr .btn_start").prop('disabled',true);
-          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn_finish").prop('disabled',false);
+          if(set_comp_status(competitor_id, "start" ,run_id)){
+            console.log('start competitor - run:'+run_id+' competitor:'+competitor_id);
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("started");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("danger");
+            $("#tab_manualcontrol tr .btn_start").prop('disabled',true);
+            $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn_finish").prop('disabled',false);
+          }
         },
         error: function(error) {
           alert('error - start competitor run:'+run_id+' competitor:'+competitor_id);
@@ -603,21 +598,17 @@ $(document).ready(function () {
           'competitor_id': competitor_id
         }),
         success:function(data) {
-          console.log('finish competitor - run:'+run_id+' competitor:'+competitor_id);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("finished");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("warning");
-          $("#tab_manualcontrol tr .btn_start").prop('disabled',false);
-          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
-
+          if(set_comp_status(competitor_id, "finish" ,run_id)){
+            console.log('finish competitor - run:'+run_id+' competitor:'+competitor_id);
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("finished");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("warning");
+            $("#tab_manualcontrol tr .btn_start").prop('disabled',false);
+            $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+          }
         },
         error: function(error) {
           alert('error - end competitor run:'+run_id+' competitor:'+competitor_id);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("finished");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("warning");
-          $("#tab_manualcontrol tr .btn_start").prop('disabled',false);
-          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
         }
       });
     });
@@ -630,22 +621,18 @@ $(document).ready(function () {
         data:({
         }),
         success:function(data) {
-          console.log('approve competitor - run:'+run_id+' competitor:'+competitor_id);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("approved");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("info");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("success");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").prop('disabled',true);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").hide();
+          if(set_comp_status(competitor_id, "approve" ,run_id)){
+            console.log('approve competitor - run:'+run_id+' competitor:'+competitor_id);
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("approved");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("success");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").prop('disabled',true);
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").hide();
+          }
         },
         error: function(error) {
           alert('error - approve competitor run:'+run_id+' competitor:'+competitor_id);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("approved");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("active");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("finish");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("approved");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").prop('disabled',true);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").hide();
         }
       });
     });
@@ -672,22 +659,18 @@ $(document).ready(function () {
           'competitor_id': competitor_id
         }),
         success:function(data) {
-          console.log('approve competitor - run:'+run_id+' competitor:'+competitor_id);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
-          $("#tab_manualcontrol .btn").prop('disabled',false);
-          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+          if(set_comp_status(competitor_id, "clear" ,run_id)){
+            console.log('approve competitor - run:'+run_id+' competitor:'+competitor_id);
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
+            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
+            $("#tab_manualcontrol .btn").prop('disabled',false);
+            $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+          }
         },
         error: function(error) {
           alert('error - CLEAR competitor run:'+run_id+' competitor:'+competitor_id);
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
-          $("#tab_manualcontrol .btn").prop('disabled',false);
-          $("#tab_manualcontrol .btn_finish").prop('disabled',true);
         }
       });
     });
@@ -892,6 +875,80 @@ function runinfo_get(){
 /*
 * Functions
 */
+function set_comp_status(competitor_id, state ,run_id){
+
+  var err="";
+  if(!comp_state["run_"+run_id])comp_state["run_"+run_id]=new Array();
+
+    if(state=="start"){
+      if(!comp_state["run_"+run_id]["comp_"+competitor_id])
+        comp_state["run_"+run_id]["comp_"+competitor_id]="start";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="start")
+        err = "error - can't start because has already started";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="finish")
+        err = "error - can't start because has already finished";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="approve")
+        err = "error - can't start because has been already approved";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="manual_approve")
+        err = "error - can't start because has been approved manualy";
+    }
+
+    if(state=="finish"){
+      if(!comp_state["run_"+run_id]["comp_"+competitor_id])
+        err = "error - can't finish because hasn't started";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="finish")
+        err = "error - can't finish because already has finished";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="approve")
+        err = "error - can't finish because already has been approved";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="manual_approve")
+        err = "error - can't finish because already has been approved manualy";
+      else
+        comp_state["run_"+run_id]["comp_"+competitor_id]="finish";
+    }
+
+    if(state=="approve"){
+      if(!comp_state["run_"+run_id]["comp_"+competitor_id])
+        err = "error - can't be approved because hasn't started";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="start")
+        err = "error - can't be approved because has to finish before";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="approve")
+        err = "error - can't be approved because already has been approved";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="manual_approve")
+        err = "error - can't be approved because already has been approved manualy";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="finish")
+        comp_state["run_"+run_id]["comp_"+competitor_id]="approve";
+    }
+
+    if(state=="manual_approve"){
+      if(!comp_state["run_"+run_id]["comp_"+competitor_id])
+        err = "error - can't be approved because hasn't started";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="start")
+        err = "error - can't be approved because has to finish before";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="approve")
+        err = "error - can't be approved because already has been approved";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="manual_approve")
+        err = "error - can't be approved because already has been approved manualy";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="finish")
+        comp_state["run_"+run_id]["comp_"+competitor_id]="manual_approve";
+    }
+
+    if(state=="clear"){
+      if(!comp_state["run_"+run_id]["comp_"+competitor_id])
+        err = "error - can't be cleared because hasn't started";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="approve")
+        err = "error - can't be cleared because already has been approved";
+      else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="manual_approve")
+        err = "error - can't be cleared because already has been approved manualy";
+      else
+        comp_state["run_"+run_id]["comp_"+competitor_id]=false;
+    }
+
+    if(err){
+      alert(err);
+      return false;
+    }else
+      return true;
+}
 function set_list_for_manualcontrol(){
   console.log("set_list_for_manualcontrol: ");
   console.log(run_list[run_list_ids["id"+run.id]].start_list );

@@ -110,7 +110,7 @@ def device_1get():
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
 def approve_automate(run_id, competitor_id):
 
-   data = json.loads(request.args['data'])
+ #  data = json.loads(request.args['data'])
    status = Status.query.filter_by(name='QLF').one()
    try:
        ResultApproved.query.filtel(ResultApproved.race_competitor_id==competitor_id, ResultApproved.run_id==run_id).one()
@@ -131,7 +131,7 @@ def approve_automate(run_id, competitor_id):
        resultDetail.race_competitor_id = competitor_id
        resultDetail.run_id = run_id
        resultDetail.status_id = status.id
-       resultDetail.timerun = data['absolut_time']
+#       resultDetail.timerun = data['absolut_time']
        resultDetail.result_id = result.id
 
        db.session.add(resultDetail)
@@ -361,24 +361,24 @@ def load_data_vol2():
 
     results = ResultDetail.query.filter(ResultDetail.course_device_id == course_device[0].id).all()
     # Запущенный пользователь может быть только один, иначе ошибка
-#    try:
-    resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
+    try:
+        resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
                                                      ResultApproved.is_start == True,
                                                      ResultApproved.is_finish == None).one()
-#    except Exception as e:
-#        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),('TIME', datetime.now().time().__str__()),('MESSAGE', 'Ошибка получения компетитора')])))
-#        input_data = DataIn(
-#            src_sys=data['src_sys'],
-#            src_dev=data['src_dev'],
-#            bib=data['bib'],
-#            event_code=data['eventcode'],
-#            time=data['time'],
-#            reserved=data['reserved']
-#        )
-#        db.session.add(input_data)
-#
-#        db.session.commit()
-#        return
+    except Exception as e:
+        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),('TIME', datetime.now().time().__str__()),('MESSAGE', 'Ошибка получения компетитора')])))
+        input_data = DataIn(
+            src_sys=data['src_sys'],
+            src_dev=data['src_dev'],
+            bib=data['bib'],
+            event_code=data['eventcode'],
+            time=data['time'],
+            reserved=data['reserved']
+        )
+        db.session.add(input_data)
+
+        db.session.commit()
+        return ''
     competitor = RaceCompetitor.query.filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
 #    competitor = RaceCompetitor.query.filter_by(resultApproved.race_competitor_id).one()
     result = ResultDetail(
@@ -443,11 +443,19 @@ def load_data_vol2():
 
     db.session.add(result)
 # ------- если че заменить
-    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType, RunOrder).join(RaceCompetitor).\
-        join(Competitor).\
-        join(CourseDevice).\
-        join(CourseDeviceType).\
-        filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id==run.id).order_by(asc(RunOrder.order)).all()
+    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType,RunOrder).\
+       join(RaceCompetitor).\
+       join(Competitor).\
+       join(CourseDevice).\
+       join(CourseDeviceType).\
+       join(RunOrder, RunOrder.race_competitor_id == RaceCompetitor.id).\
+       filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id == run.id,RunOrder.run_id == run.id).order_by(asc(RunOrder.order)).all()
+
+#    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType, RunOrder).join(RaceCompetitor).\
+#        join(Competitor).\
+#        join(CourseDevice).\
+#        join(CourseDeviceType).\
+#        filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id==run.id).order_by(asc(RunOrder.order)).all()
 
     tmp = json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
     socketio.emit("newData", tmp)
