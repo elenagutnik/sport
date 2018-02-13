@@ -1741,6 +1741,7 @@ def competitor_finish():
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
 def competitor_clear():
 
+<<<<<<< HEAD
     ResultApproved.query.filter(
         ResultApproved.race_competitor_id==request.args.get('competitor_id'),
         ResultApproved.run_id==request.args.get('run_id')
@@ -1751,3 +1752,15 @@ def competitor_clear():
     ).delete()
 
     return '', 200
+=======
+   ResultApproved.query.filter(
+       ResultApproved.race_competitor_id==request.args.get('competitor_id'),
+       ResultApproved.run_id==request.args.get('run_id')
+   ).delete()
+   ResultDetail.query.filter(
+       ResultDetail.race_competitor_id==request.args.get('competitor_id'),
+       ResultDetail.run_id==request.args.get('run_id')
+   ).delete()
+
+   return '', 200
+>>>>>>> 825f3a404d8bfbf91ec8e0567016e02b24dab446
