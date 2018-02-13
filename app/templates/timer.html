@@ -50,7 +50,7 @@ function reqSend(snum,devnum,starttime){
 		}).done(function() {
 //			  $( this ).addClass( "done" );
 		});
-{#	alert("dev=" + devlist[devnum].src_dev + " bib=" + startlist[snum] + " time="+t);#}
+{#	alert("dev=" + devlist[devnum].src_dev + " bib=" + snum + " time="+t);#}
 	var sectordelay=100; //1sec
 //	console.log(snum,devnum,starttime);
 
@@ -58,10 +58,14 @@ function reqSend(snum,devnum,starttime){
 		devnum=0;
 		snum++;
 		starttime=0;
+		$("#data").append("<tr><td colspan=5><button class='btn' onclick='setTimeout(reqSend, 100+(Math.random()*1840), "+snum+", "+devnum+",0)'>Next competitor</button></td></tr>");
+	}else{
+		devnum++;
+		//if(snum<=startlist.length-1)
+			setTimeout(reqSend, sectordelay+(Math.random()*1840), snum, devnum,starttime);
+
 	}
-	else devnum++;
-	if(snum<=startlist.length-1)
-		setTimeout(reqSend, sectordelay+(Math.random()*1840), snum, devnum,starttime);
+
 
 
 }

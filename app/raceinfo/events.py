@@ -333,11 +333,11 @@ def device_get(course_id):
 
 
 
-@raceinfo.route('/current_data/get', methods=['POST'])
-def get_current_data():
+@raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
+def get_current_data(race_id):
     return json.dumps(db.session.query(RaceCompetitor, Competitor, ResultDetail, ResultApproved).join(Competitor)
                       .join(ResultDetail).join(ResultApproved)\
-                      .filter(RaceCompetitor.race_id == request.args.get['race_id'])\
+                      .filter(RaceCompetitor.race_id == race_id)\
                       .all(), cls=jsonencoder.AlchemyEncoder)
 
 
@@ -361,25 +361,26 @@ def load_data_vol2():
 
     results = ResultDetail.query.filter(ResultDetail.course_device_id == course_device[0].id).all()
     # Запущенный пользователь может быть только один, иначе ошибка
-    try:
-        resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
+#    try:
+    resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
                                                      ResultApproved.is_start == True,
-                                                     ResultApproved.is_finish != True).one()
-    except Exception as e:
-        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),('TIME', datetime.now().time().__str__()),('MESSAGE', 'Ошибка получения компетитора')])))
-        input_data = DataIn(
-            src_sys=data['src_sys'],
-            src_dev=data['src_dev'],
-            bib=data['bib'],
-            event_code=data['eventcode'],
-            time=data['time'],
-            reserved=data['reserved']
-        )
-        db.session.add(input_data)
-
-        db.session.commit()
-        return
-    competitor = RaceCompetitor.query.filter_by(resultApproved.race_competitor_id).one()
+                                                     ResultApproved.is_finish == None).one()
+#    except Exception as e:
+#        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),('TIME', datetime.now().time().__str__()),('MESSAGE', 'Ошибка получения компетитора')])))
+#        input_data = DataIn(
+#            src_sys=data['src_sys'],
+#            src_dev=data['src_dev'],
+#            bib=data['bib'],
+#            event_code=data['eventcode'],
+#            time=data['time'],
+#            reserved=data['reserved']
+#        )
+#        db.session.add(input_data)
+#
+#        db.session.commit()
+#        return
+    competitor = RaceCompetitor.query.filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
+#    competitor = RaceCompetitor.query.filter_by(resultApproved.race_competitor_id).one()
     result = ResultDetail(
         course_device_id=course_device[0].id,
         race_competitor_id=competitor.id,
@@ -395,9 +396,28 @@ def load_data_vol2():
     else:
         start_device = db.session.query(CourseDevice.id).filter(CourseDevice.course_id == run.course_id,
                                                                 CourseDevice.course_device_type_id == 1)
-        start_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == result.race_competitor_id,
-                                                 ResultDetail.course_device_id == start_device,
-                                                 ResultDetail.run_id == run.id).one()
+#        start_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == result.race_competitor_id,
+#                                                 ResultDetail.course_device_id == start_device,
+#                                                 ResultDetail.run_id == run.id).one()
+        try:
+           start_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == result.race_competitor_id,
+                                                    ResultDetail.course_device_id == start_device,
+                                                    ResultDetail.run_id == run.id).one()
+        except Exception as e:
+           socketio.emit('errorHandler', json.dumps(dict([('ERROR', '0000x1'),('TIME', datetime.now().time().__str__()),('MESSAGE', 'Ошибка: дублирование данных')])))
+           input_data = DataIn(
+               src_sys=data['src_sys'],
+               src_dev=data['src_dev'],
+               bib=data['bib'],
+               event_code=data['eventcode'],
+               time=data['time'],
+               reserved=data['reserved']
+           )
+           db.session.add(input_data)
+
+           db.session.commit()
+           return ''
+
 
         previous_course_device = CourseDevice.query.filter_by(order=course_device[0].order - 1, course_id=run.course_id).one()
 
@@ -422,8 +442,8 @@ def load_data_vol2():
             result.sectordiff = result.sectortime - best_result.sectortime
 
     db.session.add(result)
-
-    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType).join(RaceCompetitor).\
+# ------- если че заменить
+    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType, RunOrder).join(RaceCompetitor).\
         join(Competitor).\
         join(CourseDevice).\
         join(CourseDeviceType).\

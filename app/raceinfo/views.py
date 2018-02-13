@@ -1742,15 +1742,14 @@ def competitor_finish():
 
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
 def competitor_clear():
-    try:
-        ResultApproved.delete(
-            ResultApproved.race_competitor_id==request.args.get('competitor_id'),
-            ResultApproved.run_id==request.args.get('run_id')
-        ).execute()
-        ResultDetail.delete(
-            ResultDetail.race_competitor_id==request.args.get('competitor_id'),
-            ResultDetail.run_id==request.args.get('run_id')
-        ).execute()
-        return '', 200
-    except Exception as err:
-        return err
+
+   ResultApproved.query.filter(
+       ResultApproved.race_competitor_id==request.args.get('competitor_id'),
+       ResultApproved.run_id==request.args.get('run_id')
+   ).delete()
+   ResultDetail.query.filter(
+       ResultDetail.race_competitor_id==request.args.get('competitor_id'),
+       ResultDetail.run_id==request.args.get('run_id')
+   ).delete()
+
+   return '', 200

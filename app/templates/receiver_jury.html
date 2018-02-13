@@ -32,7 +32,8 @@
 
       var i;
       var data_arr2=JSON.parse(data);
-      var data_arr = new Array(data_arr2.length);
+  //    var data_arr = new Array(data_arr2.length);
+  var data_arr=JSON.parse(data);
       var list = new Array(data_arr.length);
       var course = new Array(data_arr.length);
       var sector = new Array(data_arr.length);
@@ -680,7 +681,7 @@ $(document).ready(function () {
           $("#tab_manualcontrol .btn_finish").prop('disabled',true);
         },
         error: function(error) {
-          alert('error - approve competitor run:'+run_id+' competitor:'+competitor_id);
+          alert('error - CLEAR competitor run:'+run_id+' competitor:'+competitor_id);
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
