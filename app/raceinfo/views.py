@@ -1371,27 +1371,26 @@ def race_course_run_stop(id,run_id):
     run_info = RunInfo.query.get_or_404(run_id)
     run_info.endtime = datetime.now()
     db.session.add(run_info)
-    cache = TempCashe.query.filter(TempCashe.key == 'Current_competitor').one()
-    db.session.delete(cache)
+    try:
+        news_run = db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
 
-    news_run=db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
+        RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
+        race_competitors = db.session.query(RaceCompetitor, ResultApproved, Status).\
+            join(ResultApproved).\
+            join(Status).\
+            filter(RaceCompetitor.race_id == id, RunInfo.number==run_info.number, ResultApproved.run_id==run_id).\
+            order_by(Status.filter_order.desc(),ResultApproved.timerun.desc()).all()
 
-    RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
-    race_competitors = db.session.query(RaceCompetitor, ResultApproved, Status).\
-        join(ResultApproved).\
-        join(Status).\
-        filter(RaceCompetitor.race_id == id, RunInfo.number==run_info.number, ResultApproved.run_id==run_id).\
-        order_by(Status.filter_order.desc(),ResultApproved.timerun.desc()).all()
-
-    for i in range(len(race_competitors)):
-        run_order = RunOrder(
-            race_competitor_id=race_competitors[i][0].id,
-            run_id=news_run.id,
-            order=i+1
-        )
-        db.session.add(run_order)
-    db.session.commit()
-
+        for i in range(len(race_competitors)):
+            run_order = RunOrder(
+                race_competitor_id=race_competitors[i][0].id,
+                run_id=news_run.id,
+                order=i+1
+            )
+            db.session.add(run_order)
+        db.session.commit()
+    except:
+        return redirect(url_for('.race_run', id=id, _external=True))
     flash('The run has been finishd.')
     return redirect(url_for('.race_run', id=id,_external=True))
 
@@ -1674,6 +1673,7 @@ def device_type_del(id):
 
 
 @raceinfo.route('/race/<int:id>/order_list/buld', methods=['GET', 'POST'])
+@login_required
 @admin_required
 def race_order_list(id):
     race = Race.query.filter_by(id=id).one()
@@ -1699,6 +1699,8 @@ def race_order_list(id):
     return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=orders_list)
 
 @raceinfo.route('/race/order_list/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def race_order_list_edit():
     data = json.loads(request.args['data'])
     new_order = data['order_list']
@@ -1710,13 +1712,14 @@ def race_order_list_edit():
 
 
 @raceinfo.route('/status/get', methods=['GET'])
-@admin_required
+
 def status_get_list():
     return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)
 
 @raceinfo.route('/run/competitor/start', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def competitor_start():
-
     result_approves = ResultApproved(
         race_competitor_id=request.args.get('competitor_id'),
         run_id=request.args.get('run_id'),
@@ -1726,6 +1729,8 @@ def competitor_start():
     return 'ok', 200
 
 @raceinfo.route('/run/competitor/finish', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def competitor_finish():
     try:
         result_approves = ResultApproved.query.filter_by(
@@ -1739,6 +1744,8 @@ def competitor_finish():
         return err
 
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def competitor_clear():
    ResultApproved.query.filter(
        ResultApproved.race_competitor_id==request.args.get('competitor_id'),

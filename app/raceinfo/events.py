@@ -2,7 +2,7 @@ from .. import socketio
 from .models import *
 from . import raceinfo
 from .. import db
-
+from ..decorators import admin_required
 from . import jsonencoder
 import json
 from sqlalchemy import cast, TIME, DATE, asc
@@ -108,6 +108,7 @@ def device_1get():
 #     #     abort(500)
 
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
+@admin_required
 def approve_automate(run_id, competitor_id):
    status = Status.query.filter_by(name='QLF').one()
    try:
@@ -163,6 +164,7 @@ def approve_manual(run_id, competitor_id):
     return 'huy', 200
 
 @raceinfo.route('/emulation')
+
 def emulation():
     db.engine.execute('delete from data_in;')
     db.engine.execute('delete from result_approved;')
@@ -179,6 +181,7 @@ def receiver():
     return render_template('receiver.html')
 
 @raceinfo.route('/receiver_jury')
+@admin_required
 def receiver_jury():
     return render_template('receiver_jury.html')
 
