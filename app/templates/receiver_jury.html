@@ -674,7 +674,7 @@ $(document).ready(function () {
           console.log('approve competitor - run:'+run_id+' competitor:'+competitor_id);
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("info");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
           $("#tab_manualcontrol .btn").prop('disabled',false);
           $("#tab_manualcontrol .btn_finish").prop('disabled',true);
@@ -683,7 +683,7 @@ $(document).ready(function () {
           alert('error - approve competitor run:'+run_id+' competitor:'+competitor_id);
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
-          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("info");
+          $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
           $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
           $("#tab_manualcontrol .btn").prop('disabled',false);
           $("#tab_manualcontrol .btn_finish").prop('disabled',true);
@@ -896,16 +896,16 @@ function set_list_for_manualcontrol(){
   console.log(run_list[run_list_ids["id"+run.id]].start_list );
   if(run_list[run_list_ids["id"+run.id]].start_list && run_list[run_list_ids["id"+run.id]].start_list.length){
     $.each(run_list[run_list_ids["id"+run.id]].start_list, function(value){
+      var competitor_id=this[2].race_competitor_id;
+      var btn_start="<button class='btn btn-primary btn-sm btn_start' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Start</button>";
+      var btn_finish="<button class='btn btn-success btn-sm btn_finish' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Finish</button>";
 
-      var btn_start="<button class='btn btn-primary btn-sm btn_start' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Start</button>";
-      var btn_finish="<button class='btn btn-success btn-sm btn_finish' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Finish</button>";
+      var btn_approveqlf="<button class='btn btn-defaul btn-sm btn_approveqlf' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Approve QLF</button>";
+      var btn_editresult="<button class='btn btn-defaul btn-sm btn_editresult' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Edit Manually</button>";
 
-      var btn_approveqlf="<button class='btn btn-defaul btn-sm btn_approveqlf' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Approve QLF</button>";
-      var btn_editresult="<button class='btn btn-defaul btn-sm btn_editresult' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Edit Manually</button>";
+      var btn_clearresult="<button class='btn btn-danger btn-sm btn_clear' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Clear</button>";
 
-      var btn_clearresult="<button class='btn btn-danger btn-sm btn_clear' competitor_id='"+this[1].competitor_id+"' run_id='"+run.id+"'>Clear</button>";
-
-      $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"_"+this[1].competitor_id+"'><td class='order'>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_laststname+"</td><td class='status'></td><td>"+btn_start+btn_finish+"</td><td>"+btn_approveqlf+btn_editresult+"</td><td>"+btn_clearresult+"</td></tr>");
+      $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"_"+competitor_id+"'><td class='order'>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_laststname+"</td><td class='status'></td><td>"+btn_start+btn_finish+"</td><td>"+btn_approveqlf+btn_editresult+"</td><td>"+btn_clearresult+"</td></tr>");
     });
   }else{
     console.log("ERROR! set_list_for_manualcontrol: run_list["+run_list_ids["id"+run.id]+"].start_list.length is false");
