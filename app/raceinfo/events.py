@@ -330,16 +330,10 @@ def device_get(course_id):
 
 
 
-<<<<<<< HEAD
-@raceinfo.route('/current_data/get', methods=['GET'])
-def get_current_data():
-    race_id = request.args.get('race_id')
-    data = json.dumps(db.session.query(RaceCompetitor, Competitor, ResultDetail, ResultApproved).join(Competitor)
-=======
+
 @raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
 def get_current_data(race_id):
     return json.dumps(db.session.query(RaceCompetitor, Competitor, ResultDetail, ResultApproved).join(Competitor)
->>>>>>> 825f3a404d8bfbf91ec8e0567016e02b24dab446
                       .join(ResultDetail).join(ResultApproved)\
                       .filter(RaceCompetitor.race_id == race_id)\
                       .all(), cls=jsonencoder.AlchemyEncoder)

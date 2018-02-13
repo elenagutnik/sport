@@ -4,8 +4,6 @@
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/events.py" afterPath="$PROJECT_DIR$/app/raceinfo/events.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/views.py" afterPath="$PROJECT_DIR$/app/raceinfo/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/receiver_jury.html" afterPath="$PROJECT_DIR$/app/templates/receiver_jury.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/timer.html" afterPath="$PROJECT_DIR$/app/templates/timer.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,7 +14,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/sport$Unittests_in_manage_py.coverage" NAME="Unittests in manage.py Coverage Results" MODIFIED="1511445914995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sport$sport.coverage" NAME="sport Coverage Results" MODIFIED="1518504197654" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sport$sport.coverage" NAME="sport Coverage Results" MODIFIED="1518517481648" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
@@ -50,18 +48,18 @@
       <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6945">
-              <caret line="463" column="134" lean-forward="false" selection-start-line="463" selection-start-column="134" selection-end-line="463" selection-end-column="134" />
+            <state relative-caret-position="586">
+              <caret line="354" column="0" lean-forward="true" selection-start-line="354" selection-start-column="0" selection-end-line="354" selection-end-column="0" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
-                <marker date="1518517422351" expanded="true" signature="6444:6463" ph="delete from " />
-                <marker date="1518517422351" expanded="true" signature="6490:6517" ph="delete from " />
-                <marker date="1518517422351" expanded="true" signature="6544:6569" ph="delete from " />
-                <marker date="1518517422351" expanded="true" signature="6597:6615" ph="delete from " />
-                <marker date="1518517422351" expanded="true" signature="6642:6661" ph="delete from " />
-                <marker date="1518517422351" expanded="true" signature="6688:6720" ph="update run_i... " />
-                <marker date="1518517422351" expanded="true" signature="6747:6844" ph="INSERT INTO &quot;CASHE&quot;... " />
-                <marker date="1518517422351" expanded="true" signature="6870:6920" ph="update run_i... " />
+                <marker date="1518517481529" expanded="true" signature="6444:6463" ph="delete from " />
+                <marker date="1518517481529" expanded="true" signature="6490:6517" ph="delete from " />
+                <marker date="1518517481529" expanded="true" signature="6544:6569" ph="delete from " />
+                <marker date="1518517481529" expanded="true" signature="6597:6615" ph="delete from " />
+                <marker date="1518517481529" expanded="true" signature="6642:6661" ph="delete from " />
+                <marker date="1518517481529" expanded="true" signature="6688:6720" ph="update run_i... " />
+                <marker date="1518517481529" expanded="true" signature="6747:6844" ph="INSERT INTO &quot;CASHE&quot;... " />
+                <marker date="1518517481529" expanded="true" signature="6870:6920" ph="update run_i... " />
               </folding>
             </state>
           </provider>
@@ -108,11 +106,10 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="25860">
-              <caret line="1724" column="23" lean-forward="false" selection-start-line="1724" selection-start-column="23" selection-end-line="1724" selection-end-column="23" />
+            <state relative-caret-position="702">
+              <caret line="1752" column="0" lean-forward="true" selection-start-line="1752" selection-start-column="0" selection-end-line="1752" selection-end-column="0" />
               <folding>
                 <element signature="e#0#75#0" expanded="true" />
-                <marker date="1518517302188" expanded="true" signature="75673:76499" ph="..." />
               </folding>
             </state>
           </provider>
@@ -705,7 +702,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27264494" sideWeight="0.3599574" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23369566" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23369566" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.4978701" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32608697" sideWeight="0.48935038" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -773,7 +770,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>343</line>
+          <line>337</line>
           <option name="timeStamp" value="202" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="jinja2-line">
@@ -1141,17 +1138,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="25860">
-          <caret line="1724" column="23" lean-forward="false" selection-start-line="1724" selection-start-column="23" selection-end-line="1724" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#75#0" expanded="true" />
-            <marker date="1518517302188" expanded="true" signature="75673:76499" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="7620">
@@ -1160,20 +1146,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="702">
+          <caret line="1752" column="0" lean-forward="true" selection-start-line="1752" selection-start-column="0" selection-end-line="1752" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#75#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6945">
-          <caret line="463" column="134" lean-forward="false" selection-start-line="463" selection-start-column="134" selection-end-line="463" selection-end-column="134" />
+        <state relative-caret-position="586">
+          <caret line="354" column="0" lean-forward="true" selection-start-line="354" selection-start-column="0" selection-end-line="354" selection-end-column="0" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
-            <marker date="1518517422351" expanded="true" signature="6444:6463" ph="delete from " />
-            <marker date="1518517422351" expanded="true" signature="6490:6517" ph="delete from " />
-            <marker date="1518517422351" expanded="true" signature="6544:6569" ph="delete from " />
-            <marker date="1518517422351" expanded="true" signature="6597:6615" ph="delete from " />
-            <marker date="1518517422351" expanded="true" signature="6642:6661" ph="delete from " />
-            <marker date="1518517422351" expanded="true" signature="6688:6720" ph="update run_i... " />
-            <marker date="1518517422351" expanded="true" signature="6747:6844" ph="INSERT INTO &quot;CASHE&quot;... " />
-            <marker date="1518517422351" expanded="true" signature="6870:6920" ph="update run_i... " />
+            <marker date="1518517481529" expanded="true" signature="6444:6463" ph="delete from " />
+            <marker date="1518517481529" expanded="true" signature="6490:6517" ph="delete from " />
+            <marker date="1518517481529" expanded="true" signature="6544:6569" ph="delete from " />
+            <marker date="1518517481529" expanded="true" signature="6597:6615" ph="delete from " />
+            <marker date="1518517481529" expanded="true" signature="6642:6661" ph="delete from " />
+            <marker date="1518517481529" expanded="true" signature="6688:6720" ph="update run_i... " />
+            <marker date="1518517481529" expanded="true" signature="6747:6844" ph="INSERT INTO &quot;CASHE&quot;... " />
+            <marker date="1518517481529" expanded="true" signature="6870:6920" ph="update run_i... " />
           </folding>
         </state>
       </provider>
