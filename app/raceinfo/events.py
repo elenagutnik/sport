@@ -5,6 +5,8 @@ from .. import db
 from ..decorators import admin_required
 from . import jsonencoder
 import json
+import operator
+
 from sqlalchemy import cast, TIME, DATE, asc
 import time
 from operator import attrgetter
@@ -373,11 +375,12 @@ def load_data_vol2():
         input_data = DataIn(
             src_sys=data['src_sys'],
             src_dev=data['src_dev'],
-            bib=data['bib'],
             event_code=data['eventcode'],
             time=data['time'],
             reserved=data['reserved']
         )
+        if 'bib' in data:
+            input_data.bib = data['bib']
         db.session.add(input_data)
 
         db.session.commit()
@@ -412,11 +415,12 @@ def load_data_vol2():
            input_data = DataIn(
                src_sys=data['src_sys'],
                src_dev=data['src_dev'],
-               bib=data['bib'],
                event_code=data['eventcode'],
                time=data['time'],
                reserved=data['reserved']
            )
+           if 'bib' in data:
+               input_data.bib = data['bib']
            db.session.add(input_data)
 
            db.session.commit()
@@ -445,32 +449,66 @@ def load_data_vol2():
             result.sectordiff = result.sectortime - best_result.sectortime
 
     db.session.add(result)
+    db.session.commit()
 
-    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType,RunOrder).\
-       join(RaceCompetitor).\
-       join(Competitor).\
-       join(CourseDevice).\
-       join(CourseDeviceType).\
-       join(RunOrder, RunOrder.race_competitor_id == RaceCompetitor.id).\
-       filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id == run.id,RunOrder.run_id == run.id).order_by(asc(RunOrder.order)).all()
+    # result_details = ResultDetail.query.filter(
+    #     ResultDetail.run_id == run.id,
+    #     ResultDetail.course_device_id == course_device[0].id
+    # ).order_by(asc(ResultDetail.diff)).all()
+    # for i in range(0, len(result_details)):
+    #     result_details[i].rank = i+1
+    # result_details.sort(key=operator.attrgetter('sectortime'))
+    # for i in range(0, len(result_details)):
+    #     result_details[i].sectorrank = i+1
 
-#    final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType, RunOrder).join(RaceCompetitor).\
-#        join(Competitor).\
-#        join(CourseDevice).\
-#        join(CourseDeviceType).\
-#        filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id==run.id).order_by(asc(RunOrder.order)).all()
-    tmp = json.dumps(final_results, cls=jsonencoder.AlchemyEncoder)
+
+
+    # result_details = ResultDetail.query.filter(
+    #     ResultDetail.run_id == run.id,
+    #     ResultDetail.course_device_id == course_device[0].id
+    # ).order_by(asc(ResultDetail.diff)).all()
+
+
+    result_details = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType,RunOrder).\
+        join(RaceCompetitor).\
+        join(Competitor).\
+        join(CourseDevice).\
+        join(CourseDeviceType).\
+        join(RunOrder, RunOrder.race_competitor_id == RaceCompetitor.id).\
+        filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id == run.id,RunOrder.run_id == run.id).order_by(asc(ResultDetail.diff)).all()
+    for i in range(0, len(result_details)):
+        result_details[i][0].rank = i+1
+    # result_details.sort(key=operator.attrgetter('sectortime'))
+    result_details.sort(key=lambda item: item[0].sectortime)
+
+    for i in range(0, len(result_details)):
+        result_details[i][0].sectorrank = i+1
+    result_details.sort(key=lambda item: item[5].order)
+    # final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType,RunOrder).\
+    #    join(RaceCompetitor).\
+    #    join(Competitor).\
+    #    join(CourseDevice).\
+    #    join(CourseDeviceType).\
+    #    join(RunOrder, RunOrder.race_competitor_id == RaceCompetitor.id).\
+    #    filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id == run.id,RunOrder.run_id == run.id).order_by(asc(RunOrder.order)).all()
+
+    # final_results = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType, RunOrder).join(RaceCompetitor).\
+    #    join(Competitor).\
+    #    join(CourseDevice).\
+    #    join(CourseDeviceType).\
+    #    filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id==run.id).order_by(asc(RunOrder.order)).all()
+    tmp = json.dumps(result_details, cls=jsonencoder.AlchemyEncoder)
     socketio.emit("newData", tmp)
     input_data = DataIn(
         src_sys=data['src_sys'],
         src_dev=data['src_dev'],
-        bib=data['bib'],
         event_code=data['eventcode'],
         time=data['time'],
         reserved=data['reserved']
     )
+    if 'bib' in data:
+        input_data.bib = data['bib']
     db.session.add(input_data)
-    db.session.add(result)
     db.session.commit()
 
     return '', 200

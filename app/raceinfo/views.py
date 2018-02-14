@@ -1677,7 +1677,11 @@ def device_type_del(id):
 @admin_required
 def race_order_list(id):
     race = Race.query.filter_by(id=id).one()
-    run = RunInfo.query.filter_by(race_id=id, number=1).one()
+    try:
+        run = RunInfo.query.filter_by(race_id=id, number=1).one()
+    except:
+        return redirect(url_for('.race', id=id, _external=True))
+
     RunOrder.query.filter(RunOrder.run_id==run.id).delete()
 
     race_competitors = db.session.query(RaceCompetitor, FisPoints, RunInfo).\
