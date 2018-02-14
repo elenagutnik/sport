@@ -474,3 +474,9 @@ def load_data_vol2():
     db.session.commit()
 
     return '', 200
+
+
+
+@raceinfo.route('/promise', methods=['POST', 'GET'])
+def get_current_datdda():
+    return render_template("testPromises.html")
