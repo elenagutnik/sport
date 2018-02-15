@@ -496,8 +496,8 @@ def load_data_vol2():
 
 @raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
 def get_current_data(race_id):
-    return json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, ResultApproved).join(RaceCompetitor)
-                      .join(Competitor).join(ResultApproved)\
+    return json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, ResultApproved, CourseDevice).join(RaceCompetitor)
+                      .join(Competitor).join(ResultApproved).join(CourseDevice)\
                       .filter(RaceCompetitor.race_id == race_id)\
                       .all(), cls=jsonencoder.AlchemyEncoder)
 
