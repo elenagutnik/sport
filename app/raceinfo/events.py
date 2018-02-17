@@ -6,13 +6,24 @@ from ..decorators import admin_required
 from . import jsonencoder
 import json
 import operator
-
+from functools import wraps
+from time import time
 from sqlalchemy import cast, TIME, DATE, asc
 import time
 from operator import attrgetter
 from flask_login import current_user
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import request, abort, render_template
+
+def exectutiontime(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = datetime.now()
+        result = func(*args, **kwargs)
+        end = datetime.now()
+        print('Elapsed time:', (end-timedelta(hours=start.hour,minutes=start.minute,seconds=start.second,microseconds=start.microsecond)).time())
+        return result
+    return wrapper
 
 @raceinfo.route('/d')
 def device_1get():
@@ -338,6 +349,7 @@ def device_get(course_id):
 
 
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
+@exectutiontime
 def load_data_vol2():
 
     data = json.loads(request.args['data'])
@@ -376,10 +388,10 @@ def load_data_vol2():
 
         db.session.commit()
         return ''
-    competitor = RaceCompetitor.query.filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
+    competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
     result = ResultDetail(
         course_device_id=course_device[0].id,
-        race_competitor_id=competitor.id,
+        race_competitor_id=competitor[0].id,
         run_id=run.id,
         absolut_time=data['time'])
 
@@ -421,65 +433,57 @@ def load_data_vol2():
         result.time = data['time'] - start_result.absolut_time
         result.sectortime = data['time'] - previous_device_results.absolut_time
         result.speed = ((course_device[0].distance - previous_course_device.distance)/1000) / (result.sectortime/3600000)
-
-        # if len(results) == 0:
-        #     result.diff = 0
-        #     result.sectordiff = 0
-        # else:
-        #     best_result = min(results, key=attrgetter("time"))
-        #
-        #     if result.race_competitor_id == best_result.race_competitor_id:
-        #         pass
-        #
-        #     result.diff = result.time - best_result.time
-        #
-        #     best_result = min(results, key=attrgetter("sectortime"))
-        #
-        #     if result.race_competitor_id == best_result.race_competitor_id:
-        #         pass
-        #     result.sectordiff = result.sectortime - best_result.sectortime
-
-
+    # result_details = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType,RunOrder).\
+    #     join(RaceCompetitor).\
+    #     join(Competitor).\
+    #     join(CourseDevice).\
+    #     join(CourseDeviceType).\
+    #     join(RunOrder, RunOrder.race_competitor_id == RaceCompetitor.id).\
+    #     filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id == run.id,RunOrder.run_id == run.id).order_by(asc(ResultDetail.diff)).all()
     db.session.add(result)
     db.session.commit()
+    result_details = db.session.query(ResultDetail).\
+        filter(
+            ResultDetail.course_device_id == course_device[0].id,
+            ResultDetail.run_id == run.id).order_by(asc(ResultDetail.diff)).\
+        all()
 
-
-    result_details = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, CourseDeviceType,RunOrder).\
-        join(RaceCompetitor).\
-        join(Competitor).\
-        join(CourseDevice).\
-        join(CourseDeviceType).\
-        join(RunOrder, RunOrder.race_competitor_id == RaceCompetitor.id).\
-        filter(ResultDetail.course_device_id == course_device[0].id, ResultDetail.run_id == run.id,RunOrder.run_id == run.id).order_by(asc(ResultDetail.diff)).all()
 
     if len(result_details) == 1:
         result.diff = 0
         result.sectordiff = 0
+        result.sectorrank = 1
+        result.rank = 1
     else:
-        best_result = min(result_details, key=lambda item: item[0].time)
-        if best_result[0].race_competitor_id==result.race_competitor_id:
-            best_result[0].diff = 0
+        best_result = min(result_details, key=lambda item: item.time)
+        if best_result.race_competitor_id == result.race_competitor_id:
+            best_result.diff = 0
         else:
             for item in result_details:
-                item[0].diff = item[0].time - best_result[0].time
-        best_result = min(result_details, key=lambda item: item[0].sectortime)
-        if best_result[0].race_competitor_id==result.race_competitor_id:
-            best_result[0].sectordiff = 0
+                item.diff = item.time - best_result.time
+        best_result = min(result_details, key=lambda item: item.sectortime)
+        if best_result.race_competitor_id == result.race_competitor_id:
+            best_result.sectordiff = 0
         else:
             for item in result_details:
-                item[0].sectordiff = item[0].sectortime - best_result[0].sectortime
+                item.sectordiff = item.sectortime - best_result.sectortime
 
+        for index, item in enumerate(result_details):
+            item.rank = index+1
 
-    for i in range(0, len(result_details)):
-        result_details[i][0].rank = i+1
-    result_details.sort(key=lambda item: item[0].sectortime)
+        result_details.sort(key=lambda item: item.sectortime)
+        for index, item in enumerate(result_details):
+            item.sectorrank = index + 1
 
-    for i in range(0, len(result_details)):
-        result_details[i][0].sectorrank = i+1
-    result_details.sort(key=lambda item: item[5].order)
-
-    tmp = json.dumps(result_details, cls=jsonencoder.AlchemyEncoder)
-    socketio.emit("newData", tmp)
+    socketio.emit("newData", json.dumps(
+        dict(current_object=[
+        result_details.pop(result_details.index(result)),
+        competitor[0],
+        competitor[1],
+        course_device[0],
+        course_device[1]
+    ],
+        list_of_object=result_details), cls=jsonencoder.AlchemyEncoder))
     input_data = DataIn(
         src_sys=data['src_sys'],
         src_dev=data['src_dev'],
@@ -501,3 +505,9 @@ def get_current_data(race_id):
                       .filter(RaceCompetitor.race_id == race_id)\
                       .all(), cls=jsonencoder.AlchemyEncoder)
 
+
+
+
+@raceinfo.route('/jsondata', methods=['POST', 'GET'])
+def jsondata():
+    return render_template('testPromises.html')

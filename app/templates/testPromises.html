@@ -5,39 +5,43 @@
 
 {% block scripts %}
 {{ super() }}
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+
 <script type="text/javascript">
 
-var dev_list;
-var status_list;
+{#var dev_list;#}
+{#var status_list;#}
+{##}
+{#function func1(){#}
+{#  console.log("func1");#}
+{#      return $.get("/raceinfo/device/get/course/1")#}
+{#       .done(function(data){#}
+{#        dev_list=JSON.parse(data);#}
+{#        console.log("func1 - ajax:");#}
+{#        console.log(dev_list);#}
+{#        return dev_list;#}
+{#      })#}
+{#}#}
+{#function func2(){#}
+{#    console.log("func2");#}
+{#    return $.get("/raceinfo/status/get")#}
+{#    .done(function(data){#}
+{#      status_list=JSON.parse(data);#}
+{#      console.log("func2 - ajax:");#}
+{#      console.log(status_list);#}
+{#      return status_list;#}
+{#    })#}
+{#}#}
+{#Promise.all([func1(),func2()]).then(#}
+{#    function (data) {#}
+{#      console.log("promise: ");#}
+{#            console.log("dev_list: ");#}
+{#      console.log(dev_list);#}
+{#          console.log("status-list: ");#}
+{#      console.log(status_list);#}
+{#         });#}
 
-function func1(){
-  console.log("func1");
-      return $.get("/raceinfo/device/get/course/1")
-       .done(function(data){
-        dev_list=JSON.parse(data);
-        console.log("func1 - ajax:");
-        console.log(dev_list);
-        return dev_list;
-      })
-}
-function func2(){
-    console.log("func2");
-    return $.get("/raceinfo/status/get")
-    .done(function(data){
-      status_list=JSON.parse(data);
-      console.log("func2 - ajax:");
-      console.log(status_list);
-      return status_list;
-    })
-}
-Promise.all([func1(),func2()]).then(
-    function (data) {
-      console.log("promise: ");
-            console.log("dev_list: ");
-      console.log(dev_list);
-          console.log("status-list: ");
-      console.log(status_list);
-         });
-
+ var socket = io.connect('http://127.0.0.1:5000');
+  socket.on('newData', function(data) {console.log(data);});
 </script>
 {% endblock %}
