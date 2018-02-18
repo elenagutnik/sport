@@ -1,15 +1,10 @@
-from flask import render_template, redirect, request, url_for, flash, abort
+from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_required, current_user
 from . import raceinfo
-from .. import db
-from .models import *
-from ..models import *
 from ..decorators import admin_required
 from .forms import *
 from flask_babel import gettext
 import json
-
-import random
 
 from . import jsonencoder
 
@@ -1719,45 +1714,3 @@ def race_order_list_edit():
 
 def status_get_list():
     return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)
-
-@raceinfo.route('/run/competitor/start', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def competitor_start():
-    result_approves = ResultApproved(
-        race_competitor_id=request.args.get('competitor_id'),
-        run_id=request.args.get('run_id'),
-        is_start=True)
-    db.session.add(result_approves)
-    db.session.commit()
-    return 'ok', 200
-
-@raceinfo.route('/run/competitor/finish', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def competitor_finish():
-    try:
-        result_approves = ResultApproved.query.filter_by(
-            race_competitor_id=request.args.get('competitor_id'),
-            run_id=request.args.get('run_id')).one()
-        result_approves.is_finish = True
-        db.session.add(result_approves)
-        db.session.commit()
-        return '', 200
-    except Exception as err:
-        return err
-
-@raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def competitor_clear():
-   ResultApproved.query.filter(
-       ResultApproved.race_competitor_id==request.args.get('competitor_id'),
-       ResultApproved.run_id==request.args.get('run_id')
-   ).delete()
-   ResultDetail.query.filter(
-       ResultDetail.race_competitor_id==request.args.get('competitor_id'),
-       ResultDetail.run_id==request.args.get('run_id')
-   ).delete()
-
-   return '', 200
