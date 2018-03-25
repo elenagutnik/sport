@@ -1,4 +1,5 @@
 from .. import socketio, db
+from .. import cache
 from ..decorators import admin_required
 from .models import *
 from . import jsonencoder, raceinfo
@@ -68,6 +69,7 @@ def device_get(course_id):
 @exectutiontime
 def load_data_vol2():
     data = json.loads(request.args['data'])
+    # Перевести на кэш {
     # Девайс с которого пришли данные
     device = Device.query.filter_by(src_dev=data['src_dev']).one()
     # Трассы на которых стоит этот девайс
@@ -81,6 +83,7 @@ def load_data_vol2():
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
         filter(CourseDevice.device_id == device.id,
                CourseDevice.course_id == run.course_id).one()
+    # }
 
     # Запущенный пользователь может быть только один, иначе ошибка
 
@@ -89,9 +92,12 @@ def load_data_vol2():
                                                      ResultApproved.is_start == True,
                                                      ResultApproved.is_finish == None).one()
     except Exception as e:
-        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),('TIME', datetime.now().time().__str__()),('MESSAGE', 'Ошибка получения компетитора')])))
-        setDataIn(data)
-        db.session.commit()
+        device_data = setDeviceDataInDB(data)
+        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),
+                                                       ('TIME', datetime.now().time().__str__()),
+                                                       ('MESSAGE', 'Ошибка получения компетитора'),
+                                                       ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder))
+                                                       ])))
         return ''
     #  Получение компетитора
     competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
@@ -115,9 +121,15 @@ def load_data_vol2():
                                                     ResultDetail.course_device_id == start_device,
                                                     ResultDetail.run_id == run.id).one()
         except Exception as e:
-           socketio.emit('errorHandler', json.dumps(dict([('ERROR', '0000x1'),('TIME', datetime.now().time().__str__()),('MESSAGE', 'Ошибка: дублирование данных')])))
-           setDataIn(data)
-           return ''
+            device_data = setDeviceDataInDB(data)
+            socketio.emit('errorHandler', json.dumps(dict([('ERROR', '0000x1'),
+                                                           ('TIME', datetime.now().time().__str__()),
+                                                           ('MESSAGE', 'Ошибка: дублирование данных'),
+                                                           ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder)),
+                                                           ('COMPETITOR', json.dumps(competitor, cls=jsonencoder.AlchemyEncoder))
+                                                           ])))
+            return ''
+
         try:
             previous_course_device = CourseDevice.query.filter_by(order=course_device[0].order - 1, course_id=run.course_id).one()
 
@@ -168,7 +180,7 @@ def load_data_vol2():
     ],
         list_of_object=result_details), cls=jsonencoder.AlchemyEncoder))
 
-    setDataIn(data)
+    setDeviceDataInDB(data)
     return '', 200
 
 @raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
@@ -194,7 +206,7 @@ def result_detail_recount(result_details):
     for index, item in enumerate(result_details):
         item.sectorrank = index + 1
 
-def setDataIn(data):
+def setDeviceDataInDB(data):
     input_data = DataIn(
         src_sys=data['src_sys'],
         src_dev=data['src_dev'],
@@ -206,6 +218,7 @@ def setDataIn(data):
         input_data.bib = data['bib']
     db.session.add(input_data)
     db.session.commit()
+    return input_data
 
 
 @raceinfo.route('/run/competitor/start', methods=['GET', 'POST'])

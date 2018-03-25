@@ -8,6 +8,7 @@ from config import config
 from flask_babel import Babel
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_socketio import SocketIO
+from werkzeug.contrib.cache import MemcachedCache
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -17,6 +18,7 @@ babel = Babel()
 dtb = DebugToolbarExtension()
 socketio = SocketIO()
 
+cache = MemcachedCache(['127.0.0.1:11211'])
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
