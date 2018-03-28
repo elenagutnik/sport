@@ -283,12 +283,22 @@ def competitor_finish(competitor_id, run_id):
         return
     except Exception as err:
         return
+# Без разницы какую функцию использовать в случае, если
+# компетитор упал, мы писали функцию для отмены старта, ее и можно использовать,
+# если не нравится написал функцию competitor_remove по URL /run/competitor/remove
+# но если судья сразу не отменит спортсмена есть вероятность
+# потерять акктуальные данные следующего спортсмена
+# Жюри придется их доставать из "ямы" сырых данных :-)
 
 @raceinfo.route('/run/competitor/remove', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def competitor_remove(competitor_id, run_id):
-    pass
+def competitor_remove():
+    ResultApproved.query.filter(
+        ResultApproved.race_competitor_id == request.args.get('competitor_id'),
+        ResultApproved.run_id == request.args.get('run_id')
+    ).delete()
+    return '', 200
 
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
 @login_required
