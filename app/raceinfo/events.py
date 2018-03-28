@@ -1,12 +1,11 @@
 from .. import socketio, db
-from .. import cache
 from ..decorators import admin_required
 from .models import *
 from . import jsonencoder, raceinfo
 import json
 
 from functools import wraps
-from sqlalchemy import cast, DATE
+from sqlalchemy import cast, DATE, func
 
 from flask_login import current_user, login_required
 from datetime import datetime, timedelta
@@ -37,6 +36,8 @@ def emulation():
     db.engine.execute('update run_info set endtime=NULL;')
     db.engine.execute('INSERT INTO "CASHE" (id, key, data) VALUES (1,\'Current_competitor\', \'{"run": 1, "order": 0}\')')
     db.engine.execute('update run_info set starttime=NULL where number!=1;')
+    db.engine.execute('update run_order set manual_order=NULL;')
+
     return render_template('timer.html')
 
 @raceinfo.route('/receiver')
@@ -100,7 +101,9 @@ def load_data_vol2():
                                                        ])))
         return ''
     #  Получение компетитора
-    competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
+    # competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
+    competitor = get_current_competitor(course_device[0].id, run.id)
+    print('Old race competitor id:', competitor[0].id)
 
     result = ResultDetail(
         course_device_id=course_device[0].id,
@@ -142,6 +145,10 @@ def load_data_vol2():
         except:
             pass
 
+        # autoapprove
+        if course_device[1].name == "Finish":
+            competitor_finish(competitor[0].id, run.id)
+
     db.session.add(result)
     db.session.commit()
     result_details = db.session.query(ResultDetail).\
@@ -170,6 +177,8 @@ def load_data_vol2():
         for index, item in enumerate(result_details):
             item.sectorrank = index + 1
 
+    device_data = setDeviceDataInDB(data)
+
     socketio.emit("newData", json.dumps(
         dict(current_object=[
         result_details.pop(result_details.index(result)),
@@ -180,7 +189,7 @@ def load_data_vol2():
     ],
         list_of_object=result_details), cls=jsonencoder.AlchemyEncoder))
 
-    setDeviceDataInDB(data)
+
     return '', 200
 
 @raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
@@ -231,22 +240,55 @@ def competitor_start():
         is_start=True)
     db.session.add(result_approves)
     db.session.commit()
-    return 'ok', 200
+    competitor_order = db.session.query(func.count('*')).select_from(RunOrder).\
+                           filter(RunOrder.run_id == request.args.get('run_id'),
+                                  RunOrder.manual_order != None).\
+                           scalar()+1
+    current_competitor = RunOrder.query.filter(RunOrder.race_competitor_id == request.args.get('competitor_id'),
+                                               RunOrder.run_id == request.args.get('run_id')).one()
 
-@raceinfo.route('/run/competitor/finish', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def competitor_finish():
+    current_competitor.manual_order = competitor_order
+    db.session.add(current_competitor)
+    db.session.commit()
+    print('competitor_order', competitor_order)
+    return '', 200
+
+def get_current_competitor(course_device_id, run_id):
+    competitor_order = db.session.query(func.count('*')).select_from(ResultDetail). \
+                           filter(ResultDetail.run_id == run_id,
+                                  ResultDetail.course_device_id == course_device_id). \
+                           scalar() + 1
+    print('function: get_current_competitor')
+    print('competitor_order', competitor_order)
+    race_competitor = db.session.query(RaceCompetitor, Competitor, RunOrder).\
+        join(Competitor).\
+        join(RunOrder).\
+        filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).one()
+    print('New race competitor id:', race_competitor[0].id)
+    return race_competitor
+
+
+# Not required, rewrite to automatic
+# @raceinfo.route('/run/competitor/finish', methods=['GET', 'POST'])
+# @login_required
+# @admin_required
+def competitor_finish(competitor_id, run_id):
     try:
         result_approves = ResultApproved.query.filter_by(
-            race_competitor_id=request.args.get('competitor_id'),
-            run_id=request.args.get('run_id')).one()
+            race_competitor_id=competitor_id,
+            run_id=run_id).one()
         result_approves.is_finish = True
         db.session.add(result_approves)
         db.session.commit()
-        return '', 200
+        return
     except Exception as err:
-        return err
+        return
+
+@raceinfo.route('/run/competitor/remove', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def competitor_remove(competitor_id, run_id):
+    pass
 
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
 @login_required

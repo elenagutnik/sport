@@ -18,7 +18,7 @@ babel = Babel()
 dtb = DebugToolbarExtension()
 socketio = SocketIO()
 
-cache = MemcachedCache(['127.0.0.1:11211'])
+
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
