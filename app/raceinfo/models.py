@@ -184,8 +184,7 @@ class Competitor(db.Model):
     NSA = db.Column(db.String)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))#справочник
     points = db.Column(db.Float)
-    # fis_points ожидает переноса в RaceCompetitor
-    fis_points = db.Column(db.Float)
+
 
 
 
@@ -206,6 +205,7 @@ class RaceCompetitor(db.Model):
     gate = db.Column(db.String)
     reason = db.Column(db.String)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    fis_points = db.Column(db.Float)
 
 
 
@@ -322,7 +322,6 @@ class Status(db.Model):
                 stts.description = status[d]
             db.session.add(stts)
         db.session.commit()
-
 
 class Mark(db.Model):
     __tablename__ = 'mark'

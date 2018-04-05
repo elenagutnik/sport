@@ -6,5 +6,6 @@ from . import views
 from ..models import *
 from . import events
 from . import testdata
+from . import competitors
 from . import jsonencoder
 
