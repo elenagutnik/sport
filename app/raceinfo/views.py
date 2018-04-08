@@ -906,7 +906,7 @@ def edit_race_competitor(id):
 @admin_required
 def remove_race_competitor(race_id,competitor_id):
     db.session.delete(RaceCompetitor.query.filter_by(id=competitor_id).one())
-    return redirect(url_for('edit_race_competitor', id=race_id,_external=True))
+    return redirect(url_for('.edit_race_competitor', id=race_id,_external=True))
 
 @raceinfo.route('/race/<int:race_id>/competitor/<int:competitor_id>/edit', methods=['GET', 'POST'])
 @admin_required
@@ -1679,16 +1679,15 @@ def race_order_list(id):
 
     RunOrder.query.filter(RunOrder.run_id==run.id).delete()
 
-    race_competitors = db.session.query(RaceCompetitor, FisPoints, RunInfo).\
+    race_competitors = db.session.query(RaceCompetitor, FisPoints).\
         join(FisPoints, FisPoints.competitor_id == RaceCompetitor.competitor_id).\
-        join(RunInfo).\
-        filter(RaceCompetitor.race_id == id, RunInfo.number==1, FisPoints.discipline_id==race.discipline_id).\
+        filter(RaceCompetitor.race_id == id, FisPoints.discipline_id==race.discipline_id).\
         order_by(FisPoints.fispoint.desc()).all()
 
     for i in range(len(race_competitors)):
         run_order = RunOrder(
             race_competitor_id = race_competitors[i][0].id,
-            run_id=race_competitors[i][0].run_id,
+            run_id=run.id,
             order=i+1
         )
         db.session.add(run_order)

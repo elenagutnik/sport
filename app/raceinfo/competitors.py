@@ -6,6 +6,11 @@ from .models import Competitor, RaceCompetitor, Gender, Category, Nation, Race, 
 
 @raceinfo.route('/race/<int:race_id>/competitors/upload', methods=['POST'])
 def load_competitors(race_id):
+
+    db.session.flush()
+    db.session.rollback()
+    db.session.commit()
+
     filename = request.files['list'].filename
     extension = filename.split(".")[-1]
     content = request.files['list'].read()
@@ -55,7 +60,9 @@ def load_competitors(race_id):
                 race_competitor.bib = item[12]
                 race_competitor.age_class = item[11]
                 race_competitor.fis_points = item[14]
+
             db.session.add(race_competitor)
+            db.session.commit()
             fis_point = FisPoints.query.filter(FisPoints.competitor_id==competitor.id, FisPoints.discipline_id==race.discipline_id).first()
             if fis_point is None:
                 fis_point = FisPoints(
@@ -63,13 +70,13 @@ def load_competitors(race_id):
                     discipline_id=race.discipline_id,
                     fispoint=item[14]
                 )
-                db.session.add(fis_point)
             else:
                 fis_point.fispoint = item[14]
+            db.session.add(fis_point)
         except BaseException as e:
             flash('Ошибка добавления компетитора %s %s' % (item[1], item[2]))
     db.session.commit()
-    return redirect(url_for('.edit_race_competitor', id=race_id))
+    return redirect(url_for('.edit_race_competitor', id=race_id, _external=True))
 
 @raceinfo.route('/upload', methods=['GET'])
 def upload_form():

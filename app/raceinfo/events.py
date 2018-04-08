@@ -5,7 +5,7 @@ from . import jsonencoder, raceinfo
 import json
 
 from functools import wraps
-from sqlalchemy import cast, DATE, func
+from sqlalchemy import cast, DATE, func, asc
 
 from flask_login import current_user, login_required
 from datetime import datetime, timedelta
@@ -87,19 +87,19 @@ def load_data_vol2():
     # }
 
     # Запущенный пользователь может быть только один, иначе ошибка
-
-    try:
-        resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
-                                                     ResultApproved.is_start == True,
-                                                     ResultApproved.is_finish == None).one()
-    except Exception as e:
-        device_data = setDeviceDataInDB(data)
-        socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),
-                                                       ('TIME', datetime.now().time().__str__()),
-                                                       ('MESSAGE', 'Ошибка получения компетитора'),
-                                                       ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder))
-                                                       ])))
-        return ''
+    #
+    # try:
+    #     resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
+    #                                                  ResultApproved.is_start == True,
+    #                                                  ResultApproved.is_finish == None).one()
+    # except Exception as e:
+    #     device_data = setDeviceDataInDB(data)
+    #     socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),
+    #                                                    ('TIME', datetime.now().time().__str__()),
+    #                                                    ('MESSAGE', 'Ошибка получения компетитора'),
+    #                                                    ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder))
+    #                                                    ])))
+    #     return ''
     #  Получение компетитора
     # competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
     competitor = get_current_competitor(course_device[0].id, run.id)
@@ -253,6 +253,7 @@ def competitor_start():
     print('competitor_order', competitor_order)
     return '', 200
 
+
 def get_current_competitor(course_device_id, run_id):
     competitor_order = db.session.query(func.count('*')).select_from(ResultDetail). \
                            filter(ResultDetail.run_id == run_id,
@@ -260,10 +261,19 @@ def get_current_competitor(course_device_id, run_id):
                            scalar() + 1
     print('function: get_current_competitor')
     print('competitor_order', competitor_order)
-    race_competitor = db.session.query(RaceCompetitor, Competitor, RunOrder).\
-        join(Competitor).\
-        join(RunOrder).\
-        filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).one()
+    try:
+        race_competitor = db.session.query(RaceCompetitor, Competitor, RunOrder).\
+            join(Competitor).\
+            join(RunOrder).\
+            filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).one()
+    except:
+        race_competitor = db.session.query(RaceCompetitor, Competitor, RunOrder). \
+            join(Competitor). \
+            join(RunOrder). \
+            filter(RunOrder.manual_order == None, RunOrder.run_id == run_id).order_by(asc(RunOrder.order)).limit(1).one()
+        race_competitor[2].manual_order = competitor_order
+        db.session.add(race_competitor[2])
+        db.session.commit()
     print('New race competitor id:', race_competitor[0].id)
     return race_competitor
 
