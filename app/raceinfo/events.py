@@ -84,31 +84,17 @@ def load_data_vol2():
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
         filter(CourseDevice.device_id == device.id,
                CourseDevice.course_id == run.course_id).one()
-    # }
 
-    # Запущенный пользователь может быть только один, иначе ошибка
-    #
-    # try:
-    #     resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
-    #                                                  ResultApproved.is_start == True,
-    #                                                  ResultApproved.is_finish == None).one()
-    # except Exception as e:
-    #     device_data = setDeviceDataInDB(data)
-    #     socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),
-    #                                                    ('TIME', datetime.now().time().__str__()),
-    #                                                    ('MESSAGE', 'Ошибка получения компетитора'),
-    #                                                    ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder))
-    #                                                    ])))
-    #     return ''
-    #  Получение компетитора
-    # competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
     competitor = get_current_competitor(course_device[0].id, run.id)
     print('Old race competitor id:', competitor[0].id)
+
+    device_data = setDeviceDataInDB(data)
 
     result = ResultDetail(
         course_device_id=course_device[0].id,
         race_competitor_id=competitor[0].id,
         run_id=run.id,
+        data_in_id=device_data.id,
         absolut_time=data['time'])
 
     if course_device[1].name == "Start":
@@ -177,7 +163,7 @@ def load_data_vol2():
         for index, item in enumerate(result_details):
             item.sectorrank = index + 1
 
-    device_data = setDeviceDataInDB(data)
+
 
     socketio.emit("newData", json.dumps(
         dict(current_object=[
@@ -389,3 +375,28 @@ def approve_manual(run_id, competitor_id):
     result_detail_recount(result_details)
 
     return 'Ok', 200
+
+
+
+    # }
+
+    # Запущенный пользователь может быть только один, иначе ошибка
+    #
+    # try:
+    #     resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
+    #                                                  ResultApproved.is_start == True,
+    #                                                  ResultApproved.is_finish == None).one()
+    # except Exception as e:
+    #     device_data = setDeviceDataInDB(data)
+    #     socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),
+    #                                                    ('TIME', datetime.now().time().__str__()),
+    #                                                    ('MESSAGE', 'Ошибка получения компетитора'),
+    #                                                    ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder))
+    #                                                    ])))
+    #     return ''
+    #  Получение компетитора
+    # competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
+
+@socketio.on('get/results')
+def socket_get_results():
+    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor).join(ResultDetail).join(RaceCompetitor).all(), cls=jsonencoder.AlchemyEncoder))

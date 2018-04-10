@@ -891,7 +891,8 @@ def edit_race_competitor(id):
             competitor_id= form.competitor_ref.data,
             race_id = id,
             age_class =form.age_class.data,
-            chip = form.chip.data,
+            transponder_1 = form.transponder_1.data,
+            transponder_2=form.transponder_2.data,
             bib = form.chip.data
         )
         if race.isTeam:

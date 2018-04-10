@@ -194,7 +194,8 @@ class RaceCompetitor(db.Model):
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
     race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
     age_class = db.Column(db.String)
-    chip = db.Column(db.String)
+    transponder_1 = db.Column(db.String)
+    transponder_2 = db.Column(db.String)
     bib = db.Column(db.Integer)
     classified = db.Column(db.Boolean)
     rank = db.Column(db.Integer)
@@ -206,6 +207,8 @@ class RaceCompetitor(db.Model):
     reason = db.Column(db.String)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
     fis_points = db.Column(db.Float)
+
+    club = db.Column(db.String)
 
 
 
@@ -442,6 +445,9 @@ class ResultDetail(db.Model):
     course_device_id = db.Column(db.Integer, db.ForeignKey('course_device.id'))
     race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+
+    data_in_id = db.Column(db.Integer, db.ForeignKey('data_in.id'))
+
     diff = db.Column(db.BigInteger)
     time = db.Column(db.BigInteger)
     rank = db.Column(db.Integer)
@@ -452,6 +458,8 @@ class ResultDetail(db.Model):
 
     absolut_time = db.Column(db.BigInteger)
     is_start = db.Column(db.Boolean)
+
+
 
 class ResultApproved(db.Model):
     __tablename__ = 'result_approved'

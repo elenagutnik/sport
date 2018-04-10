@@ -142,7 +142,8 @@ class EditRaceCompetitor(FlaskForm):
     competitor_ref = SelectField('Competitor', coerce=int, validators=[InputRequired()])
 
     age_class = StringField('Age class')
-    chip = StringField('Chip')
+    transponder_1 = StringField('Transponder 1')
+    transponder_2 = StringField('Transponder 2')
     bib = IntegerField('Bib')
 
     submit = SubmitField('Add')
