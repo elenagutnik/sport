@@ -177,21 +177,6 @@ def get_current_data(race_id):
                       .filter(RaceCompetitor.race_id == race_id)\
                       .all(), cls=jsonencoder.AlchemyEncoder)
 
-def result_detail_recount(result_details):
-    min_time_result = min(result_details, key=lambda item: item.time)
-    min_sectortime_result = min(result_details, key=lambda item: item.sectortime)
-
-    for item in result_details:
-        item.diff = item.time - min_time_result.time
-        item.sectordiff = item.sectortime - min_sectortime_result.sectortime
-
-    result_details.sort(key=lambda item: item.diff)
-    for index, item in enumerate(result_details):
-        item.rank = index + 1
-
-    result_details.sort(key=lambda item: item.sectordiff)
-    for index, item in enumerate(result_details):
-        item.sectorrank = index + 1
 
 def setDeviceDataInDB(data, run_id):
     input_data = DataIn(
@@ -359,7 +344,8 @@ def approve_manual(run_id, competitor_id):
     resultDetail.approve_user = current_user.id
     resultDetail.approve_time = datetime.now()
     resultDetail.status_id = data['status_id']
-    resultDetail.timerun = data['absolut_time']
+    if data['absolur_time'] != '':
+        resultDetail.timerun = data['absolut_time']
     resultDetail.result_id = result.id
     resultDetail.gate = data['gate']
     resultDetail.reason = data['reason']
@@ -367,16 +353,25 @@ def approve_manual(run_id, competitor_id):
     db.session.add(resultDetail)
     db.session.commit()
 
-    result_details = db.session.query(ResultDetail).\
-        filter(
-            ResultDetail.course_device_id == resultDetail.course_device_id,
-            ResultDetail.run_id == resultDetail.run_id).all()
-
-    result_detail_recount(result_details)
-
     return 'Ok', 200
 
-    # }
+def result_detail_recount(result_details):
+    min_time_result = min(result_details, key=lambda item: item.time)
+    min_sectortime_result = min(result_details, key=lambda item: item.sectortime)
+
+    for item in result_details:
+        item.diff = item.time - min_time_result.time
+        item.sectordiff = item.sectortime - min_sectortime_result.sectortime
+
+    result_details.sort(key=lambda item: item.diff)
+    for index, item in enumerate(result_details):
+        item.rank = index + 1
+
+    result_details.sort(key=lambda item: item.sectordiff)
+    for index, item in enumerate(result_details):
+        item.sectorrank = index + 1
+
+            # }
 
     # Запущенный пользователь может быть только один, иначе ошибка
     #
@@ -396,8 +391,7 @@ def approve_manual(run_id, competitor_id):
     # competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
 
 @socketio.on('get/results')
-def socket_get_results(jsn):
-    data = json.loads(jsn)
+def socket_get_results(data):
     socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor).
                                                      join(ResultDetail).
                                                      join(RaceCompetitor).
