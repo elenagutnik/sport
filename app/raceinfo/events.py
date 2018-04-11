@@ -251,6 +251,11 @@ def get_current_competitor(course_device_id, run_id):
             join(RunOrder). \
             filter(RunOrder.manual_order == None, RunOrder.run_id == run_id).order_by(asc(RunOrder.order)).limit(1).one()
         race_competitor[2].manual_order = competitor_order
+        result_approves = ResultApproved(
+            race_competitor_id=race_competitor[0].id,
+            run_id=run_id,
+            is_start=True)
+        db.session.add(result_approves)
         db.session.add(race_competitor[2])
         db.session.commit()
     print('New race competitor id:', race_competitor[0].id)
@@ -266,6 +271,8 @@ def competitor_finish(competitor_id, run_id):
         result_approves = ResultApproved.query.filter_by(
             race_competitor_id=competitor_id,
             run_id=run_id).one()
+        # Если что ипсправить
+        result_approves.status_id = 1
         result_approves.is_finish = True
         db.session.add(result_approves)
         db.session.commit()
