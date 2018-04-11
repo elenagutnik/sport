@@ -1399,7 +1399,7 @@ def race_course_run_stop(id,run_id):
     # except:
     #     return redirect(url_for('.race_run', id=id, _external=True))
     # flash('The run has been finishd.')
-    return redirect(url_for('.race_run', id=id,_external=True))
+
 
 @raceinfo.route('/race/<int:id>/run/add', methods=['GET', 'POST'])
 @admin_required

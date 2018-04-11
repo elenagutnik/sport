@@ -49,6 +49,11 @@ def receiver():
 def receiver_jury():
     return render_template('receiver_jury.html')
 
+@raceinfo.route('/jury_page')
+@admin_required
+def jury_page():
+    return render_template('jury_page.html')
+
 @raceinfo.route('/run/get/', methods=['POST', 'GET'])
 def run_get():
     if 'race_id' in request.args:
@@ -313,7 +318,6 @@ def approve_automate(run_id, competitor_id):
        resultDetail.race_competitor_id = competitor_id
        resultDetail.run_id = run_id
        resultDetail.status_id = status.id
-       resultDetail.result_id = result.id
 
    except:
        try:
@@ -323,9 +327,6 @@ def approve_automate(run_id, competitor_id):
            db.session.add(result)
            db.session.commit()
 
-
-
-
        db.session.add(resultDetail)
        db.session.commit()
 
@@ -334,33 +335,34 @@ def approve_automate(run_id, competitor_id):
 
 @raceinfo.route('/approve/edit/run/<int:run_id>/competitor/<int:competitor_id>')
 def approve_manual(run_id, competitor_id):
-    data = json.loads(request.args['data'])
-    try:
-        result = Result.query.filter_by(race_competitor_id=competitor_id).one()
-    except:
-        result = Result(race_competitor_id=competitor_id)
-        db.session.add(result)
-        db.session.commit()
-    try:
-        resultDetail = ResultApproved.query.filter_by(race_competitor_id=competitor_id, run_id=run_id).one()
-    except:
-        resultDetail = ResultApproved(
-            race_competitor_id=competitor_id,
-            run_id=run_id
-        )
-    resultDetail.is_manual = True
-    resultDetail.approve_user = current_user.id
-    resultDetail.approve_time = datetime.now()
-    resultDetail.status_id = data['status_id']
-    if data['absolut_time'] != '':
-        resultDetail.timerun = data['absolut_time']
-    resultDetail.result_id = result.id
-    resultDetail.gate = data['gate']
-    resultDetail.reason = data['reason']
+   data = json.loads(request.args['data'])
+   try:
+       result = Result.query.filter_by(race_competitor_id=competitor_id).one()
+   except:
+       result = Result(race_competitor_id=competitor_id)
+       db.session.add(result)
+       db.session.commit()
+   try:
+       resultDetail = ResultApproved.query.filter_by(race_competitor_id=competitor_id, run_id=run_id).one()
+   except:
+       resultDetail = ResultApproved(
+           race_competitor_id=competitor_id,
+           run_id=run_id
+       )
+   resultDetail.is_manual = True
+   resultDetail.approve_user = current_user.id
+   resultDetail.approve_time = datetime.now()
+   resultDetail.status_id = data['status_id']
+   if data['absolut_time'] != '':
+       resultDetail.timerun = data['absolut_time']
+   resultDetail.result_id = result.id
+   resultDetail.gate = data['gate']
+   resultDetail.reason = data['reason']
 
-    db.session.add(resultDetail)
-    db.session.commit()
-    return 'Ok', 200
+   db.session.add(resultDetail)
+   db.session.commit()
+   return 'Ok', 200
+
 
 def result_detail_recount(result_details):
     min_time_result = min(result_details, key=lambda item: item.time)
@@ -400,8 +402,8 @@ def result_detail_recount(result_details):
 @socketio.on('get/results')
 def socket_get_results(data):
     socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor).
-                                                     join(ResultDetail, isouter=True).
-                                                     join(RaceCompetitor, isouter=True).
-                                                     filter(DataIn.run_id == data['run_id']).order_by(asc(DataIn.id)).
-                                                     all(),
-                                                     cls=jsonencoder.AlchemyEncoder))
+                                                    join(ResultDetail, isouter=True).
+                                                    join(RaceCompetitor, isouter=True).
+                                                    filter(DataIn.run_id == data['run_id']).
+                                                    all(),
+                                                    cls=jsonencoder.AlchemyEncoder))
