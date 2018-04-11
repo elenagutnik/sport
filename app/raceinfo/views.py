@@ -1365,11 +1365,11 @@ def race_course_run_stop(id,run_id):
 
         RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
         race_competitors = db.session.query(RaceCompetitor, ResultApproved, Status).\
-            join(ResultApproved).\
-            join(Status).\
+            join(ResultApproved, isouter=True).\
+            join(Status, isouter=True).\
             filter(RaceCompetitor.race_id == id, RunInfo.number==run_info.number, ResultApproved.run_id==run_id).\
             order_by(Status.filter_order.desc(),ResultApproved.timerun.desc()).all()
-
+        print("Кол-во компетиторов", len(race_competitors))
         for i in range(len(race_competitors)):
             run_order = RunOrder(
                 race_competitor_id=race_competitors[i][0].id,
