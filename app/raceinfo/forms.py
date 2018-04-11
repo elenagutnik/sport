@@ -131,8 +131,8 @@ class EditCompetitorBase(FlaskForm):
     NSA = StringField('NSA')
     category_ref = SelectField('Category', coerce=int, validators=[InputRequired()])
 
-    points = StringField('Points')# Не понятно
-    fis_points = StringField('Points')
+    # points = StringField('Points')# Не понятно
+    # fis_points = StringField('Points')
     is_ajax = HiddenField('is_ajax')
     submit = SubmitField('Submit')
 

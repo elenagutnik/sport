@@ -766,10 +766,6 @@ def competitor_add():
         )
         if form.NSA.data != "":
             competitor.NSA = form.NSA.data
-        if form.points.data != "":
-            competitor.points = form.points.data
-        if form.fis_points.data != "":
-            competitor.fis_points = form.fis_points.data
         db.session.add(competitor)
         if form.is_ajax.data is None or form.is_ajax.data == "":
             flash('The competitor has been added.')
@@ -816,8 +812,6 @@ def competitor_edit(id):
         competitor.NSA=form.NSA.data
         competitor.category_id=form.category_ref.data
 
-        competitor.points=form.points.data
-        competitor.fis_points=form.fis_points.data
         db.session.add(competitor)
         flash('The competitor has been updated.')
         return redirect(url_for('.competitor_list',_external=True))
@@ -833,9 +827,6 @@ def competitor_edit(id):
     form.national_code.data = competitor.national_code
     form.NSA.data = competitor.NSA
     form.category_ref.data = competitor.category_id
-
-    form.points.data = competitor.points
-    form.fis_points.data = competitor.fis_points
 
     return render_template('raceinfo/static-tab/comptitors_add.html', form=form, competitor=competitor)
 
@@ -930,17 +921,19 @@ def race_competitor_edit(race_id,competitor_id):
     if form.validate_on_submit():
         # selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
 
-        race_competitor.competitor_id=form.competitor_ref.data,
-        race_competitor.age_class=form.age_class.data,
-        race_competitor.chip=form.chip.data,
-        race_competitor.bib=form.chip.data
+        race_competitor.competitor_id = form.competitor_ref.data
+        race_competitor.age_class = form.age_class.data
+        race_competitor.transponder_1 = form.transponder_1.data
+        race_competitor.transponder_2 = form.transponder_2.data
+        race_competitor.bib = form.bib.data
         db.session.add(race_competitor)
         db.session.commit()
         flash('The competitor has been updated')
         return redirect(url_for('.edit_race_competitor',_external=True))
     form.competitor_ref.data = race_competitor.competitor_id
     form.age_class.data = race_competitor.age_class
-    form.chip.data = race_competitor.chip
+    form.transponder_1.data = race_competitor.transponder_1
+    form.transponder_2.data = race_competitor.transponder_2
     form.bib.data = race_competitor.bib
 
     return render_template('raceinfo/static-tab/form_page.html', form=form, title='Edit competitor')

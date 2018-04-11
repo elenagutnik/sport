@@ -116,6 +116,8 @@ def load_data_vol2():
                                                            ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder)),
                                                            ('COMPETITOR', json.dumps(competitor, cls=jsonencoder.AlchemyEncoder))
                                                            ])))
+            socketio.emit('get/results/response',
+                          json.dumps([device_data, None, competitor], cls=jsonencoder.AlchemyEncoder))
             return ''
         try:
             previous_course_device = CourseDevice.query.filter_by(order=course_device[0].order - 1, course_id=run.course_id).one()
@@ -157,7 +159,7 @@ def load_data_vol2():
         result_details.sort(key=lambda item: item.sectordiff)
         for index, item in enumerate(result_details):
             item.sectorrank = index + 1
-
+    socketio.emit('get/results/response', json.dumps([device_data, result, competitor], cls=jsonencoder.AlchemyEncoder))
     socketio.emit("newData", json.dumps(
         dict(current_object=[
         result_details.pop(result_details.index(result)),
@@ -393,8 +395,8 @@ def result_detail_recount(result_details):
 @socketio.on('get/results')
 def socket_get_results(data):
     socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor).
-                                                     join(ResultDetail).
-                                                     join(RaceCompetitor).
-                                                     filter(DataIn.run_id == data['run_id']).
+                                                     join(ResultDetail, isouter=True).
+                                                     join(RaceCompetitor, isouter=True).
+                                                     filter(DataIn.run_id == data['run_id']).order_by(asc(DataIn.id)).
                                                      all(),
                                                      cls=jsonencoder.AlchemyEncoder))
