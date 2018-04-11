@@ -430,7 +430,9 @@ class DataIn(db.Model):
     __tablename__ = 'data_in'
     id = db.Column(db.Integer, primary_key=True)
     dt = db.Column(db.DateTime)
+
     race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
 
     src_sys = db.Column(db.String)
     src_dev = db.Column(db.String)
@@ -458,8 +460,6 @@ class ResultDetail(db.Model):
 
     absolut_time = db.Column(db.BigInteger)
     is_start = db.Column(db.Boolean)
-
-
 
 class ResultApproved(db.Model):
     __tablename__ = 'result_approved'

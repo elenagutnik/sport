@@ -88,7 +88,7 @@ def load_data_vol2():
     competitor = get_current_competitor(course_device[0].id, run.id)
     print('Old race competitor id:', competitor[0].id)
 
-    device_data = setDeviceDataInDB(data)
+    device_data = setDeviceDataInDB(data, run.id)
 
     result = ResultDetail(
         course_device_id=course_device[0].id,
@@ -110,7 +110,6 @@ def load_data_vol2():
                                                     ResultDetail.course_device_id == start_device,
                                                     ResultDetail.run_id == run.id).one()
         except Exception as e:
-            device_data = setDeviceDataInDB(data)
             socketio.emit('errorHandler', json.dumps(dict([('ERROR', '0000x1'),
                                                            ('TIME', datetime.now().time().__str__()),
                                                            ('MESSAGE', 'Ошибка: дублирование данных'),
@@ -118,20 +117,16 @@ def load_data_vol2():
                                                            ('COMPETITOR', json.dumps(competitor, cls=jsonencoder.AlchemyEncoder))
                                                            ])))
             return ''
-
         try:
             previous_course_device = CourseDevice.query.filter_by(order=course_device[0].order - 1, course_id=run.course_id).one()
 
             previous_device_results = db.session.query(ResultDetail).filter(ResultDetail.course_device_id == previous_course_device.id,
                 ResultDetail.race_competitor_id == result.race_competitor_id,  ResultDetail.run_id == run.id).one()
-            # time
             result.time = data['time'] - start_result.absolut_time
             result.sectortime = data['time'] - previous_device_results.absolut_time
             result.speed = ((course_device[0].distance - previous_course_device.distance)/1000) / (result.sectortime/3600000)
         except:
             pass
-
-        # autoapprove
         if course_device[1].name == "Finish":
             competitor_finish(competitor[0].id, run.id)
 
@@ -163,8 +158,6 @@ def load_data_vol2():
         for index, item in enumerate(result_details):
             item.sectorrank = index + 1
 
-
-
     socketio.emit("newData", json.dumps(
         dict(current_object=[
         result_details.pop(result_details.index(result)),
@@ -174,7 +167,6 @@ def load_data_vol2():
         course_device[1]
     ],
         list_of_object=result_details), cls=jsonencoder.AlchemyEncoder))
-
 
     return '', 200
 
@@ -201,13 +193,14 @@ def result_detail_recount(result_details):
     for index, item in enumerate(result_details):
         item.sectorrank = index + 1
 
-def setDeviceDataInDB(data):
+def setDeviceDataInDB(data, run_id):
     input_data = DataIn(
         src_sys=data['src_sys'],
         src_dev=data['src_dev'],
         event_code=data['eventcode'],
         time=data['time'],
-        reserved=data['reserved']
+        reserved=data['reserved'],
+        run_id = run_id
     )
     if 'bib' in data:
         input_data.bib = data['bib']
@@ -376,8 +369,6 @@ def approve_manual(run_id, competitor_id):
 
     return 'Ok', 200
 
-
-
     # }
 
     # Запущенный пользователь может быть только один, иначе ошибка
@@ -398,5 +389,11 @@ def approve_manual(run_id, competitor_id):
     # competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
 
 @socketio.on('get/results')
-def socket_get_results():
-    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor).join(ResultDetail).join(RaceCompetitor).all(), cls=jsonencoder.AlchemyEncoder))
+def socket_get_results(jsn):
+    data = json.loads(jsn)
+    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor).
+                                                     join(ResultDetail).
+                                                     join(RaceCompetitor).
+                                                     filter(DataIn.run_id == data['run_id']).
+                                                     all(),
+                                                     cls=jsonencoder.AlchemyEncoder))
