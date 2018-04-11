@@ -305,17 +305,7 @@ def competitor_clear():
 def approve_automate(run_id, competitor_id):
    status = Status.query.filter_by(name='QLF').one()
    try:
-       ResultApproved.query.filtel(ResultApproved.race_competitor_id==competitor_id, ResultApproved.run_id==run_id).one()
-       return 'record allredy exist', 200
-   except:
-       try:
-           result = Result.query.filter_by(race_competitor_id=competitor_id).one()
-       except:
-           result = Result(race_competitor_id=competitor_id)
-           db.session.add(result)
-           db.session.commit()
-
-       resultDetail = ResultApproved.query.filter_by(race_competitor_id=competitor_id, run_id=run_id).one()
+       resultDetail = ResultApproved.query.filtel(ResultApproved.race_competitor_id==competitor_id, ResultApproved.run_id==run_id).one()
        resultDetail.is_manual = True
        resultDetail.is_manual = False
        resultDetail.approve_user = current_user.id
@@ -324,6 +314,17 @@ def approve_automate(run_id, competitor_id):
        resultDetail.run_id = run_id
        resultDetail.status_id = status.id
        resultDetail.result_id = result.id
+
+   except:
+       try:
+           result = Result.query.filter_by(race_competitor_id=competitor_id).one()
+       except:
+           result = Result(race_competitor_id=competitor_id)
+           db.session.add(result)
+           db.session.commit()
+
+
+
 
        db.session.add(resultDetail)
        db.session.commit()
@@ -340,13 +341,18 @@ def approve_manual(run_id, competitor_id):
         result = Result(race_competitor_id=competitor_id)
         db.session.add(result)
         db.session.commit()
-
-    resultDetail = ResultApproved.query.filter_by(race_competitor_id=competitor_id, run_id=run_id).one()
-    resultDetail.is_manual = True,
+    try:
+        resultDetail = ResultApproved.query.filter_by(race_competitor_id=competitor_id, run_id=run_id).one()
+    except:
+        resultDetail = ResultApproved(
+            race_competitor_id=competitor_id,
+            run_id=run_id
+        )
+    resultDetail.is_manual = True
     resultDetail.approve_user = current_user.id
     resultDetail.approve_time = datetime.now()
     resultDetail.status_id = data['status_id']
-    if data['absolur_time'] != '':
+    if data['absolut_time'] != '':
         resultDetail.timerun = data['absolut_time']
     resultDetail.result_id = result.id
     resultDetail.gate = data['gate']
@@ -354,7 +360,6 @@ def approve_manual(run_id, competitor_id):
 
     db.session.add(resultDetail)
     db.session.commit()
-
     return 'Ok', 200
 
 def result_detail_recount(result_details):

@@ -5,7 +5,7 @@ from ..decorators import admin_required
 from .forms import *
 from flask_babel import gettext
 import json
-
+from sqlalchemy import and_
 from . import jsonencoder
 
 
@@ -1360,27 +1360,45 @@ def race_course_run_stop(id,run_id):
     run_info = RunInfo.query.get_or_404(run_id)
     run_info.endtime = datetime.now()
     db.session.add(run_info)
-    try:
-        news_run = db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
+    # try:
+    news_run = db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
 
-        RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
-        race_competitors = db.session.query(RaceCompetitor, ResultApproved, Status).\
-            join(ResultApproved).\
-            join(Status).\
-            filter(RaceCompetitor.race_id == id, RunInfo.number==run_info.number, ResultApproved.run_id==run_id).\
-            order_by(Status.filter_order.desc(),ResultApproved.timerun.desc()).all()
+    RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
+    # race_competitors = db.session.query(RaceCompetitor, ResultApproved, Status).\
+    #     outerjoin(ResultApproved,  and_(ResultApproved.run_id==run_id)).\
+    #     join(Status, isouter=True).\
+    #     filter(RaceCompetitor.race_id == id).\
+    #     order_by(Status.filter_order.desc(), ResultApproved.timerun.desc()).all()
+    #
+    # race_competitors_test = db.session.query(RaceCompetitor, ResultApproved).\
+    #     join(ResultApproved, isouter=True).\
+    #     filter(RaceCompetitor.race_id == id, ResultApproved.run_id==run_id).\
+    #     all()
+    # tmp2= db.session.query(ResultApproved, RaceCompetitor).outerjoin(RaceCompetitor,
+    #                                                             RaceCompetitor.id==ResultApproved.race_competitor_id,
+    #                                                             and_(ResultApproved.run_id==run_id)).filter(RaceCompetitor.race_id == id, ResultApproved.run_id==run_id).\
+    #     all()
+    sub_query = ResultApproved.query.filter(ResultApproved.run_id == run_id).subquery()
 
-        for i in range(len(race_competitors)):
-            run_order = RunOrder(
-                race_competitor_id=race_competitors[i][0].id,
-                run_id=news_run.id,
-                order=i+1
-            )
-            db.session.add(run_order)
-        db.session.commit()
-    except:
-        return redirect(url_for('.race_run', id=id, _external=True))
-    flash('The run has been finishd.')
+    race_competitors = not not db.session.query(RaceCompetitor, Status) \
+        .filter(RaceCompetitor.race_id == id) \
+        .outerjoin(sub_query, and_(sub_query.c.race_competitor_id == RaceCompetitor.id))\
+        .join(Status)\
+        .order_by(Status.filter_order.desc(), sub_query.c.timerun.desc())\
+        .all()
+
+    print('Компетиторы список ', len(race_competitors))
+    for i in range(len(race_competitors)):
+        run_order = RunOrder(
+            race_competitor_id=race_competitors[i][0].id,
+            run_id=news_run.id,
+            order=i+1
+        )
+        db.session.add(run_order)
+    db.session.commit()
+    # except:
+    #     return redirect(url_for('.race_run', id=id, _external=True))
+    # flash('The run has been finishd.')
     return redirect(url_for('.race_run', id=id,_external=True))
 
 @raceinfo.route('/race/<int:id>/run/add', methods=['GET', 'POST'])

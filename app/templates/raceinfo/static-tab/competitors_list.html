@@ -11,7 +11,6 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <td>#id</td>
       <td>FIS Code</td>
       <td>Russia name</td>
       <td>English name</td>
@@ -23,7 +22,6 @@
   <tbody>
     {% for competitor in competitors %}
     <tr>
-      <td>{{ competitor.id }}</td>
       <td>{{ competitor.fiscode }}</td>
       <td>{{ competitor.ru_firstname }} {{ competitor.ru_lastname }}</td>
       <td>{{ competitor.en_firstname }} {{ competitor.en_lastname }}</td>

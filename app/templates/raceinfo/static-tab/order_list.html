@@ -13,7 +13,6 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <td>#id</td>
       <td>Name</td>
       <td>Order</td>
       <td>Points</td>
@@ -22,7 +21,6 @@
   <tbody>
     {% for competitor in competitors %}
     <tr>
-      <td>{{ competitor[2].id }}</td>
       <td>{{ competitor[0].en_firstname }} {{ competitor[0].en_lastname }}</td>
       <td>{{ competitor[2].order }}</td>
           <td>{{ competitor[3].fispoint }}</td>

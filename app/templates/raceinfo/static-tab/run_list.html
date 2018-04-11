@@ -12,7 +12,6 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <td>#id</td>
       <td>Number</td>
       <td>Course name</td>
       <td>Start time</td>
@@ -24,7 +23,6 @@
   <tbody>
     {% for run in course_runs %}
     <tr>
-      <td>{{ run[0].id }}</td>
       <td>{{ run[0].number }} </td>
       <td>{{ run[1].en_name }}</td>
       <td>{{ run[0].starttime }}</td>

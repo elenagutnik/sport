@@ -10,7 +10,8 @@
     <table class="table table-striped">
      <thead>
         <tr>
-          <td>#id</td>
+          <td>bib</td>
+          <td>fis</td>
           <td>Фамилия Имя</td>
           <td>First Name, Last Name</td>
           <td></td>
@@ -19,7 +20,8 @@
      <tbody>
      {% for c in competitors %}
         <tr>
-          <td>{{ c[0].id }}</td>
+          <td>{{ c[0].bib}}</td>
+          <td>{{ c[0].fis_points }}</td>
           <td>{{ c[1].ru_lastname }} {{ c[1].ru_firstname }}</td>
           <td>{{ c[1].en_firstname }} {{ c[1].en_lastname }}</td>
           <td>
@@ -35,7 +37,7 @@
       <div class="col-md-12">
         <form action="competitors/upload" method="post" enctype="multipart/form-data" class="form-inline">
             <div class="form-group">
-                <input type="file" class="btn btn-default" name="list">
+                <input type="file" class="btn btn-default" required name="list">
             </div>
             <div class="form-group">
                 <input type="submit" class="btn btn-primary">

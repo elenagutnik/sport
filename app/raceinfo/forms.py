@@ -76,7 +76,7 @@ class EditTDForm(FlaskForm):
 class EditRaceBase(FlaskForm):
     eventname = StringField('Event Name (in FIS Calendar)', validators=[Required()])
     race_type = SelectField('Race type', choices=[('True', 'Team competition'), ('False', 'Individual competition')])
-    racedate = DateField('Race date', format='%d.%m.%Y')
+    racedate = DateField('Race date', format='%d.%m.%Y', render_kw={"class": "race_datepicker"})
     place = StringField('Place')
     gender_ref = SelectField('Gender', coerce=int)
     nation_ref = SelectField('Nation', coerce=int)
