@@ -210,7 +210,27 @@ class RaceCompetitor(db.Model):
 
     club = db.Column(db.String)
 
+class ResultFunction(db.Model):
+    __tablename__ = 'result_function'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    descrioption = db.Column(db.String)
 
+    @staticmethod
+    def insert():
+        function = {
+            'Sum of runs': "Сумма попыток - итоговый результат - суммируются результаты всех попыток каждого спортсмена",
+            'The best one': "Лучшая из попыток - итоговая таблица результатов формируется из лучшего времени каждого спортсмена",
+            'The sum of two best runs': "Выбирается сумма двух лучших попыток спортсмена и заносится в итоговый список",
+            'The sum of three best runs': "Выбирается сумм трех лучших попыток спортсмена и заносится в итоговый список"
+        }
+        for f in function.keys():
+            result_function = ResultFunction.query.filter_by(name=f).first()
+            if result_function is None:
+                result_function = ResultFunction(name=f)
+                result_function.descrioption = function[f]
+            db.session.add(result_function)
+        db.session.commit()
 
 class Race(db.Model):
     __tablename__ = 'race'
@@ -223,6 +243,9 @@ class Race(db.Model):
     nation_id = db.Column(db.Integer, db.ForeignKey('nation.id'))
     discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+
+    result_function = db.Column(db.Integer, db.ForeignKey('result_function.id'))
+
     type_of_content = db.Column(db.String)
     training = db.Column(db.String)
     speedcodex = db.Column(db.Integer)
@@ -264,6 +287,9 @@ class Race(db.Model):
     softwarecompany = db.Column(db.String)
     softwarename = db.Column(db.String)
     softwareversion = db.Column(db.String)
+
+
+
     # - AL_classified
     # - AL_notclassified
 

@@ -82,6 +82,7 @@ class EditRaceBase(FlaskForm):
     nation_ref = SelectField('Nation', coerce=int)
     category_ref = SelectField('Category', coerce=int)
     discipline_ref = SelectField('Discipline', coerce=int)
+    result_method_ref = SelectField('Resault method')
     season = StringField('Season')
     sector = StringField('Sector (AL)')
     codex = IntegerField('Codex')

@@ -24,13 +24,19 @@ def exectutiontime(func):
 @raceinfo.route('/d')
 def device_1get():
     db.create_all()
+    ResultFunction.insert()
+    Discipline.insert_discipline()
+    Gender.insert_genders()
+    Status.insert()
+    Jury_function.insert_functions()
+    CourseDeviceType.insert_types()
     return ''
 
 @raceinfo.route('/emulation')
 def emulation():
+    db.engine.execute('delete from result_detail; ')
     db.engine.execute('delete from data_in;')
     db.engine.execute('delete from result_approved;')
-    db.engine.execute('delete from result_detail; ')
     db.engine.execute('delete from result;')
     db.engine.execute('delete from "CASHE";')
     db.engine.execute('update run_info set endtime=NULL;')
@@ -92,7 +98,8 @@ def load_data_vol2():
 
     competitor = get_current_competitor(course_device[0].id, run.id)
     print('Old race competitor id:', competitor[0].id)
-
+    print('Competitor RUN INFO:')
+    print('Current device:', course_device[0].id, 'order:', course_device[0].order, 'type:', course_device[1].name )
     device_data = setDeviceDataInDB(data, run.id)
 
     result = ResultDetail(
@@ -101,73 +108,39 @@ def load_data_vol2():
         run_id=run.id,
         data_in_id=device_data.id,
         absolut_time=data['time'])
-
+    print('Current data: competitor', result.race_competitor_id, 'absolut_time:', result.absolut_time)
+    result_details = db.session.query(ResultDetail). \
+        filter(
+        ResultDetail.course_device_id == course_device[0].id,
+        ResultDetail.run_id == run.id).all()
+    print('Competitors crossed this  device:', len(result_details))
+    for index, item in enumerate(result_details):
+        print(index,'.', item.race_competitor_id)
     if course_device[1].name == "Start":
-        result.time = 0
         result.sectortime = 0
+        result.sectordiff = 0
         result.is_start = True
     else:
-        start_device = db.session.query(CourseDevice.id).filter(CourseDevice.course_id == run.course_id,
-                                                                CourseDevice.course_device_type_id == 1)
+    # socketio.emit('get/results/response',
+    #               json.dumps([device_data, None, competitor], cls=jsonencoder.AlchemyEncoder))
+    # return ''
+        calculate_sector_params(result, course_device[0], run.course_id, result_details)
 
-        try:
-           start_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == result.race_competitor_id,
-                                                    ResultDetail.course_device_id == start_device,
-                                                    ResultDetail.run_id == run.id).one()
-        except Exception as e:
-            socketio.emit('errorHandler', json.dumps(dict([('ERROR', '0000x1'),
-                                                           ('TIME', datetime.now().time().__str__()),
-                                                           ('MESSAGE', 'Ошибка: дублирование данных'),
-                                                           ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder)),
-                                                           ('COMPETITOR', json.dumps(competitor, cls=jsonencoder.AlchemyEncoder))
-                                                           ])))
-            socketio.emit('get/results/response',
-                          json.dumps([device_data, None, competitor], cls=jsonencoder.AlchemyEncoder))
-            return ''
-        try:
-            previous_course_device = CourseDevice.query.filter_by(order=course_device[0].order - 1, course_id=run.course_id).one()
-
-            previous_device_results = db.session.query(ResultDetail).filter(ResultDetail.course_device_id == previous_course_device.id,
-                ResultDetail.race_competitor_id == result.race_competitor_id,  ResultDetail.run_id == run.id).one()
-            result.time = data['time'] - start_result.absolut_time
-            result.sectortime = data['time'] - previous_device_results.absolut_time
-            result.speed = ((course_device[0].distance - previous_course_device.distance)/1000) / (result.sectortime/3600000)
-        except:
-            pass
         if course_device[1].name == "Finish":
+            finished_competitors = db.session.query(ResultDetail).filter(
+                ResultDetail.course_device_id == course_device[0].id,
+                ResultDetail.run_id == run.id).all()
             competitor_finish(competitor[0].id, run.id)
+            calculate_finish_params(result, finished_competitors)
+
 
     db.session.add(result)
     db.session.commit()
-    result_details = db.session.query(ResultDetail).\
-        filter(
-            ResultDetail.course_device_id == course_device[0].id,
-            ResultDetail.run_id == run.id).all()
 
-    if len(result_details) == 1:
-        result.diff = 0
-        result.sectordiff = 0
-        result.sectorrank = 1
-        result.rank = 1
-    else:
-        min_time_result = min(result_details, key=lambda item: item.time)
-        min_sectortime_result = min(result_details, key=lambda item: item.sectortime)
-
-        for item in result_details:
-            item.diff = item.time - min_time_result.time
-            item.sectordiff = item.sectortime - min_sectortime_result.sectortime
-
-        result_details.sort(key=lambda item: item.diff)
-        for index, item in enumerate(result_details):
-            item.rank = index+1
-
-        result_details.sort(key=lambda item: item.sectordiff)
-        for index, item in enumerate(result_details):
-            item.sectorrank = index + 1
     socketio.emit('get/results/response', json.dumps([device_data, result, competitor], cls=jsonencoder.AlchemyEncoder))
     socketio.emit("newData", json.dumps(
         dict(current_object=[
-        result_details.pop(result_details.index(result)),
+        result_details,
         competitor[0],
         competitor[1],
         course_device[0],
@@ -184,7 +157,6 @@ def get_current_data(race_id):
                       .filter(RaceCompetitor.race_id == race_id)\
                       .all(), cls=jsonencoder.AlchemyEncoder)
 
-
 def setDeviceDataInDB(data, run_id):
     input_data = DataIn(
         src_sys=data['src_sys'],
@@ -199,7 +171,6 @@ def setDeviceDataInDB(data, run_id):
     db.session.add(input_data)
     db.session.commit()
     return input_data
-
 
 @raceinfo.route('/run/competitor/start', methods=['GET', 'POST'])
 @login_required
@@ -253,11 +224,6 @@ def get_current_competitor(course_device_id, run_id):
     print('New race competitor id:', race_competitor[0].id)
     return race_competitor
 
-
-# Not required, rewrite to automatic
-# @raceinfo.route('/run/competitor/finish', methods=['GET', 'POST'])
-# @login_required
-# @admin_required
 def competitor_finish(competitor_id, run_id):
     try:
         result_approves = ResultApproved.query.filter_by(
@@ -271,12 +237,6 @@ def competitor_finish(competitor_id, run_id):
         return
     except Exception as err:
         return
-# Без разницы какую функцию использовать в случае, если
-# компетитор упал, мы писали функцию для отмены старта, ее и можно использовать,
-# если не нравится написал функцию competitor_remove по URL /run/competitor/remove
-# но если судья сразу не отменит спортсмена есть вероятность
-# потерять акктуальные данные следующего спортсмена
-# Жюри придется их доставать из "ямы" сырых данных :-)
 
 @raceinfo.route('/run/competitor/remove', methods=['GET', 'POST'])
 @login_required
@@ -364,40 +324,52 @@ def approve_manual(run_id, competitor_id):
    return 'Ok', 200
 
 
-def result_detail_recount(result_details):
-    min_time_result = min(result_details, key=lambda item: item.time)
-    min_sectortime_result = min(result_details, key=lambda item: item.sectortime)
+def calculate_finish_params(current_competitor_finish, finished_competitors):
+    start_result = db.session.query(ResultDetail).filter(ResultDetail.run_id == current_competitor_finish.run_id,
+                                          ResultDetail.race_competitor_id == current_competitor_finish.race_competitor_id,
+                                          ResultDetail.is_start == True).one()
+    current_competitor_finish.time = current_competitor_finish.absolut_time - start_result.absolut_time
 
-    for item in result_details:
-        item.diff = item.time - min_time_result.time
-        item.sectordiff = item.sectortime - min_sectortime_result.sectortime
+    сompetitors_list = sorted([current_competitor_finish] + finished_competitors, key=lambda item: item.time)
 
-    result_details.sort(key=lambda item: item.diff)
-    for index, item in enumerate(result_details):
+    for index, item in enumerate(сompetitors_list):
+        item.diff = item.time - сompetitors_list[0].time
         item.rank = index + 1
 
-    result_details.sort(key=lambda item: item.sectordiff)
-    for index, item in enumerate(result_details):
-        item.sectorrank = index + 1
+def calculate_sector_params(current_competitor, device, course_id, device_competitors_list):
+    print("function: calculate_sector_params")
+    previous_course_device = CourseDevice.query.filter_by(order=device.order-1, course_id=course_id).one()
 
-            # }
+    print("current device order:%s" % device.order)
+    print("previous device order:%s" % previous_course_device.order)
 
-    # Запущенный пользователь может быть только один, иначе ошибка
-    #
-    # try:
-    #     resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run.id,
-    #                                                  ResultApproved.is_start == True,
-    #                                                  ResultApproved.is_finish == None).one()
-    # except Exception as e:
-    #     device_data = setDeviceDataInDB(data)
-    #     socketio.emit('errorHandler', json.dumps(dict([('ERROR', '000000'),
-    #                                                    ('TIME', datetime.now().time().__str__()),
-    #                                                    ('MESSAGE', 'Ошибка получения компетитора'),
-    #                                                    ('DATA', json.dumps(device_data, cls=jsonencoder.AlchemyEncoder))
-    #                                                    ])))
-    #     return ''
-    #  Получение компетитора
-    # competitor = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.id == resultApproved.race_competitor_id).one()
+    previous_device_results = db.session.query(ResultDetail).filter(ResultDetail.course_device_id == previous_course_device.id,
+                                                                    ResultDetail.race_competitor_id == current_competitor.race_competitor_id,
+                                                                    ResultDetail.run_id == current_competitor.run_id).one()
+    print("previous device result:%s" % previous_device_results.id, previous_device_results.absolut_time, previous_device_results.sectortime, previous_device_results.sectordiff, previous_device_results.sectorrank )
+    current_competitor.sectortime = current_competitor.absolut_time - previous_device_results.absolut_time
+
+    current_competitor.speed = ((device.distance - previous_course_device.distance) / 1000) / (current_competitor.sectortime / 3600000)
+    if len(device_competitors_list) !=0:
+        min_сompetitor = min(device_competitors_list, key=lambda item: item.sectortime)
+        if min_сompetitor.sectortime < current_competitor.sectortime:
+            сompetitors_list = sorted([current_competitor] + device_competitors_list, key=lambda item: item.sectortime)
+            for index, item in enumerate(сompetitors_list):
+                item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
+                item.sectorrank = index + 1
+                print('competitor id:', item.race_competitor_id, 'sector diff:', item.sectordiff,'sector rank:', item.sectorrank)
+        else:
+            current_competitor.sectordiff = current_competitor.sectortime - min_сompetitor.sectortime
+            current_competitor.sectorrank = 1
+            сompetitors_list = sorted([current_competitor] + device_competitors_list, key=lambda item: item.sectortime)
+            for index, item in enumerate(сompetitors_list):
+                # item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
+                item.sectorrank = index + 2
+                print('competitor id:', item.race_competitor_id, 'sector diff:', item.sectordiff, 'sector rank:', item.sectorrank)
+    else:
+        current_competitor.sectordiff = 0
+        current_competitor.sectorrank = 1
+
 
 @socketio.on('get/results')
 def socket_get_results(data):

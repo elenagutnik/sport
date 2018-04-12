@@ -2,7 +2,7 @@ import json
 from .models import *
 
 from sqlalchemy.ext.declarative import DeclarativeMeta
-
+import decimal
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
@@ -19,5 +19,13 @@ class AlchemyEncoder(json.JSONEncoder):
                     else:
                         fields[field] = None
             return fields
+        return json.JSONEncoder.default(self, obj)
 
+class DecialEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            # wanted a simple yield str(o) in the next line,
+            # but that would mean a yield on the line with super(...),
+            # which wouldn't work (see my comment below), so...
+            return (str(obj) for obj in [obj])
         return json.JSONEncoder.default(self, obj)
