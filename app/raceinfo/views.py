@@ -1362,6 +1362,8 @@ def race_course_run_stop(id,run_id):
     db.session.add(run_info)
     try:
         news_run = db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
+    except:
+        return 'ok'
 
         RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
 
@@ -1382,8 +1384,6 @@ def race_course_run_stop(id,run_id):
             db.session.add(run_order)
         db.session.commit()
 
-    except:
-        return 'fail'
     return 'ok'
 
 
