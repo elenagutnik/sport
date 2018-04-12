@@ -21,7 +21,7 @@ def race_results(race_id):
 def Sum_of_runs(race):
     result_list = db.session.query(ResultDetail.race_competitor_id, func.count(ResultDetail.id), func.sum(ResultDetail.time).label('total')).join(RunInfo). \
         filter(ResultDetail.time != None, RunInfo.race_id == race.id).\
-        group_by(ResultDetail.race_competitor_id).order_by(func.count(ResultDetail.id).desc(),func.sum(ResultDetail.time).asc()).all()
+        group_by(ResultDetail.race_competitor_id).order_by(func.count(ResultDetail.id).desc(), func.sum(ResultDetail.time).asc()).all()
     return ''
 
 def The_best_one(race):
@@ -31,14 +31,52 @@ def The_best_one(race):
     return ''
 
 def The_sum_of_two_best_runs(race):
-    result_list = db.session.query(ResultDetail.race_competitor_id, func.count(ResultDetail.id), func.min(ResultDetail.time).label('total')).join(RunInfo). \
+    result_list = db.session.query(ResultDetail.race_competitor_id, ResultDetail.time).join(RunInfo). \
         filter(ResultDetail.time != None, RunInfo.race_id == race.id).\
-        group_by(ResultDetail.race_competitor_id).having(func.count(ResultDetail.id)<=2).order_by(func.count(ResultDetail.id).desc(),func.sum(ResultDetail.time).asc()).all()
+        order_by(ResultDetail.race_competitor_id.asc(), ResultDetail.time.asc()).all()
+    total_result =[]
+    succes_runs = 0
+    points = 0
+    previous_competitor = result_list[0][0]
+    for item in result_list:
+        if previous_competitor == item[0]:
+            if succes_runs != 2:
+                points += item[1]
+                succes_runs += 1
+            else:
+                continue
+        else:
+            total_result.append({previous_competitor: points})
+            previous_competitor = item[0]
+            points = item[1]
+            succes_runs = 1
+    if succes_runs!=2:
+        total_result.append({previous_competitor: points})
     return ''
 
 def The_sum_of_three_best_runs():
-    pass
-
+    result_list = db.session.query(ResultDetail.race_competitor_id, ResultDetail.time).join(RunInfo). \
+        filter(ResultDetail.time != None, RunInfo.race_id == race.id).\
+        order_by(ResultDetail.race_competitor_id.asc(), ResultDetail.time.asc()).all()
+    total_result =[]
+    succes_runs = 0
+    points = 0
+    previous_competitor = result_list[0][0]
+    for item in result_list:
+        if previous_competitor == item[0]:
+            if succes_runs != 3:
+                points += item[1]
+                succes_runs += 1
+            else:
+                continue
+        else:
+            total_result.append({previous_competitor: points})
+            previous_competitor = item[0]
+            points = item[1]
+            succes_runs = 1
+    if succes_runs != 3:
+        total_result.append({previous_competitor: points})
+    return ''
 
 @raceinfo.route('ralts')
 def race_resul32ts():
