@@ -140,7 +140,7 @@ def load_data_vol2():
     socketio.emit('get/results/response', json.dumps([device_data, result, competitor], cls=jsonencoder.AlchemyEncoder))
     socketio.emit("newData", json.dumps(
         dict(current_object=[
-        result_details,
+        result,
         competitor[0],
         competitor[1],
         course_device[0],
