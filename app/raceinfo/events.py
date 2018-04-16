@@ -391,7 +391,7 @@ def calculate_common_sector_params(current_competitor, competitors_list):
     if len(competitors_list) != 0:
             min_сompetitor = min(competitors_list, key=lambda item: item.sectortime)
             if min_сompetitor.sectortime < current_competitor.sectortime:
-                сompetitors_list = sorted([current_competitor] + current_competitor, key=lambda item: item.sectortime)
+                сompetitors_list = sorted([current_competitor] + competitors_list, key=lambda item: item.sectortime)
                 for index, item in enumerate(сompetitors_list):
                     item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
                     item.sectorrank = index + 1
