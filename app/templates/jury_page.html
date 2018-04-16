@@ -6,6 +6,7 @@
 {% block page_content %}
 <style>
 .btn {margin-right: 10px;}
+tr.row_competitor td {border-top:2px solid gray!important;}
 </style>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript" charset="utf-8">
@@ -150,10 +151,11 @@
       if($("#tab_summarytable .div_run"+data.run_id).length){
         // если нужной строке в таблице нет
         console.log("+++");
-        console.log("$(#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_time).length = "+ $("#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_time").length);
-        if(!$("#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_time").length){
-          $("#tab_summarytable .div_run"+data.run_id+" tbody").append("<tr class='comp_"+data.race_competitor_id+"_time'></tr>");
-          var arr= new Array("rank", "speed", "diff", "sectortime", "sectorrank", "sectordiff");
+        console.log("$(#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_sectortime).length = "+ $("#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_sectortime").length);
+        if(!$("#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_sectortime").length){
+          $("#tab_summarytable .div_run"+data.run_id+" tbody").append("<tr class='comp_"+data.race_competitor_id+"_sectortime row_competitor'></tr>");
+          var arr= new Array("sectortime", "sectorrank", "sectordiff","speed");
+          var total_arr=new Array("time","rank", "diff");
           // tr time
           var data=glob_arr["run"+data.run_id]["comp_"+data.race_competitor_id]
           var d = device_list["course_"+data.course_id];
@@ -161,46 +163,57 @@
           console.log(d);
 
           //bib td
-          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_time").append("<td rowspan=7>"+data.bib+"</td>");
+          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime").append("<td rowspan="+arr.length+">"+data.bib+"</td>");
           //name td
-          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_time").append("<td rowspan=7>"+data.en_firstname+" "+data.en_lastname+"</td>");
+          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime").append("<td rowspan="+arr.length+">"+data.en_firstname+" "+data.en_lastname+"</td>");
           //status td
-          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_time").append("<td rowspan=7 class='comp_"+data.race_competitor_id+"_status'>"+(data.status_id?data.status_id:(data.is_finish?"finished":(data.is_start?"started":"N/A")))+"</td>");
-
+          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime").append("<td rowspan="+arr.length+" class='comp_"+data.race_competitor_id+"_status'>"+(data.status_id?getObjById(status_list,"id",data.status_id).name:(data.is_finish?"finished":(data.is_start?"started":"N/A")))+"</td>");
+/*
           $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_time").append("<td class='dev_"+d[0][0].id+"'>time</td>");
           for(var i=1;i<d.length;i++){
             $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_time").append("<td class='dev_"+d[i][0].id+"_time'>"+((data.dev_data["dev_"+d[i][0].id])?data.dev_data["dev_"+d[i][0].id].time:"N/A")+"</td>");
           }
+*/
           console.log("DEV_DATA^^^^");
           console.log(data.dev_data);
           console.log(data.dev_data["dev_1"]);
           console.log(data.dev_data["dev_2"]);
           console.log(data.dev_data["dev_3"]);
           for(var j=0; j<arr.length;j++){
-            $("#tab_summarytable .div_run"+data.run_id+" tbody").append("<tr class='comp_"+data.race_competitor_id+"_"+arr[j]+"'></tr>");
+            if(j>0)
+              $("#tab_summarytable .div_run"+data.run_id+" tbody").append("<tr class='comp_"+data.race_competitor_id+"_"+arr[j]+"'></tr>");
             console.log("WTF???");
             console.log(d);
             console.log(d[1][0].id);
             console.log(data.dev_data["dev_"+d[1][0].id]);
 //            console.log(data.dev_data["dev_"+d[1][0].id][arr[j]]);
-            $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[0][0].id+"_"+arr[j]+"'>"+arr[j]+"</td>");
+            $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[0][0].id+"_"+arr[j]+"'>"+(total_arr[j]?total_arr[j]:arr[j])+"</td>");
             for(var i=1;i<d.length;i++){
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[i][0].id+"_"+arr[j]+"'>"+((data.dev_data["dev_"+d[i][0].id])?data.dev_data["dev_"+d[i][0].id][arr[j]]:"N/A")+"</td>");
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[i][0].id+"_"+arr[j]+"'>"+((data.dev_data["dev_"+d[i][0].id])?((arr[j]=="speed")?nform(data.dev_data["dev_"+d[i][0].id][arr[j]]):tform(data.dev_data["dev_"+d[i][0].id][arr[j]])):"N/A")+"</td>");
+            }
+            if(j<total_arr.length){
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[d.length-1][0].id+"_"+total_arr[j]+"'>"+((data.dev_data["dev_"+d[d.length-1][0].id])?data.dev_data["dev_"+d[d.length-1][0].id][total_arr[j]]:"N/A")+"</td>");
+            }else{
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td></td>");
             }
           }
 
         }else{ // если есть
           console.log("FUNC: sumtab_set_maininfo // пишем данные не со стартового устройства");
 
-          var arr= new Array("time","rank", "speed", "diff", "sectortime", "sectorrank", "sectordiff");
+          var arr= new Array("sectortime", "sectorrank", "sectordiff","speed");
+          var total_arr=new Array("time","rank", "diff");
+
           var data=glob_arr["run"+data.run_id]["comp_"+data.race_competitor_id]
           var d = device_list["course_"+data.course_id];
           var dev = Object.keys(data.dev_data)[Object.keys(data.dev_data).length-1];//название div dev_(id заезда)
-          console.log(data.dev_data[dev]);
+          console.log("data.dev_data");
+          console.log(data);
+          console.log("dev="+dev);
           //status td
           var status_str='';
           if(data.status_id){
-              status_str=data.status_id;
+              status_str=getObjById(status_list,"id",data.status_id).name;
           }else if(data.is_finish){
               status_str="finished";
           }else if(data.is_start){
@@ -211,9 +224,17 @@
           }
           //data.status_id?data.status_id:(data.is_finish?"finished":(data.is_start?"started":"N/A"))(data.is_manual?"<br>!manual input":"");
 
-          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_time td.comp_"+data.race_competitor_id+"_status").html(status_str);
+          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime td.comp_"+data.race_competitor_id+"_status").html(status_str);
           for(var j=0;j<arr.length;j++){
-            $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]+" td."+dev+"_"+arr[j]).html(tform(data.dev_data[dev][arr[j]]));
+            $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]+" td."+dev+"_"+arr[j]).html((arr[j]=="speed")?nform(data.dev_data[dev][arr[j]]):tform(data.dev_data[dev][arr[j]]));
+
+            if(total_arr[j]){
+              console.log(total_arr[j]+"="+tform(data.dev_data[dev][total_arr[j]]));
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]+" td."+dev+"_"+total_arr[j]).html(tform(data.dev_data[dev][total_arr[j]]));
+            }
+            //else{
+            //  $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_").append("<td></td>");
+            //}
           }
           //if(data[4].name!="Start"){
           //}
@@ -285,6 +306,12 @@
         </div>
         <div id="tab_device" class="tab-pane fade"></div>
         <div id="tab_datasrc" class="tab-pane fade">
+            <div class="hidden">
+              <select id="src_select_bib" class="src_select_bib">
+                <option value="">Не меняем</option>
+                <option value="error">Error</option>
+              </select>
+            </div>
             <table id="tab_data_src" class="table table-hover">
               <thead>
                 <tr>
@@ -404,6 +431,8 @@
       Promise.all([get_status_list(),get_runs_list()]).then(
             result=>get_startlist(run.id)
       ).then(
+            result=>set_select_bib()
+      ).then(
             result=>runinfo_get()
       ).then(
             result=>courselist_get()              // получение и внесение информации для вкладки "Устройства на трассах" (#tab_device)
@@ -468,8 +497,9 @@
             url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/stop",
           })
             .done(function(data) {
-              runinfo_get();
+              alert("#tab_startlist_run"+$(this).attr('run_id')+" .status");
               $("#tab_startlist_run"+$(this).attr('run_id')+" .status").html("завершен");
+              runinfo_get();
             });
         });
         // обработка кнопки старт заезда
@@ -690,6 +720,17 @@
             }
           });
         });
+        $("body").on("click", "#btn_src_save", function () {
+          var data=new Array();
+          $(".src_select_bib").each(function(index, el){
+            if(el.value!=""){
+              data.push({"data_in_id":$(el).attr("data_in_id"), "race_competitor_id":(el.value?el.value:false), "result_detail_id":($(el).attr("result_detail_id")?$(el).attr("result_detail_id"):false)});
+              //el.data_in_id
+            }
+          });
+          console.log("btn_src_save:");
+          console.log(data);
+        });
     /*
     *   END // обработка кнопок
     */
@@ -699,7 +740,16 @@
 
 
     });
-
+function set_select_bib(){
+  for(var i=0;i<run_list[0].start_list.length;i++){
+    $("#src_select_bib").append($('<option>', {
+    value: run_list[0].start_list[i][2].race_competitor_id,
+    text: run_list[0].start_list[i][1].bib+" - "+(run_list[0].start_list[i][0].ru_lastname?run_list[0].start_list[i][0].ru_lastname:run_list[0].start_list[i][0].en_lastname)
+    }));
+  }
+  $("#tab_datasrc").append("<button id='btn_src_save' class='btn btn-primary btn-sm'>Save data</button>");
+  return true;
+}
 function set_html_runlist(){
   if(!run_list.length){
     console.log("ERROR: set_html_runlist : run_list is empty");
@@ -884,8 +934,9 @@ function set_html_startlist(run_id){
           $("#tab_summarytable .div_run"+run.id+" table thead tr").append("<th>bib</th><th>Name</th><th>Status</th>");
           var d = device_list["course_"+run.course_id];
           for(var i=0;i<d.length;i++){
-            $("#tab_summarytable .div_run"+run.id+" table thead tr").append("<th>"+d[i][1].name+" - "+d[i][0].distance+"</th>");
+            $("#tab_summarytable .div_run"+run.id+" table thead tr").append("<th>"+d[i][1].name+" - "+d[i][0].distance+(i>0?"<br>Sector "+i:"")+"</th>");
           }
+          $("#tab_summarytable .div_run"+run.id+" table thead tr").append("<th>Result</th>");
         }
       }
       return true;
@@ -933,12 +984,18 @@ function set_html_startlist(run_id){
       })
     }
     function add2datasrc(data){
-      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[3].course_id+"</td><td>"+data[3].device_id+(data[3].is_start?" - start":" -"+data[3].distance)+"</td><td>"+data[0].absolut_time+"</td><td>"+data[0].time+"</td><td>"+data[1].bib+"</td><td>"+data[2].en_firstname+" "+data[2].en_lastname +" / " + data[2].ru_lastname+" "+data[2].ru_firstname+"</td><td></td></tr>")
+      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[3].course_id+"</td><td>"+data[3].device_id+(data[3].is_start?" - start":" -"+data[3].distance)+"</td><td>"+data[0].absolut_time+"</td><td>"+data[0].time+"</td><td>"+data[1].bib+"</td><td>"+data[2].en_firstname+" "+data[2].en_lastname +" / " + data[2].ru_lastname+" "+data[2].ru_firstname+"</td><td class='act'></td></tr>")
+      $("#src_select_bib").clone()
+        .attr({"id": "src_select_bib_"+data[0].id,
+               "result_detail_id": data[1].id,
+               "data_in_id": data[0].id})
+        .appendTo("tr.datasrc_"+data[0].id+" td.act");
+
     }
     // переделка входящих данных в удобный массив
     function data2arr(row){
       console.log("START FUNC: data2arr");
-
+      //if(row[0].length==1)row[0]=row[0][0];
       if(!glob_arr["run"+row[0].run_id])glob_arr["run"+row[0].run_id]=new Array();
       if(!glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id]){
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id]={
@@ -976,6 +1033,15 @@ function set_html_startlist(run_id){
           "sectordiff": row[0].sectordiff,
           "sectorrank": row[0].sectorrank,
         };
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].reason     = row[4].reason; // или row[1].reason
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].status_id  = row[4].status_id;
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_start   = row[4].is_start;
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_finish  = row[4].is_finish;
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_manual  = row[4].is_manual;
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].timerun    = row[0].time;
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].rank       = row[1].rank; // rank на заезде или вообще?
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].course_id  = row[3].course_id; // надо добавить в выдачу
+
       }else{
         console.log("END FUNC: data2arr - return false");
         return false;
@@ -1110,5 +1176,11 @@ function set_html_startlist(run_id){
         }
         return s.join(dec);
     }
+    // getstatusById
+    function getObjById(arr,prop,val){
+        for(var idx = 0, l = arr.length;arr[idx] && arr[idx][prop] !== val;idx++);
+        return idx === l ? false : arr[idx];
+    }
+
     </script>
     {% endblock %}
