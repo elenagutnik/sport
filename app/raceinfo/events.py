@@ -144,7 +144,7 @@ def load_data_vol2():
         competitor[0],
         competitor[1],
         course_device[0],
-        ResultApproved.query.filter(ResultApproved.race_competitor_id == competitor.id, ResultApproved.run_id == run.id).one(),
+        ResultApproved.query.filter(ResultApproved.race_competitor_id == competitor[0].id, ResultApproved.run_id == run.id).one(),
         course_device[1]
     ],
         list_of_object=result_details), cls=jsonencoder.AlchemyEncoder))
