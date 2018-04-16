@@ -725,9 +725,9 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           $(".src_select_bib").each(function(index, el){
             if(el.value!=""){
               data.push({"data_in_id":$(el).attr("data_in_id"), "race_competitor_id":(el.value?el.value:false), "result_detail_id":($(el).attr("result_detail_id")?$(el).attr("result_detail_id"):false)});
-              //el.data_in_id
             }
           });
+          socket.emit('/change/data_in/competitors', $.getJSON(data));
           console.log("btn_src_save:");
           console.log(data);
         });
