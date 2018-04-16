@@ -402,9 +402,9 @@ def calculate_common_sector_params(current_competitor, competitors_list):
                 for index, item in enumerate(сompetitors_list):
                     # item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
                     item.sectorrank = index + 2
-        else:
-            current_competitor.sectordiff = 0
-            current_competitor.sectorrank = 1
+    else:
+        current_competitor.sectordiff = 0
+        current_competitor.sectorrank = 1
 
 
 @socketio.on('get/results')
