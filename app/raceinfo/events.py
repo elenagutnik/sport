@@ -144,6 +144,7 @@ def load_data_vol2():
         competitor[0],
         competitor[1],
         course_device[0],
+        ResultApproved.query.filter(ResultApproved.race_competitor_id == competitor.id, ResultApproved.run_id == run.id).one(),
         course_device[1]
     ],
         list_of_object=result_details), cls=jsonencoder.AlchemyEncoder))
@@ -152,8 +153,8 @@ def load_data_vol2():
 
 @raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
 def get_current_data(race_id):
-    return json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice,ResultApproved).join(RaceCompetitor)
-                      .join(Competitor).join(CourseDevice).join(ResultApproved)\
+    return json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)
+                      .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
                       .filter(RaceCompetitor.race_id == race_id)\
                       .all(), cls=jsonencoder.AlchemyEncoder)
 
