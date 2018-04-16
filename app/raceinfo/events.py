@@ -421,15 +421,16 @@ def socket_get_results(data):
 def edit_cometitor(json_data):
     data = json.loads(json_data)
     for item in data:
-        if item['ResultDetail'] is not None:
-            resultDetail = ResultDetail.query.filter(ResultDetail.id == item['ResultDetail']).one()
+        print(item)
+        if item['result_detail_id'] is not None:
+            resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
 
-            resultDetail.race_competitor_id = item['RaceCompetitor']
+            resultDetail.race_competitor_id = item['race_competitor_id']
         else:
-            dataIn = DataIn.query.filter(DataIn.id == item['DataIn']).one()
+            dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
             resultDetail = ResultDetail(
                 course_device_id=dataIn.cource_device_id,
-                race_competitor_id=item['RaceCompetitor'],
+                race_competitor_id=item['race_competitor_id'],
                 run_id=dataIn.run_id,
                 data_in_id=dataIn.id,
                 absolut_time=dataIn.time

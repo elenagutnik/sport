@@ -728,7 +728,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
             }
           });
 
-          socket.emit('/change/data_in/competitors', JSON.stringify(data));
+          socket.emit('change/data_in/competitors', JSON.stringify(data));
           console.log("btn_src_save:");
           console.log(JSON.stringify(data));
         });
