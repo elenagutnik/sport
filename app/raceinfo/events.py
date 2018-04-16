@@ -409,9 +409,10 @@ def calculate_common_sector_params(current_competitor, competitors_list):
 
 @socketio.on('get/results')
 def socket_get_results(data):
-    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor).
+    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor).
                                                     join(ResultDetail, isouter=True).
                                                     join(RaceCompetitor, isouter=True).
+                                                    join(Competitor).
                                                     filter(DataIn.run_id == data['run_id']).
                                                     all(),
                   cls=jsonencoder.AlchemyEncoder))
