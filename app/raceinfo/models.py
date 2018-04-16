@@ -459,7 +459,7 @@ class DataIn(db.Model):
 
     race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
-
+    cource_device_id = db.Column(db.Integer, db.ForeignKey('course_device.id'))
     src_sys = db.Column(db.String)
     src_dev = db.Column(db.String)
     bib = db.Column(db.Integer)

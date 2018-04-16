@@ -99,8 +99,8 @@ def load_data_vol2():
     competitor = get_current_competitor(course_device[0].id, run.id)
     print('Old race competitor id:', competitor[0].id)
     print('Competitor RUN INFO:')
-    print('Current device:', course_device[0].id, 'order:', course_device[0].order, 'type:', course_device[1].name )
-    device_data = setDeviceDataInDB(data, run.id)
+    print('Current device:', course_device[0].id, 'order:', course_device[0].order, 'type:', course_device[1].name)
+    device_data = setDeviceDataInDB(data, run.id, course_device[0].id)
 
     result = ResultDetail(
         course_device_id=course_device[0].id,
@@ -158,14 +158,15 @@ def get_current_data(race_id):
                       .filter(RaceCompetitor.race_id == race_id)\
                       .all(), cls=jsonencoder.AlchemyEncoder)
 
-def setDeviceDataInDB(data, run_id):
+def setDeviceDataInDB(data, run_id, cource_device_id):
     input_data = DataIn(
         src_sys=data['src_sys'],
         src_dev=data['src_dev'],
         event_code=data['eventcode'],
         time=data['time'],
         reserved=data['reserved'],
-        run_id = run_id
+        run_id = run_id,
+        cource_device_id=cource_device_id
     )
     if 'bib' in data:
         input_data.bib = data['bib']
@@ -351,7 +352,7 @@ def calculate_sector_params(current_competitor, device, course_id, device_compet
     current_competitor.sectortime = current_competitor.absolut_time - previous_device_results.absolut_time
 
     current_competitor.speed = ((device.distance - previous_course_device.distance) / 1000) / (current_competitor.sectortime / 3600000)
-    if len(device_competitors_list) !=0:
+    if len(device_competitors_list) != 0:
         min_сompetitor = min(device_competitors_list, key=lambda item: item.sectortime)
         if min_сompetitor.sectortime < current_competitor.sectortime:
             сompetitors_list = sorted([current_competitor] + device_competitors_list, key=lambda item: item.sectortime)
@@ -380,3 +381,33 @@ def socket_get_results(data):
                                                     filter(DataIn.run_id == data['run_id']).
                                                     all(),
                                                     cls=jsonencoder.AlchemyEncoder))
+
+
+@socketio.on('change/data_in/competitors')
+def edit_cometitor(json_data):
+    data = json.loads(json_data)
+    for item in data:
+        if item['ResultDetail'] is not None:
+            resultDetail = ResultDetail.query.filter(ResultDetail.id == item['ResultDetail']).one()
+
+            resultDetail.race_competitor_id = item['RaceCompetitor']
+        else:
+            dataIn = DataIn.query.filter(DataIn.id == item['DataIn']).one()
+            resultDetail = ResultDetail(
+                course_device_id=dataIn.cource_device_id,
+                race_competitor_id=item['RaceCompetitor'],
+                run_id=dataIn.run_id,
+                data_in_id=dataIn.id,
+                absolut_time=dataIn.time
+            )
+            db.session.add(resultDetail)
+            db.session.commit()
+
+        device = CourseDevice.query.filter(Device.id == resultDetail.course_device_id).one()
+        competitors_list = ResultDetail.query.filter(ResultDetail.race_competitor_id != resultDetail.race_competitor_id,
+                                                     ResultDetail.course_device_id == resultDetail.course_device_id).all()
+        calculate_sector_params(resultDetail, device.id, device.course_id, competitors_list)
+        if device.course_device_type_id == 3:
+            calculate_finish_params(resultDetail, competitors_list)
+
+    socket_get_results({'run_id': dataIn.run_id})
