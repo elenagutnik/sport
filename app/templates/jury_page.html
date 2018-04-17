@@ -242,8 +242,15 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           }
           //обновление sectorrank sectordiff и rank diff для остальных спортсменов на данном заезде
           var comps=glob_arr["run"+data.run_id];
-          for(var i=0; i<Object.keys(glob_arr).length-1; i++){ //перебор всех спортсменов кроме последнего
-
+          //for(var i=0; i<Object.keys(glob_arr).length-1; i++){ //перебор всех спортсменов заезда кроме последнего
+          var key
+          for(key in comps){
+            $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_sectordiff").html(tform(comps[key].dev_data[dev].sectordiff));
+            $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev+"_sectorrank").html((comps[key].dev_data[dev].sectorrank));
+            if(dev=="dev_"+device_list["course_"+data.course_id][device_list["course_"+data.course_id].length-1][0].device_id){
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_diff").html(tform(comps[key].dev_data[dev].diff));
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev+"_rank").html((comps[key].dev_data[dev].rank));
+            }
           }
           //if(data[4].name!="Start"){
           //}
@@ -733,7 +740,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           var data=new Array();
           $(".src_select_bib").each(function(index, el){
             if(el.value!=""){
-              data.push({"data_in_id":$(el).attr("data_in_id"), "race_competitor_id":(el.value?el.value:false), "result_detail_id":($(el).attr("result_detail_id")?$(el).attr("result_detail_id"):false)});
+              data.push({"run_id":$(el).attr("run_id"), "data_in_id":$(el).attr("data_in_id"), "race_competitor_id":(el.value?el.value:false), "result_detail_id":($(el).attr("result_detail_id")?$(el).attr("result_detail_id"):false)});
             }
           });
           socket.emit('change/data_in/competitors', JSON.stringify(data));
@@ -1002,12 +1009,13 @@ console.log(data);
       $("#src_select_bib").clone()
         .attr({"id": "src_select_bib_"+data[0].id,
                "result_detail_id": data[1].id, //my
-               "data_in_id": data[0].id})
+               "data_in_id": data[0].id,
+               "run_id": data[0].run_id})
         .appendTo("tr.datasrc_"+data[0].id+" td.act");
 
     }
     // переделка входящих данных в удобный массив
-    function data2arr(row){
+    function data2arr(row, allrows=false){
       console.log("START FUNC: data2arr");
       //if(row[0].length==1)row[0]=row[0][0];
       if(!glob_arr["run"+row[0].run_id])glob_arr["run"+row[0].run_id]=new Array();
@@ -1056,6 +1064,16 @@ console.log(data);
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].rank       = row[1].rank; // rank на заезде или вообще?
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].course_id  = row[3].course_id; // надо добавить в выдачу
 
+        if(allrows){
+          var rcid;
+          for(i in allrows){
+              rcid=allrows[i].race_competitor_id;
+              glob_arr["run"+row[0].run_id]["comp_"+rcid]["dev_data"]["dev_"+row[0].course_device_id].sectordiff=allrows[i].sectordiff;
+              glob_arr["run"+row[0].run_id]["comp_"+rcid]["dev_data"]["dev_"+row[0].course_device_id].sectorrank=allrows[i].sectorrank;
+              glob_arr["run"+row[0].run_id]["comp_"+rcid]["dev_data"]["dev_"+row[0].course_device_id].diff=allrows[i].diff;
+              glob_arr["run"+row[0].run_id]["comp_"+rcid]["dev_data"]["dev_"+row[0].course_device_id].rank=allrows[i].rank;
+          }
+        }
       }else{
         console.log("END FUNC: data2arr - return false");
         return false;
