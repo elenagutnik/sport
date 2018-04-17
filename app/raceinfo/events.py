@@ -139,7 +139,7 @@ def load_data_vol2():
     db.session.add(result)
     db.session.commit()
 
-    socketio.emit('get/results/current', json.dumps([[device_data, result, competitor[0], competitor[1]]], cls=jsonencoder.AlchemyEncoder))
+    socketio.emit('get/results/current', json.dumps([[device_data, result, competitor[0], competitor[1], course_device[0]]], cls=jsonencoder.AlchemyEncoder))
     socketio.emit("newData", json.dumps(
         dict(current_object=[
         result,
@@ -417,10 +417,11 @@ def calculate_common_sector_params(current_competitor, competitors_list):
 
 @socketio.on('get/results')
 def socket_get_results(data):
-    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor).
+    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor, CourseDevice).
                                                     join(ResultDetail, isouter=True).
                                                     join(RaceCompetitor, isouter=True).
                                                     join(Competitor).
+                                                    join(CourseDevice).
                                                     filter(DataIn.run_id == data['run_id']).
                                                     order_by(asc(DataIn.id)).
                                                     all(),
@@ -441,6 +442,7 @@ def edit_competitor(json_data):
             if existedData:
                 db.session.delete(existedData)
         if item['result_detail_id'] is not None:
+            print(item['result_detail_id'])
             resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
             try:
                 existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==item['race_competitor_id'],
