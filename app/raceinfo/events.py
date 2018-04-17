@@ -420,8 +420,8 @@ def socket_get_results(data):
     socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor, CourseDevice).
                                                     join(ResultDetail, isouter=True).
                                                     join(RaceCompetitor, isouter=True).
-                                                    join(Competitor).
-                                                    join(CourseDevice).
+                                                    join(Competitor, isouter=True).
+                                                    join(CourseDevice, DataIn.cource_device_id==CourseDevice.id , isouter=True).
                                                     filter(DataIn.run_id == data['run_id']).
                                                     order_by(asc(DataIn.id)).
                                                     all(),
