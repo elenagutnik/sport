@@ -139,7 +139,7 @@ def load_data_vol2():
     db.session.add(result)
     db.session.commit()
 
-    socketio.emit('get/results/response', json.dumps([[device_data, result, competitor[0], competitor[1]]], cls=jsonencoder.AlchemyEncoder))
+    socketio.emit('get/results/current', json.dumps([[device_data, result, competitor[0], competitor[1]]], cls=jsonencoder.AlchemyEncoder))
     socketio.emit("newData", json.dumps(
         dict(current_object=[
         result,

@@ -39,19 +39,19 @@
       <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="436" column="122" lean-forward="false" selection-start-line="436" selection-start-column="122" selection-end-line="436" selection-end-column="122" />
+            <state relative-caret-position="382">
+              <caret line="141" column="19" lean-forward="false" selection-start-line="141" selection-start-column="19" selection-end-line="141" selection-end-column="38" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
-                <marker date="1523992377013" expanded="true" signature="1045:1070" ph="delete from " />
-                <marker date="1523992377013" expanded="true" signature="1098:1117" ph="delete from " />
-                <marker date="1523992377013" expanded="true" signature="1144:1171" ph="delete from " />
-                <marker date="1523992377013" expanded="true" signature="1198:1216" ph="delete from " />
-                <marker date="1523992377013" expanded="true" signature="1243:1262" ph="delete from " />
-                <marker date="1523992377013" expanded="true" signature="1289:1321" ph="update run_i... " />
-                <marker date="1523992377013" expanded="true" signature="1348:1445" ph="INSERT INTO &quot;CASHE&quot;... " />
-                <marker date="1523992377013" expanded="true" signature="1471:1521" ph="update run_i... " />
-                <marker date="1523992377013" expanded="true" signature="1548:1586" ph="update run_i... " />
+                <marker date="1523996968108" expanded="true" signature="1045:1070" ph="delete from " />
+                <marker date="1523996968108" expanded="true" signature="1098:1117" ph="delete from " />
+                <marker date="1523996968108" expanded="true" signature="1144:1171" ph="delete from " />
+                <marker date="1523996968108" expanded="true" signature="1198:1216" ph="delete from " />
+                <marker date="1523996968108" expanded="true" signature="1243:1262" ph="delete from " />
+                <marker date="1523996968108" expanded="true" signature="1289:1321" ph="update run_i... " />
+                <marker date="1523996968108" expanded="true" signature="1348:1445" ph="INSERT INTO &quot;CASHE&quot;... " />
+                <marker date="1523996968108" expanded="true" signature="1471:1521" ph="update run_i... " />
+                <marker date="1523996968108" expanded="true" signature="1548:1586" ph="update run_i... " />
               </folding>
             </state>
           </provider>
@@ -654,7 +654,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27264494" sideWeight="0.3599574" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22373189" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4311594" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.4978701" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32608697" sideWeight="0.48935038" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1161,19 +1161,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="436" column="122" lean-forward="false" selection-start-line="436" selection-start-column="122" selection-end-line="436" selection-end-column="122" />
+        <state relative-caret-position="382">
+          <caret line="141" column="19" lean-forward="false" selection-start-line="141" selection-start-column="19" selection-end-line="141" selection-end-column="38" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
-            <marker date="1523992377013" expanded="true" signature="1045:1070" ph="delete from " />
-            <marker date="1523992377013" expanded="true" signature="1098:1117" ph="delete from " />
-            <marker date="1523992377013" expanded="true" signature="1144:1171" ph="delete from " />
-            <marker date="1523992377013" expanded="true" signature="1198:1216" ph="delete from " />
-            <marker date="1523992377013" expanded="true" signature="1243:1262" ph="delete from " />
-            <marker date="1523992377013" expanded="true" signature="1289:1321" ph="update run_i... " />
-            <marker date="1523992377013" expanded="true" signature="1348:1445" ph="INSERT INTO &quot;CASHE&quot;... " />
-            <marker date="1523992377013" expanded="true" signature="1471:1521" ph="update run_i... " />
-            <marker date="1523992377013" expanded="true" signature="1548:1586" ph="update run_i... " />
+            <marker date="1523996968108" expanded="true" signature="1045:1070" ph="delete from " />
+            <marker date="1523996968108" expanded="true" signature="1098:1117" ph="delete from " />
+            <marker date="1523996968108" expanded="true" signature="1144:1171" ph="delete from " />
+            <marker date="1523996968108" expanded="true" signature="1198:1216" ph="delete from " />
+            <marker date="1523996968108" expanded="true" signature="1243:1262" ph="delete from " />
+            <marker date="1523996968108" expanded="true" signature="1289:1321" ph="update run_i... " />
+            <marker date="1523996968108" expanded="true" signature="1348:1445" ph="INSERT INTO &quot;CASHE&quot;... " />
+            <marker date="1523996968108" expanded="true" signature="1471:1521" ph="update run_i... " />
+            <marker date="1523996968108" expanded="true" signature="1548:1586" ph="update run_i... " />
           </folding>
         </state>
       </provider>
