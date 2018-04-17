@@ -113,9 +113,11 @@ def load_data_vol2():
         filter(
         ResultDetail.course_device_id == course_device[0].id,
         ResultDetail.run_id == run.id).all()
+
     print('Competitors crossed this  device:', len(result_details))
     for index, item in enumerate(result_details):
         print(index,'.', item.race_competitor_id)
+
     if course_device[1].name == "Start":
         result.sectortime = 0
         result.sectordiff = 0
@@ -329,16 +331,117 @@ def approve_manual(run_id, competitor_id):
 
 
 def calculate_finish_params(current_competitor_finish, finished_competitors):
-    start_result = db.session.query(ResultDetail).filter(ResultDetail.run_id == current_competitor_finish.run_id,
-                                          ResultDetail.race_competitor_id == current_competitor_finish.race_competitor_id,
-                                          ResultDetail.is_start == True).one()
-    current_competitor_finish.time = current_competitor_finish.absolut_time - start_result.absolut_time
+    try:
+        start_result = db.session.query(ResultDetail).filter(ResultDetail.run_id == current_competitor_finish.run_id,
+                                              ResultDetail.race_competitor_id == current_competitor_finish.race_competitor_id,
+                                              ResultDetail.is_start == True).one()
+        current_competitor_finish.time = current_competitor_finish.absolut_time - start_result.absolut_time
 
-    сompetitors_list = sorted([current_competitor_finish] + finished_competitors, key=lambda item: item.time)
+        сompetitors_list = sorted([current_competitor_finish] + finished_competitors, key=lambda item: item.time)
 
-    for index, item in enumerate(сompetitors_list):
-        item.diff = item.time - сompetitors_list[0].time
-        item.rank = index + 1
+        for index, item in enumerate(сompetitors_list):
+            item.diff = item.time - сompetitors_list[0].time
+            item.rank = index + 1
+    except:
+        socketio.emit('recount/error', dict(competitor_id=current_competitor_finish.id,
+                                            error='Count finished params: diff, rank'))
+
+
+def calculate_personal_sector_params(current_competitor, device, course_id):
+    try:
+        previous_course_device = CourseDevice.query.filter_by(order=device.order-1, course_id=course_id).one()
+
+        previous_device_results = db.session.query(ResultDetail).filter(ResultDetail.course_device_id == previous_course_device.id,
+                                                                        ResultDetail.race_competitor_id == current_competitor.race_competitor_id,
+                                                                        ResultDetail.run_id == current_competitor.run_id).one()
+        current_competitor.sectortime = current_competitor.absolut_time - previous_device_results.absolut_time
+
+        current_competitor.speed = ((device.distance - previous_course_device.distance) / 1000) / (current_competitor.sectortime / 3600000)
+    except:
+        socketio.emit('recount/error', dict(competitor_id=current_competitor.id,
+                                            error='Count personal params: speed, sectortime'))
+
+# Функция принемает текущий результат и список  объекты ResultDetail
+# результатов БЕЗ текущего
+def calculate_common_sector_params(current_competitor, competitors_list, isFinished = False):
+    try:
+        if len(competitors_list) != 0:
+                min_сompetitor = min(competitors_list, key=lambda item: item.sectortime)
+                if min_сompetitor.sectortime < current_competitor.sectortime:
+                    сompetitors_list = sorted([current_competitor] + competitors_list, key=lambda item: item.sectortime)
+                    for index, item in enumerate(сompetitors_list):
+                        item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
+                        item.sectorrank = index + 1
+                else:
+                    current_competitor.sectordiff = current_competitor.sectortime - min_сompetitor.sectortime
+                    current_competitor.sectorrank = 1
+                    сompetitors_list = sorted([current_competitor] + competitors_list, key=lambda item: item.sectortime)
+                    for index, item in enumerate(сompetitors_list):
+                        # item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
+                        item.sectorrank = index + 1
+        else:
+            current_competitor.sectordiff = 0
+            current_competitor.sectorrank = 1
+    except:
+        socketio.emit('recount/error', dict(competitor_id=current_competitor.id,
+                                            error='Count common params: sectorrank, sectordiff'))
+
+@socketio.on('get/results')
+def socket_get_results(data):
+    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor).
+                                                    join(ResultDetail, isouter=True).
+                                                    join(RaceCompetitor, isouter=True).
+                                                    join(Competitor).
+                                                    filter(DataIn.run_id == data['run_id']).
+                                                    all(),
+                  cls=jsonencoder.AlchemyEncoder))
+
+
+@socketio.on('change/data_in/competitors')
+def edit_cometitor(json_data):
+    data = json.loads(json_data)
+    changed_results_list = []
+    for item in data:
+        # Получить все данные компетитора которому меняем набор данных
+        competitorResults = ResultDetail.query.filter(ResultDetail.run_id == item['run_id'],
+                                                      ResultDetail.race_competitor_id == item['race_competitor_id'])
+        dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
+        if len(competitorResults):
+            existedData=next((item for item in competitorResults if item.course_device_id == dataIn.cource_device_id), None)
+            if existedData:
+                db.session.delete(existedData)
+        if item['result_detail_id'] is not None:
+            resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
+            try:
+                existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==item['race_competitor_id'],
+                                         ResultDetail.course_device_id==resultDetail.course_device_id,
+                                         ResultDetail.run_id==resultDetail.run_id).delete()
+            except:
+                pass
+
+            resultDetail.race_competitor_id = item['race_competitor_id']
+        else:
+            resultDetail = ResultDetail(
+                course_device_id=dataIn.cource_device_id,
+                race_competitor_id=item['race_competitor_id'],
+                run_id=dataIn.run_id,
+                data_in_id=dataIn.id,
+                absolut_time=dataIn.time
+            )
+        db.session.add(resultDetail)
+        db.session.commit()
+        changed_results_list.append(resultDetail)
+
+    for resultDetail in changed_results_list:
+        device = CourseDevice.query.filter(CourseDevice.id == resultDetail.course_device_id).one()
+        competitors_list = ResultDetail.query.filter(ResultDetail.race_competitor_id != resultDetail.race_competitor_id,
+                                                     ResultDetail.course_device_id == resultDetail.course_device_id).all()
+        calculate_personal_sector_params(resultDetail, device.id, device.course_id)
+        calculate_common_sector_params(resultDetail, competitors_list)
+        if device.course_device_type_id == 3:
+            calculate_finish_params(resultDetail, competitors_list)
+
+    socket_get_results({'run_id': dataIn.run_id})
 
 # def calculate_sector_params(current_competitor, device, course_id, device_competitors_list):
 #     print("function: calculate_sector_params")
@@ -373,78 +476,3 @@ def calculate_finish_params(current_competitor_finish, finished_competitors):
 #     else:
 #         current_competitor.sectordiff = 0
 #         current_competitor.sectorrank = 1
-
-
-def calculate_personal_sector_params(current_competitor, device, course_id):
-    previous_course_device = CourseDevice.query.filter_by(order=device.order-1, course_id=course_id).one()
-
-    previous_device_results = db.session.query(ResultDetail).filter(ResultDetail.course_device_id == previous_course_device.id,
-                                                                    ResultDetail.race_competitor_id == current_competitor.race_competitor_id,
-                                                                    ResultDetail.run_id == current_competitor.run_id).one()
-    current_competitor.sectortime = current_competitor.absolut_time - previous_device_results.absolut_time
-
-    current_competitor.speed = ((device.distance - previous_course_device.distance) / 1000) / (current_competitor.sectortime / 3600000)
-
-# Функция принемает текущий результат и список  объекты ResultDetail
-# результатов БЕЗ текущего
-def calculate_common_sector_params(current_competitor, competitors_list):
-    if len(competitors_list) != 0:
-            min_сompetitor = min(competitors_list, key=lambda item: item.sectortime)
-            if min_сompetitor.sectortime < current_competitor.sectortime:
-                сompetitors_list = sorted([current_competitor] + competitors_list, key=lambda item: item.sectortime)
-                for index, item in enumerate(сompetitors_list):
-                    item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
-                    item.sectorrank = index + 1
-            else:
-                current_competitor.sectordiff = current_competitor.sectortime - min_сompetitor.sectortime
-                current_competitor.sectorrank = 1
-                сompetitors_list = sorted([current_competitor] + competitors_list, key=lambda item: item.sectortime)
-                for index, item in enumerate(сompetitors_list):
-                    # item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
-                    item.sectorrank = index + 2
-    else:
-        current_competitor.sectordiff = 0
-        current_competitor.sectorrank = 1
-
-
-@socketio.on('get/results')
-def socket_get_results(data):
-    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor).
-                                                    join(ResultDetail, isouter=True).
-                                                    join(RaceCompetitor, isouter=True).
-                                                    join(Competitor).
-                                                    filter(DataIn.run_id == data['run_id']).
-                                                    all(),
-                  cls=jsonencoder.AlchemyEncoder))
-
-
-@socketio.on('change/data_in/competitors')
-def edit_cometitor(json_data):
-    data = json.loads(json_data)
-    for item in data:
-        print(item)
-        if item['result_detail_id'] is not None:
-            resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
-
-            resultDetail.race_competitor_id = item['race_competitor_id']
-        else:
-            dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
-            resultDetail = ResultDetail(
-                course_device_id=dataIn.cource_device_id,
-                race_competitor_id=item['race_competitor_id'],
-                run_id=dataIn.run_id,
-                data_in_id=dataIn.id,
-                absolut_time=dataIn.time
-            )
-            db.session.add(resultDetail)
-            db.session.commit()
-
-        device = CourseDevice.query.filter(Device.id == resultDetail.course_device_id).one()
-        competitors_list = ResultDetail.query.filter(ResultDetail.race_competitor_id != resultDetail.race_competitor_id,
-                                                     ResultDetail.course_device_id == resultDetail.course_device_id).all()
-        calculate_personal_sector_params(resultDetail, device.id, device.course_id)
-        calculate_common_sector_params(resultDetail, competitors_list)
-        if device.course_device_type_id == 3:
-            calculate_finish_params(resultDetail, competitors_list)
-
-    socket_get_results({'run_id': dataIn.run_id})
