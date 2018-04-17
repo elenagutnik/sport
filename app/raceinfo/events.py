@@ -393,6 +393,7 @@ def socket_get_results(data):
                                                     join(RaceCompetitor, isouter=True).
                                                     join(Competitor).
                                                     filter(DataIn.run_id == data['run_id']).
+                                                    order_by(asc(DataIn.id)).
                                                     all(),
                   cls=jsonencoder.AlchemyEncoder))
 
@@ -414,11 +415,10 @@ def edit_cometitor(json_data):
             resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
             try:
                 existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==item['race_competitor_id'],
-                                         ResultDetail.course_device_id==resultDetail.course_device_id,
-                                         ResultDetail.run_id==resultDetail.run_id).delete()
+                                         ResultDetail.course_device_id == resultDetail.course_device_id,
+                                         ResultDetail.run_id == resultDetail.run_id).delete()
             except:
                 pass
-
             resultDetail.race_competitor_id = item['race_competitor_id']
         else:
             resultDetail = ResultDetail(
