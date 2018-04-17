@@ -422,8 +422,10 @@ def socket_get_results(data):
 @socketio.on('change/data_in/competitors')
 def edit_cometitor(json_data):
     data = json.loads(json_data)
+    run_id = None
     for item in data:
         print(item)
+
         if item['result_detail_id'] is not None:
             resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
             try:
@@ -446,12 +448,13 @@ def edit_cometitor(json_data):
             db.session.add(resultDetail)
             db.session.commit()
 
-        device = CourseDevice.query.filter(Device.id == resultDetail.course_device_id).one()
+        device = CourseDevice.query.filter(CourseDevice.id == resultDetail.course_device_id).one()
+
         competitors_list = ResultDetail.query.filter(ResultDetail.race_competitor_id != resultDetail.race_competitor_id,
                                                      ResultDetail.course_device_id == resultDetail.course_device_id).all()
-        calculate_personal_sector_params(resultDetail, device.id, device.course_id)
+        calculate_personal_sector_params(resultDetail, device, device.course_id)
         calculate_common_sector_params(resultDetail, competitors_list)
         if device.course_device_type_id == 3:
             calculate_finish_params(resultDetail, competitors_list)
 
-    socket_get_results({'run_id': dataIn.run_id})
+    socket_get_results({'run_id': data[0]['run_id']})
