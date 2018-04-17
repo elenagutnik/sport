@@ -24,9 +24,13 @@ tr.row_competitor td {border-top:2px solid gray!important;}
     socket.on('get/results/response', function(data) {
       console.log("socket.on('get/results/response', function(data)");
       var sdata=JSON.parse(data);
+
       console.log(sdata);
       console.log("----------------------------------------------");
       //обраотка тут
+      for(var i=0;i<sdata.length; i++){
+        add2datasrc(sdata[i]);
+      }
     });
 
     socket.on('newData', function(data) {
@@ -727,7 +731,6 @@ tr.row_competitor td {border-top:2px solid gray!important;}
               data.push({"data_in_id":$(el).attr("data_in_id"), "race_competitor_id":(el.value?el.value:false), "result_detail_id":($(el).attr("result_detail_id")?$(el).attr("result_detail_id"):false)});
             }
           });
-
           socket.emit('change/data_in/competitors', JSON.stringify(data));
           console.log("btn_src_save:");
           console.log(JSON.stringify(data));
@@ -972,10 +975,11 @@ function set_html_startlist(run_id){
          var data_arr=JSON.parse(data);
          console.log(data_arr);
          for(var i=0; i<data_arr.length;i++){
-           add2datasrc(data_arr[i]);
+           //add2datasrc(data_arr[i]);
            data2arr(data_arr[i]);
 
          }
+//         for(var i=0; i<)
          console.log("glob_arr:");
          console.log(glob_arr);
          set_current_data();
@@ -985,13 +989,16 @@ function set_html_startlist(run_id){
       })
     }
     function add2datasrc(data){
-      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[3].course_id+"</td><td>"+data[3].device_id+(data[3].is_start?" - start":" -"+data[3].distance)+"</td><td>"+data[0].absolut_time+"</td><td>"+data[0].time+"</td><td>"+data[1].bib+"</td><td>"+data[2].en_firstname+" "+data[2].en_lastname +" / " + data[2].ru_lastname+" "+data[2].ru_firstname+"</td><td class='act'></td></tr>")
+//      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[3].course_id+"</td><td>"+data[3].device_id+(data[3].is_start?" - start":" -"+data[3].distance)+"</td><td>"+data[0].absolut_time+"</td><td>"+data[0].time+"</td><td>"+data[1].bib+"</td><td>"+data[2].en_firstname+" "+data[2].en_lastname +" / " + data[2].ru_lastname+" "+data[2].ru_firstname+"</td><td class='act'></td></tr>")
+      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+"</td><td>"+"</td><td>"+data[1].absolut_time+"</td><td>"+data[0].time+"</td><td>"+data[0].bib+"</td><td>"+data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname+"</td><td class='act'></td></tr>")
       $("#src_select_bib").clone()
         .attr({"id": "src_select_bib_"+data[0].id,
-               "result_detail_id": data[1].id,
+               "result_detail_id": data[1].id, //my
                "data_in_id": data[0].id})
         .appendTo("tr.datasrc_"+data[0].id+" td.act");
-
+      console.log("add2datasrc");
+      console.log("data[0].id="+data[0].id);
+      console.log(data);
     }
     // переделка входящих данных в удобный массив
     function data2arr(row){
