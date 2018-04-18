@@ -347,7 +347,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
             <div class="hidden">
               <select id="src_select_bib" class="src_select_bib">
                 <option value="">Не меняем</option>
-                <option value="error">Error</option>
+                <option value="-1">Error</option>
               </select>
             </div>
             <table id="tab_data_src" class="table table-hover">
@@ -535,28 +535,30 @@ function socket_emit(){
         });
         // обработка кнопки финиш заезда
         $("body").on("click", ".run_finish", function () {
-          alert("/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/stop");
+          var cid = $(this).attr('run_id');
+          alert("/raceinfo/race/"+race_id+"/run/"+cid+"/stop");
           $.ajax({
             type: "GET",
-            url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/stop",
-          })
-            .done(function(data) {
-              alert("#tab_startlist_run"+$(this).attr('run_id')+" .status");
-              $("#tab_startlist_run"+$(this).attr('run_id')+" .status").html("завершен");
+            url: "/raceinfo/race/"+race_id+"/run/"+cid+"/stop",
+            success: function(data) {
+              alert("#tab_startlist_run"+cid+" .status");
+              $("#tab_startlist_run"+cid+" .status").html("завершен");
               runinfo_get();
-            });
+            }
+          });
         });
         // обработка кнопки старт заезда
         $("body").on("click", ".run_start", function () {
+          var cid = $(this).attr('run_id');
           $.ajax({
             type: "GET",
-            url: "/raceinfo/race/"+race_id+"/run/"+$(this).attr('run_id')+"/start",
-          })
-            .done(function(data) {
+            url: "/raceinfo/race/"+race_id+"/run/"+cid+"/start",
+            success: function(data) {
               runinfo_get();
-              $("#tab_startlist_run"+$(this).attr('run_id')+" .status").html("активен");
-            //  add_result_table($(this).attr('run_id')); // создаем таблицу для общих результатов. !!!к этому моменту должны быть уже получены все массивы run_list, course_list, dev_list
-            });
+              $("#tab_startlist_run"+cid+" .status").html("активен");
+              //  add_result_table($(this).attr('run_id')); // создаем таблицу для общих результатов. !!!к этому моменту должны быть уже получены все массивы run_list, course_list, dev_list
+            }
+          });
         });
         // обработка кнопки вызова ручного ввода результата - модальное окно #popup_editresult
         $("body").on("click", ".editresult", function () {
