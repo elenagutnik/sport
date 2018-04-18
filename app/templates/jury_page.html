@@ -1046,7 +1046,7 @@ console.log(data);
       $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+"</td><td>"+"</td><td>"+data[0].time+"</td><td>"+(data[2]?data[2].bib:"")+"</td><td>"+(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"")+"</td><td class='act'></td></tr>")
       $("#src_select_bib").clone()
         .attr({"id": "src_select_bib_"+data[0].id,
-               "result_detail_id": data[1]?data[1].id:false, //my
+               "result_detail_id": data[1]?data[1].id:null, //my
                "data_in_id": data[0].id,
                "run_id": data[0].run_id})
         .appendTo("tr.datasrc_"+data[0].id+" td.act");
