@@ -326,19 +326,19 @@ def approve_manual(run_id, competitor_id):
 
 
 def calculate_finish_params(current_competitor_finish, finished_competitors):
-    # try:
-    start_result = db.session.query(ResultDetail).filter(ResultDetail.run_id == current_competitor_finish.run_id,
-                                                         ResultDetail.race_competitor_id == current_competitor_finish.race_competitor_id,
-                                                         ResultDetail.is_start == True).one()
-    current_competitor_finish.time = current_competitor_finish.absolut_time - start_result.absolut_time
-    сompetitors_list = sorted([current_competitor_finish] + finished_competitors, key=lambda item: item.time)
+    try:
+        start_result = db.session.query(ResultDetail).filter(ResultDetail.run_id == current_competitor_finish.run_id,
+                                                             ResultDetail.race_competitor_id == current_competitor_finish.race_competitor_id,
+                                                             ResultDetail.is_start == True).one()
+        current_competitor_finish.time = current_competitor_finish.absolut_time - start_result.absolut_time
+        сompetitors_list = sorted([current_competitor_finish] + finished_competitors, key=lambda item: item.time)
 
-    for index, item in enumerate(сompetitors_list):
-        item.diff = item.time - сompetitors_list[0].time
-        item.rank = index + 1
-    # except:
-    #     socketio.emit('recount/error', dict(competitor_id=current_competitor_finish.id,
-    #                                         error='Count finished params: diff, rank'))
+        for index, item in enumerate(сompetitors_list):
+            item.diff = item.time - сompetitors_list[0].time
+            item.rank = index + 1
+    except:
+        socketio.emit('recount/error', dict(competitor_id=current_competitor_finish.id,
+                                            error='Count finished params: diff, rank'))
 # def calculate_sector_params(current_competitor, device, course_id, device_competitors_list):
 #     print("function: calculate_sector_params")
 #     previous_course_device = CourseDevice.query.filter_by(order=device.order-1, course_id=course_id).one()
@@ -434,7 +434,6 @@ def recalculate_run_resaults(run_id):
     keys_list=list(tree_view.keys())
     recalculate_finished_resaults(tree_view[keys_list[0]], tree_view[keys_list[-1]])
 
-
     return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
 
 def recalculate_sector_resaults(current_results=None, previous_resaults=None):
@@ -528,3 +527,52 @@ def socket_get_results(data):
 #             calculate_finish_params(resultDetail, competitors_list)
 #
 #     socket_get_results({'run_id': data[0]['run_id']})
+
+
+@socketio.on('change/data_in/competitors')
+def edit_competitor(json_data):
+    data = json.loads(json_data)
+    tree_view = {}
+    # Причведение данных к удобночитаемому формату
+    for item in data:
+        if item['run_id'] not in tree_view.keys():
+            tree_view[item['run_id']] = {}
+
+        if item['race_competitor_id'] not in tree_view[item['run_id']].keys():
+            tree_view[item['run_id']][item['race_competitor_id']] = []
+        tree_view[item['run_id']][item['race_competitor_id']].append({'result_detail_id': item['result_detail_id'],
+                                                                      'data_in_id': item['data_in_id']})
+    for run_id, competitors_list in tree_view.items():
+        for competitor_id, data_list in competitors_list.items():
+            if competitor_id == -1:
+                for item in data_list:
+                    ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).delete()
+            else:
+                for item in data_list:
+                    if item['result_detail_id'] is not None:
+                        resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
+                        try:
+                            existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==item['race_competitor_id'],
+                                                     ResultDetail.course_device_id == resultDetail.course_device_id,
+                                                     ResultDetail.run_id == resultDetail.run_id).delete()
+                        except:
+                            pass
+                        resultDetail.race_competitor_id = item['race_competitor_id']
+                    else:
+                        dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
+                        resultDetail = ResultDetail(
+                            course_device_id=dataIn.cource_device_id,
+                            race_competitor_id=item['race_competitor_id'],
+                            run_id=dataIn.run_id,
+                            data_in_id=dataIn.id,
+                            absolut_time=dataIn.time
+                        )
+                        db.session.add(resultDetail)
+                        db.session.commit()
+        recalculate_run_resaults(run_id)
+
+
+
+
+
+
