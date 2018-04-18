@@ -20,17 +20,39 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       var data=JSON.parse(data);
       console.log(data);
     });
-    socket.emit('get/results', {run_id: 1});
+    //socket.emit('get/results', {run_id: 1});
     socket.on('get/results/response', function(data) {
       console.log("socket.on('get/results/response', function(data)");
       var sdata=JSON.parse(data);
 
       console.log(sdata);
       console.log("----------------------------------------------");
-      //обраотка тут
+
+      $("#tab_data_src tbody").html('');
+      //обраотка ту
       for(var i=0;i<sdata.length; i++){
         add2datasrc(sdata[i]);
       }
+      //glob_arr.length = 0; // очищаем массив
+      clear_resulttables();
+      delete glob_arr;
+      //glob_arr["run"+run.id].length);
+      get_current_data(race_id);
+    });
+    function clear_resulttables(){
+      for(var i=0;i<run_list.length;i++){
+        if(glob_arr){
+          if(glob_arr["run"+run_list[i].id]){
+            glob_arr["run"+run_list[i].id]=null;
+          }
+        }
+      }
+
+      $("#tab_summarytable").html('');
+      prepare_result_tables();
+    }
+    socket.on('get/results/current', function(data){
+      add2datasrc(JSON.parse(data)[0]);
     });
 
     socket.on('newData', function(data) {
@@ -50,7 +72,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       console.log("lastcomp:");
       console.log(lastcomp);
 
-      sumtab_set_maininfo(data2arr(lastcomp));
+      sumtab_set_maininfo(data2arr(lastcomp, data_arr.list_of_object));
 
       if(data_arr.length<=1 && lastcomp[4].name=="Start"){
         // на всякий случай очищаем массив finish_res
@@ -243,7 +265,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           //обновление sectorrank sectordiff и rank diff для остальных спортсменов на данном заезде
           var comps=glob_arr["run"+data.run_id];
           //for(var i=0; i<Object.keys(glob_arr).length-1; i++){ //перебор всех спортсменов заезда кроме последнего
-          var key
+          var key;
           for(key in comps){
             $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_sectordiff").html(tform(comps[key].dev_data[dev].sectordiff));
             $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev+"_sectorrank").html((comps[key].dev_data[dev].sectorrank));
@@ -333,8 +355,8 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 <tr>
                   <th>course_id</th>
                   <th>device</th>
-                  <th>absolute time</th>
-                  <th>time</th>
+                  <th>(absolute) time</th>
+
                   <th>bib</th>
                   <th>name</th>
                   <th>act</th>
@@ -447,21 +469,27 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       Promise.all([get_status_list(),get_runs_list()]).then(
             result=>get_startlist(run.id)
       ).then(
-            result=>set_select_bib()
-      ).then(
             result=>runinfo_get()
+      ).then(
+            result=>set_select_bib()
       ).then(
             result=>courselist_get()              // получение и внесение информации для вкладки "Устройства на трассах" (#tab_device)
       ).then(
             result=>courselist_tab_prepare()
       ).then(
-            result=>prepare_result_tables()
-      ).then(
+/*            result=>prepare_result_tables()
+      )
+
+      .then(
+*/
             result=>set_list_for_manualcontrol()
       ).then(
-            result=>get_current_data(race_id)
+            result=>socket_emit()//socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
       );
+function socket_emit(){
+  return socket.emit('get/results', {run_id: 1}); //result=>get_current_data(race_id)
 
+}
 
    /*
      .then(
@@ -757,6 +785,12 @@ tr.row_competitor td {border-top:2px solid gray!important;}
 
     });
 function set_select_bib(){
+  /*
+  if(!run_list[0].start_list.length)
+    alert("func set_select_bib: run_list[0].start_list is empty");
+  else
+    alert("func set_select_bib: run_list[0].start_list.length="+run_list[0].start_list.length);
+  */
   for(var i=0;i<run_list[0].start_list.length;i++){
     $("#src_select_bib").append($('<option>', {
     value: run_list[0].start_list[i][2].race_competitor_id,
@@ -905,7 +939,8 @@ function set_html_startlist(run_id){
             $.each(dev_list, function(value) {
               $("#device_course_"+this[0].course_id+" tbody").append("<tr><td>"+ this[1].id+"</td><td>"+this[0].order+"</td><td>"+this[0].distance+"</td><td>"+this[1].name+"</td>");
             });
-            prepare_result_tables();
+            console.log("FUNC: courselist_tab_prepare - device_list ready");
+            //prepare_result_tables();
             return device_list;
           })
         }
@@ -932,6 +967,7 @@ function set_html_startlist(run_id){
     function prepare_result_tables(){
       var run=run_list[run_list_ids["id"+run_id]];
       console.log("PREPARE_RESULT_TABLES: run_list:"+run_list.length);
+      console.log(device_list["course_1"]);
       console.log(run_list);
       for(var j=0;j<run_list.length;j++){
         var run=run_list[j];
@@ -1005,17 +1041,17 @@ function set_html_startlist(run_id){
 console.log("add2datasrc");
 //console.log("data[0].id="+data[0].id);
 console.log(data);
-      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+"</td><td>"+"</td><td>"+data[1].absolut_time+"</td><td>"+data[0].time+"</td><td>"+data[0].bib+"</td><td>"+data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname+"</td><td class='act'></td></tr>")
+      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+"</td><td>"+"</td><td>"+data[0].time+"</td><td>"+(data[2]?data[2].bib:"")+"</td><td>"+(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"")+"</td><td class='act'></td></tr>")
       $("#src_select_bib").clone()
         .attr({"id": "src_select_bib_"+data[0].id,
-               "result_detail_id": data[1].id, //my
+               "result_detail_id": data[1]?data[1].id:false, //my
                "data_in_id": data[0].id,
                "run_id": data[0].run_id})
         .appendTo("tr.datasrc_"+data[0].id+" td.act");
 
     }
     // переделка входящих данных в удобный массив
-    function data2arr(row, allrows=false){
+    function data2arr(row, allrows){
       console.log("START FUNC: data2arr");
       //if(row[0].length==1)row[0]=row[0][0];
       if(!glob_arr["run"+row[0].run_id])glob_arr["run"+row[0].run_id]=new Array();
@@ -1140,6 +1176,7 @@ console.log(data);
         }
 
         if(state=="clear"){
+          /*
           if(!comp_state["run_"+run_id]["comp_"+competitor_id])
             err = "error - can't be cleared because hasn't started";
           else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="approve")
@@ -1147,6 +1184,7 @@ console.log(data);
           else if(comp_state["run_"+run_id]["comp_"+competitor_id]=="manual_approve")
             err = "error - can't be cleared because already has been approved manualy";
           else
+          */
             comp_state["run_"+run_id]["comp_"+competitor_id]=false;
         }
 
