@@ -477,13 +477,19 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       ).then(
             result=>courselist_tab_prepare()
       ).then(
-            result=>prepare_result_tables()
-      ).then(
+/*            result=>prepare_result_tables()
+      )
+
+      .then(
+*/
             result=>set_list_for_manualcontrol()
       ).then(
-            socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
+            result=>socket_emit()//socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
       );
+function socket_emit(){
+  return socket.emit('get/results', {run_id: 1}); //result=>get_current_data(race_id)
 
+}
 
    /*
      .then(
@@ -779,8 +785,12 @@ tr.row_competitor td {border-top:2px solid gray!important;}
 
     });
 function set_select_bib(){
-  if(!run_list[0].start_list.length)alert("func set_select_bib: run_list[0].start_list is empty");
-  else alert("func set_select_bib: run_list[0].start_list.length="+run_list[0].start_list.length);
+  /*
+  if(!run_list[0].start_list.length)
+    alert("func set_select_bib: run_list[0].start_list is empty");
+  else
+    alert("func set_select_bib: run_list[0].start_list.length="+run_list[0].start_list.length);
+  */
   for(var i=0;i<run_list[0].start_list.length;i++){
     $("#src_select_bib").append($('<option>', {
     value: run_list[0].start_list[i][2].race_competitor_id,
@@ -929,7 +939,8 @@ function set_html_startlist(run_id){
             $.each(dev_list, function(value) {
               $("#device_course_"+this[0].course_id+" tbody").append("<tr><td>"+ this[1].id+"</td><td>"+this[0].order+"</td><td>"+this[0].distance+"</td><td>"+this[1].name+"</td>");
             });
-            prepare_result_tables();
+            console.log("FUNC: courselist_tab_prepare - device_list ready");
+            //prepare_result_tables();
             return device_list;
           })
         }
@@ -956,6 +967,7 @@ function set_html_startlist(run_id){
     function prepare_result_tables(){
       var run=run_list[run_list_ids["id"+run_id]];
       console.log("PREPARE_RESULT_TABLES: run_list:"+run_list.length);
+      console.log(device_list["course_1"]);
       console.log(run_list);
       for(var j=0;j<run_list.length;j++){
         var run=run_list[j];
