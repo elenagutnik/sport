@@ -1352,18 +1352,18 @@ def race_course_run_start(id,run_id):
         db.session.commit()
     except:
         return 'fail', 200
-    return 'ok', 200
+    return json.dumps({'start_time': str(run_info.starttime)})
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/stop', methods=['GET', 'POST'])
 @admin_required
 def race_course_run_stop(id,run_id):
+    # CHECK IT, IT LOOKS like a shi...t
     run_info = RunInfo.query.get_or_404(run_id)
     run_info.endtime = datetime.now()
     db.session.add(run_info)
     try:
         news_run = db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
     except:
-        return 'ok'
 
         RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
 
@@ -1384,7 +1384,7 @@ def race_course_run_stop(id,run_id):
             db.session.add(run_order)
         db.session.commit()
 
-    return 'ok'
+    return json.dumps({'stop_time': str(run_info.endtime)})
 
 
 @raceinfo.route('/race/<int:id>/run/add', methods=['GET', 'POST'])

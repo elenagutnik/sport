@@ -5,7 +5,7 @@ from . import jsonencoder, raceinfo
 import json
 
 from functools import wraps
-from sqlalchemy import cast, DATE, func, asc
+from sqlalchemy import cast, DATE, func, asc, null
 
 from flask_login import current_user, login_required
 from datetime import datetime, timedelta
@@ -114,30 +114,21 @@ def load_data_vol2():
         ResultDetail.course_device_id == course_device[0].id,
         ResultDetail.run_id == run.id).all()
     print('Competitors crossed this  device:', len(result_details))
+    db.session.add(result)
+    db.session.commit()
+
     for index, item in enumerate(result_details):
         print(index,'.', item.race_competitor_id)
     if course_device[1].name == "Start":
         result.sectortime = 0
         result.sectordiff = 0
         result.is_start = True
+    elif course_device[1].name == "Finish":
+        competitor_finish(competitor[0].id, run.id)
+        recalculate_run_resaults(run.id)
     else:
-    # socketio.emit('get/results/response',
-    #               json.dumps([device_data, None, competitor], cls=jsonencoder.AlchemyEncoder))
-    # return ''
-    #     calculate_sector_params(result, course_device[0], run.course_id, result_details)
         calculate_personal_sector_params(result, course_device[0], run.course_id)
         calculate_common_sector_params(result, result_details)
-
-        if course_device[1].name == "Finish":
-            finished_competitors = db.session.query(ResultDetail).filter(
-                ResultDetail.course_device_id == course_device[0].id,
-                ResultDetail.run_id == run.id).all()
-            competitor_finish(competitor[0].id, run.id)
-            calculate_finish_params(result, finished_competitors)
-
-
-    db.session.add(result)
-    db.session.commit()
 
     socketio.emit('get/results/current', json.dumps([[device_data, result, competitor[0], competitor[1], course_device[0]]], cls=jsonencoder.AlchemyEncoder))
     socketio.emit("newData", json.dumps(
@@ -256,18 +247,31 @@ def competitor_remove():
 @login_required
 @admin_required
 def competitor_clear():
-   ResultApproved.query.filter(
+    competitor_order = RunOrder.query.filter(RunOrder.race_competitor_id == request.args.get('competitor_id'),
+                                             RunOrder.run_id == request.args.get('run_id')).one()
+    others_competitors_orders = RunOrder.query.filter(RunOrder.manual_order > competitor_order.manual_order,
+                                             RunOrder.run_id == request.args.get('run_id')).all()
+    if len(others_competitors_orders) > 0:
+        for item in others_competitors_orders:
+            item.manual_order -= 1
+            db.session.add(item)
+    competitor_order.manual_order = None
+
+    db.session.add(competitor_order)
+    ResultApproved.query.filter(
        ResultApproved.race_competitor_id == request.args.get('competitor_id'),
        ResultApproved.run_id == request.args.get('run_id')
-   ).delete()
-   ResultDetail.query.filter(
+    ).delete()
+    ResultDetail.query.filter(
        ResultDetail.race_competitor_id == request.args.get('competitor_id'),
        ResultDetail.run_id == request.args.get('run_id')
-   ).delete()
+    ).delete()
 
-   socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
+    db.session.commit()
+    socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
 
-   return '', 200
+    recalculate_run_resaults(request.args.get('run_id'))
+    return '', 200
 
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
 @admin_required
@@ -301,12 +305,6 @@ def approve_automate(run_id, competitor_id):
 def approve_manual(run_id, competitor_id):
    data = json.loads(request.args['data'])
    try:
-       result = Result.query.filter_by(race_competitor_id=competitor_id).one()
-   except:
-       result = Result(race_competitor_id=competitor_id)
-       db.session.add(result)
-       db.session.commit()
-   try:
        resultDetail = ResultApproved.query.filter_by(race_competitor_id=competitor_id, run_id=run_id).one()
    except:
        resultDetail = ResultApproved(
@@ -319,7 +317,6 @@ def approve_manual(run_id, competitor_id):
    resultDetail.status_id = data['status_id']
    if data['absolut_time'] != '':
        resultDetail.timerun = data['absolut_time']
-   resultDetail.result_id = result.id
    resultDetail.gate = data['gate']
    resultDetail.reason = data['reason']
 
@@ -329,19 +326,19 @@ def approve_manual(run_id, competitor_id):
 
 
 def calculate_finish_params(current_competitor_finish, finished_competitors):
-    try:
-        start_result = db.session.query(ResultDetail).filter(ResultDetail.run_id == current_competitor_finish.run_id,
-                                                             ResultDetail.race_competitor_id == current_competitor_finish.race_competitor_id,
-                                                             ResultDetail.is_start == True).one()
-        current_competitor_finish.time = current_competitor_finish.absolut_time - start_result.absolut_time
-        сompetitors_list = sorted([current_competitor_finish] + finished_competitors, key=lambda item: item.time)
+    # try:
+    start_result = db.session.query(ResultDetail).filter(ResultDetail.run_id == current_competitor_finish.run_id,
+                                                         ResultDetail.race_competitor_id == current_competitor_finish.race_competitor_id,
+                                                         ResultDetail.is_start == True).one()
+    current_competitor_finish.time = current_competitor_finish.absolut_time - start_result.absolut_time
+    сompetitors_list = sorted([current_competitor_finish] + finished_competitors, key=lambda item: item.time)
 
-        for index, item in enumerate(сompetitors_list):
-            item.diff = item.time - сompetitors_list[0].time
-            item.rank = index + 1
-    except:
-        socketio.emit('recount/error', dict(competitor_id=current_competitor_finish.id,
-                                            error='Count finished params: diff, rank'))
+    for index, item in enumerate(сompetitors_list):
+        item.diff = item.time - сompetitors_list[0].time
+        item.rank = index + 1
+    # except:
+    #     socketio.emit('recount/error', dict(competitor_id=current_competitor_finish.id,
+    #                                         error='Count finished params: diff, rank'))
 # def calculate_sector_params(current_competitor, device, course_id, device_competitors_list):
 #     print("function: calculate_sector_params")
 #     previous_course_device = CourseDevice.query.filter_by(order=device.order-1, course_id=course_id).one()
@@ -389,6 +386,7 @@ def calculate_personal_sector_params(current_competitor, device, course_id):
     except:
         socketio.emit('recount/error', dict(competitor_id=current_competitor.id,
                                             error='Count personal params: speed, sectortime'))
+
 # Функция принемает текущий результат и список  объекты ResultDetail
 # результатов БЕЗ текущего
 def calculate_common_sector_params(current_competitor, competitors_list):
@@ -415,6 +413,61 @@ def calculate_common_sector_params(current_competitor, competitors_list):
                                             error='Count common params: sectorrank, sectordiff'))
 
 
+@raceinfo.route('/recalculate/<int:run_id>', methods=['GET'])
+def recalculate_run_resaults(run_id):
+    tree_view = {}
+    data = db.session.query(ResultDetail, ResultApproved, CourseDevice).\
+           join(CourseDevice, CourseDevice.id==ResultDetail.course_device_id).\
+           join(ResultApproved, ResultApproved.race_competitor_id==ResultDetail.race_competitor_id, isouter=True).\
+           filter(ResultDetail.run_id == run_id).order_by(asc(CourseDevice.order)).\
+        all()
+    for item in data:
+        if item[2].order not in tree_view.keys():
+            tree_view[item[2].order] = []
+        tree_view[item[2].order].append(item)
+
+    for key, item in tree_view.items():
+        if key == 1:
+            continue
+        else:
+            recalculate_sector_resaults(item, tree_view[key-1])
+    keys_list=list(tree_view.keys())
+    recalculate_finished_resaults(tree_view[keys_list[0]], tree_view[keys_list[-1]])
+
+
+    return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
+
+def recalculate_sector_resaults(current_results=None, previous_resaults=None):
+    #  пересчитать  параметры speed, sectordiff
+    for current_result in current_results:
+        for previous_item in previous_resaults:
+            if previous_item[0].race_competitor_id ==current_result[0].race_competitor_id:
+                current_result[0].sectortime = current_result[0].absolut_time - previous_item[0].absolut_time
+                current_result[0].speed = ((current_result[2].distance - previous_item[2].distance) / 1000) / (
+                    current_result[0].sectortime / 3600000)
+                break
+
+    сompetitors_list = sorted(current_results, key=lambda item: item[0].sectortime)
+    min_element = next(item for item in сompetitors_list if item[1].is_finish == True)
+
+    for index, item in enumerate(сompetitors_list):
+        item[0].sectordiff = item[0].sectortime - min_element[0].sectortime
+        item[0].sectorrank = index + 1
+
+def recalculate_finished_resaults(start_results, finish_results):
+    for finish_result in finish_results:
+        for start_item in start_results:
+            if finish_result[0].race_competitor_id ==start_item[0].race_competitor_id:
+                finish_result[0].time = finish_result[0].absolut_time - start_item[0].absolut_time
+                break
+
+    сompetitors_list = sorted(finish_results, key=lambda item: item[0].time)
+
+    for index, item in enumerate(сompetitors_list):
+        item[0].diff = item[0].time - сompetitors_list[0][0].time
+        item[0].rank = index + 1
+
+
 @socketio.on('get/results')
 def socket_get_results(data):
     socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor, CourseDevice).
@@ -428,49 +481,50 @@ def socket_get_results(data):
                   cls=jsonencoder.AlchemyEncoder))
 
 
-@socketio.on('change/data_in/competitors')
-def edit_competitor(json_data):
-    data = json.loads(json_data)
-    changed_results_list = []
-    for item in data:
-        # Получить все данные компетитора которому меняем набор данных
-        competitorResults = ResultDetail.query.filter(ResultDetail.run_id == item['run_id'],
-                                                      ResultDetail.race_competitor_id == item['race_competitor_id']).all()
-        dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
-        if len(competitorResults):
-            existedData=next((item for item in competitorResults if item.course_device_id == dataIn.cource_device_id), None)
-            if existedData:
-                db.session.delete(existedData)
-        if item['result_detail_id'] is not None:
-            print(item['result_detail_id'])
-            resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
-            try:
-                existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==item['race_competitor_id'],
-                                         ResultDetail.course_device_id == resultDetail.course_device_id,
-                                         ResultDetail.run_id == resultDetail.run_id).delete()
-            except:
-                pass
-
-            resultDetail.race_competitor_id = item['race_competitor_id']
-        else:
-            resultDetail = ResultDetail(
-                course_device_id=dataIn.cource_device_id,
-                race_competitor_id=item['race_competitor_id'],
-                run_id=dataIn.run_id,
-                data_in_id=dataIn.id,
-                absolut_time=dataIn.time
-            )
-            db.session.add(resultDetail)
-            db.session.commit()
-            changed_results_list.append(resultDetail)
-    for resultDetail in changed_results_list:
-        device = CourseDevice.query.filter(CourseDevice.id == resultDetail.course_device_id).one()
-        competitors_list = ResultDetail.query.filter(ResultDetail.race_competitor_id != resultDetail.race_competitor_id,
-                                                     ResultDetail.course_device_id == resultDetail.course_device_id).all()
-        calculate_personal_sector_params(resultDetail, device, device.course_id)
-        calculate_common_sector_params(resultDetail, competitors_list)
-
-        if device.course_device_type_id == 3:
-            calculate_finish_params(resultDetail, competitors_list)
-
-    socket_get_results({'run_id': data[0]['run_id']})
+# @socketio.on('change/data_in/competitors')
+# def edit_competitor(json_data):
+#     data = json.loads(json_data)
+#     changed_results_list = []
+#     for item in data:
+#         # if item['']
+#         # Получить все данные компетитора которому меняем набор данных
+#         competitorResults = ResultDetail.query.filter(ResultDetail.run_id == item['run_id'],
+#                                                       ResultDetail.race_competitor_id == item['race_competitor_id']).all()
+#         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
+#         if len(competitorResults):
+#             existedData=next((item for item in competitorResults if item.course_device_id == dataIn.cource_device_id), None)
+#             if existedData:
+#                 db.session.delete(existedData)
+#         if item['result_detail_id'] is not None:
+#             print(item['result_detail_id'])
+#             resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
+#             try:
+#                 existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==item['race_competitor_id'],
+#                                          ResultDetail.course_device_id == resultDetail.course_device_id,
+#                                          ResultDetail.run_id == resultDetail.run_id).delete()
+#             except:
+#                 pass
+#
+#             resultDetail.race_competitor_id = item['race_competitor_id']
+#         else:
+#             resultDetail = ResultDetail(
+#                 course_device_id=dataIn.cource_device_id,
+#                 race_competitor_id=item['race_competitor_id'],
+#                 run_id=dataIn.run_id,
+#                 data_in_id=dataIn.id,
+#                 absolut_time=dataIn.time
+#             )
+#             db.session.add(resultDetail)
+#             db.session.commit()
+#             changed_results_list.append(resultDetail)
+#     for resultDetail in changed_results_list:
+#         device = CourseDevice.query.filter(CourseDevice.id == resultDetail.course_device_id).one()
+#         competitors_list = ResultDetail.query.filter(ResultDetail.race_competitor_id != resultDetail.race_competitor_id,
+#                                                      ResultDetail.course_device_id == resultDetail.course_device_id).all()
+#         calculate_personal_sector_params(resultDetail, device, device.course_id)
+#         calculate_common_sector_params(resultDetail, competitors_list)
+#
+#         if device.course_device_type_id == 3:
+#             calculate_finish_params(resultDetail, competitors_list)
+#
+#     socket_get_results({'run_id': data[0]['run_id']})
