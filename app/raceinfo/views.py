@@ -1363,8 +1363,6 @@ def race_course_run_stop(id,run_id):
     db.session.add(run_info)
     try:
         news_run = db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
-    except:
-
         RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
 
         sub_query = db.session.query(ResultApproved.race_competitor_id, Status.filter_order).join(Status).filter(ResultApproved.run_id == run_id).subquery()
@@ -1383,7 +1381,8 @@ def race_course_run_stop(id,run_id):
             )
             db.session.add(run_order)
         db.session.commit()
-
+    except:
+        return json.dumps({'stop_time': str(run_info.endtime)})
     return json.dumps({'stop_time': str(run_info.endtime)})
 
 
