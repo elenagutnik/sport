@@ -447,7 +447,7 @@ def recalculate_sector_resaults(current_results=None, previous_resaults=None):
                 break
 
     сompetitors_list = sorted(current_results, key=lambda item: item[0].sectortime)
-    min_element = next(item for item in сompetitors_list if item[1].is_finish == True)
+    min_element = next(item for item in сompetitors_list if item[1].status_id == 1)
 
     for index, item in enumerate(сompetitors_list):
         item[0].sectordiff = item[0].sectortime - min_element[0].sectortime
@@ -544,25 +544,37 @@ def edit_competitor(json_data):
                                                                       'data_in_id': item['data_in_id']})
     for run_id, competitors_list in tree_view.items():
         for competitor_id, data_list in competitors_list.items():
-            if competitor_id == -1:
+            if competitor_id == '-1':
                 for item in data_list:
                     ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).delete()
             else:
                 for item in data_list:
+
+                    try:
+                        result_approved = ResultApproved.query.filter(ResultApproved.run_id==run_id,
+                                                                      ResultApproved.race_competitor_id==competitor_id).one()
+                    except:
+                        resultApproved = ResultApproved(
+                            run_id=run_id,
+                            race_competitor_id=competitor_id,
+                            is_start=True)
+                        db.session.add(resultApproved)
+                        db.session.commit()
+
                     if item['result_detail_id'] is not None:
                         resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
                         try:
-                            existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==item['race_competitor_id'],
+                            existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==competitor_id,
                                                      ResultDetail.course_device_id == resultDetail.course_device_id,
                                                      ResultDetail.run_id == resultDetail.run_id).delete()
                         except:
                             pass
-                        resultDetail.race_competitor_id = item['race_competitor_id']
+                        resultDetail.race_competitor_id = competitor_id
                     else:
                         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
                         resultDetail = ResultDetail(
                             course_device_id=dataIn.cource_device_id,
-                            race_competitor_id=item['race_competitor_id'],
+                            race_competitor_id=competitor_id,
                             run_id=dataIn.run_id,
                             data_in_id=dataIn.id,
                             absolut_time=dataIn.time
@@ -570,6 +582,7 @@ def edit_competitor(json_data):
                         db.session.add(resultDetail)
                         db.session.commit()
         recalculate_run_resaults(run_id)
+        socket_get_results({'run_id': run_id})
 
 
 
