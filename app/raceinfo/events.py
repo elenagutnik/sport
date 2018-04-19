@@ -123,8 +123,11 @@ def load_data_vol2():
         result.sectortime = 0
         result.sectordiff = 0
         result.is_start = True
+        approvedResult = ResultApproved.query.filter(ResultApproved.race_competitor_id == result.race_competitor_id,
+                                                     ResultApproved.run_id == result.run_id).one()
+        approvedResult.start_time = result.absolut_time
     elif course_device[1].name == "Finish":
-        competitor_finish(competitor[0].id, run.id)
+        competitor_finish(competitor[0].id, run.id, result.absolut_time)
         recalculate_run_resaults(run.id)
     else:
         calculate_personal_sector_params(result, course_device[0], run.course_id)
@@ -219,7 +222,7 @@ def get_current_competitor(course_device_id, run_id):
     print('New race competitor id:', race_competitor[0].id)
     return race_competitor
 
-def competitor_finish(competitor_id, run_id):
+def competitor_finish(competitor_id, run_id, finish_time):
     try:
         result_approves = ResultApproved.query.filter_by(
             race_competitor_id=competitor_id,
@@ -227,6 +230,8 @@ def competitor_finish(competitor_id, run_id):
         # Если что ипсправить
         result_approves.status_id = 1
         result_approves.is_finish = True
+        result_approves.finish_time = finish_time
+        result_approves.time = result_approves.finish_time - result_approves.start_time
         db.session.add(result_approves)
         db.session.commit()
         return
@@ -427,44 +432,60 @@ def recalculate_run_resaults(run_id):
         tree_view[item[2].order].append(item)
 
     for key, item in tree_view.items():
+        print(key, type(key))
         if key == 1:
             continue
         else:
-            recalculate_sector_resaults(item, tree_view[key-1])
+            recalculate_sector_results(item, tree_view[key-1])
     keys_list=list(tree_view.keys())
-    recalculate_finished_resaults(tree_view[keys_list[0]], tree_view[keys_list[-1]])
-
+    # recalculate_finished_resaults(tree_view[keys_list[0]], tree_view[keys_list[-1]])
+    recalculate_finished_resaults(run_id)
     return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
 
-def recalculate_sector_resaults(current_results=None, previous_resaults=None):
+def recalculate_sector_results(current_results=None, previous_resaults=None):
     #  пересчитать  параметры speed, sectordiff
     for current_result in current_results:
         for previous_item in previous_resaults:
-            if previous_item[0].race_competitor_id ==current_result[0].race_competitor_id:
-                current_result[0].sectortime = current_result[0].absolut_time - previous_item[0].absolut_time
-                current_result[0].speed = ((current_result[2].distance - previous_item[2].distance) / 1000) / (
-                    current_result[0].sectortime / 3600000)
-                break
-
-    сompetitors_list = sorted(current_results, key=lambda item: item[0].sectortime)
+            if previous_item[0].race_competitor_id == current_result[0].race_competitor_id:
+                try:
+                    current_result[0].sectortime = current_result[0].absolut_time - previous_item[0].absolut_time
+                    current_result[0].speed = ((current_result[2].distance - previous_item[2].distance) / 1000) / (
+                        current_result[0].sectortime / 3600000)
+                    break
+                except:
+                    current_result[0].sectortime = None
+                    current_result[0].speed = None
+    сompetitors_list = sorted(current_results, key=lambda item: (item[0].sectortime is None, item[0].sectortime))
     min_element = next(item for item in сompetitors_list if item[1].status_id == 1)
 
     for index, item in enumerate(сompetitors_list):
-        item[0].sectordiff = item[0].sectortime - min_element[0].sectortime
-        item[0].sectorrank = index + 1
+        try:
+            item[0].sectordiff = item[0].sectortime - min_element[0].sectortime
+            item[0].sectorrank = index + 1
+        except:
+            item[0].sectordiff = None
+            item[0].sectorrank = None
 
-def recalculate_finished_resaults(start_results, finish_results):
-    for finish_result in finish_results:
-        for start_item in start_results:
-            if finish_result[0].race_competitor_id ==start_item[0].race_competitor_id:
-                finish_result[0].time = finish_result[0].absolut_time - start_item[0].absolut_time
-                break
-
-    сompetitors_list = sorted(finish_results, key=lambda item: item[0].time)
+# def recalculate_finished_resaults(start_results, finish_results):
+#     for finish_result in finish_results:
+#         for start_item in start_results:
+#             if finish_result[0].race_competitor_id ==start_item[0].race_competitor_id:
+#                 finish_result[0].time = finish_result[0].absolut_time - start_item[0].absolut_time
+#                 break
+#
+#     сompetitors_list = sorted(finish_results, key=lambda item: item[0].time)
+#
+#     for index, item in enumerate(сompetitors_list):
+#         item[0].diff = item[0].time - сompetitors_list[0][0].time
+#         item[0].rank = index + 1
+#
+def recalculate_finished_resaults(run_id):
+    finish_results = ResultApproved.query.filter(ResultApproved.run_id==run_id).all()
+    сompetitors_list = sorted(finish_results, key=lambda item: item.time)
 
     for index, item in enumerate(сompetitors_list):
-        item[0].diff = item[0].time - сompetitors_list[0][0].time
-        item[0].rank = index + 1
+        item.diff = item.time - сompetitors_list[0].time
+        item.rank = index + 1
 
 
 @socketio.on('get/results')
@@ -546,7 +567,18 @@ def edit_competitor(json_data):
         for competitor_id, data_list in competitors_list.items():
             if competitor_id == '-1':
                 for item in data_list:
-                    ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).delete()
+                    resultCleared = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
+
+                    resultCleared.speed = None
+                    resultCleared.sectortime = None
+                    resultCleared.absolut_time = None
+                    resultCleared.data_in_id = None
+                    resultCleared.diff = None
+                    resultCleared.time = None
+                    resultCleared.rank = None
+
+                    db.session.add(resultCleared)
+                    db.session.commit()
             else:
                 for item in data_list:
 
