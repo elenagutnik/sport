@@ -481,7 +481,7 @@ def recalculate_sector_results(current_results=None, previous_resaults=None):
 #
 def recalculate_finished_resaults(run_id):
     finish_results = ResultApproved.query.filter(ResultApproved.run_id==run_id).all()
-    сompetitors_list = sorted(finish_results, key=lambda item: item.time)
+    сompetitors_list = sorted(finish_results, key= lambda item:( item.time is None, item.time))
 
     for index, item in enumerate(сompetitors_list):
         item.diff = item.time - сompetitors_list[0].time
