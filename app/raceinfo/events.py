@@ -129,6 +129,8 @@ def load_data_vol2():
     elif course_device[1].name == "Finish":
         competitor_finish(competitor[0].id, run.id, result.absolut_time)
         recalculate_run_resaults(run.id)
+        result_details = db.session.query(ResultDetail). \
+            filter(ResultDetail.run_id == run.id).all()
     else:
         calculate_personal_sector_params(result, course_device[0], run.course_id)
         calculate_common_sector_params(result, result_details)
