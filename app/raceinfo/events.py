@@ -440,7 +440,7 @@ def recalculate_run_resaults(run_id):
         else:
             recalculate_sector_results(item, tree_view[key-1])
     keys_list=list(tree_view.keys())
-    # recalculate_finished_resaults(tree_view[keys_list[0]], tree_view[keys_list[-1]])
+    recalculate_finished_resaults_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
     recalculate_finished_resaults(run_id)
     return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
 
@@ -468,19 +468,19 @@ def recalculate_sector_results(current_results=None, previous_resaults=None):
             item[0].sectordiff = None
             item[0].sectorrank = None
 
-# def recalculate_finished_resaults(start_results, finish_results):
-#     for finish_result in finish_results:
-#         for start_item in start_results:
-#             if finish_result[0].race_competitor_id ==start_item[0].race_competitor_id:
-#                 finish_result[0].time = finish_result[0].absolut_time - start_item[0].absolut_time
-#                 break
-#
-#     сompetitors_list = sorted(finish_results, key=lambda item: item[0].time)
-#
-#     for index, item in enumerate(сompetitors_list):
-#         item[0].diff = item[0].time - сompetitors_list[0][0].time
-#         item[0].rank = index + 1
-#
+def recalculate_finished_resaults_old(start_results, finish_results):
+    for finish_result in finish_results:
+        for start_item in start_results:
+            if finish_result[0].race_competitor_id ==start_item[0].race_competitor_id:
+                finish_result[0].time = finish_result[0].absolut_time - start_item[0].absolut_time
+                break
+
+    сompetitors_list = sorted(finish_results, key=lambda item: item[0].time)
+
+    for index, item in enumerate(сompetitors_list):
+        item[0].diff = item[0].time - сompetitors_list[0][0].time
+        item[0].rank = index + 1
+
 def recalculate_finished_resaults(run_id):
     finish_results = ResultApproved.query.filter(ResultApproved.run_id==run_id).all()
     сompetitors_list = sorted(finish_results, key= lambda item:( item.time is None, item.time))
