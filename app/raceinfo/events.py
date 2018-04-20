@@ -5,7 +5,7 @@ from . import jsonencoder, raceinfo
 import json
 
 from functools import wraps
-from sqlalchemy import cast, DATE, func, asc, null
+from sqlalchemy import cast, DATE, func, asc, null,
 
 from flask_login import current_user, login_required
 from datetime import datetime, timedelta
@@ -659,7 +659,8 @@ def switch_approve(new_approve, old_approve, devices, device_id):
     if devices[device_id]==1:
         new_approve.start_time = old_approve.start_time
     else:
-        old_approve.finish_time = new_approve.finish_time
+        new_approve.finish_time = old_approve.finish_time
+    new_approve.status_id=None
 
 def get_start_finish_device(run_id):
     data = db.session.query(CourseDevice.id.label('device_id'), CourseDevice.course_device_type_id.label('type_id')).filter(CourseDevice.course_device_type_id != 3,
