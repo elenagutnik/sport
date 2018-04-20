@@ -154,6 +154,7 @@ def get_current_data(race_id):
     return json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)
                       .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
                       .filter(RaceCompetitor.race_id == race_id)\
+                      .order_by(asc(ResultDetail.absolut_time))
                       .all(), cls=jsonencoder.AlchemyEncoder)
 
 def setDeviceDataInDB(data, run_id, cource_device_id):
@@ -617,9 +618,3 @@ def edit_competitor(json_data):
                         db.session.commit()
         recalculate_run_resaults(run_id)
         socket_get_results({'run_id': run_id})
-
-
-
-
-
-

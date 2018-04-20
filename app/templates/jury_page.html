@@ -486,10 +486,10 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       ).then(
             result=>socket_emit()//socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
       );
-function socket_emit(){
-  return socket.emit('get/results', {run_id: 1}); //result=>get_current_data(race_id)
 
-}
+      function socket_emit(){
+        return socket.emit('get/results', {run_id: 1}); //result=>get_current_data(race_id)
+      }
 
    /*
      .then(
@@ -1111,10 +1111,10 @@ console.log(data);
           var rcid;
           for(i in allrows){
               rcid=allrows[i].race_competitor_id;
-              glob_arr["run"+row[0].run_id]["comp_"+rcid]["dev_data"]["dev_"+row[0].course_device_id].sectordiff=allrows[i].sectordiff;
-              glob_arr["run"+row[0].run_id]["comp_"+rcid]["dev_data"]["dev_"+row[0].course_device_id].sectorrank=allrows[i].sectorrank;
-              glob_arr["run"+row[0].run_id]["comp_"+rcid]["dev_data"]["dev_"+row[0].course_device_id].diff=allrows[i].diff;
-              glob_arr["run"+row[0].run_id]["comp_"+rcid]["dev_data"]["dev_"+row[0].course_device_id].rank=allrows[i].rank;
+              glob_arr["run"+allrows[i].run_id]["comp_"+rcid]["dev_data"]["dev_"+allrows[i].course_device_id].sectordiff=allrows[i].sectordiff;
+              glob_arr["run"+allrows[i].run_id]["comp_"+rcid]["dev_data"]["dev_"+allrows[i].course_device_id].sectorrank=allrows[i].sectorrank;
+              glob_arr["run"+allrows[i].run_id]["comp_"+rcid]["dev_data"]["dev_"+allrows[i].course_device_id].diff=allrows[i].diff;
+              glob_arr["run"+allrows[i].run_id]["comp_"+rcid]["dev_data"]["dev_"+allrows[i].course_device_id].rank=allrows[i].rank;
           }
         }
       }else{
