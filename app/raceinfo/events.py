@@ -499,8 +499,8 @@ def recalculate_finished_resaults(run_id):
             item.diff = item.time - сompetitors_list[0].time
             item.rank = index + 1
         except:
-            item.diff = 0
-            item.rank = 0
+            item.diff = None
+            item.rank = None
 
 
 @socketio.on('get/results')
