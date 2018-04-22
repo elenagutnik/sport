@@ -616,8 +616,9 @@ def edit_competitor(json_data):
                             new_result.race_competitor_id = competitor_id
 
                         except:
-                            error = {'error': "Competitor doesn't start", 'competitor': item['result_detail_id'] }
+                            error = {'error': "Competitor doesn't start", 'competitor': competitor_id}
                             error_list.append(error)
+                            break
                     else:
                         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
                         resultDetail = ResultDetail(
