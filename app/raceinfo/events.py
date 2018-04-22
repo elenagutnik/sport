@@ -597,23 +597,23 @@ def edit_competitor(json_data):
 
                     if item['result_detail_id'] is not None:
                         new_result = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
-                        try:
-                            old_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == competitor_id,
-                                                               ResultDetail.run_id == new_result.run_id,
-                                                               ResultDetail.course_device_id == new_result.course_device_id).one()
+                        # try:
+                        old_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == competitor_id,
+                                                           ResultDetail.run_id == new_result.run_id,
+                                                           ResultDetail.course_device_id == new_result.course_device_id).one()
 
-                            if old_result.course_device_id in list(devices.keys()):
-                                old_approve= db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
-                                                                                     resultApproved.race_competitor_id==old_result.race_competitor_id).one()
-                                new_approve= db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
-                                                                                     resultApproved.race_competitor_id==new_result.race_competitor_id).one()
-                                switch_approve(new_approve, old_approve, devices, old_result.course_device_id)
-                                clear_approve(devices, old_result)
+                        if old_result.course_device_id in list(devices.keys()):
+                            old_approve= db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
+                                                                                 resultApproved.race_competitor_id==old_result.race_competitor_id).one()
+                            new_approve= db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
+                                                                                 resultApproved.race_competitor_id==new_result.race_competitor_id).one()
+                            switch_approve(new_approve, old_approve, devices, old_result.course_device_id)
+                            clear_approve(devices, old_result)
 
-                            result_set_None(old_result)
-                            old_result.race_competitor_id = new_result.race_competitor_id
-                        except:
-                            pass
+                        result_set_None(old_result)
+                        old_result.race_competitor_id = new_result.race_competitor_id
+                        # except:
+                        #     pass
                         new_result.race_competitor_id = competitor_id
                     else:
                         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
