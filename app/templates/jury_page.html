@@ -39,6 +39,11 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       //glob_arr["run"+run.id].length);
       get_current_data(race_id);
     });
+    socket.on('change/data_in/error', function(data) {
+      console.log('change/data_in/error');
+      console.log(JSON.parse(data));
+    });
+
     function clear_resulttables(){
       for(var i=0;i<run_list.length;i++){
         if(glob_arr){
@@ -71,9 +76,13 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       lastcomp=data_arr.current_object;
       console.log("lastcomp:");
       console.log(lastcomp);
-
-      sumtab_set_maininfo(data2arr(lastcomp, data_arr.list_of_object));
-
+      //если это последний девайс
+      if(lastcomp[0].course_device_id==device_list["course_"+run_list[run_list_ids["id"+run.id]].course_id][device_list["course_"+run_list[run_list_ids["id"+run.id]].course_id].length-1][0].id){
+        data2arr(lastcomp, data_arr.list_of_object);
+        set_current_data();
+      }else{
+        sumtab_set_maininfo(data2arr(lastcomp, data_arr.list_of_object));
+      }
       if(data_arr.length<=1 && lastcomp[4].name=="Start"){
         // на всякий случай очищаем массив finish_res
         finish_res.length = 0;
@@ -267,11 +276,20 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           //for(var i=0; i<Object.keys(glob_arr).length-1; i++){ //перебор всех спортсменов заезда кроме последнего
           var key;
           for(key in comps){
-            $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_sectordiff").html(tform(comps[key].dev_data[dev].sectordiff));
-            $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev+"_sectorrank").html((comps[key].dev_data[dev].sectorrank));
             if(dev=="dev_"+device_list["course_"+data.course_id][device_list["course_"+data.course_id].length-1][0].device_id){
+              //для последнего девайса обновляем ВСЕ ранк и дифф на ВСЕХ секторах
+              for(var i2=1;i2<device_list["course_"+data.course_id].length;i2++){
+                var dev_key="dev_"+device_list["course_1"][i2][0].device_id;
+                $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev_key+"_sectordiff").html(tform(comps[key].dev_data[dev_key].sectordiff));
+                $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev_key+"_sectorrank").html((comps[key].dev_data[dev_key].sectorrank));
+              }
+              // обновляем ранк и дифф на трассе
               $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_diff").html(tform(comps[key].dev_data[dev].diff));
               $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev+"_rank").html((comps[key].dev_data[dev].rank));
+            }else{
+              //для НЕ последнего девайса просто обновляем ранк и дифф на секторе
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_sectordiff").html(tform(comps[key].dev_data[dev].sectordiff));
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev+"_sectorrank").html((comps[key].dev_data[dev].sectorrank));
             }
           }
           //if(data[4].name!="Start"){
@@ -292,12 +310,12 @@ tr.row_competitor td {border-top:2px solid gray!important;}
     }
     </script>
     <ul class="nav nav-tabs">
-      <li><a href="#tab_runs" data-toggle="tab">Заезды</a></li>
-      <li><a href="#tab_startlist" data-toggle="tab">Стартовые списки</a></li>
-      <li class="active"><a href="#tab_curcompetitor" data-toggle="tab">Текущие результаты</a></li>
-      <li><a href="#tab_summarytable" data-toggle="tab">Все результаты</a></li>
-      <li><a href="#tab_datasrc" data-toggle="tab">Данные с устройств</a></li>
-      <li><a href="#tab_device" data-toggle="tab">Девайсы</a></li>
+      <li id="li_tab_runs"><a href="#tab_runs" data-toggle="tab">Заезды</a></li>
+      <li id="li_tab_startlist"><a href="#tab_startlist" data-toggle="tab">Стартовые списки</a></li>
+      <li id="li_tab_curcompetitor" class="active"><a href="#tab_curcompetitor" data-toggle="tab">Текущие результаты</a></li>
+      <li id="li_tab_summarytable"><a href="#tab_summarytable" data-toggle="tab">Все результаты</a></li>
+      <li id="li_tab_datasrc"><a href="#tab_datasrc" data-toggle="tab">Данные с устройств</a></li>
+      <li id="li_tab_device"><a href="#tab_device" data-toggle="tab">Девайсы</a></li>
     </ul>
     <div class="tab-content">
         <div id="tab_runs" class="tab-pane fade">
@@ -513,6 +531,10 @@ tr.row_competitor td {border-top:2px solid gray!important;}
     /*
     *   обработка кнопок
     */
+    $("body").on("click", ".nav nav-tabs li", function () {
+      document.cookie = "tab="+$(this).id;
+    });
+
         // обработка кнопки - подтверждение заезда спортсмена со статусом QLF
         $("body").on("click", ".approveQLF", function () {
           $.ajax({
@@ -1109,8 +1131,13 @@ console.log(data);
 
         if(allrows){
           var rcid;
-          for(i in allrows){
+          console.log("allrows:=======");
+          console.log(allrows);
+          for(var i=0;i<allrows.length;i++){
               rcid=allrows[i].race_competitor_id;
+              if(rcid==row[0].race_competitor_id && row[0].course_device_id==6)
+                console.log(allrows[i]);
+
               glob_arr["run"+allrows[i].run_id]["comp_"+rcid]["dev_data"]["dev_"+allrows[i].course_device_id].sectordiff=allrows[i].sectordiff;
               glob_arr["run"+allrows[i].run_id]["comp_"+rcid]["dev_data"]["dev_"+allrows[i].course_device_id].sectorrank=allrows[i].sectorrank;
               glob_arr["run"+allrows[i].run_id]["comp_"+rcid]["dev_data"]["dev_"+allrows[i].course_device_id].diff=allrows[i].diff;
