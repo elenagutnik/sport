@@ -561,7 +561,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
         // обработка кнопки финиш заезда
         $("body").on("click", ".run_finish", function () {
           var cid = $(this).attr('run_id');
-          alert("/raceinfo/race/"+race_id+"/run/"+cid+"/stop");
+        //  alert("/raceinfo/race/"+race_id+"/run/"+cid+"/stop");
           $.ajax({
             type: "GET",
             url: "/raceinfo/race/"+race_id+"/run/"+cid+"/stop",
@@ -1084,7 +1084,7 @@ function set_html_startlist(run_id){
 console.log("add2datasrc");
 //console.log("data[0].id="+data[0].id);
 console.log(data);
-      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+"</td><td>"+"</td><td>"+data[0].time+"</td><td>"+(data[2]?data[2].bib:"")+"</td><td>"+(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"")+"</td><td class='act'></td></tr>")
+      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[4].course_id+"</td><td>"+data[4].device_id+"</td><td>"+data[0].time+"</td><td>"+(data[2]?data[2].bib:"")+"</td><td>"+(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"")+"</td><td class='act'></td></tr>")
       $("#src_select_bib").clone()
         .attr({"id": "src_select_bib_"+data[0].id,
                "result_detail_id": data[1]?data[1].id:null, //my
