@@ -473,19 +473,26 @@ def recalculate_sector_results(current_results=None, previous_resaults=None):
 def recalculate_finished_resaults_old(start_results, finish_results):
     for finish_result in finish_results:
         for start_item in start_results:
-            if finish_result[0].race_competitor_id ==start_item[0].race_competitor_id:
-                finish_result[0].time = finish_result[0].absolut_time - start_item[0].absolut_time
-                break
-
-    сompetitors_list = sorted(finish_results, key=lambda item: item[0].time)
+            if finish_result[0].race_competitor_id == start_item[0].race_competitor_id:
+                try:
+                    finish_result[0].time = finish_result[0].absolut_time - start_item[0].absolut_time
+                    break
+                except:
+                    finish_result[0].time = None
+    сompetitors_list = sorted(finish_results, key=lambda item: (item[0].time is None, item[0].time))
 
     for index, item in enumerate(сompetitors_list):
-        item[0].diff = item[0].time - сompetitors_list[0][0].time
-        item[0].rank = index + 1
+        try:
+            item[0].diff = item[0].time - сompetitors_list[0][0].time
+            item[0].rank = index + 1
+        except:
+            item[0].diff = None
+            item[0].rank = None
+
 
 def recalculate_finished_resaults(run_id):
     finish_results = ResultApproved.query.filter(ResultApproved.run_id==run_id).all()
-    сompetitors_list = sorted(finish_results, key= lambda item:( item.time is None, item.time))
+    сompetitors_list = sorted(finish_results, key= lambda item:(item.time is None, item.time))
 
     for index, item in enumerate(сompetitors_list):
         try:
@@ -646,9 +653,8 @@ def result_set_None(result):
 
 def clear_approve(devices, resultDetail, resultApproved=None):
     if resultApproved is None:
-        resultApproved = ResultApproved.query(ResultApproved.run_id == resultDetail.run_id,
-                                              ResultApproved.race_competitor_id == resultDetail.race_competitor_id). \
-            one()
+        resultApproved = ResultApproved.query.filter(ResultApproved.run_id == resultDetail.run_id,
+                                              ResultApproved.race_competitor_id == resultDetail.race_competitor_id).one()
     resultApproved.status_id = None
     resultApproved.time = None
     resultApproved.start_time = None
@@ -674,4 +680,4 @@ def get_start_finish_device(run_id):
     dict_view = {}
     for item in data:
         dict_view[item[0]] = item[1]
-    return json.dumps(dict_view, cls=jsonencoder.AlchemyEncoder)
+    return  dict_view
