@@ -705,9 +705,9 @@ def edit_competitor(json_data):
                                                       course_device_id = new_result.course_device_id)
                         if old_result.course_device_id in list(devices.keys()):
                             old_approve = db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
-                                                                                 resultApproved.race_competitor_id==old_result.race_competitor_id).one()
+                                                                                 ResultApproved.race_competitor_id==old_result.race_competitor_id).one()
                             new_approve = db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
-                                                                                 resultApproved.race_competitor_id==new_result.race_competitor_id).one()
+                                                                                 ResultApproved.race_competitor_id==new_result.race_competitor_id).one()
                             switch_approve(new_approve, old_approve, devices, old_result.course_device_id)
                             clear_approve(devices, old_result)
 
