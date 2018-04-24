@@ -365,7 +365,8 @@ tr.row_competitor td {border-top:2px solid gray!important;}
             <div class="hidden">
               <select id="src_select_bib" class="src_select_bib">
                 <option value="">Не меняем</option>
-                <option value="-1">Error</option>
+                <option value="-1">Не этот спортсмен</option>
+                <option value="-2">Помеха</option>
               </select>
             </div>
             <table id="tab_data_src" class="table table-hover">
@@ -1084,7 +1085,7 @@ function set_html_startlist(run_id){
 console.log("add2datasrc");
 //console.log("data[0].id="+data[0].id);
 console.log(data);
-      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[4].course_id+"</td><td>"+data[4].device_id+"</td><td>"+data[0].time+"</td><td>"+(data[2]?data[2].bib:"")+"</td><td>"+(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"")+"</td><td class='act'></td></tr>")
+      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[0].run_id+"</td><td>"+data[4].course_id+"</td><td>"+data[4].device_id+"</td><td>"+data[0].time+"</td><td>"+(data[2]?data[2].bib:"")+"</td><td>"+(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"")+"</td><td class='act'></td></tr>")
       $("#src_select_bib").clone()
         .attr({"id": "src_select_bib_"+data[0].id,
                "result_detail_id": data[1]?data[1].id:null, //my
