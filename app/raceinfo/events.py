@@ -125,10 +125,11 @@ def load_data_vol2():
         result.is_start = True
         approvedResult = ResultApproved.query.filter(ResultApproved.race_competitor_id == result.race_competitor_id,
                                                      ResultApproved.run_id == result.run_id).one()
+        approvedResult.is_start = True
         approvedResult.start_time = result.absolut_time
     elif course_device[1].name == "Finish":
         competitor_finish(competitor[0].id, run.id, result.absolut_time)
-        recalculate_run_resaults(run.id)
+        recalculate_run_results(run.id)
         result_details = db.session.query(ResultDetail). \
             filter(ResultDetail.run_id == run.id).all()
     else:
@@ -179,8 +180,7 @@ def setDeviceDataInDB(data, run_id, cource_device_id):
 def competitor_start():
     result_approves = ResultApproved(
         race_competitor_id=request.args.get('competitor_id'),
-        run_id=request.args.get('run_id'),
-        is_start=True)
+        run_id=request.args.get('run_id'))
     db.session.add(result_approves)
     db.session.commit()
     competitor_order = db.session.query(func.count('*')).select_from(RunOrder).\
@@ -278,7 +278,7 @@ def competitor_clear():
     db.session.commit()
     socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
 
-    recalculate_run_resaults(request.args.get('run_id'))
+    recalculate_run_results(request.args.get('run_id'))
     return '', 200
 
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
@@ -317,12 +317,14 @@ def approve_manual(run_id, competitor_id):
     except:
        resultDetail = ResultApproved(
            race_competitor_id=competitor_id,
-           run_id=run_id
+           run_id=run_id,
+           is_start=False
        )
     resultDetail.is_manual = True
     resultDetail.approve_user = current_user.id
     resultDetail.approve_time = datetime.now()
     resultDetail.status_id = data['status_id']
+    resultDetail.is_finish = True
     if data['absolut_time'] != '':
        resultDetail.timerun = data['absolut_time']
     resultDetail.gate = data['gate']
@@ -330,21 +332,22 @@ def approve_manual(run_id, competitor_id):
 
     db.session.add(resultDetail)
     db.session.commit()
-    recalculate_run_resaults(resultDetail.run_id)
+    recalculate_run_results(resultDetail.run_id)
 
-
-    for item in db.session.query(CourseDevice.id).filter(CourseDevice.course_id == RunInfo.course_id, RunInfo.id == run_id).all():
-        resultDetail = ResultDetail.query.filter(ResultDetail.run_id == run_id,
-                                                 ResultDetail.race_competitor_id == competitor_id,
-                                                 ResultDetail.course_device_id == item).first()
-        if resultDetail is None:
-            resultDetail = ResultDetail(
-                run_id=run_id,
-                race_competitor_id=competitor_id,
-                course_device_id=item
-            )
-            db.session.add(resultDetail)
-    db.session.commit
+    if resultDetail.is_start == True:
+        for item in db.session.query(CourseDevice.id).filter(CourseDevice.course_id == RunInfo.course_id, RunInfo.id == run_id).all():
+            resultDetail = ResultDetail.query.filter(ResultDetail.run_id == run_id,
+                                                     ResultDetail.race_competitor_id == competitor_id,
+                                                     ResultDetail.course_device_id == item).first()
+            if resultDetail is None:
+                resultDetail = ResultDetail(
+                    run_id=run_id,
+                    race_competitor_id=competitor_id,
+                    course_device_id=item
+                )
+                db.session.add(resultDetail)
+        db.session.commit
+        recalculate_finished_resaults(run_id)
     return 'Ok', 200
 
 
@@ -437,12 +440,13 @@ def calculate_common_sector_params(current_competitor, competitors_list):
 
 
 @raceinfo.route('/recalculate/<int:run_id>', methods=['GET'])
-def recalculate_run_resaults(run_id):
+def recalculate_run_results(run_id):
     tree_view = {}
     data = db.session.query(ResultDetail, ResultApproved, CourseDevice).\
-           join(CourseDevice, CourseDevice.id==ResultDetail.course_device_id).\
-           join(ResultApproved, ResultApproved.race_competitor_id==ResultDetail.race_competitor_id, isouter=True).\
-           filter(ResultDetail.run_id == run_id).order_by(asc(CourseDevice.order)).\
+           join(CourseDevice, CourseDevice.id == ResultDetail.course_device_id).\
+           join(ResultApproved, ResultApproved.race_competitor_id == ResultDetail.race_competitor_id, isouter=True).\
+           filter(ResultDetail.run_id == run_id, ResultApproved.status_id == None, ResultApproved.status_id == 1).\
+        order_by(asc(CourseDevice.order)).\
         all()
     for item in data:
         if item[2].order not in tree_view.keys():
@@ -455,8 +459,8 @@ def recalculate_run_resaults(run_id):
             continue
         else:
             recalculate_sector_results(item, tree_view[key-1])
-    keys_list=list(tree_view.keys())
-    recalculate_finished_resaults_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
+    keys_list = list(tree_view.keys())
+    recalculate_finished_results_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
     recalculate_finished_resaults(run_id)
     return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
 
@@ -484,7 +488,7 @@ def recalculate_sector_results(current_results=None, previous_resaults=None):
             item[0].sectordiff = None
             item[0].sectorrank = None
 
-def recalculate_finished_resaults_old(start_results, finish_results):
+def recalculate_finished_results_old(start_results, finish_results):
     for finish_result in finish_results:
         for start_item in start_results:
             if finish_result[0].race_competitor_id == start_item[0].race_competitor_id:
@@ -682,7 +686,8 @@ def edit_competitor(json_data):
                     result_set_None(resultCleared)
                     db.session.add(resultCleared)
             elif competitor_id == '-2':
-                 ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).delete()
+                 for item in data_list:
+                    ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).delete()
             else:
                 for item in data_list:
                     try:
@@ -728,7 +733,7 @@ def edit_competitor(json_data):
                         )
                         db.session.add(resultDetail)
                         db.session.commit()
-        recalculate_run_resaults(run_id)
+        recalculate_run_results(run_id)
         socket_get_results({'run_id': run_id})
         socketio.emit('change/data_in/error', json.dumps(error_list))
 
