@@ -207,20 +207,26 @@ def load_data_vol2():
 
             if course_device[1].name == "Finish":
                 print('Device: Finish')
-                competitor_finish(competitor[0].id, run.id, result.absolut_time)
-                recalculate_run_results(run.id)
                 result_details = db.session.query(ResultDetail). \
                     filter(ResultDetail.run_id == run.id).all()
+                db.session.add(result)
+                db.session.commit()
+                competitor_finish(competitor[0].id, run.id, result.absolut_time)
+                recalculate_run_results(run.id)
+
+                print('Result:', result.diff, result.rank, result.time)
             else:
                 print('Device: Point')
                 result_details = db.session.query(ResultDetail). \
                     filter(
                     ResultDetail.course_device_id == course_device[0].id,
                     ResultDetail.run_id == run.id).all()
+                db.session.add(result)
+                db.session.commit()
                 calculate_personal_sector_params(result, course_device[0], run.course_id)
                 calculate_common_sector_params(result, result_details)
-            db.session.add(result)
-            db.session.commit()
+
+
         else:
             socketio.emit('errorData',json.dumps({'ERROR': 'UNKNOWED COMPETITOR', 'DATA': device_data}, cls=jsonencoder.AlchemyEncoder))
 
