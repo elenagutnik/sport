@@ -39,6 +39,7 @@ def emulation():
     db.engine.execute('delete from result_approved;')
     db.engine.execute('delete from result;')
     db.engine.execute('delete from "CASHE";')
+    db.engine.execute('delete from run_order where run_id>1;')
     db.engine.execute('update run_info set endtime=NULL;')
     db.engine.execute('INSERT INTO "CASHE" (id, key, data) VALUES (1,\'Current_competitor\', \'{"run": 1, "order": 0}\')')
     db.engine.execute('update run_info set starttime=NULL where number!=1;')
@@ -294,7 +295,9 @@ def competitor_start_run(run_id):
         join(RunOrder). \
         filter(RunOrder.run_id == run_id).order_by(asc(RunOrder.order)).all()
     order = sum(item[2].manual_order is not None for item in race_competitors)
-    сompetitor = min(race_competitors, key=lambda item: item[2].manual_order is None)
+
+
+    сompetitor = next(item for item in race_competitors if item[2].manual_order is None)
     сompetitor[2].manual_order = order + 1
     result_approves = ResultApproved(run_id=run_id,
                                      is_start=True,

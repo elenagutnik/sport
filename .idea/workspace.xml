@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/events.py" afterPath="$PROJECT_DIR$/app/raceinfo/events.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/timer.html" afterPath="$PROJECT_DIR$/app/templates/timer.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,7 +14,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/sport$Unittests_in_manage_py.coverage" NAME="Unittests in manage.py Coverage Results" MODIFIED="1511445914995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sport$sport.coverage" NAME="sport Coverage Results" MODIFIED="1524691884936" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sport$sport.coverage" NAME="sport Coverage Results" MODIFIED="1524693827690" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
@@ -52,20 +52,51 @@
       <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="365">
-              <caret line="221" column="50" lean-forward="false" selection-start-line="221" selection-start-column="50" selection-end-line="221" selection-end-column="50" />
+            <state relative-caret-position="376">
+              <caret line="314" column="81" lean-forward="true" selection-start-line="314" selection-start-column="81" selection-end-line="314" selection-end-column="81" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
-                <marker date="1524692137236" expanded="true" signature="1051:1076" ph="delete from " />
-                <marker date="1524692137236" expanded="true" signature="1104:1123" ph="delete from " />
-                <marker date="1524692137236" expanded="true" signature="1150:1177" ph="delete from " />
-                <marker date="1524692137236" expanded="true" signature="1204:1222" ph="delete from " />
-                <marker date="1524692137236" expanded="true" signature="1249:1268" ph="delete from " />
-                <marker date="1524692137236" expanded="true" signature="1295:1327" ph="update run_i... " />
-                <marker date="1524692137236" expanded="true" signature="1354:1451" ph="INSERT INTO &quot;CASHE&quot;... " />
-                <marker date="1524692137236" expanded="true" signature="1477:1527" ph="update run_i... " />
-                <marker date="1524692137236" expanded="true" signature="1554:1592" ph="update run_i... " />
+                <marker date="1524693838114" expanded="true" signature="1051:1076" ph="delete from " />
+                <marker date="1524693838114" expanded="true" signature="1104:1123" ph="delete from " />
+                <marker date="1524693838114" expanded="true" signature="1150:1177" ph="delete from " />
+                <marker date="1524693838114" expanded="true" signature="1204:1222" ph="delete from " />
+                <marker date="1524693838114" expanded="true" signature="1249:1268" ph="delete from " />
+                <marker date="1524693838114" expanded="true" signature="1295:1331" ph="delete from " />
+                <marker date="1524693838114" expanded="true" signature="1358:1390" ph="update run_i... " />
+                <marker date="1524693838114" expanded="true" signature="1417:1514" ph="INSERT INTO &quot;CASHE&quot;... " />
+                <marker date="1524693838114" expanded="true" signature="1540:1590" ph="update run_i... " />
+                <marker date="1524693838114" expanded="true" signature="1617:1655" ph="update run_i... " />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/flask_debugtoolbar/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="199">
+              <caret line="124" column="0" lean-forward="false" selection-start-line="124" selection-start-column="0" selection-end-line="124" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="app.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/flask/app.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="227">
+              <caret line="1983" column="0" lean-forward="false" selection-start-line="1983" selection-start-column="0" selection-end-line="1983" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="attributes.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="125">
+              <caret line="229" column="0" lean-forward="false" selection-start-line="229" selection-start-column="0" selection-end-line="229" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -112,7 +143,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>url_</find>
       <find>NA</find>
       <find>fore</find>
       <find>Compe</find>
@@ -142,6 +172,7 @@
       <find>next</find>
       <find>min</find>
       <find>min(</find>
+      <find>next(</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -561,7 +592,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27264494" sideWeight="0.3599574" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28434506" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28434506" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.4978701" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32608697" sideWeight="0.48935038" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -640,23 +671,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>733</line>
+          <line>736</line>
           <option name="timeStamp" value="381" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>627</line>
+          <line>630</line>
           <option name="timeStamp" value="388" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>197</line>
-          <option name="timeStamp" value="398" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>317</line>
-          <option name="timeStamp" value="400" />
+          <line>292</line>
+          <option name="timeStamp" value="405" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="jinja2-line">
           <url>file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/cource_forerunner_list.html</url>
@@ -664,7 +690,10 @@
           <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="401" />
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
+      <option name="time" value="406" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -927,13 +956,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/flask_debugtoolbar/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="124" column="0" lean-forward="false" selection-start-line="124" selection-start-column="0" selection-end-line="124" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/socketio/server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="317">
@@ -945,13 +967,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-74">
           <caret line="743" column="44" lean-forward="true" selection-start-line="743" selection-start-column="44" selection-end-line="743" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/flask/app.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1667">
-          <caret line="598" column="0" lean-forward="false" selection-start-line="598" selection-start-column="0" selection-end-line="598" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -1021,6 +1036,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/timer.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-28">
+          <caret line="55" column="18" lean-forward="false" selection-start-line="55" selection-start-column="18" selection-end-line="55" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="125">
@@ -1029,29 +1052,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/timer.html">
+    <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/flask_debugtoolbar/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="55" column="4" lean-forward="true" selection-start-line="55" selection-start-column="4" selection-end-line="55" selection-end-column="4" />
+        <state relative-caret-position="199">
+          <caret line="124" column="0" lean-forward="false" selection-start-line="124" selection-start-column="0" selection-end-line="124" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/flask/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="227">
+          <caret line="1983" column="0" lean-forward="false" selection-start-line="1983" selection-start-column="0" selection-end-line="1983" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
-          <caret line="221" column="50" lean-forward="false" selection-start-line="221" selection-start-column="50" selection-end-line="221" selection-end-column="50" />
+        <state relative-caret-position="376">
+          <caret line="314" column="81" lean-forward="true" selection-start-line="314" selection-start-column="81" selection-end-line="314" selection-end-column="81" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
-            <marker date="1524692137236" expanded="true" signature="1051:1076" ph="delete from " />
-            <marker date="1524692137236" expanded="true" signature="1104:1123" ph="delete from " />
-            <marker date="1524692137236" expanded="true" signature="1150:1177" ph="delete from " />
-            <marker date="1524692137236" expanded="true" signature="1204:1222" ph="delete from " />
-            <marker date="1524692137236" expanded="true" signature="1249:1268" ph="delete from " />
-            <marker date="1524692137236" expanded="true" signature="1295:1327" ph="update run_i... " />
-            <marker date="1524692137236" expanded="true" signature="1354:1451" ph="INSERT INTO &quot;CASHE&quot;... " />
-            <marker date="1524692137236" expanded="true" signature="1477:1527" ph="update run_i... " />
-            <marker date="1524692137236" expanded="true" signature="1554:1592" ph="update run_i... " />
+            <marker date="1524693838114" expanded="true" signature="1051:1076" ph="delete from " />
+            <marker date="1524693838114" expanded="true" signature="1104:1123" ph="delete from " />
+            <marker date="1524693838114" expanded="true" signature="1150:1177" ph="delete from " />
+            <marker date="1524693838114" expanded="true" signature="1204:1222" ph="delete from " />
+            <marker date="1524693838114" expanded="true" signature="1249:1268" ph="delete from " />
+            <marker date="1524693838114" expanded="true" signature="1295:1331" ph="delete from " />
+            <marker date="1524693838114" expanded="true" signature="1358:1390" ph="update run_i... " />
+            <marker date="1524693838114" expanded="true" signature="1417:1514" ph="INSERT INTO &quot;CASHE&quot;... " />
+            <marker date="1524693838114" expanded="true" signature="1540:1590" ph="update run_i... " />
+            <marker date="1524693838114" expanded="true" signature="1617:1655" ph="update run_i... " />
           </folding>
         </state>
       </provider>
