@@ -204,8 +204,6 @@ def load_data_vol2():
                 data_in_id=device_data.id,
                 race_competitor_id=competitor[0].id,
                 absolut_time=data['time'])
-            db.session.add(result)
-            db.session.commit()
 
             if course_device[1].name == "Finish":
                 print('Device: Finish')
@@ -221,6 +219,8 @@ def load_data_vol2():
                     ResultDetail.run_id == run.id).all()
                 calculate_personal_sector_params(result, course_device[0], run.course_id)
                 calculate_common_sector_params(result, result_details)
+            db.session.add(result)
+            db.session.commit()
         else:
             socketio.emit('errorData',json.dumps({'ERROR': 'UNKNOWED COMPETITOR', 'DATA': device_data}, cls=jsonencoder.AlchemyEncoder))
 
