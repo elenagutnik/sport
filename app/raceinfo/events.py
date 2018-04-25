@@ -5,7 +5,7 @@ from . import jsonencoder, raceinfo
 import json
 
 from functools import wraps
-from sqlalchemy import cast, DATE, func, asc, null
+from sqlalchemy import cast, DATE, func, asc, null, or_
 
 from flask_login import current_user, login_required
 from datetime import datetime, timedelta
@@ -576,7 +576,7 @@ def recalculate_run_results(run_id):
     data = db.session.query(ResultDetail, ResultApproved, CourseDevice).\
            join(CourseDevice, CourseDevice.id == ResultDetail.course_device_id).\
            join(ResultApproved, ResultApproved.race_competitor_id == ResultDetail.race_competitor_id, isouter=True).\
-           filter(ResultDetail.run_id == run_id, ResultApproved.status_id == None, ResultApproved.status_id == 1).\
+           filter(ResultDetail.run_id == run_id,  or_(ResultApproved.status_id == None, ResultApproved.status_id == 1)).\
         order_by(asc(CourseDevice.order)).\
         all()
     for item in data:
@@ -591,7 +591,7 @@ def recalculate_run_results(run_id):
         else:
             recalculate_sector_results(item, tree_view[key-1])
     keys_list = list(tree_view.keys())
-    # recalculate_finished_results_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
+    recalculate_finished_results_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
     recalculate_finished_resaults(run_id)
     return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
 
