@@ -858,6 +858,16 @@ def edit_competitor(json_data):
                                 )
                                 db.session.add(competitor_result_detail)
                                 db.session.commit()
+                        else:
+                            resultDetail = ResultDetail(
+                                course_device_id=dataIn.cource_device_id,
+                                race_competitor_id=competitor_id,
+                                run_id=dataIn.run_id,
+                                data_in_id=dataIn.id,
+                                absolut_time=dataIn.time
+                            )
+                            db.session.add(resultDetail)
+                            db.session.commit()
 
 
                         # new_result = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
@@ -880,16 +890,7 @@ def edit_competitor(json_data):
                         # result_set_None(old_result)
                         # old_result.race_competitor_id = new_result.race_competitor_id
                         # new_result.race_competitor_id = competitor_id
-                        # else:
-                        #     resultDetail = ResultDetail(
-                        #         course_device_id=dataIn.cource_device_id,
-                        #         race_competitor_id=competitor_id,
-                        #         run_id=dataIn.run_id,
-                        #         data_in_id=dataIn.id,
-                        #         absolut_time=dataIn.time
-                        #     )
-                        #     db.session.add(resultDetail)
-                        #     db.session.commit()
+
         recalculate_run_results(run_id)
         socket_get_results({'run_id': run_id})
         socketio.emit('change/data_in/error', json.dumps(error_list))
