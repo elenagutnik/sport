@@ -615,13 +615,17 @@ def recalculate_sector_results(current_results=None, previous_resaults=None):
                     current_result[0].sectortime = None
                     current_result[0].speed = None
     сompetitors_list = sorted(current_results, key=lambda item: (item[0].sectortime is None, item[0].sectortime))
-    min_element = next(item for item in сompetitors_list if item[1].status_id == 1)
-
-    for index, item in enumerate(сompetitors_list):
-        try:
-            item[0].sectordiff = item[0].sectortime - min_element[0].sectortime
-            item[0].sectorrank = index + 1
-        except:
+    try:
+        min_element = next(item for item in сompetitors_list if item[1].status_id == 1)
+        for index, item in enumerate(сompetitors_list):
+            try:
+                item[0].sectordiff = item[0].sectortime - min_element[0].sectortime
+                item[0].sectorrank = index + 1
+            except:
+                item[0].sectordiff = None
+                item[0].sectorrank = None
+    except:
+        for index, item in enumerate(сompetitors_list):
             item[0].sectordiff = None
             item[0].sectorrank = None
 
@@ -634,26 +638,26 @@ def recalculate_finished_results_old(start_results, finish_results):
                     break
                 except:
                     finish_result[0].time = None
-    сompetitors_list = sorted(finish_results, key=lambda item: (item[0].time is None, item[0].time))
+    сompetitors_list = sorted(finish_results, key=lambda item: (item[0].time is None, item[1].status_id,item[0].time))
 
     for index, item in enumerate(сompetitors_list):
-        try:
+        if item[1].status_id == 1:
             item[0].diff = item[0].time - сompetitors_list[0][0].time
             item[0].rank = index + 1
-        except:
+        else:
             item[0].diff = None
             item[0].rank = None
 
 
 def recalculate_finished_resaults(run_id):
     finish_results = ResultApproved.query.filter(ResultApproved.run_id==run_id).all()
-    сompetitors_list = sorted(finish_results, key= lambda item:(item.time is None, item.time))
+    сompetitors_list = sorted(finish_results, key=lambda item:(item.time is None, item.status_id,  item.time))
 
     for index, item in enumerate(сompetitors_list):
-        try:
+        if item.status_id == 1:
             item.diff = item.time - сompetitors_list[0].time
             item.rank = index + 1
-        except:
+        else:
             item.diff = None
             item.rank = None
 
@@ -669,133 +673,6 @@ def socket_get_results(data):
                                                     order_by(asc(DataIn.id)).
                                                     all(),
                   cls=jsonencoder.AlchemyEncoder))
-
-
-# @socketio.on('change/data_in/competitors')
-# def edit_competitor(json_data):
-#     data = json.loads(json_data)
-#     changed_results_list = []
-#     for item in data:
-#         # if item['']
-#         # Получить все данные компетитора которому меняем набор данных
-#         competitorResults = ResultDetail.query.filter(ResultDetail.run_id == item['run_id'],
-#                                                       ResultDetail.race_competitor_id == item['race_competitor_id']).all()
-#         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
-#         if len(competitorResults):
-#             existedData=next((item for item in competitorResults if item.course_device_id == dataIn.cource_device_id), None)
-#             if existedData:
-#                 db.session.delete(existedData)
-#         if item['result_detail_id'] is not None:
-#             print(item['result_detail_id'])
-#             resultDetail = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
-#             try:
-#                 existenceData = ResultDetail.query.filter(ResultDetail.race_competitor_id==item['race_competitor_id'],
-#                                          ResultDetail.course_device_id == resultDetail.course_device_id,
-#                                          ResultDetail.run_id == resultDetail.run_id).delete()
-#             except:
-#                 pass
-#
-#             resultDetail.race_competitor_id = item['race_competitor_id']
-#         else:
-#             resultDetail = ResultDetail(
-#                 course_device_id=dataIn.cource_device_id,
-#                 race_competitor_id=item['race_competitor_id'],
-#                 run_id=dataIn.run_id,
-#                 data_in_id=dataIn.id,
-#                 absolut_time=dataIn.time
-#             )
-#             db.session.add(resultDetail)
-#             db.session.commit()
-#             changed_results_list.append(resultDetail)
-#     for resultDetail in changed_results_list:
-#         device = CourseDevice.query.filter(CourseDevice.id == resultDetail.course_device_id).one()
-#         competitors_list = ResultDetail.query.filter(ResultDetail.race_competitor_id != resultDetail.race_competitor_id,
-#                                                      ResultDetail.course_device_id == resultDetail.course_device_id).all()
-#         calculate_personal_sector_params(resultDetail, device, device.course_id)
-#         calculate_common_sector_params(resultDetail, competitors_list)
-#
-#         if device.course_device_type_id == 3:
-#             calculate_finish_params(resultDetail, competitors_list)
-#
-#     socket_get_results({'run_id': data[0]['run_id']})
-#
-#
-# @socketio.on('change/data_in/competitors')
-# def edit_competitor(json_data):
-#     error_list = []
-#     data = json.loads(json_data)
-#     tree_view = {}
-#     # Причведение данных к удобночитаемому формату
-#     for item in data:
-#         if item['run_id'] not in tree_view.keys():
-#             tree_view[item['run_id']] = {}
-#
-#         if item['race_competitor_id'] not in tree_view[item['run_id']].keys():
-#             tree_view[item['run_id']][item['race_competitor_id']] = []
-#         tree_view[item['run_id']][item['race_competitor_id']].append({'result_detail_id': item['result_detail_id'],
-#                                                                       'data_in_id': item['data_in_id']})
-#     for run_id, competitors_list in tree_view.items():
-#         devices = get_start_finish_device(run_id)
-#         for competitor_id, data_list in competitors_list.items():
-#             if competitor_id == '-1':
-#                 for item in data_list:
-#                     resultCleared = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
-#                     if resultCleared.course_device_id in list(devices.keys()):
-#                         clear_approve(devices, resultCleared)
-#                     result_set_None(resultCleared)
-#                     db.session.add(resultCleared)
-#
-#             else:
-#                 for item in data_list:
-#                     try:
-#                         result_approved = ResultApproved.query.filter(ResultApproved.run_id == run_id,
-#                                                                       ResultApproved.race_competitor_id == competitor_id).one()
-#                     except:
-#                         resultApproved = ResultApproved(
-#                             run_id=run_id,
-#                             race_competitor_id=competitor_id,
-#                             is_start=True)
-#                         db.session.add(resultApproved)
-#                         db.session.commit()
-#
-#                     if item['result_detail_id'] is not None:
-#                         try:
-#                             new_result = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
-#                             old_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == competitor_id,
-#                                                                ResultDetail.run_id == new_result.run_id,
-#                                                                ResultDetail.course_device_id == new_result.course_device_id).one()
-#
-#                             if old_result.course_device_id in list(devices.keys()):
-#                                 old_approve= db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
-#                                                                                      resultApproved.race_competitor_id==old_result.race_competitor_id).one()
-#                                 new_approve= db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
-#                                                                                      resultApproved.race_competitor_id==new_result.race_competitor_id).one()
-#                                 switch_approve(new_approve, old_approve, devices, old_result.course_device_id)
-#                                 clear_approve(devices, old_result)
-#
-#                             result_set_None(old_result)
-#                             old_result.race_competitor_id = new_result.race_competitor_id
-#                             new_result.race_competitor_id = competitor_id
-#
-#                         except:
-#                             error = {'error': "Competitor doesn't start", 'competitor': competitor_id}
-#                             error_list.append(error)
-#                             break
-#                     else:
-#                         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
-#                         resultDetail = ResultDetail(
-#                             course_device_id=dataIn.cource_device_id,
-#                             race_competitor_id=competitor_id,
-#                             run_id=dataIn.run_id,
-#                             data_in_id=dataIn.id,
-#                             absolut_time=dataIn.time
-#                         )
-#                         db.session.add(resultDetail)
-#                         db.session.commit()
-#         recalculate_run_resaults(run_id)
-#         socket_get_results({'run_id': run_id})
-#         socketio.emit('change/data_in/error', json.dumps(error_list))
-
 
 
 @socketio.on('change/data_in/competitors')
@@ -836,38 +713,39 @@ def edit_competitor(json_data):
                         break
                     else:
                         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
-                        if item['result_detail_id'] is not None:
-                            isDataSet = ResultDetail.query.filter(ResultDetail.data_in_id == dataIn.id).count()
-                            if isDataSet > 0:
-                                error = {'error': "Duble data", 'data_in_od': item['data_in_id']}
-                                error_list.append(error)
+                        isDataSet = ResultDetail.query.filter(ResultDetail.data_in_id == dataIn.id).count()
+                        if isDataSet > 0:
+                            error = {'error': "Duble data", 'data_in_od': item['data_in_id']}
+                            error_list.append(error)
 
-                            competitor_result_detail = ResultDetail.query.filter(ResultDetail.run_id == run_id,
-                                                                                 ResultDetail.course_device_id == dataIn.cource_device_id,
-                                                                                 ResultDetail.race_competitor_id == competitor_id).first()
-                            if competitor_result_detail is not None:
-                                competitor_result_detail.data_in_id = dataIn.id
-                                competitor_result_detail.absolut_time = dataIn.time
-                            else:
-                                competitor_result_detail = ResultDetail(
-                                    course_device_id=dataIn.cource_device_id,
-                                    run_id=run_id,
-                                    data_in_id=dataIn.id,
-                                    race_competitor_id=competitor_id,
-                                    absolut_time=dataIn.time
-                                )
-                                db.session.add(competitor_result_detail)
-                                db.session.commit()
+                        competitor_result_detail = ResultDetail.query.filter(ResultDetail.run_id == run_id,
+                                                                             ResultDetail.course_device_id == dataIn.cource_device_id,
+                                                                             ResultDetail.race_competitor_id == competitor_id).first()
+                        if competitor_result_detail is not None:
+                            competitor_result_detail.data_in_id = dataIn.id
+                            competitor_result_detail.absolut_time = dataIn.time
                         else:
-                            resultDetail = ResultDetail(
+                            competitor_result_detail = ResultDetail(
                                 course_device_id=dataIn.cource_device_id,
-                                race_competitor_id=competitor_id,
-                                run_id=dataIn.run_id,
+                                run_id=run_id,
                                 data_in_id=dataIn.id,
+                                race_competitor_id=competitor_id,
                                 absolut_time=dataIn.time
                             )
-                            db.session.add(resultDetail)
-                            db.session.commit()
+                        if competitor_result_detail.course_device_id in list(devices.keys()):
+                            resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run_id,
+                                                                         ResultApproved.race_competitor_id == competitor_id).first()
+                            if devices[competitor_result_detail.course_device_id] == 1:
+                                resultApproved.start_time = dataIn.time
+                            else:
+                                resultApproved.finish_time = dataIn.time
+                            resultApproved.diff = None
+                            resultApproved.rank = None
+                            resultApproved.time = None
+                            resultApproved.status_id = None
+                        db.session.add(competitor_result_detail)
+                        db.session.commit()
+
 
 
                         # new_result = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
@@ -922,11 +800,11 @@ def clear_approve(devices, resultDetail, resultApproved=None):
     db.session.add(resultApproved)
 
 def switch_approve(new_approve, old_approve, devices, device_id):
-    if devices[device_id]==1:
+    if devices[device_id] == 1:
         new_approve.start_time = old_approve.start_time
     else:
         new_approve.finish_time = old_approve.finish_time
-    new_approve.status_id=None
+    new_approve.status_id = None
 
 def get_start_finish_device(run_id):
     data = db.session.query(CourseDevice.id.label('device_id'), CourseDevice.course_device_type_id.label('type_id')).filter(CourseDevice.course_device_type_id != 3,
