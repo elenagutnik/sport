@@ -638,7 +638,7 @@ def recalculate_finished_results_old(start_results, finish_results):
                     break
                 except:
                     finish_result[0].time = None
-    сompetitors_list = sorted(finish_results, key=lambda item: (item[0].time is None, item[1].status_id,item[0].time))
+    сompetitors_list = sorted(finish_results, key=lambda item: (item[0].time is None, item[1].status_id is None, item[1].status_id, item[0].time))
 
     for index, item in enumerate(сompetitors_list):
         if item[1].status_id == 1:
