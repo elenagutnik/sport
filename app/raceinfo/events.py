@@ -462,8 +462,13 @@ def approve_manual(run_id, competitor_id):
     resultDetail.approve_time = datetime.now()
     resultDetail.status_id = data['status_id']
     resultDetail.is_finish = True
-    if data['absolut_time'] != '':
-       resultDetail.timerun = data['absolut_time']
+    try:
+        if data['absolut_time'] != '':
+            resultDetail.finish_time = data['absolut_time']
+        if data['start_time'] != '':
+           resultDetail.start_time = data['start_time']
+    except:
+        pass
     resultDetail.gate = data['gate']
     resultDetail.reason = data['reason']
 
@@ -483,7 +488,7 @@ def approve_manual(run_id, competitor_id):
                     course_device_id=item
                 )
                 db.session.add(resultDetail)
-        db.session.commit
+        db.session.commit()
         recalculate_finished_resaults(run_id)
     return 'Ok', 200
 
@@ -650,17 +655,20 @@ def recalculate_finished_results_old(start_results, finish_results):
 
 
 def recalculate_finished_resaults(run_id):
-    finish_results = ResultApproved.query.filter(ResultApproved.run_id==run_id).all()
-    сompetitors_list = sorted(finish_results, key=lambda item:(item.time is None, item.status_id,  item.time))
+    finish_results = ResultApproved.query.filter(ResultApproved.run_id == run_id).all()
+    сompetitors_list = sorted(finish_results, key=lambda item: (item.time is None, item.status_id is None,item.status_id, item.time))
 
     for index, item in enumerate(сompetitors_list):
-        if item.status_id == 1:
-            item.diff = item.time - сompetitors_list[0].time
-            item.rank = index + 1
-        else:
+        try:
+            if item.status_id == 1:
+                item.diff = item.time - сompetitors_list[0].time
+                item.rank = index + 1
+            else:
+                item.diff = None
+                item.rank = None
+        except:
             item.diff = None
             item.rank = None
-
 
 @socketio.on('get/results')
 def socket_get_results(data):
