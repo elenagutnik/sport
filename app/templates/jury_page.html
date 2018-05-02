@@ -363,7 +363,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
         <div id="tab_device" class="tab-pane fade"></div>
         <div id="tab_datasrc" class="tab-pane fade">
             <div class="hidden">
-              <select id="src_select_bib" class="src_select_bib">
+              <select id="src_select_bib" class="src_select_bib" style="clear:both;">
                 <option value="">Не меняем</option>
                 <option value="-1">Не этот спортсмен</option>
                 <option value="-2">Помеха</option>
@@ -1085,19 +1085,28 @@ function set_html_startlist(run_id){
 console.log("add2datasrc");
 //console.log("data[0].id="+data[0].id);
 console.log(data);
-      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[0].run_id+"</td><td>"+data[4].course_id+"</td><td>"+data[4].device_id+"</td><td>"+data[0].time+"</td><td>"+(data[2]?data[2].bib:"")+"</td><td>"+(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"")+"</td><td class='act'></td></tr>")
+      var name_str=(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"");
+      if ($("#tab_data_src tbody tr.datasrc_"+data[0].id).length == 0) {
+        //Add it to the dom
+        $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+(data[2]?"":" warning")+"'><td>"+data[0].run_id+"</td><td>"+data[4].course_id+"</td><td>"+data[4].device_id+"</td><td>"+data[0].time+"</td><td class='bib'>"+(data[2]?data[2].bib:"")+"</td><td class='name'>"+name_str+"</td><td class='act'><div class='div_select_bib_"+((data[1])?data[1].id:null)+"'></div></td></tr>");
+      }else{
+        $("#tab_data_src tbody tr.datasrc_"+data[0].id).addClass("danger");
+        $("#tab_data_src tbody tr.datasrc_"+data[0].id+" td.bib").append("<div>"+(data[2]?data[2].bib:"")+"</div>");
+        $("#tab_data_src tbody tr.datasrc_"+data[0].id+" td.name").append("<div>"+name_str+"</div>");
+        $("#tab_data_src tbody tr.datasrc_"+data[0].id+" td.act").append("<div class='div_select_bib_"+((data[1])?data[1].id:null)+"'></div>");
+      }
       $("#src_select_bib").clone()
-        .attr({"id": "src_select_bib_"+data[0].id,
+        .attr({"id": "src_select_bib_"+data[0].id+"_"+((data[1])?data[1].id:null),
                "result_detail_id": data[1]?data[1].id:null, //my
                "data_in_id": data[0].id,
                "run_id": data[0].run_id})
-        .appendTo("tr.datasrc_"+data[0].id+" td.act");
-
+        .appendTo("tr.datasrc_"+data[0].id+" td.act div.div_select_bib_"+((data[1])?data[1].id:null));
     }
     // переделка входящих данных в удобный массив
     function data2arr(row, allrows){
       console.log("START FUNC: data2arr");
       //if(row[0].length==1)row[0]=row[0][0];
+      console.log(row);
       if(!glob_arr["run"+row[0].run_id])glob_arr["run"+row[0].run_id]=new Array();
       if(!glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id]){
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id]={
@@ -1146,6 +1155,8 @@ console.log(data);
 
         if(allrows){
           var rcid;
+          console.log("devdata");
+          console.log(glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].dev_data);
           console.log("allrows:=======");
           console.log(allrows);
           for(var i=0;i<allrows.length;i++){
