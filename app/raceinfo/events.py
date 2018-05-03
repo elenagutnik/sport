@@ -228,7 +228,7 @@ def load_data_vol2():
 
 
         else:
-            socketio.emit('errorData',json.dumps({'ERROR': 'UNKNOWED COMPETITOR', 'DATA': device_data}, cls=jsonencoder.AlchemyEncoder))
+            socketio.emit('errorData', json.dumps({'ERROR': 'UNKNOWED COMPETITOR', 'DATA': device_data}, cls=jsonencoder.AlchemyEncoder))
 
     socketio.emit('get/results/current', json.dumps([[device_data, result, competitor[0], competitor[1], course_device[0]]], cls=jsonencoder.AlchemyEncoder))
     socketio.emit("newData", json.dumps(
@@ -661,6 +661,7 @@ def recalculate_finished_resaults(run_id):
     for index, item in enumerate(сompetitors_list):
         try:
             if item.status_id == 1:
+                item.time = item.finish_time - item.start_time
                 item.diff = item.time - сompetitors_list[0].time
                 item.rank = index + 1
             else:
