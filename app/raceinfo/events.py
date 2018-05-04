@@ -246,6 +246,16 @@ def load_data_vol2():
 
 @raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
 def get_current_data(race_id):
+    tmp =db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)\
+                      .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
+                      .filter(RaceCompetitor.race_id == race_id)\
+                      .order_by(asc(ResultDetail.absolut_time))\
+                      .all()
+    dd= json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)
+                      .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
+                      .filter(RaceCompetitor.race_id == race_id)\
+                      .order_by(asc(ResultDetail.absolut_time))
+                      .all(), cls=jsonencoder.AlchemyEncoder)
     return json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)
                       .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
                       .filter(RaceCompetitor.race_id == race_id)\
@@ -463,8 +473,8 @@ def approve_manual(run_id, competitor_id):
     resultDetail.status_id = data['status_id']
     resultDetail.is_finish = True
     try:
-        if data['absolut_time'] != '':
-            resultDetail.finish_time = data['absolut_time']
+        if data['finish_time'] != '':
+            resultDetail.finish_time = data['finish_time']
         if data['start_time'] != '':
            resultDetail.start_time = data['start_time']
     except:
