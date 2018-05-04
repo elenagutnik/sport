@@ -403,14 +403,17 @@ tr.row_competitor td {border-top:2px solid gray!important;}
             <div class="container-fluid">
               <!-- Контейнер, в котором можно создавать классы системы сеток -->
               <div class="row">
-                <div class="col-md-2">Status:</div><div class="col-md-10"><select name="status" id="form_status"></select></div>
+                <div class="col-md-3">Status:</div><div class="col-md-10"><select name="status" id="form_status"></select></div>
               </div>
               <div class="row">
-                <div class="col-md-2">Time</div><div class="col-md-10"><input type="text" name="time" id="form_time"></div>
+                <div class="col-md-3">Start Time</div><div class="col-md-10"><input type="text" name="starttime" id="form_starttime"></div>
               </div>
               <div class="row">
-                <div class="col-md-2">Reason</div><div class="col-md-10"><input type="text" name="reason" id="form_reason" style="width:100%;"></div>
-                <div class="col-md-2">Gate</div><div class="col-md-10"><input type="text" name="gate" id="form_gate" style="width:2em;"></div>
+                <div class="col-md-3">Finish Time</div><div class="col-md-10"><input type="text" name="finishtime" id="form_finishtime"></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">Reason</div><div class="col-md-10"><input type="text" name="reason" id="form_reason" style="width:100%;"></div>
+                <div class="col-md-3">Gate</div><div class="col-md-10"><input type="text" name="gate" id="form_gate" style="width:2em;"></div>
               </div>
             </div>
           </div>
@@ -618,7 +621,8 @@ tr.row_competitor td {border-top:2px solid gray!important;}
               //dataType: 'json',
               data: {
                 data: JSON.stringify({
-                  'absolut_time': $("#form_time").val(),
+                  'finish_time': $("#form_finishtime").val(),
+                  'start_time': $("#form_starttime").val(),
                   'reason': $("#form_reason").val(),
                   'gate': $("#form_gate").val(),
                   'status_id':  $("#form_status").val()
@@ -627,6 +631,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
               success:function(data) {
                 $("#action"+$("#form_run_id").val()+"_"+$("#form_competitor_id").val()).html("Approved");
                 $("#popup_editresult").modal('hide');
+                get_current_data(race_id);
               },
               error: function (error) {alert('error');}
             })
@@ -775,7 +780,9 @@ tr.row_competitor td {border-top:2px solid gray!important;}
 
           $("#form_run_id").val(run_id);
           $("#form_competitor_id").val(competitor_id);
-
+          $("#form_status").val(glob_arr["run"+run_id]["comp_"+competitor_id].status_id);
+          $("#form_reason").val(glob_arr["run"+run_id]["comp_"+competitor_id].reason);
+          $("#form_gate").val(glob_arr["run"+run_id]["comp_"+competitor_id].gate);
           $("#popup_editresult").modal('show');
         });
         $("body").on("click", ".btn_clear", function () {
@@ -1037,7 +1044,12 @@ function set_html_startlist(run_id){
       }
       return true;
     }
-
+    function refresh_status(run_id,comp_id,status_id){
+      console.log("START: refresh_status "+"#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" td.status");
+      $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" td.status").html(getObjById(status_list,"id",status_id).name);
+      if(status_id)
+      $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" button.btn_start").hide();
+    }
     function set_current_data(){
       console.log("set_current_data - START");
       if(Object.keys(glob_arr).length){
@@ -1046,6 +1058,7 @@ function set_html_startlist(run_id){
         for(rkey in glob_arr){
           for(ckey in glob_arr[rkey]){
             sumtab_set_maininfo(glob_arr[rkey][ckey]);
+            refresh_status(rkey,ckey,glob_arr[rkey][ckey].status_id);
           }
         }
       }else{
@@ -1122,24 +1135,26 @@ console.log(data);
           "fis_points"    : row[2].fis_points,
           "nation_code_id": row[2].nation_code_id,
           "state"     : false,
-          "reason"    : row[4].reason, // или row[1].reason
-          "status_id" : row[4].status_id,
-          "is_start"  : row[4].is_start,
-          "is_finish" : row[4].is_finish,
-          "is_manual" : row[4].is_manual,
           "timerun"   : row[4].timerun,
           "rank"      : false, // rank на заезде или вообще?
           "course_id" : row[3].course_id, // надо добавить в выдачу
           "dev_data"  : new Array()
         };
       }
+      glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].reason=row[4].reason;
+      glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].gate=row[4].gate;
+      glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].status_id=row[4].status_id;
+      glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_start=row[4].is_start;
+      glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_finish=row[4].is_finish;
+      glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_manual=row[4].is_manual;
+
       if(!glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id]["dev_data"]["dev_"+row[0].course_device_id]){
         //здесб можно зафигачить проверку на ошибочные данные
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id]["dev_data"]["dev_"+row[0].course_device_id]={
           "speed" : row[0].speed,
-          "time"  : row[0].time,
-          "diff"  : row[0].diff,
-          "rank"  : row[0].rank,
+          "time"  : row[4].time,
+          "diff"  : row[4].diff,
+          "rank"  : row[4].rank,
           "sectortime": row[0].sectortime,
           "sectordiff": row[0].sectordiff,
           "sectorrank": row[0].sectorrank,
@@ -1149,8 +1164,8 @@ console.log(data);
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_start   = row[4].is_start;
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_finish  = row[4].is_finish;
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_manual  = row[4].is_manual;
-        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].timerun    = row[0].time;
-        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].rank       = row[1].rank; // rank на заезде или вообще?
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].timerun    = row[4].time;
+        glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].rank       = row[4].rank; // rank на заезде или вообще?
         glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].course_id  = row[3].course_id; // надо добавить в выдачу
 
         if(allrows){
@@ -1271,8 +1286,8 @@ console.log(data);
             var btn_editresult="<button class='btn btn-defaul btn-sm btn_editresult' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Edit</button>";
 
             var btn_clearresult="<button class='btn btn-danger btn-sm btn_clear' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Clear</button>";
-
-            $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"_"+competitor_id+"'><td class='order'>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_laststname+"</td><td class='status'></td><td>"+btn_start+btn_finish+"</td><td>"+btn_approveqlf+btn_editresult+"</td><td>"+btn_clearresult+"</td></tr>");
+            console.log("#1278:"+glob_arr["run"+run.id]);
+            $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"_"+competitor_id+"'><td class='order'>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_laststname+"</td><td class='status'>"+(glob_arr["run"+run.id]?glob_arr["run"+run.id]["comp_"+this[2].race_competitor_id].status_id:"")+"</td><td>"+btn_start+btn_finish+"</td><td>"+btn_approveqlf+btn_editresult+"</td><td>"+btn_clearresult+"</td></tr>");
           });
         }else{
           console.log("ERROR! set_list_for_manualcontrol: run_list["+run_list_ids["id"+run.id]+"].start_list.length is false");
