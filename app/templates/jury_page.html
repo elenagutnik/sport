@@ -389,31 +389,47 @@ tr.row_competitor td {border-top:2px solid gray!important;}
     <div id="popup_editresult" class="modal fade">
       <div class="modal-dialog">
         <div class="modal-content">
-          <form action="" name="form_editresult" id="form_editresult">
+          <form action="" name="form_editresult" class="form"  id="form_editresult">
           <!-- Заголовок модального окна -->
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h4 class="modal-title">Ручной ввод результатов:
-              <BR>Спортсмен: <span id="form_txt_competitor"></span>
-              <BR>Заезд: <span id="form_txt_run"></span>
-            </h4>
+            <div class="modal-title"><h2>Ручной ввод результатов:</h2>
+              <h3>
+                Спортсмен: <span id="form_txt_competitor"></span>
+                <BR>
+                Заезд: <span id="form_txt_run"></span>
+              </h3>
+            </div>
           </div>
           <!-- Основное содержимое модального окна -->
           <div class="modal-body">
             <div class="container-fluid">
               <!-- Контейнер, в котором можно создавать классы системы сеток -->
-              <div class="row">
-                <div class="col-md-3">Status:</div><div class="col-md-10"><select name="status" id="form_status"></select></div>
+              <div class="form-group row">
+                <div class="col-md-12">
+                  <label class="control-label" for="form_status">Status:</label>
+                  <select class="form-control" name="status" id="form_status"></select>
+                </div>
               </div>
-              <div class="row">
-                <div class="col-md-3">Start Time</div><div class="col-md-10"><input type="text" name="starttime" id="form_starttime"></div>
+              <div class="form-group row">
+                <div class="col-md-6">
+                  <label class="control-label" for="form_starttime">Start Time:</label>
+                  <input type="text" class="form-control" name="starttime" id="form_starttime">
+                </div>
+                <div class="col-md-6">
+                  <label class="control-label" for="form_finishtime">Finish Time:</label>
+                  <input type="text" class="form-control" name="finishtime" id="form_finishtime">
+                </div>
               </div>
-              <div class="row">
-                <div class="col-md-3">Finish Time</div><div class="col-md-10"><input type="text" name="finishtime" id="form_finishtime"></div>
-              </div>
-              <div class="row">
-                <div class="col-md-3">Reason</div><div class="col-md-10"><input type="text" name="reason" id="form_reason" style="width:100%;"></div>
-                <div class="col-md-3">Gate</div><div class="col-md-10"><input type="text" name="gate" id="form_gate" style="width:2em;"></div>
+              <div class="form-group row">
+                <div class="col-md-10">
+                  <label class="control-label" for="form_reason">Reason:</label>
+                  <input type="text" class="form-control" name="reason" id="form_reason">
+                </div>
+                <div class="col-md-2">
+                  <label class="control-label" for="form_gate">Gate:</label>
+                  <input type="text" class="form-control" name="gate" id="form_gate">
+                </div>
               </div>
             </div>
           </div>
@@ -783,6 +799,8 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           $("#form_status").val(glob_arr["run"+run_id]["comp_"+competitor_id].status_id);
           $("#form_reason").val(glob_arr["run"+run_id]["comp_"+competitor_id].reason);
           $("#form_gate").val(glob_arr["run"+run_id]["comp_"+competitor_id].gate);
+          $("#form_starttime").val(glob_arr["run"+run_id]["comp_"+competitor_id].start_time);
+          $("#form_finishtime").val(glob_arr["run"+run_id]["comp_"+competitor_id].finish_time);
           $("#popup_editresult").modal('show');
         });
         $("body").on("click", ".btn_clear", function () {
@@ -1147,6 +1165,10 @@ console.log(data);
       glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_start=row[4].is_start;
       glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_finish=row[4].is_finish;
       glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].is_manual=row[4].is_manual;
+
+      console.log("row[4].time_start="+row[4].time_start);
+      if(row[4].start_time)glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].start_time=row[4].start_time;
+      if(row[4].finish_time)glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id].finish_time=row[4].finish_time;
 
       if(!glob_arr["run"+row[0].run_id]["comp_"+row[0].race_competitor_id]["dev_data"]["dev_"+row[0].course_device_id]){
         //здесб можно зафигачить проверку на ошибочные данные
