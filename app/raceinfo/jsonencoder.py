@@ -18,6 +18,7 @@ class AlchemyEncoder(json.JSONEncoder):
                         fields[field] = data.isoformat()
                     else:
                         fields[field] = None
+
             return fields
         return json.JSONEncoder.default(self, obj)
 

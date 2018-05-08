@@ -99,6 +99,7 @@ def load_data_vol2():
 
     device_data = setDeviceDataInDB(data, run.id, course_device[0].id)
 
+    finished_data = None
     if course_device[1].name == "Start":
         print('Device: Start')
         competitor = competitor_start_run(run.id)
@@ -141,7 +142,7 @@ def load_data_vol2():
                 db.session.commit()
                 competitor_finish(competitor[0].id, run.id, result.absolut_time)
                 recalculate_run_results(run.id)
-
+                finished_data = ResultApproved.query.filter(ResultApproved.run_id==run.id).all()
                 print('Result:', result.diff, result.rank, result.time)
             else:
                 print('Device: Point')
@@ -168,7 +169,7 @@ def load_data_vol2():
         ResultApproved.query.filter(ResultApproved.race_competitor_id == competitor[0].id, ResultApproved.run_id == run.id).one(),
         course_device[1]
     ],
-        list_of_object=result_details), cls=jsonencoder.AlchemyEncoder))
+        list_of_object=result_details,finished_data=finished_data ), cls=jsonencoder.AlchemyEncoder))
 
     return '', 200
 
