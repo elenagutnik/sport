@@ -802,6 +802,12 @@ tr.row_competitor td {border-top:2px solid gray!important;}
             $("#form_gate").val(glob_arr["run"+run_id]["comp_"+competitor_id].gate);
             $("#form_starttime").val(glob_arr["run"+run_id]["comp_"+competitor_id].start_time);
             $("#form_finishtime").val(glob_arr["run"+run_id]["comp_"+competitor_id].finish_time);
+          }else{
+            $("#form_status").val(1);
+            $("#form_reason").val("");
+            $("#form_gate").val("");
+            $("#form_starttime").val("");
+            $("#form_finishtime").val("");            
           }
           $("#popup_editresult").modal('show');
         });
