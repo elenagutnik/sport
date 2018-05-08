@@ -78,79 +78,6 @@ def startlist_get(run_id):
 def device_get(course_id):
     return json.dumps(db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter(CourseDevice.course_id == course_id).order_by(CourseDevice.order).all(), cls=jsonencoder.AlchemyEncoder)
 
-# @raceinfo.route('/input/data', methods=['POST', 'GET'])
-# @exectutiontime
-# def load_data_vol2():
-#     data = json.loads(request.args['data'])
-#     # Перевести на кэш {
-#     # Девайс с которого пришли данные
-#     device = Device.query.filter_by(src_dev=data['src_dev']).one()
-#     # Трассы на которых стоит этот девайс
-#     course_devices = db.session.query(CourseDevice.course_id).filter_by(device_id=device.id)
-#     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
-#     # Заезд с пришли данные
-#
-#     run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None ).one()
-#
-#     # Сам девайс с которого пришли данные
-#     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
-#         filter(CourseDevice.device_id == device.id,
-#                CourseDevice.course_id == run.course_id).one()
-#
-#     competitor = get_current_competitor(course_device[0].id, run.id)
-#     print('Old race competitor id:', competitor[0].id)
-#     print('Competitor RUN INFO:')
-#     print('Current device:', course_device[0].id, 'order:', course_device[0].order, 'type:', course_device[1].name)
-#     device_data = setDeviceDataInDB(data, run.id, course_device[0].id)
-#
-#     result = ResultDetail(
-#         course_device_id=course_device[0].id,
-#         race_competitor_id=competitor[0].id,
-#         run_id=run.id,
-#         data_in_id=device_data.id,
-#         absolut_time=data['time'])
-#     print('Current data: competitor', result.race_competitor_id, 'absolut_time:', result.absolut_time)
-#     result_details = db.session.query(ResultDetail). \
-#         filter(
-#         ResultDetail.course_device_id == course_device[0].id,
-#         ResultDetail.run_id == run.id).all()
-#     print('Competitors crossed this  device:', len(result_details))
-#     db.session.add(result)
-#     db.session.commit()
-#
-#     for index, item in enumerate(result_details):
-#         print(index,'.', item.race_competitor_id)
-#     if course_device[1].name == "Start":
-#         result.sectortime = 0
-#         result.sectordiff = 0
-#         result.is_start = True
-#         approvedResult = ResultApproved.query.filter(ResultApproved.race_competitor_id == result.race_competitor_id,
-#                                                      ResultApproved.run_id == result.run_id).one()
-#         approvedResult.is_start = True
-#         approvedResult.start_time = result.absolut_time
-#     elif course_device[1].name == "Finish":
-#         competitor_finish(competitor[0].id, run.id, result.absolut_time)
-#         recalculate_run_results(run.id)
-#         result_details = db.session.query(ResultDetail). \
-#             filter(ResultDetail.run_id == run.id).all()
-#     else:
-#         calculate_personal_sector_params(result, course_device[0], run.course_id)
-#         calculate_common_sector_params(result, result_details)
-#
-#     socketio.emit('get/results/current', json.dumps([[device_data, result, competitor[0], competitor[1], course_device[0]]], cls=jsonencoder.AlchemyEncoder))
-#     socketio.emit("newData", json.dumps(
-#         dict(current_object=[
-#         result,
-#         competitor[0],
-#         competitor[1],
-#         course_device[0],
-#         ResultApproved.query.filter(ResultApproved.race_competitor_id == competitor[0].id, ResultApproved.run_id == run.id).one(),
-#         course_device[1]
-#     ],
-#         list_of_object=result_details), cls=jsonencoder.AlchemyEncoder))
-#
-#     return '', 200
-
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
 @exectutiontime
 def load_data_vol2():
@@ -195,6 +122,7 @@ def load_data_vol2():
             filter(
             ResultDetail.course_device_id == course_device[0].id,
             ResultDetail.run_id == run.id).all()
+        # result_details = crutch_result_list(course_device_id=course_device[0].id, run_id=run.id)
     else:
         competitor = get_current_competitor(course_device[0].id, run.id)
         if competitor is not None:
@@ -244,23 +172,23 @@ def load_data_vol2():
 
     return '', 200
 
-@raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
-def get_current_data(race_id):
-    tmp =db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)\
-                      .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
-                      .filter(RaceCompetitor.race_id == race_id)\
-                      .order_by(asc(ResultDetail.absolut_time))\
-                      .all()
-    dd= json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)
-                      .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
-                      .filter(RaceCompetitor.race_id == race_id)\
-                      .order_by(asc(ResultDetail.absolut_time))
-                      .all(), cls=jsonencoder.AlchemyEncoder)
-    return json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)
-                      .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
-                      .filter(RaceCompetitor.race_id == race_id)\
-                      .order_by(asc(ResultDetail.absolut_time))
-                      .all(), cls=jsonencoder.AlchemyEncoder)
+# @raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
+# def get_current_data(race_id):
+#     tmp =db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)\
+#                       .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
+#                       .filter(RaceCompetitor.race_id == race_id)\
+#                       .order_by(asc(ResultDetail.absolut_time))\
+#                       .all()
+#     dd= json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)
+#                       .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
+#                       .filter(RaceCompetitor.race_id == race_id)\
+#                       .order_by(asc(ResultDetail.absolut_time))
+#                       .all(), cls=jsonencoder.AlchemyEncoder)
+#     return json.dumps(db.session.query(ResultDetail,RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType).join(RaceCompetitor)
+#                       .join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
+#                       .filter(RaceCompetitor.race_id == race_id)\
+#                       .order_by(asc(ResultDetail.absolut_time))
+#                       .all(), cls=jsonencoder.AlchemyEncoder)
 
 def setDeviceDataInDB(data, run_id, cource_device_id):
     input_data = DataIn(
@@ -301,10 +229,6 @@ def competitor_start():
     return '', 200
 #
 #
-#
-#
-#
-#
 def competitor_start_run(run_id):
     race_competitors = db.session.query(RaceCompetitor, Competitor, RunOrder). \
         join(Competitor). \
@@ -336,41 +260,6 @@ def get_current_competitor(course_device_id, run_id):
            filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).first()
     return competitor
 
-#
-#
-#
-#
-#
-# def get_current_competitor(course_device_id, run_id):
-#     competitor_order = db.session.query(func.count('*')).select_from(ResultDetail). \
-#                            filter(ResultDetail.run_id == run_id,
-#                                   ResultDetail.course_device_id == course_device_id). \
-#                            scalar() + 1
-#     print('function: get_current_competitor')
-#     print('competitor_order', competitor_order)
-#     try:
-#         race_competitor = db.session.query(RaceCompetitor, Competitor, RunOrder).\
-#             join(Competitor).\
-#             join(RunOrder).\
-#             filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).one()
-#     except:
-#         try:
-#             race_competitor = db.session.query(RaceCompetitor, Competitor, RunOrder). \
-#                 join(Competitor). \
-#                 join(RunOrder). \
-#                 filter(RunOrder.manual_order == None, RunOrder.run_id == run_id).order_by(asc(RunOrder.order)).limit(1).one()
-#         except:
-#             pass
-#         race_competitor[2].manual_order = competitor_order
-#         result_approves = ResultApproved(
-#             race_competitor_id=race_competitor[0].id,
-#             run_id=run_id,
-#             is_start=True)
-#         db.session.add(result_approves)
-#         db.session.add(race_competitor[2])
-#         db.session.commit()
-#     print('New race competitor id:', race_competitor[0].id)
-#     return race_competitor
 
 def competitor_finish(competitor_id, run_id, finish_time):
     try:
@@ -498,6 +387,10 @@ def approve_manual(run_id, competitor_id):
                     course_device_id=item
                 )
                 db.session.add(resultDetail)
+            else:
+                resultDetail.sectorrank = None
+                resultDetail.sectordiff = None
+
         db.session.commit()
         recalculate_finished_resaults(run_id)
     return 'Ok', 200
@@ -517,41 +410,6 @@ def calculate_finish_params(current_competitor_finish, finished_competitors):
     except:
         socketio.emit('recount/error', dict(competitor_id=current_competitor_finish.id,
                                             error='Count finished params: diff, rank'))
-# def calculate_sector_params(current_competitor, device, course_id, device_competitors_list):
-#     print("function: calculate_sector_params")
-#     previous_course_device = CourseDevice.query.filter_by(order=device.order-1, course_id=course_id).one()
-#
-#     print("current device order:%s" % device.order)
-#     print("previous device order:%s" % previous_course_device.order)
-#
-#     previous_device_results = db.session.query(ResultDetail).filter(ResultDetail.course_device_id == previous_course_device.id,
-#                                                                     ResultDetail.race_competitor_id == current_competitor.race_competitor_id,
-#                                                                     ResultDetail.run_id == current_competitor.run_id).one()
-#     print("previous device result:%s" % previous_device_results.id, previous_device_results.absolut_time, previous_device_results.sectortime, previous_device_results.sectordiff, previous_device_results.sectorrank )
-#     current_competitor.sectortime = current_competitor.absolut_time - previous_device_results.absolut_time
-#
-#     current_competitor.speed = ((device.distance - previous_course_device.distance) / 1000) / (current_competitor.sectortime / 3600000)
-#     if len(device_competitors_list) != 0:
-#         min_сompetitor = min(device_competitors_list, key=lambda item: item.sectortime)
-#         if min_сompetitor.sectortime < current_competitor.sectortime:
-#             сompetitors_list = sorted([current_competitor] + device_competitors_list, key=lambda item: item.sectortime)
-#             for index, item in enumerate(сompetitors_list):
-#                 item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
-#                 item.sectorrank = index + 1
-#                 print('competitor id:', item.race_competitor_id, 'sector diff:', item.sectordiff,'sector rank:', item.sectorrank)
-#         else:
-#             current_competitor.sectordiff = current_competitor.sectortime - min_сompetitor.sectortime
-#             current_competitor.sectorrank = 1
-#             сompetitors_list = sorted([current_competitor] + device_competitors_list, key=lambda item: item.sectortime)
-#             for index, item in enumerate(сompetitors_list):
-#                 # item.sectordiff = item.sectortime - сompetitors_list[0].sectortime
-#                 item.sectorrank = index + 2
-#                 print('competitor id:', item.race_competitor_id, 'sector diff:', item.sectordiff, 'sector rank:', item.sectorrank)
-#     else:
-#         current_competitor.sectordiff = 0
-#         current_competitor.sectorrank = 1
-
-
 def calculate_personal_sector_params(current_competitor, device, course_id):
     try:
         previous_course_device = CourseDevice.query.filter_by(order=device.order-1, course_id=course_id).one()
@@ -765,29 +623,6 @@ def edit_competitor(json_data):
                         db.session.add(competitor_result_detail)
                         db.session.commit()
 
-
-
-                        # new_result = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
-                        # try:
-                        #     old_result = ResultDetail.query.filter(ResultDetail.race_competitor_id == competitor_id,
-                        #                                        ResultDetail.run_id == new_result.run_id,
-                        #                                        ResultDetail.course_device_id == new_result.course_device_id).one()
-                        # except:
-                        #     old_result = ResultDetail(race_competitor_id=competitor_id,
-                        #                               run_id=new_result.run_id,
-                        #                               course_device_id=new_result.course_device_id)
-                        # if old_result.course_device_id in list(devices.keys()):
-                        #     old_approve = db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
-                        #                                                          ResultApproved.race_competitor_id==old_result.race_competitor_id).one()
-                        #     new_approve = db.session.query(ResultApproved).filter(ResultApproved.run_id == run_id,
-                        #                                                          ResultApproved.race_competitor_id==new_result.race_competitor_id).one()
-                        #     switch_approve(new_approve, old_approve, devices, old_result.course_device_id)
-                        #     clear_approve(devices, old_result)
-                        #
-                        # result_set_None(old_result)
-                        # old_result.race_competitor_id = new_result.race_competitor_id
-                        # new_result.race_competitor_id = competitor_id
-
         recalculate_run_results(run_id)
         socket_get_results({'run_id': run_id})
         socketio.emit('change/data_in/error', json.dumps(error_list))
@@ -833,3 +668,36 @@ def get_start_finish_device(run_id):
     for item in data:
         dict_view[item[0]] = item[1]
     return dict_view
+
+# @raceinfo.route('/get_results/<int:run_id>/<int:course_device_id>')
+# def crutch_result_list(run_id, course_device_id):
+#     resultDetail = db.session.query(ResultDetail)\
+#         .filter(ResultDetail.run_id==run_id, ResultDetail.course_device_id==course_device_id)\
+#         .all()
+#     resultApproved= db.session.query(ResultApproved).filter(ResultApproved.run_id==run_id).order_by(ResultApproved.id).all()
+#     for approve in resultApproved:
+#         any(item== approve for item in resultDetail)
+#     # return json.dumps(, cls=jsonencoder.AlchemyEncoder)
+
+
+@raceinfo.route('/current_data/get/<int:race_id>', methods=['POST', 'GET'])
+def crutch_result_list(race_id):
+    data = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType)\
+        .join(RaceCompetitor).join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
+        .filter(RaceCompetitor.race_id == race_id)\
+        .order_by(asc(ResultDetail.absolut_time)).all()
+
+    manual_data = db.session.query(ResultApproved, RaceCompetitor, Competitor)\
+        .join(RaceCompetitor).join(Competitor)\
+        .filter(RaceCompetitor.race_id == race_id, ResultApproved.is_manual==True)\
+        .all()
+    # StartDevice = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter().first()
+    # FinishDevice = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).filter().first()
+    for _item in manual_data:
+        if not any(item[1].id == _item[1].id for item in data):
+            result = [None, _item[1], _item[2], None, _item[0], None]
+            data.append(result)
+    return json.dumps(data, cls=jsonencoder.AlchemyEncoder)
+
+
+
