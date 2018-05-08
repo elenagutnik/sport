@@ -456,9 +456,11 @@ def recalculate_run_results(run_id):
     data = db.session.query(ResultDetail, ResultApproved, CourseDevice).\
            join(CourseDevice, CourseDevice.id == ResultDetail.course_device_id).\
            join(ResultApproved, ResultApproved.race_competitor_id == ResultDetail.race_competitor_id, isouter=True).\
-           filter(ResultDetail.run_id == run_id,  or_(ResultApproved.status_id == None, ResultApproved.status_id == 1)).\
+           filter(ResultDetail.run_id == run_id, ResultApproved.run_id==run_id,  or_(ResultApproved.status_id == None, ResultApproved.status_id == 1)).\
         order_by(asc(CourseDevice.order)).\
         all()
+    for item in data:
+        print(item[0].run_id)
     for item in data:
         if item[2].order not in tree_view.keys():
             tree_view[item[2].order] = []
