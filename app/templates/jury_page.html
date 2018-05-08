@@ -796,11 +796,13 @@ tr.row_competitor td {border-top:2px solid gray!important;}
 
           $("#form_run_id").val(run_id);
           $("#form_competitor_id").val(competitor_id);
-          $("#form_status").val(glob_arr["run"+run_id]["comp_"+competitor_id].status_id);
-          $("#form_reason").val(glob_arr["run"+run_id]["comp_"+competitor_id].reason);
-          $("#form_gate").val(glob_arr["run"+run_id]["comp_"+competitor_id].gate);
-          $("#form_starttime").val(glob_arr["run"+run_id]["comp_"+competitor_id].start_time);
-          $("#form_finishtime").val(glob_arr["run"+run_id]["comp_"+competitor_id].finish_time);
+          if(glob_arr["run"+run_id]["comp_"+competitor_id]){
+            $("#form_status").val(glob_arr["run"+run_id]["comp_"+competitor_id].status_id);
+            $("#form_reason").val(glob_arr["run"+run_id]["comp_"+competitor_id].reason);
+            $("#form_gate").val(glob_arr["run"+run_id]["comp_"+competitor_id].gate);
+            $("#form_starttime").val(glob_arr["run"+run_id]["comp_"+competitor_id].start_time);
+            $("#form_finishtime").val(glob_arr["run"+run_id]["comp_"+competitor_id].finish_time);
+          }
           $("#popup_editresult").modal('show');
         });
         $("body").on("click", ".btn_clear", function () {
