@@ -656,14 +656,24 @@ tr.row_competitor td {border-top:2px solid gray!important;}
         });
         // обработка кнопки сохранения и апрува для ручного ввода результата
         $("body").on("click", ".editform_approve", function () {
+            var stime="";
+            var ftime="";
+            if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time){
+              if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time!=$("#form_starttime").val())
+                stime=$("#form_starttime").val();
+            }
+            if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time){
+              if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time!=$("#form_finishtime").val())
+                ftime=$("#form_finishtime").val();
+            }
             $.ajax({
               type: "GET",
               url: "/raceinfo/approve/edit/run/"+$("#form_run_id").val()+"/competitor/"+$("#form_competitor_id").val(),
               //dataType: 'json',
               data: {
                 data: JSON.stringify({
-                  'start_time':  (glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time!=$("#form_starttime").val())?$("#form_starttime").val():"",
-                  'finish_time': (glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time!=$("#form_finishtime").val())?$("#form_finishtime").val():"",
+                  'start_time':  stime,
+                  'finish_time': ftime,
                   'reason': $("#form_reason").val(),
                   'gate': $("#form_gate").val(),
                   'status_id':  $("#form_status").val(),
