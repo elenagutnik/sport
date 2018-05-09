@@ -519,7 +519,7 @@ def recalculate_run_results(run_id):
             else:
                 recalculate_sector_results(item, tree_view[key-1])
         keys_list = list(tree_view.keys())
-        recalculate_finished_results_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
+        # recalculate_finished_results_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
         recalculate_finished_resaults(run_id)
         return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
     recalculate_finished_resaults(run_id)
