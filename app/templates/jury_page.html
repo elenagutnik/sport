@@ -658,14 +658,25 @@ tr.row_competitor td {border-top:2px solid gray!important;}
         $("body").on("click", ".editform_approve", function () {
             var stime="";
             var ftime="";
-            if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time){
-              if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time!=$("#form_starttime").val())
+            if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]){
+              if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time){
+                if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time!=$("#form_starttime").val()){
+                  stime=$("#form_starttime").val();
+                }
+              }else if($("#form_starttime").val()){
                 stime=$("#form_starttime").val();
+              }
             }
-            if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time){
-              if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time!=$("#form_finishtime").val())
+            if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]){
+              if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time){
+                if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time!=$("#form_finishtime").val()){
+                  ftime=$("#form_finishtime").val();
+                }
+              }else if($("#form_finishtime").val()){
                 ftime=$("#form_finishtime").val();
+              }
             }
+            console.log("stime="+stime+" ftime="+ftime);
             $.ajax({
               type: "GET",
               url: "/raceinfo/approve/edit/run/"+$("#form_run_id").val()+"/competitor/"+$("#form_competitor_id").val(),
@@ -765,7 +776,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 console.log('start competitor - run:'+run_id+' competitor:'+competitor_id);
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("started");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("danger");
-                $("#tab_manualcontrol tr .btn_start").prop('disabled',true);
+                //$("#tab_manualcontrol tr .btn_start").prop('disabled',true);
           //      $("#tab_manualcontrol .btn_finish").prop('disabled',true);
           //      $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn_finish").prop('disabled',false);
               }
@@ -791,7 +802,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("finished");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("warning");
-                $("#tab_manualcontrol tr .btn_start").prop('disabled',false);
+                //$("#tab_manualcontrol tr .btn_start").prop('disabled',false);
   //              $("#tab_manualcontrol .btn_finish").prop('disabled',true);
               }
             },
@@ -815,7 +826,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).addClass("success");
-                $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").prop('disabled',true);
+                //$("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").prop('disabled',true);
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .btn").hide();
               }
             },
@@ -864,11 +875,13 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
-                $("#tab_manualcontrol .btn").prop('disabled',false);
-                $("#tab_manualcontrol .btn_finish").prop('disabled',true);
+                //$("#tab_manualcontrol .btn").prop('disabled',false);
+                //$("#tab_manualcontrol .btn_finish").prop('disabled',true);
+
               }
               get_current_data(race_id);
-            },
+              refresh_status(run_id,competitor_id);
+          },
             error: function(error) {
               alert('error - CLEAR competitor run:'+run_id+' competitor:'+competitor_id);
             }
@@ -1122,6 +1135,10 @@ function set_html_startlist(run_id){
           for(ckey in glob_arr[rkey]){
             sumtab_set_maininfo(glob_arr[rkey][ckey]);
             refresh_status(rkey,ckey,glob_arr[rkey][ckey].status_id);
+          }
+          if(!glob_arr[rkey]){
+            //чистим данные в таблице
+            $("#tab_summarytable table.table_run1 tbody tr").remove();
           }
         }
       }else{
