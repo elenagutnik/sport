@@ -666,7 +666,8 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                   'start_time': $("#form_starttime").val(),
                   'reason': $("#form_reason").val(),
                   'gate': $("#form_gate").val(),
-                  'status_id':  $("#form_status").val()
+                  'status_id':  $("#form_status").val(),
+                  'course_id': run_list[run_list_ids["id"+$("#form_run_id").val()]].course_id
                 })
               },
               success:function(data) {
