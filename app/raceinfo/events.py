@@ -98,12 +98,13 @@ def load_data_vol2():
                CourseDevice.course_id == run.course_id).one()
 
     device_data = setDeviceDataInDB(data, run.id, course_device[0].id)
-
+    competitor = get_current_competitor(course_device[0].id, run.id)
+    print('Competitor:', competitor)
     finished_data = None
     if course_device[1].name == "Start":
         print('Device: Start')
-        competitor = competitor_start_run(run.id)
-
+        if competitor is None:
+            competitor = competitor_start_run(run.id)
         result = ResultDetail(
             course_device_id=course_device[0].id,
             run_id=run.id,
@@ -125,7 +126,6 @@ def load_data_vol2():
             ResultDetail.run_id == run.id).all()
         # result_details = crutch_result_list(course_device_id=course_device[0].id, run_id=run.id)
     else:
-        competitor = get_current_competitor(course_device[0].id, run.id)
         if competitor is not None:
             result = ResultDetail(
                 course_device_id=course_device[0].id,
