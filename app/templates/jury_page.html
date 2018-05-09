@@ -240,7 +240,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
               }
         //    }
             if(j<total_arr.length){
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[d.length-1][0].id+"_"+total_arr[j]+"'>"+((data.dev_data["dev_"+d[d.length-1][0].id]&&data.dev_data["dev_"+d[d.length-1][0].id][total_arr[j]]!==null)?data.dev_data["dev_"+d[d.length-1][0].id][total_arr[j]]:"NA")+"</td>");
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[d.length-1][0].id+"_"+total_arr[j]+"'>"+((data[total_arr[j]]!==null)?data[total_arr[j]]:"NA")+"</td>");
             }else{
               $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td></td>");
             }
