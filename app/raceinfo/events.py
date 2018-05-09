@@ -261,7 +261,6 @@ def get_current_competitor(course_device_id, run_id):
            filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).first()
     return competitor
 
-
 def competitor_finish(competitor_id, run_id, finish_time):
     try:
         result_approves = ResultApproved.query.filter_by(
@@ -350,38 +349,79 @@ def approve_automate(run_id, competitor_id):
 def approve_manual(run_id, competitor_id):
     data = json.loads(request.args['data'])
     try:
-       resultDetail = ResultApproved.query.filter_by(race_competitor_id=competitor_id, run_id=run_id).one()
+       resultApproved = ResultApproved.query.filter_by(race_competitor_id=competitor_id, run_id=run_id).one()
     except:
-       resultDetail = ResultApproved(
+        resultApproved = ResultApproved(
            race_competitor_id=competitor_id,
            run_id=run_id,
            is_start=False
-       )
-    resultDetail.is_manual = True
-    resultDetail.approve_user = current_user.id
-    resultDetail.approve_time = datetime.now()
-    resultDetail.status_id = data['status_id']
-    resultDetail.is_finish = True
+        )
+    resultApproved.is_manual = True
+    resultApproved.approve_user = current_user.id
+    resultApproved.approve_time = datetime.now()
+    resultApproved.status_id = data['status_id']
+    resultApproved.is_finish = True
+    # try:
+    #     resultDetail = db.session.query(ResultDetail, CourseDevice, CourseDeviceType).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.race_competitor_id == competitor_id,
+    #                                                          ResultDetail.run_id == run_id).all()
+    #     if data['status_id'] == '1' and resultApproved.is_start == False:
+    #         competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id == competitor_id, RunOrder.run_id==run_id).first()
+    #         competitorOrder.manual_order = 0
+    #         db.session.add(competitorOrder)
+    #         db.session.commit()
+    #
+    #     if data['finish_time'] != '':
+    #         if len(resultDetail)>0:
+    #             finish_device = next(item for item in resultDetail if item[2].id==3)
+    #             finish_device[0].data_in_id = None
+    #             finish_device[0].absolute_time = data['finish_time']
+    #             db.session.add(finish_device)
+    #         resultApproved.finish_time = data['finish_time']
+    #     if data['start_time'] != '':
+    #         if len(resultDetail)>0:
+    #             start_device = next(item for item in resultDetail if item[2].id==1)
+    #             start_device[0].data_in_id = None
+    #             start_device[0].absolute_time = data['start_time']
+    #             db.session.add(start_device)
+    #         resultApproved.start_time = data['start_time']
+    #     db.session.commit()
+    # except:
+    #     pass
     try:
-        if data['status_id'] == '1':
-            competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id==competitor_id, RunOrder.run_id==run_id).first()
-            competitorOrder.manual_order=0
+
+        if data['status_id'] == '1' and resultApproved.is_start == False:
+            competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id == competitor_id, RunOrder.run_id==run_id).first()
+            competitorOrder.manual_order = 0
             db.session.add(competitorOrder)
             db.session.commit()
+
         if data['finish_time'] != '':
-            resultDetail.finish_time = data['finish_time']
+            finish_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.race_competitor_id == competitor_id,
+                                             ResultDetail.run_id == run_id, CourseDeviceType==3).first()
+            if finish_device is not None:
+                finish_device[0].data_in_id = None
+                finish_device[0].absolute_time = data['finish_time']
+                db.session.add(finish_device)
+            resultApproved.finish_time = data['finish_time']
         if data['start_time'] != '':
-           resultDetail.start_time = data['start_time']
+            start_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.race_competitor_id == competitor_id,
+                                             ResultDetail.run_id == run_id, CourseDeviceType==1).first()
+            if start_device is not None:
+                start_device[0].data_in_id = None
+                start_device[0].absolute_time = data['start_time']
+                db.session.add(start_device)
+            resultApproved.start_time = data['start_time']
+        db.session.commit()
     except:
         pass
-    resultDetail.gate = data['gate']
-    resultDetail.reason = data['reason']
+    resultApproved.gate = data['gate']
+    resultApproved.reason = data['reason']
 
-    db.session.add(resultDetail)
+    db.session.add(resultApproved)
     db.session.commit()
-    recalculate_run_results(resultDetail.run_id)
+    recalculate_run_results(resultApproved.run_id)
 
-    if resultDetail.is_start == True:
+    if resultApproved.is_start == True:
         for item in db.session.query(CourseDevice.id).filter(CourseDevice.course_id == RunInfo.course_id, RunInfo.id == run_id).all():
             resultDetail = ResultDetail.query.filter(ResultDetail.run_id == run_id,
                                                      ResultDetail.race_competitor_id == competitor_id,
