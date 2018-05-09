@@ -193,7 +193,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           var total_arr=new Array("time","rank", "diff");
           // tr time
           var data=glob_arr["run"+data.run_id]["comp_"+data.race_competitor_id]
-
+          console.log(data);
           //bib td
           $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime").append("<td rowspan="+arr.length+">"+data.bib+"</td>");
           //name td
@@ -240,6 +240,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
               }
         //    }
             if(j<total_arr.length){
+              console.log(total_arr[j]+" = "+data[total_arr[j]]);
               $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[d.length-1][0].id+"_"+total_arr[j]+"'>"+((data[total_arr[j]]!==null)?data[total_arr[j]]:"NA")+"</td>");
             }else{
               $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td></td>");
@@ -658,21 +659,17 @@ tr.row_competitor td {border-top:2px solid gray!important;}
         $("body").on("click", ".editform_approve", function () {
             var stime="";
             var ftime="";
-            if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]){
-              if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time){
-                if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time!=$("#form_starttime").val()){
-                  stime=$("#form_starttime").val();
-                }
-              }else if($("#form_starttime").val()){
+            if($("#form_starttime").val()){
+              if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time!=$("#form_starttime").val()){
+                stime=$("#form_starttime").val();
+              }else{
                 stime=$("#form_starttime").val();
               }
             }
-            if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]){
-              if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time){
-                if(glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time!=$("#form_finishtime").val()){
-                  ftime=$("#form_finishtime").val();
-                }
-              }else if($("#form_finishtime").val()){
+            if($("#form_finishtime").val()){
+              if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].finish_time!=$("#form_finishtime").val()){
+                ftime=$("#form_finishtime").val();
+              }else{
                 ftime=$("#form_finishtime").val();
               }
             }
@@ -1123,8 +1120,14 @@ function set_html_startlist(run_id){
     function refresh_status(run_id,comp_id,status_id){
       console.log("START: refresh_status "+"#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" td.status");
       $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" td.status").html(getObjById(status_list,"id",status_id).name);
-      if(status_id)
-      $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" button.btn_start").hide();
+      if(status_id){
+        if(status_id==1)$("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")).removeClass("danger").addClass("success");
+        else $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")).removeClass("danger").addClass("warning");
+
+        $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" button.btn_start").hide();
+      }else{
+        $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" button.btn_start").show();
+      }
     }
     function set_current_data(){
       console.log("set_current_data - START");
