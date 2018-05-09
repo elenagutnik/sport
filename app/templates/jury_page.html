@@ -1142,10 +1142,19 @@ function set_html_startlist(run_id){
          var row;
          var data_arr=JSON.parse(data);
          console.log(data_arr);
-         for(var i=0; i<data_arr.length;i++){
-           //add2datasrc(data_arr[i]);
-           data2arr(data_arr[i]);
+         if(data_arr.length===0){
+            //glob_arr.length=0;
+            var l=Object.keys(glob_arr).length;
+            for(var i=0;i<l;i++){
+                glob_arr[Object.keys(glob_arr)[i]]=null;
+            }
+            console.log("glob_arr.length=0");
+         }else{
+           for(var i=0; i<data_arr.length;i++){
+             //add2datasrc(data_arr[i]);
+             data2arr(data_arr[i]);
 
+           }
          }
 //         for(var i=0; i<)
          console.log("glob_arr:");
