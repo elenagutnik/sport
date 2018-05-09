@@ -293,28 +293,30 @@ def competitor_remove():
 def competitor_clear():
     competitor_order = RunOrder.query.filter(RunOrder.race_competitor_id == request.args.get('competitor_id'),
                                              RunOrder.run_id == request.args.get('run_id')).one()
-    others_competitors_orders = RunOrder.query.filter(RunOrder.manual_order > competitor_order.manual_order,
-                                             RunOrder.run_id == request.args.get('run_id')).all()
-    if len(others_competitors_orders) > 0:
-        for item in others_competitors_orders:
-            item.manual_order -= 1
-            db.session.add(item)
-    competitor_order.manual_order = None
 
-    db.session.add(competitor_order)
-    ResultApproved.query.filter(
-       ResultApproved.race_competitor_id == request.args.get('competitor_id'),
-       ResultApproved.run_id == request.args.get('run_id')
-    ).delete()
-    ResultDetail.query.filter(
-       ResultDetail.race_competitor_id == request.args.get('competitor_id'),
-       ResultDetail.run_id == request.args.get('run_id')
-    ).delete()
+    if competitor_order.manual_order is not None:
+        others_competitors_orders = RunOrder.query.filter(RunOrder.manual_order > competitor_order.manual_order,
+                                                 RunOrder.run_id == request.args.get('run_id')).all()
+        if len(others_competitors_orders) > 0:
+            for item in others_competitors_orders:
+                item.manual_order -= 1
+                db.session.add(item)
+        competitor_order.manual_order = None
 
-    db.session.commit()
-    socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
+        db.session.add(competitor_order)
+        ResultApproved.query.filter(
+           ResultApproved.race_competitor_id == request.args.get('competitor_id'),
+           ResultApproved.run_id == request.args.get('run_id')
+        ).delete()
+        ResultDetail.query.filter(
+           ResultDetail.race_competitor_id == request.args.get('competitor_id'),
+           ResultDetail.run_id == request.args.get('run_id')
+        ).delete()
 
-    recalculate_run_results(request.args.get('run_id'))
+        db.session.commit()
+        socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
+
+        recalculate_run_results(request.args.get('run_id'))
     return '', 200
 
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
