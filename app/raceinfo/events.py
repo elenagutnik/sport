@@ -419,7 +419,6 @@ def approve_manual(run_id, competitor_id):
 
     db.session.add(resultApproved)
     db.session.commit()
-    recalculate_run_results(resultApproved.run_id)
 
     if resultApproved.is_start == True:
         for item in db.session.query(CourseDevice.id).filter(CourseDevice.course_id == RunInfo.course_id, RunInfo.id == run_id).all():
@@ -438,7 +437,7 @@ def approve_manual(run_id, competitor_id):
                 resultDetail.sectordiff = None
 
         db.session.commit()
-        recalculate_finished_resaults(run_id)
+    recalculate_run_results(resultApproved.run_id)
     return 'Ok', 200
 
 
