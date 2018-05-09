@@ -235,7 +235,7 @@ def competitor_start_run(run_id):
         join(Competitor). \
         join(RunOrder). \
         filter(RunOrder.run_id == run_id).order_by(asc(RunOrder.order)).all()
-    order = sum(item[2].manual_order is not None for item in race_competitors)
+    order = sum(item[2].manual_order is not None and item[2].manual_order != 0 for item in race_competitors)
 
 
     сompetitor = next(item for item in race_competitors if item[2].manual_order is None)
@@ -363,6 +363,11 @@ def approve_manual(run_id, competitor_id):
     resultDetail.status_id = data['status_id']
     resultDetail.is_finish = True
     try:
+        if data['status_id'] == '1':
+            competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id==competitor_id, RunOrder.run_id==run_id).first()
+            competitorOrder.manual_order=0
+            db.session.add(competitorOrder)
+            db.session.commit()
         if data['finish_time'] != '':
             resultDetail.finish_time = data['finish_time']
         if data['start_time'] != '':
@@ -459,23 +464,26 @@ def recalculate_run_results(run_id):
            filter(ResultDetail.run_id == run_id, ResultApproved.run_id==run_id,  or_(ResultApproved.status_id == None, ResultApproved.status_id == 1)).\
         order_by(asc(CourseDevice.order)).\
         all()
-    for item in data:
-        print(item[0].run_id)
-    for item in data:
-        if item[2].order not in tree_view.keys():
-            tree_view[item[2].order] = []
-        tree_view[item[2].order].append(item)
+    if len(data)>0:
+        for item in data:
+            print(item[0].run_id)
+        for item in data:
+            if item[2].order not in tree_view.keys():
+                tree_view[item[2].order] = []
+            tree_view[item[2].order].append(item)
 
-    for key, item in tree_view.items():
-        print(key, type(key))
-        if key == 1:
-            continue
-        else:
-            recalculate_sector_results(item, tree_view[key-1])
-    keys_list = list(tree_view.keys())
-    recalculate_finished_results_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
+        for key, item in tree_view.items():
+            print(key, type(key))
+            if key == 1:
+                continue
+            else:
+                recalculate_sector_results(item, tree_view[key-1])
+        keys_list = list(tree_view.keys())
+        recalculate_finished_results_old(tree_view[keys_list[0]], tree_view[keys_list[-1]])
+        recalculate_finished_resaults(run_id)
+        return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
     recalculate_finished_resaults(run_id)
-    return json.dumps(tree_view, cls=jsonencoder.AlchemyEncoder)
+    return ''
 
 def recalculate_sector_results(current_results=None, previous_resaults=None):
     #  пересчитать  параметры speed, sectordiff

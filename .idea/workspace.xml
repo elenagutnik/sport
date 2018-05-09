@@ -14,7 +14,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/sport$Unittests_in_manage_py.coverage" NAME="Unittests in manage.py Coverage Results" MODIFIED="1511445914995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sport$sport.coverage" NAME="sport Coverage Results" MODIFIED="1525818446134" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sport$sport.coverage" NAME="sport Coverage Results" MODIFIED="1525893549740" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
@@ -28,21 +28,31 @@
       <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="172">
-              <caret line="458" column="49" lean-forward="false" selection-start-line="458" selection-start-column="49" selection-end-line="458" selection-end-column="49" />
+            <state relative-caret-position="204">
+              <caret line="237" column="79" lean-forward="false" selection-start-line="237" selection-start-column="79" selection-end-line="237" selection-end-column="79" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
-                <marker date="1525818446016" expanded="true" signature="1056:1081" ph="delete from " />
-                <marker date="1525818446016" expanded="true" signature="1109:1128" ph="delete from " />
-                <marker date="1525818446016" expanded="true" signature="1155:1182" ph="delete from " />
-                <marker date="1525818446016" expanded="true" signature="1209:1227" ph="delete from " />
-                <marker date="1525818446016" expanded="true" signature="1254:1273" ph="delete from " />
-                <marker date="1525818446016" expanded="true" signature="1300:1336" ph="delete from " />
-                <marker date="1525818446016" expanded="true" signature="1363:1395" ph="update run_i... " />
-                <marker date="1525818446016" expanded="true" signature="1422:1519" ph="INSERT INTO &quot;CASHE&quot;... " />
-                <marker date="1525818446016" expanded="true" signature="1545:1595" ph="update run_i... " />
-                <marker date="1525818446016" expanded="true" signature="1622:1660" ph="update run_i... " />
+                <marker date="1525893095065" expanded="true" signature="1056:1081" ph="delete from " />
+                <marker date="1525893095065" expanded="true" signature="1109:1128" ph="delete from " />
+                <marker date="1525893095065" expanded="true" signature="1155:1182" ph="delete from " />
+                <marker date="1525893095065" expanded="true" signature="1209:1227" ph="delete from " />
+                <marker date="1525893095065" expanded="true" signature="1254:1273" ph="delete from " />
+                <marker date="1525893095065" expanded="true" signature="1300:1336" ph="delete from " />
+                <marker date="1525893095065" expanded="true" signature="1363:1395" ph="update run_i... " />
+                <marker date="1525893095065" expanded="true" signature="1422:1519" ph="INSERT INTO &quot;CASHE&quot;... " />
+                <marker date="1525893095065" expanded="true" signature="1545:1595" ph="update run_i... " />
+                <marker date="1525893095065" expanded="true" signature="1622:1660" ph="update run_i... " />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="query.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/sqlalchemy/orm/query.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="2751" column="0" lean-forward="false" selection-start-line="2751" selection-start-column="0" selection-end-line="2751" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -260,7 +270,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -339,6 +348,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -601,16 +611,16 @@
     <frame x="0" y="0" width="1920" height="1200" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20394036" sideWeight="0.84210527" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20607029" sideWeight="0.84210527" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27264494" sideWeight="0.3599574" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13677536" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.7463768" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32825205" sideWeight="0.4978701" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32608697" sideWeight="0.48935038" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24456522" sideWeight="0.48296058" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.51449275" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.48369566" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.14802982" sideWeight="0.15789473" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -684,13 +694,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>682</line>
+          <line>690</line>
           <option name="timeStamp" value="445" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
-          <line>455</line>
-          <option name="timeStamp" value="449" />
+          <line>364</line>
+          <option name="timeStamp" value="452" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/raceinfo/events.py</url>
+          <line>240</line>
+          <option name="timeStamp" value="456" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="jinja2-line">
           <url>file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/cource_forerunner_list.html</url>
@@ -701,7 +716,7 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="450" />
+      <option name="time" value="457" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -926,13 +941,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/sqlalchemy/orm/query.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="2754" column="0" lean-forward="false" selection-start-line="2754" selection-start-column="0" selection-end-line="2754" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/templates/jury_page.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-74">
@@ -1005,26 +1013,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="172">
-          <caret line="458" column="49" lean-forward="false" selection-start-line="458" selection-start-column="49" selection-end-line="458" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-            <marker date="1525818446016" expanded="true" signature="1056:1081" ph="delete from " />
-            <marker date="1525818446016" expanded="true" signature="1109:1128" ph="delete from " />
-            <marker date="1525818446016" expanded="true" signature="1155:1182" ph="delete from " />
-            <marker date="1525818446016" expanded="true" signature="1209:1227" ph="delete from " />
-            <marker date="1525818446016" expanded="true" signature="1254:1273" ph="delete from " />
-            <marker date="1525818446016" expanded="true" signature="1300:1336" ph="delete from " />
-            <marker date="1525818446016" expanded="true" signature="1363:1395" ph="update run_i... " />
-            <marker date="1525818446016" expanded="true" signature="1422:1519" ph="INSERT INTO &quot;CASHE&quot;... " />
-            <marker date="1525818446016" expanded="true" signature="1545:1595" ph="update run_i... " />
-            <marker date="1525818446016" expanded="true" signature="1622:1660" ph="update run_i... " />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="20385">
@@ -1090,6 +1078,34 @@
         <state relative-caret-position="23805">
           <caret line="1612" column="0" lean-forward="false" selection-start-line="1612" selection-start-column="0" selection-end-line="1612" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/enviroment/lib/python3.6/site-packages/sqlalchemy/orm/query.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="2751" column="0" lean-forward="false" selection-start-line="2751" selection-start-column="0" selection-end-line="2751" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="237" column="79" lean-forward="false" selection-start-line="237" selection-start-column="79" selection-end-line="237" selection-end-column="79" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+            <marker date="1525893095065" expanded="true" signature="1056:1081" ph="delete from " />
+            <marker date="1525893095065" expanded="true" signature="1109:1128" ph="delete from " />
+            <marker date="1525893095065" expanded="true" signature="1155:1182" ph="delete from " />
+            <marker date="1525893095065" expanded="true" signature="1209:1227" ph="delete from " />
+            <marker date="1525893095065" expanded="true" signature="1254:1273" ph="delete from " />
+            <marker date="1525893095065" expanded="true" signature="1300:1336" ph="delete from " />
+            <marker date="1525893095065" expanded="true" signature="1363:1395" ph="update run_i... " />
+            <marker date="1525893095065" expanded="true" signature="1422:1519" ph="INSERT INTO &quot;CASHE&quot;... " />
+            <marker date="1525893095065" expanded="true" signature="1545:1595" ph="update run_i... " />
+            <marker date="1525893095065" expanded="true" signature="1622:1660" ph="update run_i... " />
+          </folding>
         </state>
       </provider>
     </entry>
