@@ -199,7 +199,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           //name td
           $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime").append("<td rowspan="+arr.length+">"+data.en_firstname+" "+data.en_lastname+"</td>");
           //status td
-          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime").append("<td rowspan="+arr.length+" class='comp_"+data.race_competitor_id+"_status'>"+(data.status_id?getObjById(status_list,"id",data.status_id).name:(data.is_finish?"finished":(data.is_start?"started":"N/A")))+(data.is_manual?"<br>manual":"")+"</td>");
+          $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime").append("<td rowspan="+arr.length+" class='comp_"+data.race_competitor_id+"_status'>"+(data.status_id?getObjById(status_list,"id",data.status_id).name:(data.is_finish?"finished":(data.is_start?"started":"N/A")))+(data.is_manual?"<br>manual input":"")+"</td>");
 /*
           $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_time").append("<td class='dev_"+d[0][0].id+"'>time</td>");
           for(var i=1;i<d.length;i++){
@@ -274,7 +274,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           //data.status_id?data.status_id:(data.is_finish?"finished":(data.is_start?"started":"N/A"))(data.is_manual?"<br>!manual input":"");
 
           $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime td.comp_"+data.race_competitor_id+"_status").html(status_str);
-          if(dev!=Object.keys(data.dev_data)[0]){ //не затираем первый столбец
+          if(Object.keys(data.dev_data)[0]&&dev!=Object.keys(data.dev_data)[0]){ //не затираем первый столбец
             for(var j=0;j<arr.length;j++){
               if(data.dev_data[dev]&&data.dev_data[dev][arr[j]]!==null){
                 if(arr[j]=="speed")v=nform(data.dev_data[dev][arr[j]]);
