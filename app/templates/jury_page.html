@@ -208,9 +208,6 @@ tr.row_competitor td {border-top:2px solid gray!important;}
 */
           console.log("DEV_DATA^^^^");
           console.log(data.dev_data);
-          console.log(data.dev_data["dev_1"]);
-          console.log(data.dev_data["dev_2"]);
-          console.log(data.dev_data["dev_3"]);
 
           var d = device_list["course_"+data.course_id];
     //      console.log("device_list:");
@@ -310,8 +307,10 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 }
               }
               // обновляем ранк и дифф на трассе
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+fin_dev_id+"_diff").html(comps[key].diff?tform(comps[key].diff):"NA");
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+fin_dev_id+"_rank").html(comps[key].rank?comps[key].rank:"NA");
+              console.log("#310: обновляем ранк и дифф на трассе comp="+key+" diff="+comps[key].diff+" rank="+comps[key].rank);
+              console.log("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td.dev_"+fin_dev_id+"_diff");
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td.dev_"+fin_dev_id+"_diff").html(comps[key].diff!==null?tform(comps[key].diff):"NA");
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td.dev_"+fin_dev_id+"_rank").html(comps[key].rank!==null?comps[key].rank:"NA");
             }else{
               //для НЕ последнего девайса просто обновляем ранк и дифф на секторе
               $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_sectordiff").html((comps[key].dev_data[dev]&&comps[key].dev_data[dev].sectordiff!==null)?tform(comps[key].dev_data[dev].sectordiff):"NA");
