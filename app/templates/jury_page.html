@@ -896,6 +896,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
               }
               glob_arr["run"+run_id]["comp_"+competitor_id]=null;
               socket.emit('get/results', {"run_id": run_id});
+              refresh_status("run"+run_id,"comp_"+competitor_id);
               console.log("after socket.emit('get/results'...");
 
               //get_current_data(race_id).then(refresh_status(run_id,competitor_id));
@@ -1161,6 +1162,7 @@ function set_html_startlist(run_id){
               sumtab_set_maininfo(glob_arr[rkey][ckey]);
               refresh_status(rkey,ckey,glob_arr[rkey][ckey].status_id);
             }else{
+              console.log("call:cleared_competitor");
               cleared_competitor(rkey,ckey);
             }
           }
@@ -1177,6 +1179,8 @@ function set_html_startlist(run_id){
     function cleared_competitor(rkey,ckey){
         $("#tab_summarytable .div_"+rkey+" tr[class*='"+ckey+"_']").remove();
         refresh_status(rkey,ckey);
+        $("#tab_manualcontrol tr.tr_"+rkey.replace("run","")+"_"+ckey.replace("comp_","")+" button.btn_start").show();
+        console.log("cleared_competitor("+rkey+","+ckey+"): #tab_manualcontrol tr.tr_"+rkey.replace("run","")+"_"+ckey.replace("comp_","")+" button.btn_start");
         console.log("#tab_summarytable .div_"+rkey+" tr[class*='"+ckey+"_']");
         return true;
     }
