@@ -304,20 +304,22 @@ def competitor_clear():
         competitor_order.manual_order = None
 
         db.session.add(competitor_order)
-        ResultApproved.query.filter(
-           ResultApproved.race_competitor_id == request.args.get('competitor_id'),
-           ResultApproved.run_id == request.args.get('run_id')
-        ).delete()
+
         ResultDetail.query.filter(
            ResultDetail.race_competitor_id == request.args.get('competitor_id'),
            ResultDetail.run_id == request.args.get('run_id')
         ).delete()
+    ResultApproved.query.filter(
+       ResultApproved.race_competitor_id == request.args.get('competitor_id'),
+       ResultApproved.run_id == request.args.get('run_id')
+    ).delete()
+    db.session.commit()
+    recalculate_run_results(request.args.get('run_id'))
+    socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
+    return 'OK'
 
-        db.session.commit()
-        socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
 
-        recalculate_run_results(request.args.get('run_id'))
-    return '', 200
+
 
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
 @admin_required
