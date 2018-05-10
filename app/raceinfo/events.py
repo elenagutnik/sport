@@ -370,7 +370,9 @@ def approve_manual(run_id, competitor_id):
             competitorOrder.manual_order = 0
             db.session.add(competitorOrder)
             db.session.commit()
-
+            reestablish_DSQ_competitors(competitor_id, run_id)
+        else:
+            reset_DSQ_competitors(competitor_id, run_id)
         if data['finish_time'] != '':
             finish_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.race_competitor_id == competitor_id,
                                              ResultDetail.run_id == run_id, CourseDeviceType==3).first()
@@ -733,3 +735,39 @@ def crutch_result_list(race_id):
 
 
 
+def reset_DSQ_competitors(competitor_id, run_id):
+    result_details = db.session.query(ResultDetail, ResultApproved).\
+        filter(ResultDetail.run_id == run_id, ResultDetail.race_competitor_id == competitor_id).\
+        all()
+    result_approwed = ResultApproved.query.filter(ResultApproved.run_id == run_id,
+                                                  ResultApproved.race_competitor_id == competitor_id).first()
+    result_approwed.rank = None
+    result_approwed.diff = None
+    result_approwed.time = None
+    db.session.add(result_approwed)
+
+    for item in result_details:
+        item.sectordiff = None
+        item.absolut_time = None
+        item.sectorrank = None
+        item.sectortime = None
+        item.speed = None
+
+        db.session.add(item)
+    db.session.commit()
+    return ''
+
+def reestablish_DSQ_competitors(competitor_id, run_id):
+    result_details = db.session.query(ResultDetail, DataIn).\
+        join(DataIn, ResultDetail.data_in_id==DataIn.id).\
+        filter(ResultDetail.run_id==run_id, ResultDetail.race_competitor_id==competitor_id).\
+        all()
+    result_approwed = ResultApproved.query.filter(ResultApproved.run_id == run_id,
+                                                  ResultApproved.race_competitor_id == competitor_id).first()
+    result_approwed.time = ResultApproved.finish_time-ResultApproved.start_time
+    db.session.add(result_approwed)
+    for item in result_details:
+        item[0].absolut_time = item[1].time
+        db.session.add(item)
+    db.session.commit()
+    return ''
