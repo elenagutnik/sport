@@ -370,9 +370,6 @@ def approve_manual(run_id, competitor_id):
             competitorOrder.manual_order = 0
             db.session.add(competitorOrder)
             db.session.commit()
-            reestablish_DSQ_competitors(competitor_id, run_id)
-        else:
-            reset_DSQ_competitors(competitor_id, run_id)
         if data['finish_time'] != '':
             finish_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.race_competitor_id == competitor_id,
                                              ResultDetail.run_id == run_id, CourseDeviceType==3).first()
