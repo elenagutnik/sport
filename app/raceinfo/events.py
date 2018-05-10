@@ -363,32 +363,6 @@ def approve_manual(run_id, competitor_id):
     resultApproved.approve_time = datetime.now()
     resultApproved.status_id = data['status_id']
     resultApproved.is_finish = True
-    # try:
-    #     resultDetail = db.session.query(ResultDetail, CourseDevice, CourseDeviceType).join(CourseDevice).join(CourseDeviceType).filter(ResultDetail.race_competitor_id == competitor_id,
-    #                                                          ResultDetail.run_id == run_id).all()
-    #     if data['status_id'] == '1' and resultApproved.is_start == False:
-    #         competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id == competitor_id, RunOrder.run_id==run_id).first()
-    #         competitorOrder.manual_order = 0
-    #         db.session.add(competitorOrder)
-    #         db.session.commit()
-    #
-    #     if data['finish_time'] != '':
-    #         if len(resultDetail)>0:
-    #             finish_device = next(item for item in resultDetail if item[2].id==3)
-    #             finish_device[0].data_in_id = None
-    #             finish_device[0].absolute_time = data['finish_time']
-    #             db.session.add(finish_device)
-    #         resultApproved.finish_time = data['finish_time']
-    #     if data['start_time'] != '':
-    #         if len(resultDetail)>0:
-    #             start_device = next(item for item in resultDetail if item[2].id==1)
-    #             start_device[0].data_in_id = None
-    #             start_device[0].absolute_time = data['start_time']
-    #             db.session.add(start_device)
-    #         resultApproved.start_time = data['start_time']
-    #     db.session.commit()
-    # except:
-    #     pass
     try:
 
         if data['status_id'] == '1' and resultApproved.is_start == False:
@@ -413,6 +387,10 @@ def approve_manual(run_id, competitor_id):
                 start_device[0].absolute_time = data['start_time']
                 db.session.add(start_device)
             resultApproved.start_time = data['start_time']
+        try:
+            resultApproved.time = int(resultApproved.finish_time) - int(resultApproved.start_time)
+        except:
+            resultApproved.time = None
         db.session.commit()
     except:
         pass
@@ -737,7 +715,7 @@ def crutch_result_list(race_id):
     data = db.session.query(ResultDetail, RaceCompetitor, Competitor, CourseDevice, ResultApproved, CourseDeviceType)\
         .join(RaceCompetitor).join(Competitor).join(CourseDevice).join(ResultApproved).join(CourseDeviceType)\
         .filter(RaceCompetitor.race_id == race_id)\
-        .order_by(asc(ResultDetail.absolut_time)).all()
+        .order_by(asc(ResultApproved.start_time)).all()
 
     manual_data = db.session.query(ResultApproved, RaceCompetitor, Competitor)\
         .join(RaceCompetitor).join(Competitor)\
@@ -749,6 +727,9 @@ def crutch_result_list(race_id):
         if not any(item[1].id == _item[1].id for item in data):
             result = [None, _item[1], _item[2], None, _item[0], None]
             data.append(result)
+
+    data = sorted(data, key=lambda item: item[4].start_time)
+
     return json.dumps(data, cls=jsonencoder.AlchemyEncoder)
 
 

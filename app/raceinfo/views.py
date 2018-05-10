@@ -1701,7 +1701,7 @@ def race_order_list_edit():
     new_order = data['order_list']
     for order in new_order:
         runOrder = RunOrder.query.filter(RunOrder.run_id == data['run_id'],
-                              RunOrder.order == order[0]).first()
+                              RunOrder.id == order[0]).first()
         runOrder.order = order[1]
         db.session.add(runOrder)
     db.session.commit()
