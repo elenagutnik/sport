@@ -970,7 +970,7 @@ function set_html_startlist(run_id){
     if(run.start_list && run.start_list.length){
       $("#tab_startlist #tab_startlist_run"+run.id+" table tbody").html('');
       for(var j=0;j<run.start_list.length;j++){
-        $("#tab_startlist #tab_startlist_run"+run.id+" table tbody").append('<tr class="racecompetitor_'+run.start_list[j][1].id+'"><td>'+(j+1)+'</td><td class="edit"><input type="text" name="'+run.start_list[j][1].id+'" value="'+(j+1)+'" style="width:30px;"></td><td>'+run.start_list[j][1].bib+'</td><td>'+run.start_list[j][0]['ru_lastname']+' '+ run.start_list[j][0]['ru_firstname']+' / '+run.start_list[j][0]['en_lastname']+' '+ run.start_list[j][0]['en_firstname']+'</td></tr>');
+        $("#tab_startlist #tab_startlist_run"+run.id+" table tbody").append('<tr class="racecompetitor_'+run.start_list[j][1].id+'"><td>'+(j+1)+'</td><td class="edit"><input type="text" name="'+run.start_list[j][2].id+'" value="'+(j+1)+'" style="width:30px;"></td><td>'+run.start_list[j][1].bib+'</td><td>'+run.start_list[j][0]['ru_lastname']+' '+ run.start_list[j][0]['ru_firstname']+' / '+run.start_list[j][0]['en_lastname']+' '+ run.start_list[j][0]['en_firstname']+'</td></tr>');
       }
       //кнопка редактирования стартового списка
       if(!$("#tab_startlist #tab_startlist_run"+run.id+" .btn_edit_startlist").length){
