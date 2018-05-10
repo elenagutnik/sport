@@ -183,10 +183,10 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       // если таблица есть
       console.log("sumtab_set_maininfo - START");
       console.log(data);
-      if($("#tab_summarytable .div_run"+data.run_id).length){
+      if(data){
+      if($("#tab_summarytable .div_run"+data.run_id).length){ //если див для рана есть
         // если нужной строке в таблице нет
         console.log("+++");
-        console.log("$(#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_sectortime).length = "+ $("#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_sectortime").length);
         if(!$("#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_sectortime").length){
           $("#tab_summarytable .div_run"+data.run_id+" tbody").append("<tr class='comp_"+data.race_competitor_id+"_sectortime row_competitor'></tr>");
           var arr= new Array("sectortime", "sectorrank", "sectordiff","speed");
@@ -272,6 +272,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
 
           $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_sectortime td.comp_"+data.race_competitor_id+"_status").html(status_str);
           if(Object.keys(data.dev_data)[0]&&dev!=Object.keys(data.dev_data)[0]){ //не затираем первый столбец
+            console.log("dev!=Object.keys(data.dev_data)[0]: "+dev+"!="+Object.keys(data.dev_data)[0]);
             for(var j=0;j<arr.length;j++){
               if(data.dev_data[dev]&&data.dev_data[dev][arr[j]]!==null){
                 if(arr[j]=="speed")v=nform(data.dev_data[dev][arr[j]]);
@@ -296,25 +297,32 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           //for(var i=0; i<Object.keys(glob_arr).length-1; i++){ //перебор всех спортсменов заезда кроме последнего
           var key;
           for(key in comps){
-            var fin_dev_id = device_list["course_"+data.course_id][device_list["course_"+data.course_id].length-1][0].id;
-            if(dev=="dev_"+fin_dev_id){
-              //для последнего девайса обновляем ВСЕ ранк и дифф на ВСЕХ секторах
-              for(var i2=1;i2<device_list["course_"+data.course_id].length;i2++){
-                var dev_key="dev_"+device_list["course_1"][i2][0].device_id;
-                if(comps[key].dev_data[dev_key]){
-                  $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev_key+"_sectordiff").html(comps[key].dev_data[dev_key].sectordiff!==null?tform(comps[key].dev_data[dev_key].sectordiff):"NA");
-                  $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev_key+"_sectorrank").html(comps[key].dev_data[dev_key].sectorrank!==null?comps[key].dev_data[dev_key].sectorrank:"NA");
+            if(comps[key]){
+              var fin_dev_id = device_list["course_"+data.course_id][device_list["course_"+data.course_id].length-1][0].id;
+              if(dev=="dev_"+fin_dev_id){
+                //для последнего девайса обновляем ВСЕ ранк и дифф на ВСЕХ секторах
+                for(var i2=1;i2<device_list["course_"+data.course_id].length;i2++){
+                  var dev_key="dev_"+device_list["course_1"][i2][0].device_id;
+                  if(comps[key].dev_data[dev_key]){
+                    $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev_key+"_sectordiff").html(comps[key].dev_data[dev_key].sectordiff!==null?tform(comps[key].dev_data[dev_key].sectordiff):"NA");
+                    $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev_key+"_sectorrank").html(comps[key].dev_data[dev_key].sectorrank!==null?comps[key].dev_data[dev_key].sectorrank:"NA");
+                  }
+                }
+                // обновляем ранк и дифф на трассе
+                console.log("#310: обновляем ранк и дифф на трассе comp="+key+" diff="+comps[key].diff+" rank="+comps[key].rank);
+                console.log("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td.dev_"+fin_dev_id+"_diff");
+                $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td.dev_"+fin_dev_id+"_diff").html(comps[key].diff!==null?tform(comps[key].diff):"NA");
+                $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td.dev_"+fin_dev_id+"_rank").html(comps[key].rank!==null?comps[key].rank:"NA");
+              }else{
+                //для НЕ последнего девайса просто обновляем ранк и дифф на секторе
+                //данные со старта не пишем, т.к. там в таблице заголовки
+                if(dev!="dev_"+device_list["course_"+data.course_id][0][0].id){
+                  $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_sectordiff").html((comps[key].dev_data[dev]&&comps[key].dev_data[dev].sectordiff!==null)?tform(comps[key].dev_data[dev].sectordiff):"NA");
+                  $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev+"_sectorrank").html((comps[key].dev_data[dev]&&comps[key].dev_data[dev].sectorrank!==null)?comps[key].dev_data[dev].sectorrank:"NA");
                 }
               }
-              // обновляем ранк и дифф на трассе
-              console.log("#310: обновляем ранк и дифф на трассе comp="+key+" diff="+comps[key].diff+" rank="+comps[key].rank);
-              console.log("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td.dev_"+fin_dev_id+"_diff");
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td.dev_"+fin_dev_id+"_diff").html(comps[key].diff!==null?tform(comps[key].diff):"NA");
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td.dev_"+fin_dev_id+"_rank").html(comps[key].rank!==null?comps[key].rank:"NA");
             }else{
-              //для НЕ последнего девайса просто обновляем ранк и дифф на секторе
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectordiff td."+dev+"_sectordiff").html((comps[key].dev_data[dev]&&comps[key].dev_data[dev].sectordiff!==null)?tform(comps[key].dev_data[dev].sectordiff):"NA");
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+comps[key].race_competitor_id+"_sectorrank td."+dev+"_sectorrank").html((comps[key].dev_data[dev]&&comps[key].dev_data[dev].sectorrank!==null)?comps[key].dev_data[dev].sectorrank:"NA");
+              console.log("it's cleared competitor: key="+key);
             }
           }
           //if(data[4].name!="Start"){
@@ -332,6 +340,9 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       }else{
         console.log("table for run #tab_summarytable .div_run"+data.run_id+" doesn't exist");
       }
+    }else{
+      console.log("it's cleared competitor - we've got null");
+    }
     }
     </script>
     <ul class="nav nav-tabs">
@@ -554,7 +565,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       );
 
       function socket_emit(){
-        return socket.emit('get/results', {run_id: 1}); //result=>get_current_data(race_id)
+        return socket.emit('get/results', {"run_id": 1}); //result=>get_current_data(race_id)
       }
 
    /*
@@ -688,11 +699,15 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 })
               },
               success:function(data) {
+                console.log("editform_approve:success");
                 $("#action"+$("#form_run_id").val()+"_"+$("#form_competitor_id").val()).html("Approved");
                 $("#popup_editresult").modal('hide');
                 get_current_data(race_id);
               },
-              error: function (error) {alert('error');}
+              error: function (error) {
+                console.log("editform_approve:error");
+                alert('error');
+              }
             })
         });
 
@@ -743,15 +758,19 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 },
                 success:function(data) {
                 //  startlist_get(r);
-                  alert("Start list has been changed ");
+                  //alert("Start list has been changed ");
                   $("#tab_startlist_run"+r+" table .edit").hide();
 
                   $("#tab_startlist_run"+r+" .btn_edit_startlist").show();
                   $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
                   $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
+                  Promise.all([get_startlist(r)]).then(
+                        result=>get_startlist(r)
+                  );
+                  //console.log("set_html_startlist("+r+");");
                 },
                 error: function (error) {
-                  alert('error');
+                  alert("error: save start list fro run"+r);
                 }
               })
             }
@@ -866,7 +885,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
             }),
             success:function(data) {
               if(set_comp_status(competitor_id, "clear" ,run_id)){
-                console.log('approve competitor - run:'+run_id+' competitor:'+competitor_id);
+                console.log('clear competitor - run:'+run_id+' competitor:'+competitor_id);
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
                 $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
@@ -875,8 +894,11 @@ tr.row_competitor td {border-top:2px solid gray!important;}
                 //$("#tab_manualcontrol .btn_finish").prop('disabled',true);
 
               }
-              get_current_data(race_id);
-              refresh_status(run_id,competitor_id);
+              glob_arr["run"+run_id]["comp_"+competitor_id]=null;
+              socket.emit('get/results', {"run_id": run_id});
+              console.log("after socket.emit('get/results'...");
+
+              //get_current_data(race_id).then(refresh_status(run_id,competitor_id));
           },
             error: function(error) {
               alert('error - CLEAR competitor run:'+run_id+' competitor:'+competitor_id);
@@ -1135,8 +1157,12 @@ function set_html_startlist(run_id){
         var kkey, ckey;
         for(rkey in glob_arr){
           for(ckey in glob_arr[rkey]){
-            sumtab_set_maininfo(glob_arr[rkey][ckey]);
-            refresh_status(rkey,ckey,glob_arr[rkey][ckey].status_id);
+            if(glob_arr[rkey][ckey]){
+              sumtab_set_maininfo(glob_arr[rkey][ckey]);
+              refresh_status(rkey,ckey,glob_arr[rkey][ckey].status_id);
+            }else{
+              cleared_competitor(rkey,ckey);
+            }
           }
           if(!glob_arr[rkey]){
             //чистим данные в таблице
@@ -1145,9 +1171,14 @@ function set_html_startlist(run_id){
         }
       }else{
         // нет текущих данных
-
         console.log("ERROR: set_current_data: glob_arr.length is false");
       }
+    }
+    function cleared_competitor(rkey,ckey){
+        $("#tab_summarytable .div_"+rkey+" tr[class*='"+ckey+"_']").remove();
+        refresh_status(rkey,ckey);
+        console.log("#tab_summarytable .div_"+rkey+" tr[class*='"+ckey+"_']");
+        return true;
     }
     // получение текущих данных на момент загрузки страницы
     function get_current_data(race_id){
@@ -1392,11 +1423,12 @@ console.log(data);
     function set_list_for_manualcontrol(){
       console.log("START FUNC: set_list_for_manualcontrol");
       if(!run.id){
-        $("#tab_manualcontrol tbody").append("<tr><td class='order' colspan=5>Заезд не начат</td></tr>");
+        $("#tab_manualcontrol tbody").append("<tr class='empty_run'><td class='order' colspan=7>Заезд не начат</td></tr>");
         return false;
       }else{
         console.log(run_list[run_list_ids["id"+run.id]].start_list );
         if(run_list[run_list_ids["id"+run.id]].start_list && run_list[run_list_ids["id"+run.id]].start_list.length){
+          $("#tab_manualcontrol tbody tr.empty_run").remove();
           $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"'><td colspan='7'>Run: "+run_list[run_list_ids["id"+run.id]].number+" (#"+run.id+")"+"</td></tr>");
           $.each(run_list[run_list_ids["id"+run.id]].start_list, function(value){
             var competitor_id=this[2].race_competitor_id;
