@@ -728,8 +728,7 @@ def crutch_result_list(race_id):
             result = [None, _item[1], _item[2], None, _item[0], None]
             data.append(result)
 
-    data = sorted(data, key=lambda item: item[4].start_time)
-
+    data = sorted(data, key=lambda item: (item[4].start_time is None, item[4].start_time))
     return json.dumps(data, cls=jsonencoder.AlchemyEncoder)
 
 
