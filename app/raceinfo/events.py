@@ -5,7 +5,7 @@ from . import jsonencoder, raceinfo
 import json
 
 from functools import wraps
-from sqlalchemy import cast, DATE, func, asc, null, or_
+from sqlalchemy import cast, DATE, func, asc, null, or_, and_
 
 from flask_login import current_user, login_required
 from datetime import datetime, timedelta
@@ -218,7 +218,7 @@ def competitor_start():
     db.session.commit()
     competitor_order = db.session.query(func.count('*')).select_from(RunOrder).\
                            filter(RunOrder.run_id == request.args.get('run_id'),
-                                  RunOrder.manual_order != None).\
+                                  RunOrder.manual_order != None, RunOrder.manual_order != 0).\
                            scalar()+1
     current_competitor = RunOrder.query.filter(RunOrder.race_competitor_id == request.args.get('competitor_id'),
                                                RunOrder.run_id == request.args.get('run_id')).one()
