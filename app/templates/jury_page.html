@@ -6,7 +6,9 @@
 {% block page_content %}
 <style>
 .btn {margin-right: 10px;}
-tr.row_competitor td {border-top:2px solid gray!important;}
+.table-bordered tr.row_competitor td {border-top:3px solid #ababab!important;}
+#btn_raceresults {margin:20px 0;}
+#table_raceresults thead th {text-align:center;vertical-align: middle;}
 </style>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript" charset="utf-8">
@@ -352,6 +354,7 @@ tr.row_competitor td {border-top:2px solid gray!important;}
       <li id="li_tab_summarytable"><a href="#tab_summarytable" data-toggle="tab">Все результаты</a></li>
       <li id="li_tab_datasrc"><a href="#tab_datasrc" data-toggle="tab">Данные с устройств</a></li>
       <li id="li_tab_device"><a href="#tab_device" data-toggle="tab">Девайсы</a></li>
+      <li id="li_tab_raceresults"><a href="#tab_raceresults" data-toggle="tab">Результаты</a></li>
     </ul>
     <div class="tab-content">
         <div id="tab_runs" class="tab-pane fade">
@@ -420,6 +423,11 @@ tr.row_competitor td {border-top:2px solid gray!important;}
               <tbody>
               </tbody>
             </table>
+        </div>
+        <div id="tab_raceresults" class="tab-pane fade">
+          <button type="button" class="btn btn-primary" id="btn_raceresults" data-dismiss="modal">Get/Refresh Results</button>
+          <table style='width:100%;' class='table table-bordered' id="table_raceresults">
+          </table>
         </div>
     <!-- HTML-код модального окна -->
     <div id="popup_editresult" class="modal fade">
@@ -917,6 +925,74 @@ tr.row_competitor td {border-top:2px solid gray!important;}
           console.log("btn_src_save:");
           console.log(JSON.stringify(data));
         });
+        $("body").on("click", "#btn_raceresults", function () {
+          var data=new Array();
+          $("#table_raceresults tbody").remove();
+          $("#table_raceresults thead").remove();
+          $("#table_raceresults").html("");
+
+          $.ajax({
+            type: "GET",
+            url: "/raceinfo/race/"+race_id+"/results",
+            success:function(data) {
+              $.ajax({
+                type: "GET",
+                url: "/raceinfo/race/"+race_id+"/results/get",
+                success:function(data) {
+                  var arr=JSON.parse(data);
+                  var run_cols1="";
+                  var run_cols2="";
+                  var rowspan;
+                  if(arr.length){
+                    $("#table_raceresults").append("<thead><tr class='headrow'><th rowspan=3>bib</th><th rowspan=3>Name</th><th rowspan=3>Rank</th><th rowspan=3>Time</th><th rowspan=3>Status</th></tr></thead>");
+                    $("#table_raceresults thead").append("<tr class='run_cols1'></tr>")
+                    $("#table_raceresults thead").append("<tr class='run_cols2'></tr>")
+                    for(var j=0;j<run_list.length;j++){
+                      run_cols1 = run_cols1+"<td class='run"+run_list[j].id+"_rank'></td><td class='run"+run_list[j].id+"_time'></td><td class='run"+run_list[j].id+"_status'></td>";
+                      run_cols2 = run_cols2+"<td class='run"+run_list[j].id+"_gate'></td><td class='run"+run_list[j].id+"_reason' colspan=2></td>";
+                      $("#table_raceresults thead tr.headrow").append("<th colspan=3>Run "+run_list[j].number+"</th>");
+                      $("#table_raceresults thead tr.run_cols1").append("<th>Rank</th><th>Time</th><th>Status</th>");
+                      $("#table_raceresults thead tr.run_cols2").append("<th>gate</th><th colspan=2>reason</th>");
+                    }
+                    $("#table_raceresults").append("<tbody></tbody>");
+                    for(var i=0;i<arr.length;i++){
+                      console.log("arr.length="+arr.length+" i="+i);
+                      if(arr[i].status_id==1){rowspan="";}
+                      else{rowspan=" rowspan='2' ";}
+                      var m=0;
+                      while(!glob_arr["run"+run_list[m].number]["comp_"+arr[i].race_competitor_id] && m<run_list.length){
+                          m++;
+                          console.log(arr[i].race_competitor_id+"m="+m);
+                      }
+                      run_id=run_list[m].number;
+                      console.log("run_id="+run_id);
+                      var name=glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].en_firstname+" "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].en_lastname+" / "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].ru_firstname+" "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].ru_lastname;
+                      $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+arr[i].result_time+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
+                      if(arr[i].status_id!=1)
+                        $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" danger'>"+run_cols2+"</tr>");
+                      for(var k=0;k<arr[i].results.length;k++){
+                        $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_rank").html(arr[i].results[k].rank);
+                        $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_time").html(arr[i].results[k].time);
+                        $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_status").html(getObjById(status_list,"id",arr[i].results[k].status_id).name);
+                        if(arr[i].status_id!=1){
+                          $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_gate").html(arr[i].results[k].gate);
+                          $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_reason").html(arr[i].results[k].reason);
+                        }
+                      }
+                    }
+                  }
+                },
+                error: function(error){
+                  console.log('error - get results');
+                }
+              });
+            },
+            error: function(error) {
+              console.log('error - recalculate results');
+            }
+          });
+        });
+
     /*
     *   END // обработка кнопок
     */
