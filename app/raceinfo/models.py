@@ -198,8 +198,10 @@ class RaceCompetitor(db.Model):
     transponder_2 = db.Column(db.String)
     bib = db.Column(db.Integer)
     classified = db.Column(db.Boolean)
+    # results
     rank = db.Column(db.Integer)
     status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
+    time = db.Column(db.BigInteger)
     order = db.Column(db.Integer)
     run_id =db.Column(db.Integer, db.ForeignKey('run_info.id'))
     # переделать в связь с run_info, team_id
