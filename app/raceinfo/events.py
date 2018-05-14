@@ -69,10 +69,6 @@ def run_get():
         return data
     return json.dumps(RunInfo.query.filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).all(), cls=jsonencoder.AlchemyEncoder)
 
-@raceinfo.route('/startlist/run/<int:run_id>/get/', methods=['POST', 'GET'])
-def startlist_get(run_id):
-    data = json.dumps(db.session.query(Competitor,RaceCompetitor,RunOrder).join(RaceCompetitor).join(RunOrder).filter(RunOrder.run_id==run_id).order_by(RunOrder.order).all(), cls=jsonencoder.AlchemyEncoder)
-    return data
 
 @raceinfo.route('/device/get/course/<int:course_id>')
 def device_get(course_id):

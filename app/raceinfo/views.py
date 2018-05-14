@@ -7,7 +7,7 @@ from flask_babel import gettext
 import json
 from sqlalchemy import and_
 from . import jsonencoder
-
+from .runList import next_run_list_classical, next_run_list_drop_out
 
 @raceinfo.route('/discipline/', methods=['GET', 'POST'])
 @login_required
@@ -1357,32 +1357,13 @@ def race_course_run_start(id,run_id):
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/stop', methods=['GET', 'POST'])
 @admin_required
 def race_course_run_stop(id,run_id):
-    # CHECK IT, IT LOOKS like a shi...t
     run_info = RunInfo.query.get_or_404(run_id)
     run_info.endtime = datetime.now()
     db.session.add(run_info)
-    try:
-        news_run = db.session.query(RunInfo.id).filter(RunInfo.race_id==run_info.race_id, RunInfo.number==run_info.number+1).one()
-        RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
 
-        sub_query = db.session.query(ResultApproved.race_competitor_id, Status.filter_order).join(Status).filter(ResultApproved.run_id == run_id).subquery()
+    # Расчет стартового списка для следующего run
+    next_run_list_drop_out(id, run_id, run_info.number)
 
-        race_competitors = db.session.query(RaceCompetitor, sub_query)\
-            .outerjoin(sub_query, and_(sub_query.c.race_competitor_id == RaceCompetitor.id))\
-            .order_by(sub_query.c.filter_order.asc())\
-            .all()
-
-        print('Компетиторы список ', len(race_competitors))
-        for i in range(len(race_competitors)):
-            run_order = RunOrder(
-                race_competitor_id=race_competitors[i][0].id,
-                run_id=news_run.id,
-                order=i+1
-            )
-            db.session.add(run_order)
-        db.session.commit()
-    except:
-        return json.dumps({'stop_time': str(run_info.endtime)})
     return json.dumps({'stop_time': str(run_info.endtime)})
 
 
@@ -1664,51 +1645,6 @@ def device_type_del(id):
     return redirect(url_for('.device_type',_external=True))
 
 
-@raceinfo.route('/race/<int:id>/order_list/buld', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def race_order_list(id):
-    race = Race.query.filter_by(id=id).one()
-    try:
-        run = RunInfo.query.filter_by(race_id=id, number=1).one()
-    except:
-        return redirect(url_for('.race', id=id, _external=True))
-
-    RunOrder.query.filter(RunOrder.run_id==run.id).delete()
-
-    race_competitors = db.session.query(RaceCompetitor, FisPoints).\
-        join(FisPoints, FisPoints.competitor_id == RaceCompetitor.competitor_id).\
-        filter(RaceCompetitor.race_id == id, FisPoints.discipline_id==race.discipline_id).\
-        order_by(FisPoints.fispoint.desc()).all()
-
-    for i in range(len(race_competitors)):
-        run_order = RunOrder(
-            race_competitor_id = race_competitors[i][0].id,
-            run_id=run.id,
-            order=i+1
-        )
-        db.session.add(run_order)
-    db.session.commit()
-    orders_list = db.session.query(Competitor, RaceCompetitor, RunOrder, FisPoints).join(RaceCompetitor).join(RunOrder). join(FisPoints, FisPoints.competitor_id == RaceCompetitor.competitor_id).filter(
-        RunOrder.run_id == run.id).order_by(RunOrder.order.asc()).all()
-    return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=orders_list)
-
-@raceinfo.route('/race/order_list/edit', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def race_order_list_edit():
-    data = json.loads(request.args['data'])
-    new_order = data['order_list']
-    for order in new_order:
-        runOrder = RunOrder.query.filter(RunOrder.run_id == data['run_id'],
-                              RunOrder.id == order[0]).first()
-        runOrder.order = order[1]
-        db.session.add(runOrder)
-    db.session.commit()
-    return '', 200
-
-
 @raceinfo.route('/status/get', methods=['GET'])
-
 def status_get_list():
     return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)

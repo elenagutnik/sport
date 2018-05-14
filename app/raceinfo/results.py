@@ -3,7 +3,7 @@ from .models import Race, ResultDetail, RunInfo, RaceCompetitor, ResultApproved,
 from .. import db
 from sqlalchemy import func
 import json
-
+import decimal
 
 @raceinfo.route('/race/<int:race_id>/results')
 def race_results(race_id):
@@ -116,9 +116,12 @@ def get_results(race_id, competitorList = None):
         result_item =dict([
             ('global_rank', item.rank),
             ('race_competitor_id', item.id),
-            ('result_time', item.time),
             ('status_id', item.status_id)
         ])
+        if item.time is not None:
+            result_item['result_time'] = int(item.time)
+        else:
+            result_item['result_time'] = None
         approve__result_item = []
         for approve in resultApproves:
             if item.id == approve[0].race_competitor_id:
