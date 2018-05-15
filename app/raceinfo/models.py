@@ -91,6 +91,21 @@ class Category(db.Model):
     name = db.Column(db.String(3))
     description = db.Column(db.String(150))
     level = db.Column(db.Integer) # level 0-4
+
+    @staticmethod
+    def insert():
+        Categorys = {
+            'OWG': "Olimpic Winter Games",
+            'WSC': "FIS World Ski Championships",
+            'WC': "FIS World Cup",
+        }
+        for c in Categorys.keys():
+            category = Category.query.filter_by(name=c).first()
+            if category is None:
+                category = Category(name=c)
+                category.description = Categorys[c]
+            db.session.add(category)
+        db.session.commit()
     def __repr__(self):
         return self.name
 

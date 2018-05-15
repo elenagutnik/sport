@@ -424,7 +424,7 @@ def race_list():
 
 @raceinfo.route('/race/get', methods=['GET'])
 @admin_required
-def race_lis_gett():
+def race_lis_get():
     items = Race.query.order_by(Race.id.desc()).all()
     return json.dumps(items, cls=jsonencoder.AlchemyEncoder)
 

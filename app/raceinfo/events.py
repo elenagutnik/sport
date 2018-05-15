@@ -23,16 +23,15 @@ def exectutiontime(func):
 
 @raceinfo.route('/d')
 def device_1get():
-    # db.create_all()
-    db.session.flush()
-    db.session.commit()
+    db.create_all()
     # ResultFunction.insert()
     # Discipline.insert_discipline()
     # Gender.insert_genders()
-    # Status.insert()
-    # Jury_function.insert_functions()
-    # CourseDeviceType.insert_types()
-    # RunOrderFunction.insert()
+    Category.insert()
+    Status.insert()
+    Jury_function.insert_functions()
+    CourseDeviceType.insert_types()
+    RunOrderFunction.insert()
     return ''
 
 @raceinfo.route('/emulation')
@@ -66,11 +65,17 @@ def jury_page():
 
 @raceinfo.route('/run/get/', methods=['POST', 'GET'])
 def run_get():
-    if 'race_id' in request.args:
+    try:
         race_id = request.args['race_id']
         data = json.dumps(RunInfo.query.filter(RunInfo.race_id == race_id).all(), cls=jsonencoder.AlchemyEncoder)
         return data
-    return json.dumps(RunInfo.query.filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).all(), cls=jsonencoder.AlchemyEncoder)
+    except:
+        db.session.flush()
+        db.session.commit()
+        return json.dumps(RunInfo.query.
+                          filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).
+                          all(),
+                          cls=jsonencoder.AlchemyEncoder)
 
 
 @raceinfo.route('/device/get/course/<int:course_id>')
