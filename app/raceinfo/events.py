@@ -5,7 +5,7 @@ from . import jsonencoder, raceinfo
 import json
 
 from functools import wraps
-from sqlalchemy import cast, DATE, func, asc, null, or_, and_
+from sqlalchemy import cast, DATE, func, asc,  or_
 
 from flask_login import current_user, login_required
 from datetime import datetime, timedelta
@@ -23,13 +23,16 @@ def exectutiontime(func):
 
 @raceinfo.route('/d')
 def device_1get():
-    db.create_all()
-    ResultFunction.insert()
-    Discipline.insert_discipline()
-    Gender.insert_genders()
-    Status.insert()
-    Jury_function.insert_functions()
-    CourseDeviceType.insert_types()
+    # db.create_all()
+    db.session.flush()
+    db.session.commit()
+    # ResultFunction.insert()
+    # Discipline.insert_discipline()
+    # Gender.insert_genders()
+    # Status.insert()
+    # Jury_function.insert_functions()
+    # CourseDeviceType.insert_types()
+    # RunOrderFunction.insert()
     return ''
 
 @raceinfo.route('/emulation')

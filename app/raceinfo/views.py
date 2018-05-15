@@ -7,7 +7,7 @@ from flask_babel import gettext
 import json
 from sqlalchemy import and_
 from . import jsonencoder
-from .runList import next_run_list_classical, next_run_list_drop_out
+from .runList import race_order_buld
 
 @raceinfo.route('/discipline/', methods=['GET', 'POST'])
 @login_required
@@ -422,6 +422,12 @@ def race_list():
     items = Race.query.all()
     return render_template('raceinfo/race_list.html', items=items)
 
+@raceinfo.route('/race/get', methods=['GET'])
+@admin_required
+def race_lis_gett():
+    items = Race.query.order_by(Race.id.desc()).all()
+    return json.dumps(items, cls=jsonencoder.AlchemyEncoder)
+
 @raceinfo.route('/race/<int:id>', methods=['GET', 'POST'])
 @admin_required
 def race(id):
@@ -479,6 +485,8 @@ def race_add():
         form.nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in Nation.query.all()]
     form.category_ref.choices = [(item.id, item.name + ' - ' + item.description) for item in Category.query.all()]
     form.result_method_ref.choices=[(item.id, item.name) for item in ResultFunction.query.all()]
+    form.run_order_method_ref.choices = [(item.id, item.name) for item in RunOrderFunction.query.all()]
+
     if form.validate_on_submit():
         race = Race(
             gender_id = form.gender_ref.data,
@@ -486,7 +494,8 @@ def race_add():
             isTeam = form.race_type.data,
             category_id = form.category_ref.data,
             discipline_id = form.discipline_ref.data,
-            result_function = form.result_method_ref.data
+            result_function = form.result_method_ref.data,
+            run_order_function =form.run_order_method_ref.data
         )
         if form.eventname.data != "":
             race.eventname = form.eventname.data
@@ -1362,7 +1371,7 @@ def race_course_run_stop(id,run_id):
     db.session.add(run_info)
 
     # Расчет стартового списка для следующего run
-    next_run_list_drop_out(id, run_id, run_info.number)
+    race_order_buld(id, run_id, run_info.number)
 
     return json.dumps({'stop_time': str(run_info.endtime)})
 

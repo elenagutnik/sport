@@ -15,6 +15,14 @@ def startlist_get(run_id):
     return data
 
 
+def race_order_buld(race_id, current_run_id, current_run_number):
+    race_type = db.session.query(Race.run_order_function).filter(Race.id == race_id).scalar()
+    if race_type == 1:
+        next_run_list_drop_out(race_id, current_run_id, current_run_number)
+    elif race_type ==2:
+        next_run_list_classical(race_id, current_run_id, current_run_number)
+    return
+
 @raceinfo.route('/race/<int:run_id>/order_list/buld', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -29,7 +37,7 @@ def race_order_list(run_id):
 
     race_competitors = db.session.query(RaceCompetitor, FisPoints).\
         join(FisPoints, FisPoints.competitor_id == RaceCompetitor.competitor_id).\
-        filter(RaceCompetitor.race_id == id, FisPoints.discipline_id==race.discipline_id).\
+        filter(RaceCompetitor.race_id == run_id, FisPoints.discipline_id==race.discipline_id).\
         order_by(FisPoints.fispoint.desc()).all()
 
     for i in range(len(race_competitors)):

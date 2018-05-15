@@ -186,8 +186,6 @@ class Competitor(db.Model):
     points = db.Column(db.Float)
 
 
-
-
 class RaceCompetitor(db.Model):
     __tablename__ = 'race_competitor'
     id = db.Column(db.Integer, primary_key=True)
@@ -234,6 +232,26 @@ class ResultFunction(db.Model):
             db.session.add(result_function)
         db.session.commit()
 
+class RunOrderFunction(db.Model):
+    __tablename__ = 'run_order_function'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    descrioption = db.Column(db.String)
+
+    @staticmethod
+    def insert():
+        function = {
+            'Drop Off': "Спортсмен не получивший QLF в текущем ране, не участвует в слудующем",
+            'All competitors': "Спортсмены участвуют во всех заездах, не зависимо от статуса",
+        }
+        for f in function.keys():
+            result_function = RunOrderFunction.query.filter_by(name=f).first()
+            if result_function is None:
+                result_function = RunOrderFunction(name=f)
+                result_function.descrioption = function[f]
+            db.session.add(result_function)
+        db.session.commit()
+
 class Race(db.Model):
     __tablename__ = 'race'
     id = db.Column(db.Integer, primary_key=True)
@@ -247,6 +265,8 @@ class Race(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
     result_function = db.Column(db.Integer, db.ForeignKey('result_function.id'))
+
+    run_order_function = db.Column(db.Integer, db.ForeignKey('run_order_function.id'))
 
     type_of_content = db.Column(db.String)
     training = db.Column(db.String)
