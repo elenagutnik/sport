@@ -348,15 +348,28 @@
     }
     </script>
     <ul class="nav nav-tabs">
+      <li id="li_tab_races" class="active"><a href="#tab_races" data-toggle="tab">Соревнование</a></li>
       <li id="li_tab_runs"><a href="#tab_runs" data-toggle="tab">Заезды</a></li>
       <li id="li_tab_startlist"><a href="#tab_startlist" data-toggle="tab">Стартовые списки</a></li>
-      <li id="li_tab_curcompetitor" class="active"><a href="#tab_curcompetitor" data-toggle="tab">Текущие результаты</a></li>
+      <li id="li_tab_curcompetitor"><a href="#tab_curcompetitor" data-toggle="tab">Текущие результаты</a></li>
       <li id="li_tab_summarytable"><a href="#tab_summarytable" data-toggle="tab">Все результаты</a></li>
       <li id="li_tab_datasrc"><a href="#tab_datasrc" data-toggle="tab">Данные с устройств</a></li>
       <li id="li_tab_device"><a href="#tab_device" data-toggle="tab">Девайсы</a></li>
       <li id="li_tab_raceresults"><a href="#tab_raceresults" data-toggle="tab">Результаты</a></li>
     </ul>
     <div class="tab-content">
+        <div id="tab_races" class="tab-pane fade in active">
+          <h2>Соревнования</h2>
+          Выбранная гонка: <b><div class="current_race">не выбрана</div></b>
+          <br>
+          Выбрать другую гонку:<br>
+          <select id="select_race">
+          </select>
+          <br>
+          <br>
+          <button type="button" class="btn btn-primary btn-sm" id="btn_setrace" data-dismiss="modal">Выбрать</button>
+
+        </div>
         <div id="tab_runs" class="tab-pane fade">
           <h2>Заезды</h2>
           <h3>Current run <span id="run_current"></span></h3>
@@ -377,7 +390,7 @@
         <div id="tab_summarytable" class="tab-pane fade">
           <h2>Summary tables</h2>
         </div>
-        <div id="tab_curcompetitor" class="tab-pane fade in active">
+        <div id="tab_curcompetitor" class="tab-pane fade">
           <h2>Controls</h2>
           <table id="tab_manualcontrol" class="table table-hover">
             <thead>
@@ -496,8 +509,17 @@
     {% block scripts %}
     {{ super() }}
     <script type="text/javascript">
+    var err_list= new Array();
+    err_list["code_1"]={
+        "critical":true,
+        "msg":"не выбрана гонка"
+      };
 
-    var race_id=1; // пока задаем вручную
+    var err_critical=null;
+    var err_log=new Array();
+
+    var race_id=null;
+    var race=null;// пока задаем вручную
     var run={'id':null,'number':null}; // активный заезд
     var run_list=new Array(); // список всех заездов для race_id отсортированных по порядку (number)
     var run_list_ids=new Array(); // массив run_list_ids[run_id]=run_list[index] - соответствие id_run элементам в массиве run_list'
@@ -510,8 +532,43 @@
     var course_list=new Array(); // список трасс на гонке
     var device_list=new Array();;
 
-
+    function err2log(code){
+      err_log.push(code);
+      if(err_list["code_"+code].critical)err_critical=code;
+    }
     $(document).ready(function () {
+      function get_race_list(){
+        console.log("START FUNC: get_race_list");
+        race_id=Number(getCookie("race_id"));
+        return $.get("/raceinfo/race/get")
+        .done(function(data){
+          race_list=JSON.parse(data);
+          $.each(race_list, function(value) {
+            $("#select_race").append($("<option></option>", {value: this.id, text: this.eventname}));
+            if(this.id==race_id)
+              race={"id":this.id, "eventname":this.eventname};
+          });///////
+
+          if(race_id){
+            $("#select_race").val(race_id);
+            $("#tab_races div.current_race").html(race.eventname);
+            console.log("END FUNC: get_race_list : race_list");
+            return race_list;
+          }else{
+            err2log(1);
+            $(".nav-tabs").hide();
+            $("#tab_runs").hide();
+            $("#tab_startlist").hide();
+            $("#tab_curcompetitor").hide();
+            $("#tab_summarytable").hide();
+            $("#tab_datasrc").hide();
+            $("#tab_device").hide();
+            $("#tab_raceresults").hide();
+            console.log("END FUNC: get_race_list : false");
+            return new Error("Network Error");
+          }
+        })
+      }
       // получаем список статусов
       function get_status_list(){
           console.log("START FUNC: get_status_list");
@@ -549,7 +606,13 @@
               return run_list;
           })
       }
-      Promise.all([get_status_list(),get_runs_list()]).then(
+      Promise.all([get_race_list()])
+      .then(
+            result=>get_status_list(),
+            error=>alert("[eqyz]")
+      ).then(
+            result=>get_runs_list()
+      ).then(
             result=>get_startlist(run.id)
       ).then(
             result=>get_startlist(run_list[0].id)
@@ -925,6 +988,12 @@
           console.log("btn_src_save:");
           console.log(JSON.stringify(data));
         });
+
+        $("body").on("click", "#btn_setrace", function () {
+          setCookie("race_id",$("#select_race").val());
+          //console.log("setCookie(\"race_id\","+$("#select_race").val()+");");
+          window.location.reload();
+        });
         $("body").on("click", "#btn_raceresults", function () {
           var data=new Array();
           $("#table_raceresults tbody").remove();
@@ -959,15 +1028,19 @@
                       console.log("arr.length="+arr.length+" i="+i);
                       if(arr[i].status_id==1){rowspan="";}
                       else{rowspan=" rowspan='2' ";}
+                      /*
                       var m=0;
                       while(!glob_arr["run"+run_list[m].number]["comp_"+arr[i].race_competitor_id] && m<run_list.length){
                           m++;
                           console.log(arr[i].race_competitor_id+"m="+m);
                       }
+                      getObjById(run_list[0].start_list,"id",arr[i].results[k].status_id).name
                       run_id=run_list[m].number;
+                      */
                       console.log("run_id="+run_id);
+                      var bib=""; //get info from server
                       var name=glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].en_firstname+" "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].en_lastname+" / "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].ru_firstname+" "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].ru_lastname;
-                      $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+arr[i].result_time+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
+                      $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+arr[i].result_time+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
                       if(arr[i].status_id!=1)
                         $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" danger'>"+run_cols2+"</tr>");
                       for(var k=0;k<arr[i].results.length;k++){
@@ -1565,6 +1638,40 @@ console.log(data);
         for(var idx = 0, l = arr.length;arr[idx] && arr[idx][prop] !== val;idx++);
         return idx === l ? false : arr[idx];
     }
+    // возвращает cookie с именем name, если есть, если нет, то undefined
+    function getCookie(name) {
+      var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+      ));
+      return matches ? decodeURIComponent(matches[1]) : null;
+    }
+    function setCookie(name, value, options) {
+      options = options || {};
 
+      var expires = options.expires;
+
+      if (typeof expires == "number" && expires) {
+        var d = new Date();
+        d.setTime(d.getTime() + expires * 1000);
+        expires = options.expires = d;
+      }
+      if (expires && expires.toUTCString) {
+        options.expires = expires.toUTCString();
+      }
+
+      value = encodeURIComponent(value);
+
+      var updatedCookie = name + "=" + value;
+
+      for (var propName in options) {
+        updatedCookie += "; " + propName;
+        var propValue = options[propName];
+        if (propValue !== true) {
+          updatedCookie += "=" + propValue;
+        }
+      }
+
+      document.cookie = updatedCookie;
+    }
     </script>
     {% endblock %}
