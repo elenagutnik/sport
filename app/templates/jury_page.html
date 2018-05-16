@@ -1037,9 +1037,9 @@
                       getObjById(run_list[0].start_list,"id",arr[i].results[k].status_id).name
                       run_id=run_list[m].number;
                       */
-                      console.log("run_id="+run_id);
-                      var bib=""; //get info from server
-                      var name=glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].en_firstname+" "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].en_lastname+" / "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].ru_firstname+" "+glob_arr["run"+run_id]["comp_"+arr[i].race_competitor_id].ru_lastname;
+                      //console.log("run_id="+run_id);
+                      var bib=arr[i].bib; //get info from server
+                      var name=arr[i].en_firstname+" "+arr[i].en_lastname+" / "+arr[i].ru_firstname+" "+arr[i].ru_lastname;
                       $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+arr[i].result_time+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
                       if(arr[i].status_id!=1)
                         $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" danger'>"+run_cols2+"</tr>");
@@ -1593,7 +1593,7 @@ console.log(data);
 
             var btn_clearresult="<button class='btn btn-danger btn-sm btn_clear' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Clear</button>";
             console.log("#1278:"+glob_arr["run"+run.id]);
-            $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"_"+competitor_id+"'><td class='order'>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_laststname+"</td><td class='status'>"+(glob_arr["run"+run.id]?glob_arr["run"+run.id]["comp_"+this[2].race_competitor_id].status_id:"")+"</td><td>"+btn_start+btn_finish+"</td><td>"+btn_approveqlf+btn_editresult+"</td><td>"+btn_clearresult+"</td></tr>");
+            $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"_"+competitor_id+"'><td class='order'>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_lastname+"</td><td class='status'>"+(glob_arr["run"+run.id]?glob_arr["run"+run.id]["comp_"+this[2].race_competitor_id].status_id:"")+"</td><td>"+btn_start+btn_finish+"</td><td>"+btn_approveqlf+btn_editresult+"</td><td>"+btn_clearresult+"</td></tr>");
           });
         }else{
           console.log("ERROR! set_list_for_manualcontrol: run_list["+run_list_ids["id"+run.id]+"].start_list.length is false");
