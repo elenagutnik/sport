@@ -1575,6 +1575,8 @@ console.log(data);
     }
     function set_list_for_manualcontrol(){
       console.log("START FUNC: set_list_for_manualcontrol");
+      var flag_started_run=false; //флаг, указывающий, что у нас есть хотя бы 1 начатый заезд
+/*
       if(!run.id){
         $("#tab_manualcontrol tbody").append("<tr class='empty_run'><td class='order' colspan=7>Заезд не начат</td></tr>");
         return false;
@@ -1600,8 +1602,42 @@ console.log(data);
         }
         console.log("END FUNC: set_list_for_manualcontrol");
       }
+*/
+if(run_list.length){
+  var run={"id":null,"number":null};
+  for(var i=0;i<run_list.length;i++){
+    if(run_list[i].starttime){
+      flag_started_run=true;
+      run.id=run_list[i].id;
+      run.number=run_list[i].number;
+      console.log(run_list[run_list_ids["id"+run.id]].start_list );
+      if(run_list[run_list_ids["id"+run.id]].start_list && run_list[run_list_ids["id"+run.id]].start_list.length){
+        $("#tab_manualcontrol tbody tr.empty_run").remove();
+        $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"'><td colspan='7'>Run: "+run_list[run_list_ids["id"+run.id]].number+" (#"+run.id+")"+"</td></tr>");
+        $.each(run_list[run_list_ids["id"+run.id]].start_list, function(value){
+          var competitor_id=this[2].race_competitor_id;
+          var btn_start="<button class='btn btn-primary btn-sm btn_start' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Start</button>";
+          var btn_finish="";//"<button class='btn btn-success btn-sm btn_finish' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Finish</button>";
 
+          var btn_approveqlf="";//<button class='btn btn-defaul btn-sm btn_approveqlf' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Approve QLF</button>";
+          var btn_editresult="<button class='btn btn-defaul btn-sm btn_editresult' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Edit</button>";
+
+          var btn_clearresult="<button class='btn btn-danger btn-sm btn_clear' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Clear</button>";
+          console.log("#1278:"+glob_arr["run"+run.id]);
+          $("#tab_manualcontrol tbody").append("<tr class='tr_"+run.id+"_"+competitor_id+"'><td class='order'>"+this[2].order+"</td><td>"+this[1].bib+"</td><td>"+this[0].en_firstname+" "+this[0].en_laststname+" / "+this[0].ru_firstname+" "+this[0].ru_lastname+"</td><td class='status'>"+(glob_arr["run"+run.id]?glob_arr["run"+run.id]["comp_"+this[2].race_competitor_id].status_id:"")+"</td><td>"+btn_start+btn_finish+"</td><td>"+btn_approveqlf+btn_editresult+"</td><td>"+btn_clearresult+"</td></tr>");
+        });
+      }else{
+        console.log("ERROR! set_list_for_manualcontrol: run_list["+run_list_ids["id"+run.id]+"].start_list.length is false");
+      }
+      console.log("END FUNC: set_list_for_manualcontrol");
     }
+  }//end for
+  if(!flag_started_run){
+    $("#tab_manualcontrol tbody").append("<tr class='empty_run'><td class='order' colspan=7>Ни один заезд не начат</td></tr>");
+    return false;
+  }
+}//end if
+} //end function
 
     //форматирование чисел
     function nform(v){
