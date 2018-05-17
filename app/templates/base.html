@@ -4,8 +4,12 @@
 
 {% block head %}
 {{ super() }}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}" />
+
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
 {% endblock %}
 
 {% block navbar %}
@@ -139,5 +143,11 @@
 {% block scripts %}
 {{ super() }}
 {{ moment.include_moment() }}
-
+<script src="{{ url_for('static', filename='js/moment-with-locales.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap-datetimepicker.min.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    $("form.form input#birth").datetimepicker();
+  });
+</script>
 {% endblock %}
