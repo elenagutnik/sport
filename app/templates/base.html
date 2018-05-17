@@ -147,7 +147,8 @@
 <script src="{{ url_for('static', filename='js/bootstrap-datetimepicker.min.js') }}"></script>
 <script>
   $(document).ready(function () {
-    $("form.form input#birth").datetimepicker();
+    $("form.form input#birth").datetimepicker({format: 'DD.MM.YYYY'});
+    $("form.form input#racedate").datetimepicker({format: 'DD.MM.YYYY'});
   });
 </script>
 {% endblock %}
