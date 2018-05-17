@@ -401,7 +401,7 @@ def td_edit(id):
     form.ru_lastname.data = td.ru_lastname
     form.en_lastname.data = td.en_lastname
     form.ru_nation.data = td.ru_nation
-    form.en_nation.data = td.en_nation
+    form.en_nation.data = td.en_nationom
     form.tdnumber.data = td.tdnumber
     form.tdrole_ref.data = td.tdrole_id
 
@@ -490,29 +490,24 @@ def race_add():
     if form.validate_on_submit():
         race = Race(
             gender_id = form.gender_ref.data,
+            season=form.season.data,
+            eventname=form.eventname.data,
             nation_id = form.nation_ref.data,
             isTeam = form.race_type.data,
             category_id = form.category_ref.data,
             discipline_id = form.discipline_ref.data,
             result_function = form.result_method_ref.data,
-            run_order_function =form.run_order_method_ref.data
+            run_order_function =form.run_order_method_ref.data,
+            codex=form.codex.data
         )
-        if form.eventname.data != "":
-            race.eventname = form.eventname.data
         if form.racedate.data != "":
             race.racedate = form.racedate.data
         if form.place.data != "":
             race.place = form.place.data
-        if form.season.data != "":
-            race.season = form.season.data
-        if form.sector.data != "":
-            race.sector = form.sector.data
-        if form.codex.data != "":
-            race.codex = form.codex.data
+        # if form.sector.data != "":
+        #     race.sector = form.sector.data
         if form.speedcodex.data != "":
             race.speedcodex = form.speedcodex.data
-        if form.training.data != "":
-            race.training = form.training.data
         db.session.add(race)
         db.session.commit()
 
@@ -911,7 +906,14 @@ def edit_race_competitor(id):
 @raceinfo.route('/race/<int:race_id>/competitor/<int:competitor_id>/del', methods=['GET', 'POST'])
 @admin_required
 def remove_race_competitor(race_id,competitor_id):
-    db.session.delete(RaceCompetitor.query.filter_by(id=competitor_id).one())
+    try:
+        raceCompetitor = RaceCompetitor.query.filter_by(id=competitor_id).one()
+        db.session.delete(raceCompetitor)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        db.session.commit()
+        flash('Error: competitor can not be deleted')
     return redirect(url_for('.edit_race_competitor', id=race_id,_external=True))
 
 @raceinfo.route('/race/<int:race_id>/competitor/<int:competitor_id>/edit', methods=['GET', 'POST'])

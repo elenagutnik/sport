@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
     SelectField, DateField, SelectMultipleField, IntegerField, DateTimeField, HiddenField
 from wtforms_components import TimeField
-from wtforms.validators import Required, Length, Email, Regexp, EqualTo, InputRequired
+from wtforms.validators import Required, Length, Email, Regexp, EqualTo, InputRequired, Optional, NumberRange
 from wtforms import ValidationError
 from ..models import Role, User
 from .models import *
@@ -43,7 +43,7 @@ class EditNationForm(FlaskForm):
 class EditCategoryForm(FlaskForm):
     name = StringField('Abbreviation', validators=[Required()])
     description = StringField('Description')
-    level = StringField('Level (Integer 0-4)')
+    level = IntegerField('Level (Integer 0-4)', [NumberRange(min=0, max=4)])
     submit = SubmitField('Submit')
 
 class EditWeatherForm(FlaskForm):
@@ -74,7 +74,7 @@ class EditTDForm(FlaskForm):
 #    tdrole_ref.choices = [(tdrole.id, tdrole.name) for role in TDRole.query.order_by(TDRole.name).all()]
 
 class EditRaceBase(FlaskForm):
-    eventname = StringField('Event Name (in FIS Calendar)', validators=[Required()])
+    eventname = StringField('Event Name (in FIS Calendar)', validators=[InputRequired()])
     race_type = SelectField('Race type', choices=[('True', 'Team competition'), ('False', 'Individual competition')])
     racedate = DateField('Race date', format='%d.%m.%Y', render_kw={"class": "race_datepicker"})
     place = StringField('Place')
@@ -84,11 +84,10 @@ class EditRaceBase(FlaskForm):
     discipline_ref = SelectField('Discipline', coerce=int)
     result_method_ref = SelectField('Resault method', coerce=int)
     run_order_method_ref = SelectField('Order list method', coerce=int)
-    season = StringField('Season')
-    sector = StringField('Sector (AL)')
+    season = IntegerField('Season')
+    # sector = StringField('Sector (AL)')
     codex = IntegerField('Codex')
-    speedcodex = IntegerField('Race codex of speed race for Super Combined')
-    training = StringField('Number of Training')
+    speedcodex = IntegerField('Race codex of speed race for Super Combined', [Optional()])
     submit = SubmitField('Submit')
 
 class EditRaceAdditional(FlaskForm):

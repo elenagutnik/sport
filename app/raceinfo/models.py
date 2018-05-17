@@ -90,7 +90,7 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(3))
     description = db.Column(db.String(150))
-    level = db.Column(db.Integer) # level 0-4
+    level = db.Column(db.Integer)# level 0-4
 
     @staticmethod
     def insert():
