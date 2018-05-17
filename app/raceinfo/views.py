@@ -5,6 +5,7 @@ from ..decorators import admin_required
 from .forms import *
 from flask_babel import gettext
 import json
+from .models import *
 from sqlalchemy import and_
 from . import jsonencoder
 from .runList import race_order_buld
@@ -432,12 +433,10 @@ def race_lis_get():
 @admin_required
 def race(id):
     race = Race.query.get_or_404(id)
-    race.gender=Gender.query.get(race.gender_id)
-    race.category=Category.query.get(race.category_id)
-    race.discipline=Discipline.query.get(race.discipline_id)
-    race.nation=Nation.query.get(race.nation_id)
-
-
+    # race.gender=Gender.query.get(race.gender_id)
+    # race.category=Category.query.get(race.category_id)
+    # race.discipline=Discipline.query.get(race.discipline_id)
+    # race.nation=Nation.query.get(race.nation_id)
     return render_template('raceinfo/race_view.html', race=race)
 
 
@@ -504,8 +503,6 @@ def race_add():
             race.racedate = form.racedate.data
         if form.place.data != "":
             race.place = form.place.data
-        # if form.sector.data != "":
-        #     race.sector = form.sector.data
         if form.speedcodex.data != "":
             race.speedcodex = form.speedcodex.data
         db.session.add(race)
@@ -529,7 +526,8 @@ def race_editbase(id):
         form.discipline_ref.choices = [(item.id, item.fiscode + ' - ' + item.en_name) for item in Discipline.query.all()]
         form.nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in Nation.query.all()]
     form.category_ref.choices = [(item.id, item.name + ' - ' + item.description) for item in Category.query.all()]
-    form.result_method_ref.choices=[(item.id, item.name) for item in ResultFunction.query.all()]
+    form.result_method_ref.choices = [(item.id, item.name) for item in ResultFunction.query.all()]
+    form.run_order_method_ref.choices = [(item.id, item.name) for item in RunOrderFunction.query.all()]
 
     if form.validate_on_submit():
         race.eventname = form.eventname.data
@@ -540,99 +538,29 @@ def race_editbase(id):
         race.category_id = form.category_ref.data
         race.discipline_id = form.discipline_ref.data
         race.season = form.season.data
-        race.sector = form.sector.data
         race.codex = form.codex.data
         race.speedcodex = form.speedcodex.data
-        race.training = form.training.data
+
         race.result_function = form.result_method_ref.data
 
         db.session.add(race)
-
         flash('The Race has been changed.')
-        return redirect(url_for('.race_list',_external=True))
+        return redirect(url_for('.race', id=id,_external=True))
+    form.eventname.data = race.eventname
+    form.racedate.data=race.racedate
+    form.place.data =race.place
+    form.gender_ref.data= race.gender_id
+    form.nation_ref.data =race.nation_id
+    form.category_ref.data= race.category_id
+    form.discipline_ref.data=race.discipline_id
+    form.season.data= race.season
+    form.codex.data =race.codex
+    form.speedcodex.data = race.speedcodex
     return render_template('raceinfo/static-tab/simpleform.html', form=form, race=race, title=gettext('Edit Race - General properties'))
-#  I have no idea, what do you want!!!!
-# @raceinfo.route('/race/<int:id>/jury', methods=['GET', 'POST'])
-# @admin_required
-# def race_editjury(id):
-#     race = Race.query.get_or_404(id)
-#     form = EditRaceJury(race=race)
-#     if(current_user.lang == 'ru'):
-#         form.jury_chiefrace_nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in Nation.query.all()]
-#         form.jury_referee_nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in Nation.query.all()]
-#         form.jury_assistantreferee_nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in Nation.query.all()]
-#         form.jury_chiefcourse_nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in Nation.query.all()]
-#         form.jury_startreferee_nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in Nation.query.all()]
-#         form.jury_chieftiming_nation_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in Nation.query.all()]
-#     else:
-#         form.jury_chiefrace_nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in Nation.query.all()]
-#         form.jury_referee_nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in Nation.query.all()]
-#         form.jury_assistantreferee_nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in Nation.query.all()]
-#         form.jury_chiefcourse_nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in Nation.query.all()]
-#         form.jury_startreferee_nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in Nation.query.all()]
-#         form.jury_chieftiming_nation_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in Nation.query.all()]
-#     if form.validate_on_submit():
-#         race.jury_chiefrace_ru_lastname = form.jury_chiefrace_ru_lastname.data
-#         race.jury_chiefrace_ru_firstname = form.jury_chiefrace_ru_firstname.data
-#         race.jury_chiefrace_en_lastname = form.jury_chiefrace_en_lastname.data
-#         race.jury_chiefrace_en_firstname = form.jury_chiefrace_en_firstname.data
-#         race.jury_chiefrace_nation_ref = form.jury_chiefrace_nation_ref.data
-#         race.jury_chiefrace_phonenbr = form.jury_chiefrace_phonenbr.data
-#         race.jury_chiefrace_email = form.jury_chiefrace_email.data
-#
-#         race.jury_referee_ru_lastname = form.jury_referee_ru_lastname.data
-#         race.jury_referee_ru_firstname = form.jury_referee_ru_firstname.data
-#         race.jury_referee_en_lastname = form.jury_referee_en_lastname.data
-#         race.jury_referee_en_firstname = form.jury_referee_en_firstname.data
-#         race.jury_referee_nation_ref = form.jury_referee_nation_ref.data
-#         race.jury_referee_phonenbr = form.jury_referee_phonenbr.data
-#         race.jury_referee_email = form.jury_referee_email.data
-#
-#         race.jury_assistantreferee_ru_lastname = form.jury_assistantreferee_ru_lastname.data
-#         race.jury_assistantreferee_ru_firstname = form.jury_assistantreferee_ru_firstname.data
-#         race.jury_assistantreferee_en_lastname = form.jury_assistantreferee_en_lastname.data
-#         race.jury_assistantreferee_en_firstname = form.jury_assistantreferee_en_firstname.data
-#         race.jury_assistantreferee_nation_ref = form.jury_assistantreferee_nation_ref.data
-#         race.jury_assistantreferee_phonenbr = form.jury_assistantreferee_phonenbr.data
-#         race.jury_assistantreferee_email = form.jury_assistantreferee_email.data
-#
-#         race.jury_chiefcourse_ru_lastname = form.jury_chiefcourse_ru_lastname.data
-#         race.jury_chiefcourse_ru_firstname = form.jury_chiefcourse_ru_firstname.data
-#         race.jury_chiefcourse_en_lastname = form.jury_chiefcourse_en_lastname.data
-#         race.jury_chiefcourse_en_firstname = form.jury_chiefcourse_en_firstname.data
-#         race.jury_chiefcourse_nation_ref = form.jury_chiefcourse_nation_ref.data
-#         race.jury_chiefcourse_phonenbr = form.jury_chiefcourse_phonenbr.data
-#         race.jury_chiefcourse_email = form.jury_chiefcourse_email.data
-#
-#         race.jury_startreferee_ru_lastname = form.jury_startreferee_ru_lastname.data
-#         race.jury_startreferee_ru_firstname = form.jury_startreferee_ru_firstname.data
-#         race.jury_startreferee_en_lastname = form.jury_startreferee_en_lastname.data
-#         race.jury_startreferee_en_firstname = form.jury_startreferee_en_firstname.data
-#         race.jury_startreferee_nation_ref = form.jury_startreferee_nation_ref.data
-#         race.jury_startreferee_phonenbr = form.jury_startreferee_phonenbr.data
-#         race.jury_startreferee_email = form.jury_startreferee_email.data
-#
-#         race.jury_chieftiming_ru_lastname = form.jury_chieftiming_ru_lastname.data
-#         race.jury_chieftiming_ru_firstname = form.jury_chieftiming_ru_firstname.data
-#         race.jury_chieftiming_en_lastname = form.jury_chieftiming_en_lastname.data
-#         race.jury_chieftiming_en_firstname = form.jury_chieftiming_en_firstname.data
-#         race.jury_chieftiming_nation_ref = form.jury_chieftiming_nation_ref.data
-#         race.jury_chieftiming_phonenbr = form.jury_chieftiming_phonenbr.data
-#         race.jury_chieftiming_email = form.jury_chieftiming_email.data
-#         db.session.add(race)
-#
-#         flash('The Race Jury has been changed.')
-#         return redirect(url_for('.race_list'))
-#     return render_template('raceinfo/jury.html', form=form, race=race, title=gettext('Edit Race - General properties'))
-
-# !!!!!!!!!!!!!!!!!!
 
 @raceinfo.route('/race/<int:id>/jury', methods=['GET', 'POST'])
 @admin_required
 def edit_race_jury(id):
-    race_jury = db.session.query(RaceJury,Jury).\
-        outerjoin(Jury,  RaceJury.jury_id==Jury.id).\
-        filter(RaceJury.race_id==id).all()
     form = EditRaceJury()
     if current_user.lang =='ru':
         form.jury_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Jury.query.all()]
@@ -652,7 +580,9 @@ def edit_race_jury(id):
         )
         db.session.add(raceJury)
         db.session.commit()
-
+    race_jury = db.session.query(RaceJury,Jury).\
+        outerjoin(Jury,  RaceJury.jury_id==Jury.id).\
+        filter(RaceJury.race_id==id).all()
     return render_template('raceinfo/static-tab/jury_race.html', title='Jury list', form=form, jury=race_jury)
 
 @raceinfo.route('/race/<int:race_id>/jury/<int:jury_id>/del', methods=['GET', 'POST'])
@@ -690,6 +620,7 @@ def jury_add():
             email=form.email.data
         )
         db.session.add(jury)
+        db.session.commit()
         flash('The  Jury has been added.')
         return redirect(url_for('.jury_list',_external=True))
     return render_template('raceinfo/static-tab/jury_add.html', form=form)

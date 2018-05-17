@@ -1,12 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    SelectField, DateField, SelectMultipleField, IntegerField, DateTimeField, HiddenField
-from wtforms_components import TimeField
-from wtforms.validators import Required, Length, Email, Regexp, EqualTo, InputRequired, Optional, NumberRange
-from wtforms import ValidationError
-from ..models import Role, User
-from .models import *
-from .. import db
+from wtforms import StringField, SubmitField, \
+    SelectField, DateField, IntegerField, DateTimeField, HiddenField
+
+from wtforms.validators import Required, Email, InputRequired, Optional, NumberRange, Regexp
 
 class EditDisciplineForm(FlaskForm):
     ru_name = StringField('Название дисциплины', validators=[Required()])

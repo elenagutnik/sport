@@ -6,7 +6,7 @@
 
 <div class="page-header">
     <h1>{{ race.eventname }} {{ race.racedate }}</h1>
-    <h4>{{ _('Basic properties') }}</h4>
+    <h4>{{ _('Basic properties') }}  <a class="btn btn-default" href="{{ race.id }}/editbase">edit</a></h4>
     <table class="table table-striped">
       <tbody>
         <tr><td>{{ _('Event Name') }}</td><td>{{ race.eventname}}</td></tr>
