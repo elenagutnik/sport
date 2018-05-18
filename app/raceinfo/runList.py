@@ -2,12 +2,11 @@ from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_required, current_user
 from . import raceinfo
 from ..decorators import admin_required
-from .forms import *
-from flask_babel import gettext
+
 import json
 from sqlalchemy import and_
 from . import jsonencoder
-
+from .models import *
 
 @raceinfo.route('/startlist/run/<int:run_id>/get/', methods=['POST', 'GET'])
 def startlist_get(run_id):
