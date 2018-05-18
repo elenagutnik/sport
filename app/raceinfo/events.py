@@ -587,15 +587,27 @@ def recalculate_finished_resaults(run_id):
 #                   cls=jsonencoder.AlchemyEncoder))
 @socketio.on('get/results')
 def socket_get_results(data):
-    socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor, CourseDevice).
-                                                    join(ResultDetail, isouter=True).
-                                                    join(RaceCompetitor, isouter=True).
-                                                    join(Competitor, isouter=True).
-                                                    join(CourseDevice, DataIn.cource_device_id==CourseDevice.id , isouter=True).
-                                                    filter(DataIn.run_id.in_(json.loads(data))).
-                                                    order_by(asc(DataIn.id)).
-                                                    all(),
-                  cls=jsonencoder.AlchemyEncoder))
+    print(data)
+    if isinstance(data, dict):
+        socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor, CourseDevice).
+                                                            join(ResultDetail, isouter=True).
+                                                            join(RaceCompetitor, isouter=True).
+                                                            join(Competitor, isouter=True).
+                                                            join(CourseDevice, DataIn.cource_device_id==CourseDevice.id , isouter=True).
+                                                            filter(DataIn.run_id == data['run_id']).
+                                                            order_by(asc(DataIn.id)).
+                                                            all(),
+                          cls=jsonencoder.AlchemyEncoder))
+    else:
+        socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor, CourseDevice).
+                                                        join(ResultDetail, isouter=True).
+                                                        join(RaceCompetitor, isouter=True).
+                                                        join(Competitor, isouter=True).
+                                                        join(CourseDevice, DataIn.cource_device_id==CourseDevice.id , isouter=True).
+                                                        filter(DataIn.run_id.in_(json.loads(data))).
+                                                        order_by(asc(DataIn.id)).
+                                                        all(),
+                      cls=jsonencoder.AlchemyEncoder))
 
 @socketio.on('change/data_in/competitors')
 def edit_competitor(json_data):
