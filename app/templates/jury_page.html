@@ -636,7 +636,12 @@
       );
 
       function socket_emit(){
-        return socket.emit('get/results', {"run_id": 1}); //result=>get_current_data(race_id)
+        var arr=new Array();
+        for(var i=0; i<run_list.length;i++){
+          arr.push(run_list[i].id)
+        }
+        console.log("socket.emit "+JSON.stringify(arr));
+        return socket.emit('get/results',JSON.stringify(arr)); //result=>get_current_data(race_id)
       }
 
    /*
