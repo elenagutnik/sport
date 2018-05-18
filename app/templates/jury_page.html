@@ -424,13 +424,14 @@
             <table id="tab_data_src" class="table table-hover">
               <thead>
                 <tr>
+                  <th>run_id</th>
                   <th>course_id</th>
                   <th>device</th>
                   <th>(absolute) time</th>
 
                   <th>bib</th>
                   <th>name</th>
-                  <th>act</th>
+                  <th>act | copy to new competitor</th>
                 </tr>
               </thead>
               <tbody>
@@ -971,7 +972,7 @@
 
               }
               glob_arr["run"+run_id]["comp_"+competitor_id]=null;
-              socket.emit('get/results', {"run_id": run_id});
+              socket_emit();
               refresh_status("run"+run_id,"comp_"+competitor_id);
               console.log("after socket.emit('get/results'...");
 
