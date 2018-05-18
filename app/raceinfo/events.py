@@ -574,6 +574,17 @@ def recalculate_finished_resaults(run_id):
             item.diff = None
             item.rank = None
 
+# @socketio.on('get/results')
+# def socket_get_results(data):
+#     socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor, CourseDevice).
+#                                                     join(ResultDetail, isouter=True).
+#                                                     join(RaceCompetitor, isouter=True).
+#                                                     join(Competitor, isouter=True).
+#                                                     join(CourseDevice, DataIn.cource_device_id==CourseDevice.id , isouter=True).
+#                                                     filter(DataIn.run_id == data['run_id']).
+#                                                     order_by(asc(DataIn.id)).
+#                                                     all(),
+#                   cls=jsonencoder.AlchemyEncoder))
 @socketio.on('get/results')
 def socket_get_results(data):
     socketio.emit('get/results/response', json.dumps(db.session.query(DataIn, ResultDetail, RaceCompetitor, Competitor, CourseDevice).
@@ -581,11 +592,10 @@ def socket_get_results(data):
                                                     join(RaceCompetitor, isouter=True).
                                                     join(Competitor, isouter=True).
                                                     join(CourseDevice, DataIn.cource_device_id==CourseDevice.id , isouter=True).
-                                                    filter(DataIn.run_id == data['run_id']).
+                                                    filter(DataIn.run_id.in_(json.loads(data))).
                                                     order_by(asc(DataIn.id)).
                                                     all(),
                   cls=jsonencoder.AlchemyEncoder))
-
 
 @socketio.on('change/data_in/competitors')
 def edit_competitor(json_data):
