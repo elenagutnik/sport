@@ -36,6 +36,8 @@
 {#      <tbody>#}
 {#      </tbody>#}
 {#    </table>#}
+    <div class="row">
+        <div class="col-lg-6">
     {% if race.isTeam %}
         <h4>{{ _('Team') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/team">edit</a></h4>
         <table class="table table-striped">
@@ -49,6 +51,11 @@
           </tbody>
         </table>
     {% endif %}
+        </div>
+        <div class="col-lg-6">
+            <h4>{{ _('Weather') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/weather">edit</a></h4>
+        </div>
+    </div>
     <h4>{{ _('Course') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course">edit</a></h4>
     <table class="table table-striped">
       <tbody>

@@ -10,5 +10,6 @@ from . import events
 from . import testdata
 from . import competitors
 from . import jsonencoder
+from . import validators
 
 

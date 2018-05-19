@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, \
-    SelectField, DateField, IntegerField, DateTimeField, HiddenField
+    SelectField, DateField, IntegerField, DateTimeField, HiddenField, DecimalField
+from wtforms_components import TimeField
 
 from wtforms.validators import Required, Email, InputRequired, Optional, NumberRange, Regexp
+from .validators import FunctionAllowed
 
 class EditDisciplineForm(FlaskForm):
     ru_name = StringField('Название дисциплины', validators=[Required()])
@@ -43,16 +45,15 @@ class EditCategoryForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class EditWeatherForm(FlaskForm):
-    race_ref = SelectField('Race', coerce=int)
-    time = DateTimeField('Time')
-    place = StringField('Description')
-    weather = StringField('Description')
-    snow = StringField('Description')
-    temperatureair = IntegerField('Bib')
-    temperaturesnow = IntegerField('Bib')
-    humiditystart = IntegerField('Bib')
-    windspeed = IntegerField('Bib')
-
+    time = TimeField('Time', validators=[Optional()])
+    place = StringField('place')
+    weather = StringField('weather')
+    snow = StringField('snow')
+    temperatureair = DecimalField('Air temperature', validators=[Optional()], places=2, rounding=None)
+    temperaturesnow = DecimalField('Snow temperature', validators=[Optional()],places=2, rounding=None)
+    humiditystart = IntegerField('Humidity start',validators=[Optional()])
+    windspeed = DecimalField('Wind speed', validators=[Optional()], places=2, rounding=None)
+    submit = SubmitField('Submit')
 
 class EditTDForm(FlaskForm):
     ru_firstname = StringField('Имя', validators=[Required()])
@@ -103,11 +104,10 @@ class EditRaceAdditional(FlaskForm):
 
 class EditRaceJury(FlaskForm):
     jury_ref = SelectField('Jury', coerce=int, validators=[InputRequired()])
-    jury_function_ref = SelectField('Type', coerce=int, validators=[InputRequired()])
-
+    function_ref = SelectField('Type', coerce=int, validators=[InputRequired(), FunctionAllowed])
     # phonenbr = StringField('Phone number')
     # email = StringField('E-mail', validators=[Email()])
-
+    is_member = SelectField('Jury type', coerce=bool, choices=[(True, 'Member'), (False, 'Jury')])
     submit = SubmitField('Add')
 
 

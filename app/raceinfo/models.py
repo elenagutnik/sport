@@ -24,7 +24,6 @@ class Gender(db.Model):
             db.session.add(gender)
         db.session.commit()
 
-
 class Discipline(db.Model):
     __tablename__ = 'discipline'
     id = db.Column(db.Integer, primary_key=True)
@@ -179,9 +178,37 @@ class RaceJury(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jury_id = db.Column(db.Integer, db.ForeignKey('jury.id'))
     race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
-    jury_function_id = db.Column(db.Integer, db.ForeignKey('jury_function.id'))
+    jury_function_id = db.Column(db.Integer, db.ForeignKey('jury_type.id'))
     phonenbr = db.Column(db.String)
     email = db.Column(db.String)
+    is_member = db.Column(db.Boolean)
+
+class JuryType(db.Model):
+    __tablename__ = 'jury_type'
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String)
+    description = db.Column(db.String)
+    is_member_allowed = db.Column(db.Boolean)
+    @staticmethod
+    def insert():
+        Types = {
+            'TechnicalDelegate': False,
+            'ChiefRace': True,
+            'Referee': True,
+            'Assistantreferee': True,
+            'ChiefCourse': True,
+            'Startreferee': True,
+            'Finishreferee': True,
+            'ChiefTiming': True,
+        }
+        for c in Types.keys():
+            type = JuryType.query.filter_by(type=c).first()
+            if type is None:
+                type = JuryType(type=c)
+                type.is_member_allowed = Types[c]
+            db.session.add(type)
+        db.session.commit()
+
 
 
 class Competitor(db.Model):
@@ -340,7 +367,7 @@ class Weather(db.Model):
     __tablename__ = 'weather'
     id = db.Column(db.Integer, primary_key=True)
     race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
-    time = db.Column(db.DateTime)
+    time = db.Column(db.Time)
     place = db.Column(db.String)
     weather = db.Column(db.String)
     snow = db.Column(db.String)
@@ -395,40 +422,11 @@ class Mark(db.Model):
     name = db.Column(db.String(4))
     description = db.Column(db.String(100))
 
-class Jury_function(db.Model):
-    __tablename__ = 'jury_function'
-    id = db.Column(db.Integer, primary_key=True)
-    ru_function = db.Column(db.String)
-    en_function = db.Column(db.String)
-    attribute_values = db.Column(db.String)
-
-    @staticmethod
-    def insert_functions():
-        functions = [
-            'ChiefRace',
-            'Referee',
-            'Assistantreferee',
-            'ChiefCourse',
-            'Startreferee',
-            'Finishreferee',
-            'ChiefTiming'
-        ]
-        for d in functions:
-            discipline = Jury_function.query.filter_by(attribute_values=d).first()
-            if discipline is None:
-                discipline = Jury_function(attribute_values=d)
-            discipline.ru_function = d
-            discipline.en_function = d
-            db.session.add(discipline)
-        db.session.commit()
-
 class RunInfo(db.Model):
     __tablename__ = 'run_info'
     id = db.Column(db.Integer, primary_key=True)
-
     race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-
     number = db.Column(db.Integer)
     starttime = db.Column(db.DateTime)
     endtime = db.Column(db.DateTime)

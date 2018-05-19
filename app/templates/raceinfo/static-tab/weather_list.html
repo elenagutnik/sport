@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Discipline List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Сompetitors</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>Time</td>
+      <td>Place</td>
+      <td>Weather</td>
+      <td>Snow</td>
+      <td>Temperatureair</td>
+      <td>Temperaturesnow</td>
+      <td>Humiditystart</td>
+      <td>Windspeed</td>
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for weather in weathers %}
+    <tr>
+      <td>{{ weather.time }}</td>
+      <td>{{ weather.place }}</td>
+      <td>{{ weather.weather }}</td>
+      <td>{{ weather.snow }}</td>
+      <td>{{ weather.temperatureair }}</td>
+      <td>{{ weather.temperaturesnow }}</td>
+      <td>{{ weather.humiditystart }}</td>
+      <td>{{ weather.windspeed }}</td>
+      <td>
+        <a href="weather/{{ weather.id }}/edit">edit</a>
+        |
+        <a href="weather/{{ weather.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-default" href="weather/add">Add</a>
+{% endblock %}

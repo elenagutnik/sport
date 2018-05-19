@@ -562,21 +562,20 @@ def race_editbase(id):
 @admin_required
 def edit_race_jury(id):
     form = EditRaceJury()
-    if current_user.lang =='ru':
+    if current_user.lang == 'ru':
         form.jury_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Jury.query.all()]
-        form.jury_function_ref.choices = [(item.id, item.ru_function) for item in Jury_function.query.all()]
     else:
         form.jury_ref.choices = [(item.id, item.en_lastname + ' ' + item.en_firstname) for item in Jury.query.all()]
-        form.jury_function_ref.choices = [(item.id, item.en_function) for item in Jury_function.query.all()]
-
+    form.function_ref.choices = [(item.id, item.type) for item in JuryType.query.all()]
     if form.validate_on_submit():
         selected_jury = Jury.query.filter_by(id=form.jury_ref.data).one()
         raceJury = RaceJury(
             jury_id=selected_jury.id,
             race_id=id,
-            jury_function_id=form.jury_function_ref.data,
+            jury_function_id=form.function_ref.data,
             phonenbr=selected_jury.phonenbr,
-            email=selected_jury.email
+            email=selected_jury.email,
+            is_member=form.is_member.data,
         )
         db.session.add(raceJury)
         db.session.commit()
@@ -596,7 +595,6 @@ def remove_race_jury(race_id,jury_id):
 def jury_list():
     j = Jury.query.all()
     return render_template('raceinfo/static-tab/jury_list.html', jury=j)
-
 
 
 @raceinfo.route('/jury/add/', methods=['GET', 'POST'])
@@ -1028,12 +1026,82 @@ def coursetter_del(id):
     return redirect(url_for('.coursetter_list',_external=True))
 
 
+
+@raceinfo.route('/race/<int:id>/weather', methods=['GET', 'POST'])
+@admin_required
+def race_weather(id):
+    weathers = Weather.query.filter(Weather.race_id==id).all()
+    return render_template('raceinfo/static-tab/weather_list.html', weathers=weathers)
+
+@raceinfo.route('/race/<int:id>/weather/add', methods=['GET', 'POST'])
+@admin_required
+def race_weather_add(id):
+    form = EditWeatherForm()
+    if form.validate_on_submit():
+        weather= Weather(
+            race_id=id,
+            time=form.time.data,
+            place=form.place.data,
+            weather=form.weather.data,
+            snow=form.snow.data,
+            temperatureair=form.temperatureair.data,
+            temperaturesnow=form.temperaturesnow.data,
+            humiditystart=form.humiditystart.data,
+            windspeed=form.windspeed.data
+        )
+        db.session.add(weather)
+        db.session.commit()
+        return redirect(url_for('.race_weather', id=id, _external=True))
+    return render_template('raceinfo/static-tab/form_page.html', form=form, title='Add Weather')
+
+
+@raceinfo.route('/race/<int:id>/weather/<int:weather_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def race_weather_edit(id, weather_id):
+    form = EditWeatherForm()
+    weather = Weather.query.filter(Weather.id==weather_id).first()
+    if form.validate_on_submit():
+        weather.time=form.time.data
+        weather.place=form.place.data
+        weather.weather=form.weather.data
+        weather.snow=form.snow.data
+        weather.temperatureair=form.temperatureair.data
+        weather.temperaturesnow=form.temperaturesnow.data
+        weather.humiditystart=form.humiditystart.data
+        weather.windspeed=form.windspeed.data
+        db.session.add(weather)
+        db.session.commit()
+        return redirect(url_for('.race_weather', id=id, _external=True))
+    form.time.data = weather.time
+    form.place.data=weather.place
+    form.weather.data=weather.weather
+    form.snow.data = weather.snow
+    form.temperatureair.data = weather.temperatureair
+    form.temperaturesnow.data = weather.temperaturesnow
+    form.humiditystart.data = weather.humiditystart
+    form.windspeed.data = weather.windspeed
+    return render_template('raceinfo/static-tab/form_page.html', form=form, title='Edit Weather')
+
+
+@raceinfo.route('/race/<int:id>/weather/<int:weather_id>/del', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def race_weather_del(id, weather_id):
+    weather = Weather.query.get_or_404(weather_id)
+    db.session.delete(weather)
+    flash('The weather has been deleted.')
+    return redirect(url_for('.race_weather', id=id, _external=True))
+
+
+
 @raceinfo.route('/race/<int:id>/course', methods=['GET', 'POST'])
 @admin_required
 def race_сourse_list(id):
     race = Race.query.filter_by(id=id).one()
     race_course = Course.query.filter_by(race_id=id)
     return render_template('raceinfo/static-tab/course_list.html', race=race, race_course=race_course)
+
+
 
 @raceinfo.route('/race/<int:id>/course/add', methods=['GET', 'POST'])
 @admin_required
