@@ -11,5 +11,6 @@ from . import testdata
 from . import competitors
 from . import jsonencoder
 from . import validators
+from . import report
 
 

@@ -69,11 +69,11 @@
 	}	
 </style>
 <h1>Start List</h1>
-<h2>{{Event_Name}}</h2>
-<h3>{{Gender}} {{discipline}}</h3>
+<h2>{{race[0].eventname}}</h2>
+<h3>{{race[1].en_name}} {{race[3].en_name}}</h3>
 <div class="title">
-	<span>{{Place_of_event}}</span>
-	<span>{{DATE}}</span>
+	<span>{{race[0].place}}</span>
+	<span>{{race[0].racedate}}</span>
 	<span>Start Time {{time}}</span>
 </div>
 <table class="main">
@@ -85,26 +85,28 @@
 						Jury
 					</th>
 				</tr>
+                {% for item in jury %}
 				<tr>
-					<td class="title">FIS Technical Delegate</td>
-					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>
-					<td title="national code">{{nc}}</td>
+					<td class="title">{{ item[2].type}}</td>
+					<td><span class="lname">{{item[1].en_lastname}}</span> {{item[1].en_firstname}}</td>
+					<td title="national code">{{item[3].name}}</td>
 				</tr>
-				<tr>
-					<td class="title">Referee</td>
-					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>
-					<td title="national code">{{nc}}</td>
-				</tr>
-				<tr>
-					<td class="title">Assistant Referee</td>
-					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>
-					<td title="national code">{{nc}}</td>
-				</tr>
-				<tr>
-					<td class="title">Chief of Race</td>
-					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>
-					<td title="national code">{{nc}}</td>
-				</tr>
+                {% endfor %}
+{#				<tr>#}
+{#					<td class="title">Referee</td>#}
+{#					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>#}
+{#					<td title="national code">{{nc}}</td>#}
+{#				</tr>#}
+{#				<tr>#}
+{#					<td class="title">Assistant Referee</td>#}
+{#					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>#}
+{#					<td title="national code">{{nc}}</td>#}
+{#				</tr>#}
+{#				<tr>#}
+{#					<td class="title">Chief of Race</td>#}
+{#					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>#}
+{#					<td title="national code">{{nc}}</td>#}
+{#				</tr>#}
 			</table>
 			<br>
 			<br>
@@ -116,8 +118,8 @@
 				</tr>
 				<tr>
 					<td class="title">Cource Setter</td>
-					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>
-					<td title="national code">{{nc}}</td>
+					<td><span class="lname">{{course_setter[0].en_lastname}}</span> {{course_setter[0].en_firstname}}</td>
+					<td title="national code">{{course_setter[1].name}}</td>
 				</tr>
 				<tr>
 					<td class="title">Gates/Turning Gates</td>
@@ -140,27 +142,27 @@
 				</tr>
 				<tr>
 					<td class="title">Cource Name</td>
-					<td align=right>{{cource_name}}</td>
+					<td align=right>{{course.en_name}}</td>
 				</tr>
 				<tr>
 					<td class="title">Start Altitude</td>
-					<td align=right>{{start_altitude}}m</td>
+					<td align=right>{{course.startelev}}m</td>
 				</tr>
 				<tr>
 					<td class="title">Finish Altitude</td>
-					<td align=right>{{finish_altitude}}m</td>
+					<td align=right>{{course.finishelev}}m</td>
 				</tr>
 				<tr>
 					<td class="title">Vertical Drop</td>
-					<td align=right>{{drop}}m</td>
+					<td align=right>{{course.startelev - course.finishelev}}m</td>
 				</tr>
 				<tr>
 					<td class="title">Course Length</td>
-					<td align=right>{{length}}m</td>
+					<td align=right>{{course.length}}m</td>
 				</tr>
 				<tr>
 					<td class="title">Homologation Number</td>
-					<td align=right>{{hnumber}}</td>
+					<td align=right>{{course.homologation}}</td>
 				</tr>
 			</table>
 		</td>
@@ -169,7 +171,7 @@
 		<td class="title">
 			<br>
 			<br>
-			Number of Competitors: {{n1}}, Number of NOCs: {{n2}}, FIS List #
+			Number of Competitors: {{competitors | length}}, Number of NOCs: {{n2}}, FIS List #
 		</td>
 		<td class="title" align=right>
 			<br>
@@ -192,15 +194,18 @@
 					</tr>
 				</thead>
 				<tbody>
+                    {% for item in competitors %}
 					<tr>
-						<td>{{bib}}</td>
-						<td>{{FC}}</td>
-						<td><span="lname">{{en_lastname}}</span> {{en_firstname}}</td>
-						<td>{{YB}}</td>
-						<td>{{CLUB}}</td>
-						<td>{{NAT}}</td>
+						<td>{{item[1].bib}}</td>
+						<td>{{item[0].fiscode}}</td>
+						<td><span class="lname">{{item[0].en_lastname}}</span> {{item[0].en_firstname}}</td>
+						<td>{{item[0].birth.year}}</td>
+						<td>{{item[1].club}}</td>
+						<td>{{item[2].name}}</td>
 						<td>{{points}}</td>
 					</tr>
+                    {% endfor %}
+
 				</tbody>
 			</table>
 		</td>
