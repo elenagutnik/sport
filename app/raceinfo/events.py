@@ -24,14 +24,7 @@ def exectutiontime(func):
 @raceinfo.route('/d')
 def device_1get():
     db.create_all()
-    # ResultFunction.insert()
-    # Discipline.insert_discipline()
-    # Gender.insert_genders()
-    Category.insert()
-    Status.insert()
-    Jury_function.insert_functions()
-    CourseDeviceType.insert_types()
-    RunOrderFunction.insert()
+
     return ''
 
 @raceinfo.route('/emulation')
@@ -322,9 +315,6 @@ def competitor_clear():
     socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
     return 'OK'
 
-
-
-
 @raceinfo.route('/approve/run/<int:run_id>/competitor/<int:competitor_id>')
 @admin_required
 def approve_automate(run_id, competitor_id):
@@ -351,7 +341,6 @@ def approve_automate(run_id, competitor_id):
        db.session.commit()
 
        return 'ok', 200
-
 
 @raceinfo.route('/approve/edit/run/<int:run_id>/competitor/<int:competitor_id>')
 def approve_manual(run_id, competitor_id):
@@ -425,7 +414,6 @@ def approve_manual(run_id, competitor_id):
     recalculate_run_results(resultApproved.run_id)
     return 'Ok', 200
 
-
 def calculate_finish_params(current_competitor_finish, finished_competitors):
     try:
         start_result = db.session.query(ResultDetail).filter(ResultDetail.run_id == current_competitor_finish.run_id,
@@ -452,7 +440,6 @@ def calculate_personal_sector_params(current_competitor, device, course_id):
     except:
         socketio.emit('recount/error', dict(competitor_id=current_competitor.id,
                                             error='Count personal params: speed, sectortime'))
-
 # Функция принемает текущий результат и список  объекты ResultDetail
 # результатов БЕЗ текущего
 def calculate_common_sector_params(current_competitor, competitors_list):
@@ -477,7 +464,6 @@ def calculate_common_sector_params(current_competitor, competitors_list):
     except:
         socketio.emit('recount/error', dict(competitor_id=current_competitor.id,
                                             error='Count common params: sectorrank, sectordiff'))
-
 
 @raceinfo.route('/recalculate/<int:run_id>', methods=['GET'])
 def recalculate_run_results(run_id):
