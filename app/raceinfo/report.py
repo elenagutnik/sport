@@ -1,6 +1,7 @@
 from flask import make_response, render_template
 import pdfkit
 from .models import *
+import tempfile
 
 from . import raceinfo
 
@@ -53,7 +54,6 @@ def Report_show(race_id,isHTML):
                RaceCompetitor.competitor_id==Competitor.id,
                Competitor.nation_code_id==Nation.id).\
         count()
-    print(number_of_NOCs)
     forerunners = db.session.query(Forerunner.en_firstname.label('en_firstname'),
                                    Forerunner.en_lastname.label('en_lastname'),
                                    CourseForerunner.order.label('order'),
@@ -76,6 +76,7 @@ def Report_show(race_id,isHTML):
         'page-size': 'A4',
         'dpi': 400,
     }
+    add_pdf_header(options, race)
     if isHTML=='true':
         return html_render
     else:
@@ -89,3 +90,10 @@ def Report_show(race_id,isHTML):
     # return send_file(pdf,mimetype='application/pdf',as_attachment=False)
 
 
+def add_pdf_header(options, race):
+    with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
+        options['--header-html'] = header.name
+        header.write(
+            render_template('reports/header.html', race=race).encode('utf-8')
+        )
+    return
