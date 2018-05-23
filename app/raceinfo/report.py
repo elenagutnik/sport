@@ -75,7 +75,8 @@ def Report_show(race_id,isHTML):
     options = {
         'page-size': 'A4',
         'dpi': 400,
-        '--header-spacing': '30'
+        '--header-spacing': '30',
+        '--margin-top': '40'
     }
     add_pdf_header(options, race)
     if isHTML=='true':
