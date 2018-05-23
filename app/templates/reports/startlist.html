@@ -16,7 +16,7 @@
 	h1,h3 {text-transform:uppercase;}
 	h1 {font-size:20px;}
 	h2,h3 {font-size:17px;}
-	
+
 	div.title {
 		text-align:center;
 		margin:20px 0;
@@ -49,7 +49,7 @@
 	table.main .lname {text-transform:uppercase;}
 	table.main .title {font-weight:bold;}
 	table.main .starttime td {padding-top:8px;}
-	
+
 	table.list {
 		border:collapse:collapse;
 		margin:0;
@@ -58,18 +58,20 @@
 	table.list thead th {
 		border-top:1px solid #000;
 		border-bottom:1px solid #000;
-		padding:5px;
+		padding:5px 15px 5px 0;
 		text-align:center;
 		font-weight:bold;
 		font-size:16px;
 		vertical-align:middle;
 	}
+	table.main table.list td {padding-right:15px;}
+
 	table.list thead th:last {
-		border-right:1px solid #000;	
-	}	
+		border-right:1px solid #000;
+	}
 	table.list thead th:last {
-		border-right:1px solid #000;	
-	}	
+		border-right:1px solid #000;
+	}
 </style>
 {#<h1>Start List</h1>#}
 {#<h2>{{race[0].eventname}}</h2>#}
@@ -134,7 +136,7 @@
 					<td>{{start_time}}</td>
 					<td></td>
 				</tr>
-			</table>			
+			</table>
 		</td>
 		<td class="right">
 			<table>
@@ -187,11 +189,11 @@
 			<table class="list" cellpadding="0" cellspacing="0">
 				<thead>
 					<tr>
-						<th>Bib</th>
-						<th>FIS Code</th>
-						<th>Name</th>
+						<th width="1%">Bib</th>
+						<th width="5%">FIS Code</th>
+						<th style="text-align:left">Name</th>
 						<th>YB</th>
-						<th>CLUB</th>
+						<th width="5%">CLUB</th>
 						<th>NAT</th>
 						<th>Race Points</th>
 					</tr>
@@ -199,13 +201,13 @@
 				<tbody>
                     {% for item in competitors %}
 					<tr>
-						<td>{{item[1].bib}}</td>
-						<td>{{item[0].fiscode}}</td>
-						<td><span class="lname">{{item[0].en_lastname}}</span> {{item[0].en_firstname}}</td>
-						<td>{{item[0].birth.year}}</td>
-						<td>{{item[1].club}}</td>
-						<td>{{item[2].name}}</td>
-						<td>{{points}}</td>
+						<td align="right">{{item[1].bib}}</td>
+						<td align="right">{{item[0].fiscode}}</td>
+						<td><span class="lname"><b>{{item[0].en_lastname}}</span> {{item[0].en_firstname}}</b></td>
+						<td align="center">{{item[0].birth.year}}</td>
+						<td align="center">{{item[1].club}}</td>
+						<td align="center">{{item[2].name}}</td>
+						<td align="right">{{points}}</td>
 					</tr>
                     {% endfor %}
 
