@@ -6,9 +6,14 @@
 </head>
 <body>
 <style>
+	html {
+		padding-top:30px;
+		height:150px;
+	}
 	body {
 		padding:0;margin:0;width:100%;
-{#        height:100%;#}
+    height:1%;
+		vertical-align: top;
 		font-family:Arial;
 		font-size:14px;
 	}
@@ -26,50 +31,7 @@
 	div.title span {
 		margin-right:30px;
 	}
-	table.main {
-		width:100%;
-{#        height:100%; #}
-        border:none;
-	}
-	table.main td {margin:0; padding:0; vertical-align:top;}
-	table.main td.left {width:50% }
-	table.main td.right {width:50%; padding-left:30px;}
 
-	table.main table {width:100%;}
-	table.main table td, th{
-		padding:3px 0;
-	}
-	table.main th {
-		text-align:left;
-		border-top:1px solid #000;
-		border-bottom:1px solid #000;
-		font-weight:bold;
-		font-size:16px;
-	}
-	table.main .lname {text-transform:uppercase;}
-	table.main .title {font-weight:bold;}
-	table.main .starttime td {padding-top:8px;}
-
-	table.list {
-		border:collapse:collapse;
-		margin:0;
-		padding:0;
-	}
-	table.list thead th {
-		border-top:1px solid #000;
-		border-bottom:1px solid #000;
-		padding:5px;
-		text-align:center;
-		font-weight:bold;
-		font-size:16px;
-		vertical-align:middle;
-	}
-	table.list thead th:last {
-		border-right:1px solid #000;
-	}
-	table.list thead th:last {
-		border-right:1px solid #000;
-	}
 </style>
 <h1>Start List</h1>
 <h2>{{race[0].eventname}}</h2>
