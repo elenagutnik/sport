@@ -331,7 +331,7 @@ class Race(db.Model):
     td_assistant_nation_id = db.Column(db.Integer, db.ForeignKey('nation.id'))
 
     place = db.Column(db.String)
-    racedate = db.Column(db.Date) # probably must be 3 fields: day, month, year
+    racedate = db.Column(db.DateTime)# probably must be 3 fields: day, month, year
     tempunit = db.Column(db.String(1))
     longunit = db.Column(db.String(2))
     speedunit = db.Column(db.String(3))

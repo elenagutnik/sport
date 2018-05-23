@@ -79,6 +79,7 @@ def Report_show(race_id,isHTML):
     if isHTML=='true':
         return html_render
     else:
+
         pdf = pdfkit.from_string(html_render, False, options)
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
