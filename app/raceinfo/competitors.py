@@ -22,7 +22,6 @@ def load_competitors(race_id):
     nation = None
 
     for item in sheet.to_array()[1:]:
-        print(item)
         try:
             competitor = None
             if gender is None or gender.fiscode != item[6]:
@@ -94,7 +93,7 @@ def load_competitors(race_id):
 def calculate_age_class(birth, race_date):
     middle = datetime(int(datetime.now().year), 7, 1).date()
     competitor_age = race_date.year - birth.year
-    if race_date < middle:
+    if race_date.date() < middle:
         age_classes = {'U14': [13, 14], 'U16': [15, 16], 'U18': [17, 18], 'U21': [19, 21]}
     else:
         age_classes = {'U14': [12, 13], 'U16': [14, 15], 'U18': [16, 17], 'U21': [18, 20]}
