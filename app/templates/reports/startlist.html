@@ -7,7 +7,8 @@
 <body>
 <style>
 	body {
-		padding:0;margin:0;width:100%;height:100%;
+		padding:0;margin:0;width:100%;
+{#        height:100%;#}
 		font-family:Arial;
 		font-size:14px;
 	}
@@ -26,7 +27,9 @@
 		margin-right:30px;
 	}
 	table.main {
-		width:100%; height:100%; border:none;
+		width:100%;
+{#        height:100%; #}
+        border:none;
 	}
 	table.main td {margin:0; padding:0; vertical-align:top;}
 	table.main td.left {width:50% }
@@ -70,14 +73,14 @@
 		border-right:1px solid #000;
 	}
 </style>
-<h1>Start List</h1>
-<h2>{{race[0].eventname}}</h2>
-<h3>{{race[1].en_name}} {{race[3].en_name}}</h3>
-<div class="title">
-	<span>{{race[0].place}}</span>
-	<span>{{race[0].racedate}}</span>
-	<span>Start Time {{time}}</span>
-</div>
+{#<h1>Start List</h1>#}
+{#<h2>{{race[0].eventname}}</h2>#}
+{#<h3>{{race[1].en_name}} {{race[3].en_name}}</h3>#}
+{#<div class="title">#}
+{#	<span>{{race[0].place}}</span>#}
+{#	<span>{{race[0].racedate}}</span>#}
+{#	<span>Start Time {{time}}</span>#}
+{#</div>#}
 <table class="main">
 	<tr>
 		<td class="left">
