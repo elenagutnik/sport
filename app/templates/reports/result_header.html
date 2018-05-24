@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Start List</title>
+</head>
+<body>
+<style>
+	html {
+
+		height:0mm!important;
+
+	}
+	body {
+		padding:0;margin:0;width:100%;
+		height:0!important;
+		padding-top:30px;
+		vertical-align: top;
+		font-family:Arial;
+		font-size:14px;
+	}
+	h1,h2,h3 {margin:0; padding:0;text-align:center;}
+	h1,h3 {text-transform:uppercase;}
+	h1 {font-size:20px;}
+	h2,h3 {font-size:17px;}
+
+	div.title {
+		text-align:center;
+		margin:20px 0;
+		font-size:16px;
+		font-weight:bold;
+	}
+	div.title span {
+		margin-right:30px;
+	}
+
+</style>
+<h1>Official Results</h1>
+<h2>{{race[0].eventname}}</h2>
+<h3>{{race[1].en_name}} {{race[3].en_name}}</h3>
+<div class="title">
+	<span>{{race[0].place}}</span>
+	<span>{{race[0].racedate}}</span>
+	<span>Start Time {{time}}</span>
+</div>
+</body>
+</html>
