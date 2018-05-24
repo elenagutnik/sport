@@ -91,10 +91,11 @@ def Report_show(race_id,isHTML):
         return response
 
 def add_pdf_header(options, race):
+    # date=
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
         options['--header-html'] = header.name
         header.write(
-            render_template('reports/header.html', race=race).encode('utf-8')
+            render_template('reports/header.html', race=race, date = None).encode('utf-8')
         )
     return
 
@@ -131,7 +132,7 @@ def get_results__(race_id):
         filter(ResultApproved.run_id==RunInfo.id,
                RunInfo.number.in_([1, 2])).all()
     qlf_list = []
-    disqlf_list = []
+    disqlf_list = {}
     for item in race_competitors:
         if item[0].status_id == 1:
             qlf_item={
@@ -151,23 +152,30 @@ def get_results__(race_id):
                     qlf_item['time'+str(approve.run_number)] = approve.time
                     qlf_item['rank'+str(approve.run_number)] = approve.rank
             qlf_list.append(qlf_item)
-        else: #Did not start
-            disqlf_list.append({
-                'bib': item[0].bib,
-                'fiscode': item[1].fiscode,
-                'en_firstname': item[1].en_firstname,
-                'en_lastname': item[1].en_lastname,
-                'birth': item[1].birth,
-                'club': item[0].club,
-                'nation': item[2].name,
-                'status': item[0].status_id,
-                'gate': item[0].gate,
-                'reason': item[0].reason
+        else:
+            if item[0].status_id not in disqlf_list:
+                disqlf_list[item[0].status_id]={
+                    'name': (Status.query.filter(Status.id==item[0].status_id).one()).description,
+                    'competitors': []
+                }
+            disqlf_list[item[0].status_id]['competitors'].append({
+            'bib': item[0].bib,
+            'fiscode': item[1].fiscode,
+            'en_firstname': item[1].en_firstname,
+            'en_lastname': item[1].en_lastname,
+            'birth': item[1].birth,
+            'club': item[0].club,
+            'nation': item[2].name,
+            'status': item[0].status_id,
+            'gate': item[0].gate,
+            'reason': item[0].reason
             })
-    qlf_list=sorted(qlf_list, key= lambda item: item['rank'])
+    qlf_list = sorted(qlf_list, key= lambda item: item['rank'])
+
+    weather=Weather.query.filter(Weather.race_id==race_id).all()
     return render_template('reports/results.html',
                            qlf_competitors=qlf_list,
-                           disqlf_competitors=qlf_list,
+                           disqlf_competitors=disqlf_list,
                            course=course,
-                           course_setter=course_setter, jury=jury)
+                           course_setter=course_setter, jury=jury, weather=weather)
 

@@ -250,18 +250,30 @@ html{
 		</td>
 	</tr>
 </table>
-{% for item in disqlf_competitors %}
+{% for key, item in disqlf_competitors.items() %}
 <tr>
-    <td align="right">{{item.bib}}</td>
-    <td align="right">{{item.fiscode}}</td>
-    <td><b><span class="lname">{{item.en_lastname}}</span> {{item.en_firstname}}</b></td>
-    <td align="center">{{item.birth.year}}</td>
-    <td align="center">{{item.club}}</td>
-    <td align="center">{{item.nation}}</td>
-    <td align="center">{{item.status}}</td>
-    <td align="center">{{item.gate}}</td>
-    <td align="center">{{item.reason}}</td>
+<h1>{{ item.name }}</h1>
+    {% for competitor_item in item.competitors %}
+        <td align="right">{{competitor_item.bib}}</td>
+        <td align="right">{{competitor_item.fiscode}}</td>
+        <td><b><span class="lname">{{competitor_item.en_lastname}}</span> {{competitor_item.en_firstname}}</b></td>
+        <td align="center">{{competitor_item.birth.year}}</td>
+        <td align="center">{{competitor_item.club}}</td>
+        <td align="center">{{competitor_item.nation}}</td>
+        <td align="center">{{competitor_item.status}}</td>
+        <td align="center">{{competitor_item.gate}}</td>
+        <td align="center">{{competitor_item.reason}}</td>
+    {% endfor %}
 </tr>
 {% endfor %}
+
+
+{% for foo in weather %}
+    <h3>{{ foo.temperatureair }} Целься/ {{ 9/5* (foo.temperatureair | int )+ 32}}Фаря</h3>
+    <h3>{{ foo.time }}</h3>
+    <h3>{{ foo.snow }}</h3>
+    <h3>{{ foo.weather }}</h3>
+{% endfor %}
+
 </body>
 </html>
