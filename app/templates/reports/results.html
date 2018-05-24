@@ -32,6 +32,7 @@ html{
 	}
 	table.main {
 		width:100%;
+		border-collapse: collapse;
 {#        height:100%; #}
         border:none;
 	}
@@ -88,6 +89,30 @@ html{
 	table.list thead th:last {
 		border-right:1px solid #000;
 	}
+	.bordered, .bordered th {border-collapse: collapse;
+		border-left:1px solid #000!important;
+		}
+
+	table.forerunners {
+		border-collapse: collapse;
+		border: 1px solid #000;
+		margin:0 0 30px 0;
+	}
+	table.forerunners th, table.forerunners td {
+		border-collapse: collapse;
+		border-bottom: : 1px solid #000;
+	}
+	.up {
+		text-transform: uppercase;
+	}
+	.footer {
+		width:100%;
+	}
+	.footer td {width:33%}
+
+	table.weather {border:1px solid #000;margin:0 0 30px 0;}
+		table.weather td {border-bottm:1px solid #000;}
+	table.legend {border:1px solid #000;margin:30px 0;}
 </style>
 <table class="main">
 <tbody>
@@ -196,7 +221,7 @@ html{
 		<td class="title">
 			<br>
 			<br>
-			Number of Competitors: {{competitors | length}}, Number of NOCs: {{number_of_NOCs}}, FIS List #
+			Number of Competitors: {{competitors | length}}, Number of NOCs: {{number_of_NOCs}}, FIS List #, Applied Penalty {{penalty}}
 		</td>
 		<td class="title" align=right>
 			<br>
@@ -209,20 +234,24 @@ html{
 			<table class="list" cellpadding="0" cellspacing="0">
 				<thead>
 					<tr>
-						<th width="1%" style="border-left:1px solid #000">Rank</th>
-                        <th width="1%" style="border-left:1px solid #000">Bib</th>
-						<th width="5%">FIS Code</th>
-						<th style="text-align:left">Name</th>
-						<th>YB</th>
-						<th width="5%">CLUB</th>
-                        <th width="5%">NOC Code</th>
-						<th>Time 1</th>
-                        <th>Rank 1</th>
-                        <th>Time 2</th>
-                        <th>Rank 2</th>
-                        <th>Total</th>
-                        <th>Diff</th>
-                        <th>Race Points</th>
+						<th rowspan="2" width="1%" style="border-left:1px solid #000">Rank</th>
+            <th rowspan="2" width="1%" >Bib</th>
+						<th rowspan="2" width="5%">FIS Code</th>
+						<th rowspan="2" style="text-align:left">Name</th>
+						<th rowspan="2" >YB</th>
+						<th rowspan="2" width="5%">CLUB</th>
+            <th rowspan="2" width="5%">NOC Code</th>
+						<th colspan="2" class="bordered">Run 1</th>
+            <th colspan="2" class="bordered">Run 2</th>
+            <th rowspan="2" class="bordered">Total</th>
+            <th rowspan="2" >Diff</th>
+            <th rowspan="2" >Race Points</th>
+					</tr>
+					<tr class="bordered">
+						<th>Time</th>
+            <th>Rank</th>
+            <th>Time</th>
+            <th>Rank</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -249,7 +278,83 @@ html{
 			</table>
 		</td>
 	</tr>
+	<tr>
+		<td colspan=2>
+			<br><br>
+			<table class="list">
+				{% for item in disqlf_competitors %}
+				<tr>
+				    <td align="right">{{item.bib}}</td>
+				    <td align="right">{{item.fiscode}}</td>
+				    <td><b><span class="lname">{{item.en_lastname}}</span> {{item.en_firstname}}</b></td>
+				    <td align="center">{{item.birth.year}}</td>
+				    <td align="center">{{item.club}}</td>
+				    <td align="center">{{item.nation}}</td>
+				    <td align="center">{{item.status}}</td>
+				    <td align="center">{{item.gate}}</td>
+				    <td align="center">{{item.reason}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<br>
+			<br>
+			<table class="forerunners">
+				<tr>
+					<th>Forerunners</th>
+					<th colspan="9"></th>
+				</tr>
+				{% for forerunners_row in forerunners | batch(3, '&nbsp;') %}
+						<tr>
+								<td></td>
+						{% for forerunner in forerunners_row %}
+								<td>{{forerunner.order}}</td>
+								<td>
+									<span="lname">
+										{{forerunner.en_lastname}}
+									</span>
+									{{forerunner.en_firstname}}
+								</td>
+								<td>{{forerunner.name}}</td>
+						{% endfor %}
+						</tr>
+				{% endfor %}
+			</table>
+
+			<b>Conditionals of course</b>
+			<table class="weather">
+						<tr>
+							<td width="15%">Run 1: 				<span class="up">{{cloudy}}</span></td>
+							<td width="15%"><b>Snow:</b> 	<span class="up">{{snow}}</span></td>
+							<td width="35%"><b>Temperature - Start:</b>	<span class="up">{{temp_start}}</span></td>
+							<td width="35%"><b>Temperature - Finish:</b>	<span class="up">{{temp_finish}}</span></td>
+						</tr>
+						<tr>
+							<td width="15%">Run 2: 				<span class="up">{{cloudy}}</span></td>
+							<td width="15%"><b>Snow:</b> 	<span class="up">{{snow}}</span></td>
+							<td width="35%"><b>Temperature - Start:</b>	<span class="up">{{temp_start}}</span></td>
+							<td width="35%"><b>Temperature - Finish:</b>	<span class="up">{{temp_finish}}</span></td>
+						</tr>
+			</table>
+
+			<table class="legend">
+						<tr>
+							<td>
+								<b>Legend</b>
+								<br>
+								<b>YB</b> Year of Birth
+							</td>
+						</tr>
+			</table>
+
+		</td>
+	</tr>
+
 </table>
+
 {% for key, item in disqlf_competitors.items() %}
 <tr>
 <h1>{{ item.name }}</h1>
@@ -274,6 +379,20 @@ html{
     <h3>{{ foo.snow }}</h3>
     <h3>{{ foo.weather }}</h3>
 {% endfor %}
+
+<table class="footer">
+	<tr>
+		<td align="left">{{date}} / {{place}} ({{country_code}}) / {{codex}}</td>
+		<td></td>
+		<td align="right">Page {{page}}/{{topage}}</td>
+	</tr>
+	<tr>
+		<td>Data Processing by SLA</td>
+		<td align="center">{{generation_time}}</td>
+		<td align="right">SLA Timing</td>
+	</tr>
+</table>
+
 
 </body>
 </html>

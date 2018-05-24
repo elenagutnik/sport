@@ -37,11 +37,11 @@ html{
 	}
 	table.main thead {
 		display: table-header-group ;
-		background-color: #fa0;
+
 	}
 	table.list thead {
 		display: table-header-group ;
-		background-color: #0af;
+
 	}
 	tr {
 		page-break-inside: avoid;
@@ -242,18 +242,29 @@ html{
 	</tr>
     <tr>
         <td colspan=2>
-            <table>
-                {% for forerunners_row in forerunners | batch(3, '&nbsp;') %}
-                    <tr>
-                    {% for forerunner in forerunners_row %}
-                        <td>{{forerunner.order}}</td>
-                        <td>{{forerunner.en_lastname}}</td>
-                        <td>{{forerunner.en_firstname}}</td>
-                        <td>{{forerunner.name}}</td>
-                    {% endfor %}
-                    </tr>
-                {% endfor %}
-            </table>
+					<br>
+					<br>
+					<table class="forerunners">
+						<tr>
+							<th>Forerunners</th>
+							<th colspan="9"></th>
+						</tr>
+						{% for forerunners_row in forerunners | batch(3, '&nbsp;') %}
+								<tr>
+										<td></td>
+								{% for forerunner in forerunners_row %}
+										<td>{{forerunner.order}}</td>
+										<td>
+											<span="lname">
+												{{forerunner.en_lastname}}
+											</span>
+											{{forerunner.en_firstname}}
+										</td>
+										<td>{{forerunner.name}}</td>
+								{% endfor %}
+								</tr>
+						{% endfor %}
+					</table>
         </td>
     </tr>
 </table>
