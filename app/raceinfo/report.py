@@ -131,6 +131,14 @@ def get_results__(race_id):
                                            RunInfo.number.label('run_number')). \
         filter(ResultApproved.run_id==RunInfo.id,
                RunInfo.number.in_([1, 2])).all()
+    forerunners = db.session.query(Forerunner.en_firstname.label('en_firstname'),
+                                   Forerunner.en_lastname.label('en_lastname'),
+                                   CourseForerunner.order.label('order'),
+                                   Nation.name.label('name')).\
+        filter(Forerunner.nation_id == Nation.id,
+               CourseForerunner.forerunner_id == Forerunner.id,
+               CourseForerunner.course_id == course.id).\
+        all()
     qlf_list = []
     disqlf_list = {}
     for item in race_competitors:
@@ -177,5 +185,8 @@ def get_results__(race_id):
                            qlf_competitors=qlf_list,
                            disqlf_competitors=disqlf_list,
                            course=course,
-                           course_setter=course_setter, jury=jury, weather=weather)
+                           course_setter=course_setter,
+                           jury=jury,
+                           weather=weather,
+                           forerunners=forerunners)
 
