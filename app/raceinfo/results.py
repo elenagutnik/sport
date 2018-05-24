@@ -104,11 +104,13 @@ def The_sum_of_three_best_runs(race):
 
 
 def set_results_to_DB(result_list, competitor_list, key=None):
+    best_competitor = next((item for item in competitor_list if result_list[0][0] == item[0].id), None)
     for index, result in enumerate(result_list):
         competitor_item = next((item for item in competitor_list if result[0] == item[0].id), None)
         if key(result):
             competitor_item[0].rank = index+1
             competitor_item[0].time = result[2]
+            competitor_item[0].diff = result[2] - best_competitor[0].time
             competitor_item[0].status_id = 1
 
 @raceinfo.route('/race/<int:race_id>/results/get')
@@ -122,6 +124,7 @@ def get_results(race_id, competitorList = None):
         result_item =dict([
             ('global_rank', item[0].rank),
             ('race_competitor_id', item[0].id),
+            ('diff', str(item[0].diff)),
             ('status_id', item[0].status_id),
             ('bib', item[0].bib),
             ('ru_firstname', item[1].ru_firstname),

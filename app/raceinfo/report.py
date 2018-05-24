@@ -144,7 +144,7 @@ def get_results__(race_id):
                 'club': item[0].club,
                 'nation': item[2].name,
                 'total': item[0].time,
-                # 'diff': item[0].diff
+                'diff': item[0].diff
             }
             for approve in competitors_approve:
                 if item[0].id == approve.competitor_id:

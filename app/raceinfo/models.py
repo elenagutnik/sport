@@ -242,6 +242,7 @@ class RaceCompetitor(db.Model):
     rank = db.Column(db.Integer)
     status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
     time = db.Column(db.BigInteger)
+
     order = db.Column(db.Integer)
     run_id =db.Column(db.Integer, db.ForeignKey('run_info.id'))
     # переделать в связь с run_info, team_id
@@ -251,6 +252,7 @@ class RaceCompetitor(db.Model):
     fis_points = db.Column(db.Float)
 
     club = db.Column(db.String)
+    diff = db.Column(db.BigInteger)
 
 class ResultFunction(db.Model):
     __tablename__ = 'result_function'
