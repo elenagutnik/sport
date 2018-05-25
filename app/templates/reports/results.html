@@ -20,7 +20,7 @@ html{
 	h1,h3 {text-transform:uppercase;}
 	h1 {font-size:20px;}
 	h2,h3 {font-size:17px;}
-
+	h1.left{margin-top:20px;margin-bottom:5px;font-size:16px;text-align:left;text-transform: none;}
 	div.title {
 		text-align:center;
 		margin:20px 0;
@@ -38,11 +38,11 @@ html{
 	}
 	table.main thead {
 		display: table-header-group ;
-		background-color: #fa0;
+
 	}
 	table.list thead {
 		display: table-header-group ;
-		background-color: #0af;
+
 	}
 	tr {
 		page-break-inside: avoid;
@@ -273,28 +273,34 @@ html{
 						<td align="right">{{points}}</td>
 					</tr>
                     {% endfor %}
+<tr>
+	<td colspan="14">
+			<br>
+	</td>
+</tr>
 
-				</tbody>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td colspan=2>
-			<br><br>
-			<table class="list">
-				{% for item in disqlf_competitors %}
+				{% for key, item in disqlf_competitors.items() %}
 				<tr>
-				    <td align="right">{{item.bib}}</td>
-				    <td align="right">{{item.fiscode}}</td>
-				    <td><b><span class="lname">{{item.en_lastname}}</span> {{item.en_firstname}}</b></td>
-				    <td align="center">{{item.birth.year}}</td>
-				    <td align="center">{{item.club}}</td>
-				    <td align="center">{{item.nation}}</td>
-				    <td align="center">{{item.status}}</td>
-				    <td align="center">{{item.gate}}</td>
-				    <td align="center">{{item.reason}}</td>
+					<td colspan="14">
+						<h1 class="left"><span class="up">{{ item.name }}:</span>&nbsp;&nbsp;&nbsp; {{item.competitors|length}} competitor{% if item.competitors|length>1 %}s{% endif %}</h2>
+					</td>
 				</tr>
+				    {% for competitor_item in item.competitors %}
+						<tr>
+								<td></td>
+				        <td align="right">{{competitor_item.bib}}</td>
+				        <td align="right">{{competitor_item.fiscode}}</td>
+				        <td><b><span class="lname">{{competitor_item.en_lastname}}</span> {{competitor_item.en_firstname}}</b></td>
+				        <td align="center">{{competitor_item.birth.year}}</td>
+				        <td align="center">{{competitor_item.club}}</td>
+				        <td align="center">{{competitor_item.nation}}</td>
+								<td align="center" colspan=2>{% if (competitor_item.status==6 or competitor_item.status==9 or competitor_item.status==12) and competitor_item.gate!=None %}{{competitor_item.gate}}{% endif %}</td>
+								<td align="center" colspan=2>{% if (competitor_item.status==7 or competitor_item.status==10) and competitor_item.gate!=None %}{{competitor_item.gate}}{% endif %}</td>
+				        <td align="center" colspan="3">{% if competitor_item.reason!=None %}{{competitor_item.reason}}{% endif %}</td>
+						</tr>
+				    {% endfor %}
 				{% endfor %}
+
 			</table>
 		</td>
 	</tr>
@@ -326,18 +332,15 @@ html{
 
 			<b>Conditionals of course</b>
 			<table class="weather">
+				{% for foo in weather %}
 						<tr>
-							<td width="15%">Run 1: 				<span class="up">{{cloudy}}</span></td>
-							<td width="15%"><b>Snow:</b> 	<span class="up">{{snow}}</span></td>
-							<td width="35%"><b>Temperature - Start:</b>	<span class="up">{{temp_start}}</span></td>
-							<td width="35%"><b>Temperature - Finish:</b>	<span class="up">{{temp_finish}}</span></td>
+							<!--<h3>{{ foo.time }}</h3>-->
+							<td width="15%">Run {{loop.index}}: 				<span class="up">{{ foo.weather }}</span></td>
+							<td width="15%"><b>Snow:</b> 			<span class="up">{{ foo.snow }}</span></td>
+							<td width="35%"><b>Temperature - Start:</b>	<span class="up">{{ foo.temperatureair }} &deg;C / {{ (9/5* (foo.temperatureair | int )+ 32)| round(2)}} &deg;F</span></td>
+							<td width="35%"><b>Temperature - Finish:</b>	<span class="up">{{ foo.temperatureair }} &deg;C / {{ (9/5* (foo.temperatureair | int )+ 32)| round(2)}} &deg;F</span></td>
 						</tr>
-						<tr>
-							<td width="15%">Run 2: 				<span class="up">{{cloudy}}</span></td>
-							<td width="15%"><b>Snow:</b> 	<span class="up">{{snow}}</span></td>
-							<td width="35%"><b>Temperature - Start:</b>	<span class="up">{{temp_start}}</span></td>
-							<td width="35%"><b>Temperature - Finish:</b>	<span class="up">{{temp_finish}}</span></td>
-						</tr>
+				{% endfor %}
 			</table>
 
 			<table class="legend">
@@ -355,30 +358,10 @@ html{
 
 </table>
 
-{% for key, item in disqlf_competitors.items() %}
-<tr>
-<h1>{{ item.name }}</h1>
-    {% for competitor_item in item.competitors %}
-        <td align="right">{{competitor_item.bib}}</td>
-        <td align="right">{{competitor_item.fiscode}}</td>
-        <td><b><span class="lname">{{competitor_item.en_lastname}}</span> {{competitor_item.en_firstname}}</b></td>
-        <td align="center">{{competitor_item.birth.year}}</td>
-        <td align="center">{{competitor_item.club}}</td>
-        <td align="center">{{competitor_item.nation}}</td>
-        <td align="center">{{competitor_item.status}}</td>
-        <td align="center">{{competitor_item.gate}}</td>
-        <td align="center">{{competitor_item.reason}}</td>
-    {% endfor %}
-</tr>
-{% endfor %}
 
 
-{% for foo in weather %}
-    <h3>{{ foo.temperatureair }} Целься/ {{ 9/5* (foo.temperatureair | int )+ 32}}Фаря</h3>
-    <h3>{{ foo.time }}</h3>
-    <h3>{{ foo.snow }}</h3>
-    <h3>{{ foo.weather }}</h3>
-{% endfor %}
+
+
 
 <table class="footer">
 	<tr>
