@@ -1019,7 +1019,7 @@
                   var run_cols2="";
                   var rowspan;
                   if(arr.length){
-                    $("#table_raceresults").append("<thead><tr class='headrow'><th rowspan=3>bib</th><th rowspan=3>Name</th><th rowspan=3>Rank</th><th rowspan=3>Time</th><th rowspan=3>Status</th></tr></thead>");
+                    $("#table_raceresults").append("<thead><tr class='headrow'><th rowspan=3>bib</th><th rowspan=3>Name</th><th rowspan=3>Rank</th><th rowspan=3>Time</th><th rowspan=3>Diff</th><th rowspan=3>Status</th></tr></thead>");
                     $("#table_raceresults thead").append("<tr class='run_cols1'></tr>")
                     $("#table_raceresults thead").append("<tr class='run_cols2'></tr>")
                     for(var j=0;j<run_list.length;j++){
@@ -1046,7 +1046,7 @@
                       //console.log("run_id="+run_id);
                       var bib=arr[i].bib; //get info from server
                       var name=arr[i].en_firstname+" "+arr[i].en_lastname+" / "+arr[i].ru_firstname+" "+arr[i].ru_lastname;
-                      $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+arr[i].result_time+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
+                      $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+arr[i].result_time+"</td><td"+rowspan+">"+arr[i].diff+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
                       if(arr[i].status_id!=1)
                         $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" danger'>"+run_cols2+"</tr>");
                       for(var k=0;k<arr[i].results.length;k++){
