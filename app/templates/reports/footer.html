@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Start List</title>
+
+
+<script>
+function subst() {
+  var vars={};
+  var x=document.location.search.substring(1).split('&');
+  for (var i in x) {var z=x[i].split('=',2);vars[z[0]] = unescape(z[1]);}
+  var x=['frompage','topage','page','webpage','section','subsection','subsubsection'];
+  for (var i in x) {
+    var y = document.getElementsByClassName(x[i]);
+    for (var j=0; j<y.length; ++j) y[j].textContent = vars[x[i]];
+  }
+}
+</script>
+</head>
+<body onload="subst()">
+
+<style>
+	html {
+
+		height:100px!important;
+
+	}
+	body {
+{#		padding:0;margin:0;width:100%;#}
+{#		height:0px!important;#}
+{#		padding-top:30px;#}
+		vertical-align: top;
+		font-family:Arial;
+		font-size:14px;
+	}
+	h1,h2,h3 {margin:0; padding:0;text-align:center;}
+	h1,h3 {text-transform:uppercase;}
+	h1 {font-size:20px;}
+	h2,h3 {font-size:17px;}
+{##}
+{#	div.title {#}
+{#		text-align:center;#}
+{#		margin:20px 0;#}
+{#		font-size:16px;#}
+{#		font-weight:bold;#}
+{#	}#}
+{#	div.title span {#}
+{#		margin-right:30px;#}
+{#	}#}
+	.footer {
+		width:100%;
+	}
+	.footer td {width:33%}
+
+</style>
+<table class="footer">
+	<tr>
+		<td align="left">{{date}} / {{place}} ({{country_code}}) / {{codex}}</td>
+		<td></td>
+		<td align="right">Page <span class="page"></span>/<span class="topage"></span></td>
+	</tr>
+	<tr>
+		<td class="section">Data Processing by SLA</td>
+		<td align="center">{{generation_time}}</td>
+		<td align="right">SLA Timing</td>
+	</tr>
+</table>
+
+</body>
+</html>

@@ -273,16 +273,15 @@ html{
 						<td align="right">{{points}}</td>
 					</tr>
                     {% endfor %}
-<tr>
-	<td colspan="14">
-			<br>
-	</td>
-</tr>
-
+                    <tr>
+                        <td colspan="14">
+                            <br>
+                        </td>
+                    </tr>
 				{% for key, item in disqlf_competitors.items() %}
 				<tr>
 					<td colspan="14">
-						<h1 class="left"><span class="up">{{ item.name }}:</span>&nbsp;&nbsp;&nbsp; {{item.competitors|length}} competitor{% if item.competitors|length>1 %}s{% endif %}</h2>
+						<h1 class="left"><span class="up">{{ item.name }}:</span>&nbsp;&nbsp;&nbsp; {{item.competitors|length}} competitor{% if item.competitors|length>1 %}s{% endif %}</h1>
 					</td>
 				</tr>
 				    {% for competitor_item in item.competitors %}
@@ -329,45 +328,37 @@ html{
 						</tr>
 				{% endfor %}
 			</table>
-
 			<b>Conditionals of course</b>
 			<table class="weather">
 				{% for foo in weather %}
-						<tr>
-							<!--<h3>{{ foo.time }}</h3>-->
-							<td width="15%">Run {{loop.index}}: 				<span class="up">{{ foo.weather }}</span></td>
-							<td width="15%"><b>Snow:</b> 			<span class="up">{{ foo.snow }}</span></td>
-							<td width="35%"><b>Temperature - Start:</b>	<span class="up">{{ foo.temperatureair }} &deg;C / {{ (9/5* (foo.temperatureair | int )+ 32)| round(2)}} &deg;F</span></td>
-							<td width="35%"><b>Temperature - Finish:</b>	<span class="up">{{ foo.temperatureair }} &deg;C / {{ (9/5* (foo.temperatureair | int )+ 32)| round(2)}} &deg;F</span></td>
-						</tr>
+                    <tr>
+                        <!--<h3>{{ foo.time }}</h3>-->
+                        <td width="15%">Run {{loop.index}}: 				<span class="up">{{ foo.weather }}</span></td>
+                        <td width="15%"><b>Snow:</b> 			<span class="up">{{ foo.snow }}</span></td>
+                        <td width="35%"><b>Temperature - Start:</b>	<span class="up">{{ foo.temperatureair }} &deg;C / {{ (9/5* (foo.temperatureair | int )+ 32)| round(2)}} &deg;F</span></td>
+                        <td width="35%"><b>Temperature - Finish:</b>	<span class="up">{{ foo.temperatureair }} &deg;C / {{ (9/5* (foo.temperatureair | int )+ 32)| round(2)}} &deg;F</span></td>
+                    </tr>
 				{% endfor %}
 			</table>
 
 			<table class="legend">
-						<tr>
-							<td>
-								<b>Legend</b>
-								<br>
-								<b>YB</b> Year of Birth
-							</td>
-						</tr>
+                <tr>
+                    <td>
+                        <b>Legend</b>
+                        <br>
+                        <b>YB</b> Year of Birth
+                    </td>
+                </tr>
 			</table>
-
 		</td>
 	</tr>
-
 </table>
-
-
-
-
-
 
 <table class="footer">
 	<tr>
 		<td align="left">{{date}} / {{place}} ({{country_code}}) / {{codex}}</td>
 		<td></td>
-		<td align="right">Page {{page}}/{{topage}}</td>
+		<td align="right">Page <span class="page"></span>/<span class="topage"></span></td>
 	</tr>
 	<tr>
 		<td>Data Processing by SLA</td>
@@ -375,7 +366,6 @@ html{
 		<td align="right">SLA Timing</td>
 	</tr>
 </table>
-
 
 </body>
 </html>

@@ -11,8 +11,9 @@ html{
 }
 	body {
 		padding:0;margin:0;width:100%;
-/*padding-top:170px;
-*/		height:100%;
+/*padding-top:170px;		*/
+		height:100%;
+
 		font-family:Arial;
 		font-size:14px;
 	}
@@ -88,6 +89,8 @@ html{
 	table.list thead th:last {
 		border-right:1px solid #000;
 	}
+
+
 </style>
 {#<h1>Start List</h1>#}
 {#<h2>{{race[0].eventname}}</h2>#}
@@ -228,7 +231,7 @@ html{
 					<tr>
 						<td align="right">{{item[1].bib}}</td>
 						<td align="right">{{item[0].fiscode}}</td>
-						<td><span class="lname"><b>{{item[0].en_lastname}}</span> {{item[0].en_firstname}}</b></td>
+						<td><b><span class="lname">{{item[0].en_lastname}}</span> {{item[0].en_firstname}}</b></td>
 						<td align="center">{{item[0].birth.year}}</td>
 						<td align="center">{{item[1].club}}</td>
 						<td align="center">{{item[2].name}}</td>
@@ -242,33 +245,32 @@ html{
 	</tr>
     <tr>
         <td colspan=2>
-					<br>
-					<br>
-					<table class="forerunners">
-						<tr>
-							<th>Forerunners</th>
-							<th colspan="9"></th>
-						</tr>
-						{% for forerunners_row in forerunners | batch(3, '&nbsp;') %}
-								<tr>
-										<td></td>
-								{% for forerunner in forerunners_row %}
-										<td>{{forerunner.order}}</td>
-										<td>
-											<span="lname">
-												{{forerunner.en_lastname}}
-											</span>
-											{{forerunner.en_firstname}}
-										</td>
-										<td>{{forerunner.name}}</td>
-								{% endfor %}
-								</tr>
-						{% endfor %}
-					</table>
+            <br>
+            <br>
+            <table class="forerunners">
+                <tr>
+                    <th>Forerunners</th>
+                    <th colspan="9"></th>
+                </tr>
+                {% for forerunners_row in forerunners | batch(3, '&nbsp;') %}
+                        <tr>
+                                <td></td>
+                        {% for forerunner in forerunners_row %}
+                                <td>{{forerunner.order}}</td>
+                                <td>
+                                    <span="lname">
+                                        {{forerunner.en_lastname}}
+                                    </span>
+                                    {{forerunner.en_firstname}}
+                                </td>
+                                <td>{{forerunner.name}}</td>
+                        {% endfor %}
+                        </tr>
+                {% endfor %}
+            </table>
         </td>
     </tr>
 </table>
-
 </tbody></table>
 </body>
 </html>
