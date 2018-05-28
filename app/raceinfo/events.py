@@ -86,7 +86,7 @@ def load_data_vol2():
     course_devices = db.session.query(CourseDevice.course_id).filter_by(device_id=device.id)
     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
     # Заезд с пришли данные
-
+    result = None
     run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None ).one()
 
     # Сам девайс с которого пришли данные
@@ -360,7 +360,7 @@ def approve_manual(run_id, competitor_id):
     resultApproved.is_finish = True
     try:
 
-        if data['status_id'] == '1' and resultApproved.is_start == False:
+        if resultApproved.is_start == False:
             competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id == competitor_id, RunOrder.run_id==run_id).first()
             competitorOrder.manual_order = 0
             db.session.add(competitorOrder)
