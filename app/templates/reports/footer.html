@@ -23,45 +23,42 @@ function subst() {
 <style>
 	html {
 
-		height:100px!important;
-
+		height:20mm!important;
+/*    background-color:#57cd35;*/
+    padding:0;margin:0;
 	}
 	body {
-{#		padding:0;margin:0;width:100%;#}
-{#		height:0px!important;#}
-{#		padding-top:30px;#}
-		vertical-align: top;
+
+		padding:0;margin:0;width:100%;
+		height:0px!important;
+    padding-top:20px;
+		vertical-align: bottom;
 		font-family:Arial;
 		font-size:14px;
+/*    background-color:#67dd45;*/
 	}
 	h1,h2,h3 {margin:0; padding:0;text-align:center;}
 	h1,h3 {text-transform:uppercase;}
 	h1 {font-size:20px;}
 	h2,h3 {font-size:17px;}
-{##}
-{#	div.title {#}
-{#		text-align:center;#}
-{#		margin:20px 0;#}
-{#		font-size:16px;#}
-{#		font-weight:bold;#}
-{#	}#}
-{#	div.title span {#}
-{#		margin-right:30px;#}
-{#	}#}
+
+
 	.footer {
+    height:50px;
+    margin-bottom:0;
 		width:100%;
 	}
-	.footer td {width:33%}
+	.footer td {width:33%; border-bottom: 1px solid #000;}
 
 </style>
-<table class="footer">
+<table class="footer" cellpadding=0 cellspacing=0>
 	<tr>
 		<td align="left">{{date}} / {{place}} ({{country_code}}) / {{codex}}</td>
 		<td></td>
 		<td align="right">Page <span class="page"></span>/<span class="topage"></span></td>
 	</tr>
 	<tr>
-		<td class="section">Data Processing by SLA</td>
+		<td>Data Processing by SLA</td>
 		<td align="center">{{generation_time}}</td>
 		<td align="right">SLA Timing</td>
 	</tr>
