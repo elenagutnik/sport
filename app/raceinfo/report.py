@@ -12,6 +12,8 @@ from pathlib import Path
 import xlwt
 import json
 
+path = "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe";
+
 @raceinfo.route('/race/<int:race_id>/report/ishtml/<isHTML>')
 def Report_show(race_id,isHTML):
 
@@ -74,17 +76,17 @@ def Report_show(race_id,isHTML):
     options = {
         'page-size': 'A4',
         'dpi': 400,
-        '--header-spacing': '30',
-        '--footer-spacing': '30',
-        '--margin-top': '40',
+
+        '--margin-top': '30',
+        #'--margin-bottom':'-20mm',
+        #'--footer-center':'[page]/[topage]'
     }
     add_pdf_header(options, race)
     add_pdf_footer(options, race)
     if isHTML == 'true':
         return html_render
     else:
-
-        pdf = pdfkit.from_string(html_render, False, options)
+        pdf = pdfkit.from_string(html_render, False, options, configuration=pdfkit.configuration(wkhtmltopdf=path))
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = 'inline; filename=report.pdf'
@@ -96,7 +98,7 @@ def add_pdf_header(options, race):
         header.write(
             render_template('reports/header.html', race=race,
                             date=race[0].racedate.strftime('%a %d %b %Y'),
-                            time=race[0].racedate.strftime('%-H:%M')).encode('utf-8')
+                            time=race[0].racedate.strftime('-%H:%M')).encode('utf-8')
         )
     return
 
@@ -295,8 +297,8 @@ def reports_page(race_id):
     add_pdf_header(options, race)
     add_pdf_footer(options, race)
 
-    pdfkit.from_string(startlist_report, pdf_path(race_id, 'startlist'), options)
-    pdfkit.from_string(results_report, pdf_path(race_id, 'results'), options)
+    pdfkit.from_string(startlist_report, pdf_path(race_id, 'startlist'), options, configuration=pdfkit.configuration(wkhtmltopdf=path))
+    pdfkit.from_string(results_report, pdf_path(race_id, 'results'), options, configuration=pdfkit.configuration(wkhtmltopdf=path))
 
     return render_template('reports/report_page.html',
                            race=race[0],
