@@ -91,7 +91,6 @@ def Report_show(race_id,isHTML):
         return response
 
 def add_pdf_header(options, race):
-
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
         options['--header-html'] = header.name
         header.write(
@@ -102,7 +101,6 @@ def add_pdf_header(options, race):
     return
 
 def add_pdf_footer(options, race):
-
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer:
         options['--footer-html'] = footer.name
         footer.write(
@@ -311,6 +309,7 @@ def pdf_path(race_id, report_type, format=None):
         return str(Path(__file__).resolve().parents[1])+'/static/reports/race'+str(race_id)+report_type+'.pdf'
     else:
         return str(Path(__file__).resolve().parents[1]) + '/static/reports/race' + str(race_id) + report_type + '.'+str(format)
+
 def prepare_results(race_competitors, competitors_approve):
     qlf_list = []
     disqlf_list = {}
@@ -377,7 +376,6 @@ def couresetter_information(course_coursetter_id):
         .filter(Coursetter.id == course_coursetter_id,
                 Coursetter.nation_id == Nation.id).one()
 
-
 def forrunners_information(course_id):
     return db.session.query(Forerunner.en_firstname.label('en_firstname'),
                      Forerunner.en_lastname.label('en_lastname'),
@@ -387,7 +385,6 @@ def forrunners_information(course_id):
                CourseForerunner.forerunner_id == Forerunner.id,
                CourseForerunner.course_id == course_id). \
         all()
-
 
 @raceinfo.route('/race/<int:race_id>/xls')
 def generate_excel(race_id):
@@ -418,36 +415,36 @@ class ExcelGenerator:
     def set_header(self, run_count):
         header = [{'name': 'Bib',
                    'rows_count': 0,
-                   'cell_count': 2,
+                   'cell_count': 1,
                    }, {'name': 'Name',
                        'rows_count': 0,
-                       'cell_count': 2,
+                       'cell_count': 1,
                        }, {'name': 'Rank',
                            'rows_count': 0,
-                           'cell_count': 2,
+                           'cell_count': 1,
                            }, {'name': 'Time',
                                'rows_count': 0,
-                               'cell_count': 2,
+                               'cell_count': 1,
                                }, {'name': 'Diff',
                                    'rows_count': 0,
-                                   'cell_count': 2,
+                                   'cell_count': 1,
                                    }, {'name': 'Status',
                                        'rows_count': 0,
-                                       'cell_count': 2,
+                                       'cell_count': 1,
                                        }]
 
         for index, item in enumerate(header):
             self.ws.write_merge(0, 0+item['cell_count'], index + item['rows_count'], index + item['rows_count'], item['name'])
         self.cursor[1]=6
         for item in range(run_count):
-            self.ws.write_merge(0, 0, self.cursor[1], self.cursor[1]+2,
+            self.ws.write_merge(0, 0, self.cursor[1], self.cursor[1]+4,
                                 'Run '+ str(item+1))
             self.ws.write(1, self.cursor[1], 'Rank')
             self.ws.write(1, self.cursor[1]+1, 'Time')
             self.ws.write(1, self.cursor[1]+2, 'Status')
-            self.ws.write(2, self.cursor[1], 'Gate')
-            self.ws.write_merge(2, 2, self.cursor[1]+1, self.cursor[1]+2, 'reason')
-            self.cursor[1] += 3
+            self.ws.write(1, self.cursor[1]+3, 'Gate')
+            self.ws.write(1, self.cursor[1]+4, 'reason')
+            self.cursor[1] += 5
         self.cursor[0] = 3
         self.cursor[1] = 1
     def set_data(self, data):
@@ -460,22 +457,18 @@ class ExcelGenerator:
             self.ws.write(self.cursor[0], 5, item['status'])
             self.cursor[1] = 6
             for result_item in item['results']:
-                if result_item['status_id']==1:
-                    self.ws.write(self.cursor[0], self.cursor[1], result_item['rank'])
-                    self.cursor[1] += 1
-                    self.ws.write(self.cursor[0], self.cursor[1], result_item['time'])
-                    self.cursor[1] += 1
-                    self.ws.write(self.cursor[0], self.cursor[1], result_item['status'])
-                    self.cursor[1] += 1
-                else:
+
+                self.ws.write(self.cursor[0], self.cursor[1], result_item['rank'])
+                self.cursor[1] += 1
+                self.ws.write(self.cursor[0], self.cursor[1], result_item['time'])
+                self.cursor[1] += 1
+                self.ws.write(self.cursor[0], self.cursor[1], result_item['status'])
+                self.cursor[1] += 1
+                if result_item['status_id'] != 1:
                     self.ws.write(self.cursor[0], self.cursor[1], result_item['gate'])
                     self.cursor[1] += 1
-                    self.ws.write_merge(self.cursor[0],
-                                        self.cursor[0],
-                                        self.cursor[1],
-                                        self.cursor[1]+1,
-                                        result_item['reason'])
-                    self.cursor[1] += 2
+                    self.ws.write(self.cursor[0], self.cursor[1], result_item['reason'])
+                    self.cursor[1] += 1
             self.cursor[0] += 1
 
 
