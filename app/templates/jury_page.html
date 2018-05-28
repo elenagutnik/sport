@@ -1009,7 +1009,7 @@
           $.ajax({
             type: "GET",
             url: "/raceinfo/race/"+race_id+"/results",
-            success:function(data) {
+            success:function(data1) {
               $.ajax({
                 type: "GET",
                 url: "/raceinfo/race/"+race_id+"/results/get",
@@ -1032,8 +1032,9 @@
                     $("#table_raceresults").append("<tbody></tbody>");
                     for(var i=0;i<arr.length;i++){
                       console.log("arr.length="+arr.length+" i="+i);
-                      if(arr[i].status_id==1){rowspan="";}
-                      else{rowspan=" rowspan='2' ";}
+                      if(arr[i].status_id==1){rowspan=""; style_mistakes="success";}
+                      else{rowspan=" rowspan='2' "; style_mistakes="danger";}
+                      rowspan=" rowspan='2' ";
                       /*
                       var m=0;
                       while(!glob_arr["run"+run_list[m].number]["comp_"+arr[i].race_competitor_id] && m<run_list.length){
@@ -1047,16 +1048,16 @@
                       var bib=arr[i].bib; //get info from server
                       var name=arr[i].en_firstname+" "+arr[i].en_lastname+" / "+arr[i].ru_firstname+" "+arr[i].ru_lastname;
                       $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+arr[i].result_time+"</td><td"+rowspan+">"+arr[i].diff+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
-                      if(arr[i].status_id!=1)
-                        $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" danger'>"+run_cols2+"</tr>");
+                      //if(arr[i].status_id!=1)
+                        $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+style_mistakes+"'>"+run_cols2+"</tr>");
                       for(var k=0;k<arr[i].results.length;k++){
                         $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_rank").html(arr[i].results[k].rank);
                         $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_time").html(arr[i].results[k].time);
                         $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_status").html(getObjById(status_list,"id",arr[i].results[k].status_id).name);
-                        if(arr[i].status_id!=1){
+                        //if(arr[i].status_id!=1){
                           $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_gate").html(arr[i].results[k].gate);
                           $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_reason").html(arr[i].results[k].reason);
-                        }
+                        //}
                       }
                     }
                   }
