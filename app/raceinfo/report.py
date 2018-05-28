@@ -3,11 +3,14 @@ import pdfkit
 from .models import *
 import tempfile
 import datetime
-import json
+from flask import Response
+import io
 from . import raceinfo
+from .results import get_results
 from pathlib import Path
-import os
 
+import xlwt
+import json
 
 @raceinfo.route('/race/<int:race_id>/report/ishtml/<isHTML>')
 def Report_show(race_id,isHTML):
@@ -303,20 +306,11 @@ def reports_page(race_id):
                            results_pdf=pdf_path(race_id, 'results')
                            )
 
-
-
-
-def pdf_path(race_id, report_type):
-    return str(Path(__file__).resolve().parents[1])+'/static/reports/race'+str(race_id)+report_type+'.pdf'
-
-
-
-
-
-
-
-
-
+def pdf_path(race_id, report_type, format=None):
+    if format is None:
+        return str(Path(__file__).resolve().parents[1])+'/static/reports/race'+str(race_id)+report_type+'.pdf'
+    else:
+        return str(Path(__file__).resolve().parents[1]) + '/static/reports/race' + str(race_id) + report_type + '.'+str(format)
 def prepare_results(race_competitors, competitors_approve):
     qlf_list = []
     disqlf_list = {}
@@ -395,3 +389,101 @@ def forrunners_information(course_id):
         all()
 
 
+@raceinfo.route('/race/<int:race_id>/xls')
+def generate_excel(race_id):
+    wb = ExcelGenerator('results')
+
+    wb.set_header(
+        db.session.query(RunInfo).distinct(RunInfo.id). \
+            filter(RunInfo.race_id == race_id). \
+            count()
+    )
+
+    wb.set_data(json.loads(get_results(race_id)))
+
+    response = make_response(wb.get_xls_file())
+    response.headers['Content-Type'] = 'application/vnd.ms-excel'
+    response.headers['Content-Disposition'] = 'inline; filename=report.xls'
+    return response
+
+
+class ExcelGenerator:
+    cursor = []
+    wb = None
+    ws = None
+    def __init__(self, sheet_name):
+        self.cursor = [0, 0]
+        self.wb = xlwt.Workbook()
+        self.ws = self.wb.add_sheet(sheet_name)
+    def set_header(self, run_count):
+        header = [{'name': 'Bib',
+                   'rows_count': 0,
+                   'cell_count': 2,
+                   }, {'name': 'Name',
+                       'rows_count': 0,
+                       'cell_count': 2,
+                       }, {'name': 'Rank',
+                           'rows_count': 0,
+                           'cell_count': 2,
+                           }, {'name': 'Time',
+                               'rows_count': 0,
+                               'cell_count': 2,
+                               }, {'name': 'Diff',
+                                   'rows_count': 0,
+                                   'cell_count': 2,
+                                   }, {'name': 'Status',
+                                       'rows_count': 0,
+                                       'cell_count': 2,
+                                       }]
+
+        for index, item in enumerate(header):
+            self.ws.write_merge(0, 0+item['cell_count'], index + item['rows_count'], index + item['rows_count'], item['name'])
+        self.cursor[1]=6
+        for item in range(run_count):
+            self.ws.write_merge(0, 0, self.cursor[1], self.cursor[1]+2,
+                                'Run '+ str(item+1))
+            self.ws.write(1, self.cursor[1], 'Rank')
+            self.ws.write(1, self.cursor[1]+1, 'Time')
+            self.ws.write(1, self.cursor[1]+2, 'Status')
+            self.ws.write(2, self.cursor[1], 'Gate')
+            self.ws.write_merge(2, 2, self.cursor[1]+1, self.cursor[1]+2, 'reason')
+            self.cursor[1] += 3
+        self.cursor[0] = 3
+        self.cursor[1] = 1
+    def set_data(self, data):
+        for item in data:
+            self.ws.write(self.cursor[0], 0, item['bib'])
+            self.ws.write(self.cursor[0], 1, item['ru_firstname']+' '+item['en_firstname'])
+            self.ws.write(self.cursor[0], 2, item['global_rank'])
+            self.ws.write(self.cursor[0], 3, item['result_time'])
+            self.ws.write(self.cursor[0], 4, item['diff'])
+            self.ws.write(self.cursor[0], 5, item['status'])
+            self.cursor[1] = 6
+            for result_item in item['results']:
+                if result_item['status_id']==1:
+                    self.ws.write(self.cursor[0], self.cursor[1], result_item['rank'])
+                    self.cursor[1] += 1
+                    self.ws.write(self.cursor[0], self.cursor[1], result_item['time'])
+                    self.cursor[1] += 1
+                    self.ws.write(self.cursor[0], self.cursor[1], result_item['status'])
+                    self.cursor[1] += 1
+                else:
+                    self.ws.write(self.cursor[0], self.cursor[1], result_item['gate'])
+                    self.cursor[1] += 1
+                    self.ws.write_merge(self.cursor[0],
+                                        self.cursor[0],
+                                        self.cursor[1],
+                                        self.cursor[1]+1,
+                                        result_item['reason'])
+                    self.cursor[1] += 2
+            self.cursor[0] += 1
+
+
+    def save(self, path):
+        self.wb.save(path)
+
+
+    def get_xls_file(self):
+        output = io.BytesIO()
+        self.wb.save(output)
+        return output.getvalue()

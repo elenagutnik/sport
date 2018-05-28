@@ -1,5 +1,5 @@
 from . import raceinfo, jsonencoder
-from .models import Race, ResultDetail, RunInfo, RaceCompetitor, ResultApproved, Competitor
+from .models import Race, ResultDetail, RunInfo, RaceCompetitor, ResultApproved, Competitor, Status
 from .. import db
 from sqlalchemy import func
 import json
@@ -120,6 +120,7 @@ def get_results(race_id, competitorList = None):
             RaceCompetitor.race_id == race_id).all()
     resultApproves = db.session.query(ResultApproved, RunInfo).join(RunInfo).filter(RunInfo.race_id == race_id).all()
     result = []
+    statuses=Status.query.all()
     for item in competitorList:
         result_item =dict([
             ('global_rank', item[0].rank),
@@ -132,6 +133,7 @@ def get_results(race_id, competitorList = None):
             ('ru_lastname', item[1].ru_lastname),
             ('en_lastname', item[1].en_lastname)
         ])
+        result_item['status']=next((item.name for item in statuses if item.id==result_item['status_id']), None)
         if item[0].time is not None:
             result_item['result_time'] = int(item[0].time)
         else:
@@ -147,8 +149,10 @@ def get_results(race_id, competitorList = None):
                         ('gate', approve[0].gate),
                         ('status_id', approve[0].status_id),
                         ('time', approve[0].time),
+                        ('status', next((item.name for item in statuses if item.id == approve[0].status_id), None))
                     ])
                 )
+
         result_item['results'] = approve__result_item
         result.append(result_item)
     result = sorted(result, key=lambda item: (item['global_rank'] is None, item['global_rank']))
