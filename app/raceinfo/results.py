@@ -7,6 +7,18 @@ import decimal
 
 @raceinfo.route('/race/<int:race_id>/results')
 def race_results(race_id):
+    RaceCompetitor.query.\
+       filter(RaceCompetitor.race_id == race_id).\
+       update(
+        {
+            'rank': None,
+            'reason': None,
+            'status_id': None,
+            'diff': None,
+            'time': None,
+            'gate': None
+        })
+    db.session.commit()
     race = Race.query.filter(Race.id == race_id).one()
     raceCompetitors = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.race_id == race_id).all()
     if race.result_function == 1:
