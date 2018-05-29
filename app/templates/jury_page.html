@@ -1035,9 +1035,9 @@
           console.log($(this).attr("name"));
           if($(this).attr("name")=="startlist")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist");
 
-          if($(this).attr("name")=="startlist1")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist1");
-          if($(this).attr("name")=="startlist2")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist2");
-          if($(this).attr("name")=="startlist3")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist3");
+          if($(this).attr("name")=="startlist1")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist/1");
+          if($(this).attr("name")=="startlist2")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist/2");
+          if($(this).attr("name")=="startlist3")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist/3");
 
           if($(this).attr("name")=="results_C73C")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/results");
 
@@ -1109,6 +1109,7 @@
                         //}
                       }
                     }
+                    $("#table_raceresults").append("<a href='reports/xls' class='btn-default btn'>Download xls</a>")
                   }
                 },
                 error: function(error){
