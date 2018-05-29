@@ -478,6 +478,7 @@
             <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="startlist3">Start List - Run 3</button>
             <hr>
             <h3>Результаты</h3>
+            <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="results_C73C_un">#C73C - Unofficial Results (After Run 2)</button>
             <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="results_C73C">#C73C - Official Results (After Run 2)</button>
 
         </div>
@@ -1041,6 +1042,7 @@
           if($(this).attr("name")=="startlist3")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist/3");
 
           if($(this).attr("name")=="results_C73C")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/results");
+          if($(this).attr("name")=="results_C73C_un")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/results");
 
           console.log($("#form_reportfields").attr("action"));
           $("#form_reportfields").submit();
