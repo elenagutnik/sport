@@ -129,22 +129,8 @@ html	{
 					<td title="national code">{{item.name}}</td>
 				</tr>
                 {% endfor %}
-{#				<tr>#}
-{#					<td class="title">Referee</td>#}
-{#					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>#}
-{#					<td title="national code">{{nc}}</td>#}
-{#				</tr>#}
-{#				<tr>#}
-{#					<td class="title">Assistant Referee</td>#}
-{#					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>#}
-{#					<td title="national code">{{nc}}</td>#}
-{#				</tr>#}
-{#				<tr>#}
-{#					<td class="title">Chief of Race</td>#}
-{#					<td><span class="lname">{{en_lastname}}</span> {{en_firstname}}</td>#}
-{#					<td title="national code">{{nc}}</td>#}
-{#				</tr>#}
 			</table>
+        {% if run_number == 0 %}
 			<br>
 			<br>
 			<table>
@@ -169,6 +155,7 @@ html	{
 					<td></td>
 				</tr>
 			</table>
+        {% endif %}
 		</td>
 		<td class="right">
 			<table>
@@ -204,6 +191,58 @@ html	{
 			</table>
 		</td>
 	</tr>
+    {% if run_number !=0 %}
+    <tr>
+		<td class="left">
+			<table>
+				<tr>
+					<th colspan="3">
+						Race Information Run 1
+					</th>
+				</tr>
+                <tr>
+					<td class="title">Cource Setter</td>
+					<td><span class="lname">{{course_setter.en_lastname}}</span> {{course_setter.en_firstname}}</td>
+					<td title="national code">{{course_setter.name}}</td>
+				</tr>
+				<tr>
+					<td class="title">Gates/Turning Gates</td>
+					<td>{{course.gates}}/{{ course.tuminggates }}</td>
+					<td></td>
+				</tr>
+				<tr class="starttime">
+					<td class="title">Start Time</td>
+					<td>{{runs[0][1]}}</td>
+					<td></td>
+				</tr>
+			</table>
+		</td>
+		<td class="right">
+			<table>
+				<tr>
+					<th colspan="3">
+						Race Information Run 2
+					</th>
+				</tr>
+				<tr>
+					<td class="title">Cource Setter</td>
+					<td><span class="lname">{{course_setter.en_lastname}}</span> {{course_setter.en_firstname}}</td>
+					<td title="national code">{{course_setter.name}}</td>
+				</tr>
+				<tr>
+					<td class="title">Gates/Turning Gates</td>
+					<td>{{course.gates}}/{{ course.tuminggates }}</td>
+					<td></td>
+				</tr>
+				<tr class="starttime">
+					<td class="title">Start Time</td>
+					<td>{{runs[1][1]}}</td>
+					<td></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+    {% endif %}
 	<tr>
 		<td class="title">
 			<br>
@@ -262,7 +301,7 @@ html	{
                         {% for forerunner in forerunners_row %}
                                 <td>{{forerunner.order}}</td>
                                 <td>
-                                    <span="lname">
+                                    <span class="lname">
                                         {{forerunner.en_lastname}}
                                     </span>
                                     {{forerunner.en_firstname}}

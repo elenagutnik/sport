@@ -1,4 +1,4 @@
-from flask import make_response, render_template, flash
+from flask import make_response, render_template, request
 import pdfkit
 from .models import *
 import tempfile
@@ -38,12 +38,14 @@ def generate_excel(race_id):
 @raceinfo.route('/race/<int:race_id>/reports/orderlist')
 def generate_orderlist_report(race_id):
     # Prepare data
+    ffactor =request.args.get('fields[ffactor]')
+
     race = RaceInformation.get_main_race_info(race_id)
     course = RaceInformation.get_course_info(race_id)
 
     # Create report
 
-    report = OrderListReport(1)
+    report = OrderListReport()
     report.set_header(race)
     report.set_content(race=race,
                        jury=RaceInformation.get_jury_info(race_id),
@@ -51,7 +53,34 @@ def generate_orderlist_report(race_id):
                        coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
                        competitors=RaceInformation.get_competitor_info(race_id),
                        forerunners=RaceInformation.get_forunners_info(course.id),
-                       number_of_NOCs=RaceInformation.get_number_of_NOCs(race_id)
+                       number_of_NOCs=RaceInformation.get_number_of_NOCs(race_id), F=ffactor
+                       )
+    report.set_footer(race)
+
+    response = make_response(report.get_file())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=orderlist_report.pdf'
+    return response
+
+@raceinfo.route('/race/<int:race_id>/reports/orderlist/<int:run_number>')
+def generate_orderlist_report_for_run(race_id, run_number):
+    # Prepare data
+    race = RaceInformation.get_main_race_info(race_id)
+    course = RaceInformation.get_course_info(race_id)
+    ffactor =request.args.get('fields[ffactor]')
+
+    # Create report
+
+    report = OrderListReport(run_number)
+    report.set_header(race)
+    report.set_content(race=race,
+                       jury=RaceInformation.get_jury_info(race_id),
+                       course=course,
+                       coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                       competitors=RaceInformation.get_competitor_info_for_run(race_id, run_number),
+                       forerunners=RaceInformation.get_forunners_info(course.id),
+                       number_of_NOCs=RaceInformation.get_number_of_NOCs(race_id),
+                       runs=RaceInformation.get_runs_starttime(race_id), F=ffactor
                        )
     report.set_footer(race)
 
@@ -63,8 +92,14 @@ def generate_orderlist_report(race_id):
 @raceinfo.route('/race/<int:race_id>/reports/results')
 def generate_results_report(race_id):
     # Prepare data
+
+    ffactor =request.args.get('fields[ffactor]')
+    penalty = request.args.get('fields[penalty]')
+    reasondesc = request.args.get('fields[reasondesc]')
+
     race = RaceInformation.get_main_race_info(race_id)
     course = RaceInformation.get_course_info(race_id)
+
 
     qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
                                                         RaceInformation.get_approved_competitor_info(race_id))
@@ -80,8 +115,10 @@ def generate_results_report(race_id):
                        forerunners=RaceInformation.get_forunners_info(course.id),
                        qlf_list=qlf_list,
                        disqlf_list=disqlf_list,
-                       weather=RaceInformation.get_weather_info(race_id)
+                       weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
                        )
+
+
 
     report.set_footer(race)
 
@@ -170,30 +207,31 @@ class ExcelGenerator:
 class OrderListReport:
     options = {}
     content = None
-    run_id = None
-    def __init__(self, run_id=0):
+    run_number = None
+    def __init__(self, run_number=0):
         self.options = {
             'page-size': 'A4',
             'dpi': 400,
             '--margin-top': '30'
         }
-        self.run_id = run_id
+        self.run_number = run_number
+
     def set_header(self, race ):
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
             self.options['--header-html'] = header.name
-            run_title=""
-            if self.run_id != 0:
-                run_title=self.run_id
+            run_number=""
+            if self.run_number!= 0:
+                run_number = self.run_number
             header.write(
                 render_template('reports/header.html', race=race,
                                 title='START LIST',
-                                run_title=run_title,
+                                run_title=run_number,
                                 date=race[0].racedate.strftime('%a %d %b %Y'),
                                 time=race[0].racedate.strftime('-%H:%M')).encode('utf-8')
             )
         return
 
-    def set_content(self, race, jury, course, coursesetter, competitors, forerunners, number_of_NOCs):
+    def set_content(self, race, jury, course, coursesetter, competitors, forerunners, number_of_NOCs, F, runs=None):
         self.content = render_template('reports/startlist.html',
                                       race=race,
                                       jury=jury,
@@ -201,7 +239,9 @@ class OrderListReport:
                                       course_setter=coursesetter,
                                       competitors=competitors,
                                       forerunners=forerunners,
-                                      number_of_NOCs=number_of_NOCs)
+                                      number_of_NOCs=number_of_NOCs,
+                                      run_number=self.run_number,
+                                      runs=runs, F=F)
     
     def set_footer(self, race):
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer:
@@ -220,6 +260,7 @@ class OrderListReport:
     def get_file(self):
         # return pdfkit.from_string(self.content, False, self.options, configuration=pdfkit.configuration(wkhtmltopdf=path))
         return pdfkit.from_string(self.content, False, self.options)
+
 class RaceResultReport:
     options = {}
     content = None
@@ -236,13 +277,13 @@ class RaceResultReport:
             self.options['--header-html'] = header.name
             header.write(
                 render_template('reports/header.html', race=race,
-                                title='OFFICIAL RESULTS',
+                                title='OFFICIAL RESULTS',run_title="",
                                 date=race[0].racedate.strftime('%a %d %b %Y'),
                                 time=race[0].racedate.strftime('-%H:%M')).encode('utf-8')
             )
         return
 
-    def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather):
+    def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
         self.content = render_template('reports/results.html',
                                qlf_competitors=qlf_list,
                                disqlf_competitors=disqlf_list,
@@ -250,7 +291,7 @@ class RaceResultReport:
                                course_setter=coursesetter,
                                jury=jury,
                                weather=weather,
-                               forerunners=forerunners)
+                               forerunners=forerunners, F=F, penalty=penalty, reasondesc=reasondesc)
 
     def set_footer(self, race):
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer:
@@ -269,6 +310,7 @@ class RaceResultReport:
     def get_file(self):
         # return pdfkit.from_string(self.content, False, self.options, configuration=pdfkit.configuration(wkhtmltopdf=path))
         return pdfkit.from_string(self.content, False, self.options)
+
 class RaceInformation:
     @staticmethod
     def get_main_race_info(race_id):
@@ -289,6 +331,7 @@ class RaceInformation:
                    CourseForerunner.forerunner_id == Forerunner.id,
                    CourseForerunner.course_id == course_id). \
             all()
+
     @staticmethod
     def get_jury_info(race_id):
         return db.session.query(Jury.en_lastname.label('en_lastname'),
@@ -298,6 +341,7 @@ class RaceInformation:
                                                     JuryType.id == RaceJury.jury_function_id,
                                                     RaceJury.jury_id == Jury.id,
                                                     Jury.nation_id == Nation.id).all()
+
     @staticmethod
     def get_course_info(race_id):
         return Course.query.filter(Course.race_id == race_id).first()
@@ -309,6 +353,7 @@ class RaceInformation:
                                 Nation.name.label('name')) \
             .filter(Coursetter.id == course_coursetter_id,
                     Coursetter.nation_id == Nation.id).one()
+
     @staticmethod
     def get_competitor_info(race_id):
         return db.session.query(Competitor, RaceCompetitor, Nation). \
@@ -319,11 +364,23 @@ class RaceInformation:
             all()
 
     @staticmethod
+    def get_competitor_info_for_run(race_id, run_number):
+        run=RunInfo.query.filter(RunInfo.race_id==race_id, RunInfo.number==run_number).first()
+        return db.session.query(Competitor, RaceCompetitor, Nation, RunOrder). \
+            join(RaceCompetitor). \
+            join(Nation, Nation.id == Competitor.nation_code_id). \
+            join(RunOrder, RunOrder.race_competitor_id == RaceCompetitor.id). \
+            filter(RaceCompetitor.race_id == race_id, RunOrder.run_id==run.id). \
+            order_by(RunOrder.order). \
+            all()
+
+    @staticmethod
     def get_number_of_NOCs(race_id):
         return db.session.query(Nation).distinct(Nation.name). \
                filter(RaceCompetitor.race_id == race_id,
                RaceCompetitor.competitor_id == Competitor.id,
                Competitor.nation_code_id == Nation.id).count()
+
     @staticmethod
     def get_results(race_competitors, competitors_approve):
         qlf_list = []
@@ -380,6 +437,13 @@ class RaceInformation:
             filter(ResultApproved.run_id == RunInfo.id,
                    RunInfo.race_id == race_id,
                    RunInfo.number.in_([1, 2])).all()
+
     @staticmethod
     def get_weather_info(race_id):
         return Weather.query.filter(Weather.race_id == race_id).all()
+
+    @staticmethod
+    def get_runs_starttime(race_id):
+        return [(item.number, item.starttime.strftime('%H:%M')) for item in
+                RunInfo.query.filter(RunInfo.race_id == race_id,
+                                     RunInfo.number.in_([1, 2])).all()]
