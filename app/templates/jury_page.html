@@ -356,6 +356,7 @@
       <li id="li_tab_datasrc"><a href="#tab_datasrc" data-toggle="tab">Данные с устройств</a></li>
       <li id="li_tab_device"><a href="#tab_device" data-toggle="tab">Девайсы</a></li>
       <li id="li_tab_raceresults"><a href="#tab_raceresults" data-toggle="tab">Результаты</a></li>
+      <li id="li_tab_reports"><a href="#tab_reports" data-toggle="tab">Отчеты</a></li>
     </ul>
     <div class="tab-content">
         <div id="tab_races" class="tab-pane fade in active">
@@ -439,9 +440,45 @@
             </table>
         </div>
         <div id="tab_raceresults" class="tab-pane fade">
-          <button type="button" class="btn btn-primary" id="btn_raceresults" data-dismiss="modal">Get/Refresh Results</button>
+          <button type="button" class="btn btn-primary btn_raceresults" id="btn_raceresults" data-dismiss="modal">Get/Refresh Results</button>
           <table style='width:100%;' class='table table-bordered' id="table_raceresults">
           </table>
+        </div>
+        <div id="tab_reports" class="tab-pane fade">
+            <h2>Отчеты</h2>
+            Отчеты формируются по сформированным на данный момент результатам.
+            <bR>
+            Для пересчета результатов кликаем сюда:
+            <button type="button" class="btn btn-primary btn_raceresults" id="btn_raceresults2" data-dismiss="modal">Get/Refresh Results</button>
+            <br><br>
+            <hr>
+            <h3>Поля в отчетах:</h3>
+            <form method="" action="" name="form_reportfields" class="form"  id="form_reportfields">
+              <div class="form-group row">
+                <div class="col-md-6">
+                  <label class="control-label" for="ffactor">F-factor:</label>
+                  <input type="text" class="form-control" name="fields[ffactor]" id="ffactor">
+                </div>
+                <div class="col-md-6">
+                  <label class="control-label" for="penalty">Applied Penalty:</label>
+                  <input type="text" class="form-control" name="fields[penalty]" id="penalty">
+                </div>
+                <div class="col-md-12">
+                  <label class="control-label" for="reasondesc">Reasons description:</label>
+                  <textarea class="form-control" name="fields[reasondesc]" id="reasondesc"></textarea>
+                </div>
+              </div>
+            </form>
+            <hr>
+            <h3>Стартовые листы</h3>
+            <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="startlist">Start List</button>
+            <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="startlist1">Start List - Run 1</button>
+            <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="startlist2">Start List - Run 2</button>
+            <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="startlist3">Start List - Run 3</button>
+            <hr>
+            <h3>Результаты</h3>
+            <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="results_C73C">#C73C - Official Results (After Run 2)</button>
+
         </div>
     <!-- HTML-код модального окна -->
     <div id="popup_editresult" class="modal fade">
@@ -994,13 +1031,25 @@
           console.log("btn_src_save:");
           console.log(JSON.stringify(data));
         });
+        $("body").on("click", ".btn_report", function () {
+          console.log($(this).attr("name"));
+          if($(this).attr("name")=="startlist")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist");
 
+          if($(this).attr("name")=="startlist1")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist1");
+          if($(this).attr("name")=="startlist2")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist2");
+          if($(this).attr("name")=="startlist3")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist3");
+
+          if($(this).attr("name")=="results_C73C")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/results");
+
+          console.log($("#form_reportfields").attr("action"));
+          $("#form_reportfields").submit();
+      });
         $("body").on("click", "#btn_setrace", function () {
           setCookie("race_id",$("#select_race").val());
           //console.log("setCookie(\"race_id\","+$("#select_race").val()+");");
           window.location.reload();
         });
-        $("body").on("click", "#btn_raceresults", function () {
+        $("body").on("click", ".btn_raceresults", function () {
           var data=new Array();
           $("#table_raceresults tbody").remove();
           $("#table_raceresults thead").remove();
