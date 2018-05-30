@@ -137,7 +137,7 @@ def generate_results_report(race_id):
         return render_template('custom_error.html', title='Ошибка формирования отчета')
 
 
-@raceinfo.route('/race/<int:race_id>/reports/unofficial')
+@raceinfo.route('/race/<int:race_id>/reports/results/unofficial')
 def generate_unofficial_results_report(race_id):
     # Prepare data
     try:
