@@ -258,6 +258,7 @@ class OrderListReport:
     options = {}
     content = None
     run_number = None
+    title = None
     def __init__(self, run_number=0):
         self.options = {
             'page-size': 'A4',
@@ -266,7 +267,8 @@ class OrderListReport:
         }
         self.run_number = run_number
 
-    def set_header(self, race ):
+    def set_header(self, race):
+        self.title=title='START LIST'
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
             self.options['--header-html'] = header.name
             run_number=""
@@ -283,6 +285,7 @@ class OrderListReport:
 
     def set_content(self, race, jury, course, coursesetter, competitors, forerunners, number_of_NOCs, F, runs=None):
         self.content = render_template('reports/startlist.html',
+                                       title=self.title,
                                       race=race,
                                       jury=jury,
                                       course=course,
@@ -314,7 +317,7 @@ class OrderListReport:
 class RaceResultReport:
     options = {}
     content = None
-
+    title = None
     def __init__(self):
         self.options = {
             'page-size': 'A4',
@@ -323,6 +326,7 @@ class RaceResultReport:
         }
 
     def set_header(self, race, title="OFFICIAL RESULTS"):
+        self.title=title
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
             self.options['--header-html'] = header.name
             header.write(
@@ -335,13 +339,14 @@ class RaceResultReport:
 
     def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
         self.content = render_template('reports/results.html',
-                               qlf_competitors=qlf_list,
-                               disqlf_competitors=disqlf_list,
-                               course=course,
-                               course_setter=coursesetter,
-                               jury=jury,
-                               weather=weather,
-                               forerunners=forerunners, F=F, penalty=penalty, reasondesc=reasondesc)
+                                       title= self.title,
+                                       qlf_competitors=qlf_list,
+                                       disqlf_competitors=disqlf_list,
+                                       course=course,
+                                       course_setter=coursesetter,
+                                       jury=jury,
+                                       weather=weather,
+                                       forerunners=forerunners, F=F, penalty=penalty, reasondesc=reasondesc)
 
     def set_footer(self, race):
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer:
