@@ -1,5 +1,6 @@
 <html>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.3.1/moment-with-langs.min.js"></script>
 </html>
 <script>
 var startlist=["1","2","3","4","5","6"]; //стартовый список
@@ -32,12 +33,19 @@ var devlist=[  //список устройств
 		}
 	];
 
+	function tform(v){
+		return moment(v).format('mm:ss.SSSS');
+	}
+	//форматирование времени
+	function dtform(v){
+		return moment(v).format('DD.MM.YYYY HH:mm:ss.SSS');
+	}
 
 function reqSend(snum,devnum,starttime){
 	var t=new Date().getTime() ; // 12.850 - 12.859
 	if(starttime==0)
 		starttime= new Date().getTime();
-	$("#data").append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+t+"</td></tr>");
+	$("#data").append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+tform(t-starttime)+"</td><td>"+t+"</td><td>"+dtform(t)+"</td></tr>");
 	$.ajax({
 		  url: "/raceinfo/input/data",
 		  dataType: 'json',
@@ -80,7 +88,7 @@ function reqSend(snum,devnum,starttime){
 <input type="button" onclick="reqSend(0,0,0);" value="Run">
 <HR>
 <table id="data" style="width:49%; float:left">
-<tr><td>№</td><td>src_dev</td><td>src_sys</td><td>timedif ()</td><td>current timestamp (ms)</td></tr>
+<tr><td>№</td><td>src_dev</td><td>src_sys</td><td>timediff (ms)</td><td>timediff</td><td>current timestamp (ms)</td><td>current datetime</td></tr>
 </table>
 <!-- <table id="log" style="width:49%; margin-left:1%; float:left">
 <tr><td>#</td><td>delay</td><td>time s.ms</td></tr>
