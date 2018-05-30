@@ -120,7 +120,7 @@
         $("#compname").html(lastcomp[2].en_lastname+" "+lastcomp[2].en_firstname);
         $("#compbib").html(lastcomp[1].bib);
         $("#tabcomp").html('');
-        $("#tabfinish").append("<tr id='fintr"+lastcomp[1].bib+"'><td>"+data_arr.length+"</td><td class='rank'>-</td><td class='time'>"+lastcomp[0].time+"</td><td class='diff'>-</td><td>"+lastcomp[1].bib+"</td><td>"+ lastcomp[2].en_lastname+" "+lastcomp[2].en_firstname+"</td><td class='status'>Started</td><td class='action' id='action"+lastcomp[1].run_id+"_"+lastcomp[0].race_competitor_id+"'><button value='' class='editresult' run_id='"+lastcomp[1].run_id+"' competitor_id='"+lastcomp[0].race_competitor_id+"'>edit</button></td></tr>");
+        $("#tabfinish").append("<tr id='fintr"+lastcomp[1].bib+"'><td>"+data_arr.length+"</td><td class='rank'>-</td><td class='time'>"+tform(lastcomp[0].time)+"</td><td class='diff'>-</td><td>"+lastcomp[1].bib+"</td><td>"+ lastcomp[2].en_lastname+" "+lastcomp[2].en_firstname+"</td><td class='status'>Started</td><td class='action' id='action"+lastcomp[1].run_id+"_"+lastcomp[0].race_competitor_id+"'><button value='' class='editresult' run_id='"+lastcomp[1].run_id+"' competitor_id='"+lastcomp[0].race_competitor_id+"'>edit</button></td></tr>");
       }else{
         if (lastcomp[4].name=="Finish") {
           finish_res.push([lastcomp[1].bib,lastcomp[2].en_firstname, lastcomp[2].en_lastname,lastcomp[0].time]);
@@ -138,22 +138,22 @@
           */
           for(i=0;i<course.length;i++){
             $("#fintr"+course[i][1]+" .rank").html(i+1);
-            $("#fintr"+course[i][1]+" .diff").html(data_arr[course[i][0]][0].diff);
+            $("#fintr"+course[i][1]+" .diff").html(tform(fdata_arr[course[i][0]][0].diff));
 
           }
         //  console.log(course);
         //  $("#fintr"+lastcomp[1].bib+" .rank").html()
           $("#fintr"+lastcomp[1].bib+" .status").html("finished");
-          $("#fintr"+lastcomp[1].bib+" .action").append("<button class='approveQLF' absolut_time='"+lastcomp[0].absolut_time+"' competitor_id='"+lastcomp[1].id+"' run_id='"+lastcomp[1].run_id+"'>Approve QLF</button>");
-          $("#fintr"+lastcomp[1].bib+" .time").html(lastcomp[0].time);
+          $("#fintr"+lastcomp[1].bib+" .action").append("<button class='approveQLF' absolut_time='"+tform(lastcomp[0].absolut_time)+"' competitor_id='"+lastcomp[1].id+"' run_id='"+lastcomp[1].run_id+"'>Approve QLF</button>");
+          $("#fintr"+lastcomp[1].bib+" .time").html(tform(lastcomp[0].time));
 
       //    $("#fintr"+lastcomp[1].bib).html("<td class='rank'>"+lastcomp[0].rank+"</td><td>"+lastcomp[0].time+"</td><td class='diff'>"+lastcomp[0].diff+"</td><td>"+lastcomp[1].bib+"</td><td>"+ lastcomp[2].en_lastname+" "+lastcomp[2].en_firstname+"</td><td>Finished</td>");
         }else{
-          $("#fintr"+lastcomp[1].bib+" .time").html(lastcomp[0].time);
+          $("#fintr"+lastcomp[1].bib+" .time").html(tform(lastcomp[0].time));
           $("#fintr"+lastcomp[1].bib+" .status").html("In progress");
         }
       }
-      $("#tabcomp").append("<tr><td>"+lastcomp[4].name+" - "+lastcomp[3].distance+"m (#"+lastcomp[3].device_id+")</td><td>"+lastcomp[0].speed+"</td><td>"+lastcomp[0].rank+"</td><td>"+lastcomp[0].diff+"</td><td>"+lastcomp[0].time+"</td><td>"+lastcomp[0].sectorrank+"</td><td>"+lastcomp[0].sectordiff+"</td><td>"+lastcomp[0].sectortime+"</td></tr>");
+      $("#tabcomp").append("<tr><td>"+lastcomp[4].name+" - "+lastcomp[3].distance+"m (#"+lastcomp[3].device_id+")</td><td>"+lastcomp[0].speed+"</td><td>"+lastcomp[0].rank+"</td><td>"+tform(lastcomp[0].diff)+"</td><td>"+tform(lastcomp[0].time)+"</td><td>"+lastcomp[0].sectorrank+"</td><td>"+tform(lastcomp[0].sectordiff)+"</td><td>"+tform(lastcomp[0].sectortime)+"</td></tr>");
       $("#tabsector").html('');
       //$("#tabsector").append('<tr><td colspan="5">DEVICE: '+lastcomp[3].distance+"m (#"+lastcomp[3].device_id+'</td></tr>');
       for(i=0;i<sector.length;i++){
@@ -168,7 +168,7 @@
       }
       $("#tabcourse").html('');
       for(i=0;i<course.length;i++){
-        $("#tabcourse").append("<tr><td>"+data_arr[course[i][0]][0].rank+"</td><td>"+data_arr[course[i][0]][0].time+"</td><td>"+data_arr[course[i][0]][0].diff+"</td><td>"+data_arr[course[i][0]][1].bib+"</td><td>"+ data_arr[course[i][0]][2].en_lastname+" "+data_arr[course[i][0]][2].en_firstname+"</td></tr>");
+        $("#tabcourse").append("<tr><td>"+data_arr[course[i][0]][0].rank+"</td><td>"+tform(data_arr[course[i][0]][0].time)+"</td><td>"+tform(data_arr[course[i][0]][0].diff)+"</td><td>"+data_arr[course[i][0]][1].bib+"</td><td>"+ data_arr[course[i][0]][2].en_lastname+" "+data_arr[course[i][0]][2].en_firstname+"</td></tr>");
         if(data_arr[course[i][0]][4].name!="Start"){
           $("#tab_summarytable .div_run"+data_arr[course[i][0]][0].run_id+" tr.comp_"+data_arr[course[i][0]][0].race_competitor_id+"_rank td.dev_"+data_arr[course[i][0]][3].device_id+"_rank").html(i+1);
           $("#tab_summarytable .div_run"+data_arr[course[i][0]][0].run_id+" tr.comp_"+data_arr[course[i][0]][0].race_competitor_id+"_diff td.dev_"+data_arr[course[i][0]][3].device_id+"_diff").html(course[i][2]-course[0][2]);
@@ -230,7 +230,7 @@
               for(var i=1;i<d.length;i++){
                 if(data.dev_data["dev_"+d[i][0].id] && data.dev_data["dev_"+d[i][0].id][arr[j]]!==null){
                   if(arr[j]=="speed")v=nform(data.dev_data["dev_"+d[i][0].id][arr[j]]);
-                  else if(arr[j]=="sectortime")v=tform(data.dev_data["dev_"+d[i][0].id][arr[j]]);
+                  else if(arr[j]=="sectortime"||arr[j]=="sectordiff")v=tform(data.dev_data["dev_"+d[i][0].id][arr[j]]);
                   else v=data.dev_data["dev_"+d[i][0].id][arr[j]];
                 }else{
                   v="NA";
@@ -240,7 +240,7 @@
         //    }
             if(j<total_arr.length){
               console.log(total_arr[j]+" = "+data[total_arr[j]]);
-              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[d.length-1][0].id+"_"+total_arr[j]+"'>"+((data[total_arr[j]]!==null)?data[total_arr[j]]:"NA")+"</td>");
+              $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td class='dev_"+d[d.length-1][0].id+"_"+total_arr[j]+"'>"+((data[total_arr[j]]!==null)?(total_arr[j]!="rank"?tform(data[total_arr[j]]):data[total_arr[j]]):"NA")+"</td>");
             }else{
               $("#tab_summarytable .div_run"+data.run_id+" tr.comp_"+data.race_competitor_id+"_"+arr[j]).append("<td></td>");
             }
@@ -478,6 +478,7 @@
             <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="startlist3">Start List - Run 3</button>
             <hr>
             <h3>Результаты</h3>
+            <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="results_C73C_un">#C73C - Unofficial Results (After Run 2)</button>
             <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="results_C73C">#C73C - Official Results (After Run 2)</button>
 
         </div>
@@ -1041,6 +1042,7 @@
           if($(this).attr("name")=="startlist3")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/orderlist/3");
 
           if($(this).attr("name")=="results_C73C")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/results");
+          if($(this).attr("name")=="results_C73C_un")$("#form_reportfields").attr("action","/raceinfo/race/"+race_id+"/reports/results/unofficial");
 
           console.log($("#form_reportfields").attr("action"));
           $("#form_reportfields").submit();
@@ -1436,7 +1438,7 @@ console.log(data);
       var name_str=(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"");
       if ($("#tab_data_src tbody tr.datasrc_"+data[0].id).length == 0) {
         //Add it to the dom
-        $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+(data[2]?"":" warning")+"'><td>"+data[0].run_id+"</td><td>"+data[4].course_id+"</td><td>"+data[4].device_id+"</td><td>"+data[0].time+"</td><td class='bib'>"+(data[2]?data[2].bib:"")+"</td><td class='name'>"+name_str+"</td><td class='act'><div class='div_select_bib_"+((data[1])?data[1].id:null)+"'></div></td></tr>");
+        $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+(data[2]?"":" warning")+"'><td>"+data[0].run_id+"</td><td>"+data[4].course_id+"</td><td>"+data[4].device_id+"</td><td>"+dtform(data[0].time)+"</td><td class='bib'>"+(data[2]?data[2].bib:"")+"</td><td class='name'>"+name_str+"</td><td class='act'><div class='div_select_bib_"+((data[1])?data[1].id:null)+"'></div></td></tr>");
       }else{
         $("#tab_data_src tbody tr.datasrc_"+data[0].id).addClass("danger");
         $("#tab_data_src tbody tr.datasrc_"+data[0].id+" td.bib").append("<div>"+(data[2]?data[2].bib:"")+"</div>");
@@ -1705,7 +1707,11 @@ if(run_list.length){
     }
     //форматирование времени
     function tform(v){
-      return number_format(v, 0, '.', ' ');
+      return moment(v).format('mm:ss.SSSS');
+    }
+    //форматирование времени
+    function dtform(v){
+      return moment(v).format('DD.MM.YYYY HH:mm:ss.SSS');
     }
 
     function number_format(number, decimals, dec_point, thousands_sep) {
