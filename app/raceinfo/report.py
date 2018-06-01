@@ -10,7 +10,7 @@ from .results import get_results
 
 import xlwt
 import json
-
+from math import floor
 path = "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"
 
 @raceinfo.route('/race/<int:race_id>/reports')
@@ -225,15 +225,15 @@ class ExcelGenerator:
             self.ws.write(self.cursor[0], 0, item['bib'])
             self.ws.write(self.cursor[0], 1, item['ru_firstname']+' '+item['en_firstname'])
             self.ws.write(self.cursor[0], 2, item['global_rank'])
-            self.ws.write(self.cursor[0], 3, item['result_time'])
-            self.ws.write(self.cursor[0], 4, item['diff'])
+            self.ws.write(self.cursor[0], 3, time_convertor(item['result_time']))
+            self.ws.write(self.cursor[0], 4, time_convertor(item['diff']))
             self.ws.write(self.cursor[0], 5, item['status'])
             self.cursor[1] = 6
             for result_item in item['results']:
 
                 self.ws.write(self.cursor[0], self.cursor[1], result_item['rank'])
                 self.cursor[1] += 1
-                self.ws.write(self.cursor[0], self.cursor[1], result_item['time'])
+                self.ws.write(self.cursor[0], self.cursor[1], time_convertor(result_item['time']))
                 self.cursor[1] += 1
                 self.ws.write(self.cursor[0], self.cursor[1], result_item['status'])
                 self.cursor[1] += 1
@@ -451,12 +451,14 @@ class RaceInformation:
                     'birth': item[0].birth,
                     'club': item[1].club,
                     'nation': item[2].name,
-                    'total': (datetime.datetime.fromtimestamp(item[1].time).strftime("%m:%S.%f"))[:-3],
-                    'diff': (datetime.datetime.fromtimestamp(item[1].diff).strftime("%m:%S.%f"))[:-3]
+                    # 'total': (datetime.datetime.fromtimestamp(item[1].time).strftime("%m:%S.%f"))[:-3],
+                    # 'diff': (datetime.datetime.fromtimestamp(item[1].diff).strftime("%m:%S.%f"))[:-3]
+                    'total': time_convertor(item[1].time),
+                    'diff': time_convertor(item[1].diff)
                 }
                 for approve in competitors_approve:
                     if item[1].id == approve.competitor_id:
-                        qlf_item['time' + str(approve.run_number)] = (datetime.datetime.fromtimestamp(approve.time).strftime("%m:%S.%f"))[:-3]
+                        qlf_item['time' + str(approve.run_number)] = time_convertor(approve.time)
                         qlf_item['rank' + str(approve.run_number)] = approve.rank
                 qlf_list.append(qlf_item)
             else:
@@ -502,3 +504,26 @@ class RaceInformation:
         return [(item.number, item.starttime.strftime('%H:%M')) for item in
                 RunInfo.query.filter(RunInfo.race_id == race_id,
                                      RunInfo.number.in_([1, 2])).all()]
+
+def time_convertor(timestamp):
+    if timestamp == None or timestamp == "None":
+        return None
+    sss = int(timestamp) % 1000
+    str_sss=str(sss)
+
+    if sss < 100:
+        str_sss="0"+str(str_sss)
+    if sss < 10:
+        str_sss="0"+str(str_sss)
+    ss=floor(int(timestamp)/1000)%60
+    if ss < 10:
+        ss = "0" + str(ss)
+    mm=floor(int(timestamp)/60000)
+    if mm < 10:
+        mm = "0"+str(mm)
+
+    return mm+":"+str(ss)+"."+str(str_sss)
+
+
+
+

@@ -8,7 +8,7 @@ from config import config
 from flask_babel import Babel
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_socketio import SocketIO
-from werkzeug.contrib.cache import MemcachedCache
+from .momentjs import momentjs
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -27,8 +27,11 @@ login_manager.login_view = 'auth.login'
 
 def create_app(config_name):
     app = Flask(__name__)
+
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
+
+    app.jinja_env.globals['momentjs'] = momentjs
 
     babel.init_app(app)
     bootstrap.init_app(app)
