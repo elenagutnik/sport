@@ -1102,12 +1102,12 @@
                       //console.log("run_id="+run_id);
                       var bib=arr[i].bib; //get info from server
                       var name=arr[i].en_firstname+" "+arr[i].en_lastname+" / "+arr[i].ru_firstname+" "+arr[i].ru_lastname;
-                      $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+arr[i].result_time+"</td><td"+rowspan+">"+arr[i].diff+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
+                      $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+(arr[i].status_id==1?"success":"danger")+" row_competitor'><td"+rowspan+">"+bib+"</td><td"+rowspan+">"+name+"</td><td"+rowspan+">"+arr[i].global_rank+"</td><td"+rowspan+">"+tform(arr[i].result_time)+"</td><td"+rowspan+">"+tform(arr[i].diff)+"</td><td"+rowspan+">"+getObjById(status_list,"id",arr[i].status_id).name+"</td>"+run_cols1+"</tr>");
                       //if(arr[i].status_id!=1)
                         $("#table_raceresults tbody").append("<tr class='comp_"+arr[i].race_competitor_id+" "+style_mistakes+"'>"+run_cols2+"</tr>");
                       for(var k=0;k<arr[i].results.length;k++){
                         $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_rank").html(arr[i].results[k].rank);
-                        $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_time").html(arr[i].results[k].time);
+                        $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_time").html(tform(arr[i].results[k].time));
                         $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_status").html(getObjById(status_list,"id",arr[i].results[k].status_id).name);
                         //if(arr[i].status_id!=1){
                           $("#table_raceresults tbody tr.comp_"+arr[i].race_competitor_id+" td.run"+arr[i].results[k].run_id+"_gate").html(arr[i].results[k].gate);
@@ -1707,11 +1707,24 @@ if(run_list.length){
     }
     //форматирование времени
     function tform(v){
-      return moment(v).format('mm:ss.SSSS');
+      var sss=v%1000;
+      var str_sss="";
+
+      str_sss=sss;
+      if(sss<100) str_sss="0"+str_sss;
+      if(sss<10)  str_sss="0"+str_sss;
+
+      var ss=Math.floor(v/1000)%60; //((v-v%1000)/1000)%60;
+      if(ss<10)ss="0"+ss;
+
+      var mm=Math.floor(v/60000) //(v-(ss*1000+ssss))/60/1000;
+      if(mm<10)mm="0"+mm;
+      return mm+":"+ss+"."+str_sss;
+    //  return v;
     }
     //форматирование времени
     function dtform(v){
-      return moment(v).format('DD.MM.YYYY HH:mm:ss.SSS');
+      return moment(v).format('DD.MM.YYYY HH:mm:ss.SSSS');
     }
 
     function number_format(number, decimals, dec_point, thousands_sep) {
