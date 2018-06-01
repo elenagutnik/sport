@@ -451,12 +451,12 @@ class RaceInformation:
                     'birth': item[0].birth,
                     'club': item[1].club,
                     'nation': item[2].name,
-                    'total': item[1].time,
-                    'diff': item[1].diff
+                    'total': (datetime.datetime.fromtimestamp(item[1].time).strftime("%m:%S.%f"))[:-3],
+                    'diff': (datetime.datetime.fromtimestamp(item[1].diff).strftime("%m:%S.%f"))[:-3]
                 }
                 for approve in competitors_approve:
                     if item[1].id == approve.competitor_id:
-                        qlf_item['time' + str(approve.run_number)] = approve.time
+                        qlf_item['time' + str(approve.run_number)] = (datetime.datetime.fromtimestamp(approve.time).strftime("%m:%S.%f"))[:-3]
                         qlf_item['rank' + str(approve.run_number)] = approve.rank
                 qlf_list.append(qlf_item)
             else:
