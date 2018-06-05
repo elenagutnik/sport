@@ -87,8 +87,19 @@ def load_data_vol2():
     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
     # Заезд с пришли данные
     result = None
-    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None ).one()
-
+    try:
+        run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None ).one()
+    except:
+        ddata = DataIn(
+            src_sys=data['src_sys'],
+            src_dev=data['src_dev'],
+            event_code=data['eventcode'],
+            time=data['time'],
+            reserved=data['reserved'],
+        )
+        db.session.add(ddata)
+        db.session.commit()
+        return '', 200
     # Сам девайс с которого пришли данные
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\
         filter(CourseDevice.device_id == device.id,

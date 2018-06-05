@@ -1177,7 +1177,7 @@ def race_сourse_edit(id, course_id):
     course_forerunners = (db.session.query(CourseForerunner, Forerunner, Course). \
         join(Forerunner).join(Course).filter(Course.race_id == id)).all()
 
-    race_inter_dev = CourseDevice.query.filter(course_id==course_id).all()
+    race_inter_dev = CourseDevice.query.filter(CourseDevice.course_id == course_id).order_by(CourseDevice.order).all()
 
     return render_template('raceinfo/course_view.html', course=сourse, race=race,course_forerunners=course_forerunners, race_inter_dev=race_inter_dev)
 

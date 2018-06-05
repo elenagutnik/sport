@@ -16,81 +16,82 @@ path = "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe";
 
 @raceinfo.route('/race/<int:race_id>/report/ishtml/<isHTML>')
 def Report_show(race_id,isHTML):
+    try:
+        # Race
+        race = db.session.query(Race, Gender, Category, Discipline, Nation). \
+            join(Gender). \
+            join(Category). \
+            join(Discipline). \
+            join(Nation, Race.nation_id == Nation.id). \
+            filter(Race.id == race_id).one()
 
-    # Race
-    race = db.session.query(Race, Gender, Category, Discipline, Nation).\
-        join(Gender). \
-        join(Category). \
-        join(Discipline). \
-        join(Nation, Race.nation_id==Nation.id).\
-        filter(Race.id == race_id).one()
+        # Jury
+        jury = db.session.query(Jury.en_lastname.label('en_lastname'),
+                                Jury.en_firstname.label('en_firstname'),
+                                JuryType.type.label('type'),
+                                Nation.name).filter(RaceJury.race_id == race_id,
+                                                    JuryType.id == RaceJury.jury_function_id,
+                                                    RaceJury.jury_id == Jury.id,
+                                                    Jury.nation_id == Nation.id).all()
+        # Course
+        course = Course.query.filter(Course.race_id == race_id).first()
 
-    # Jury
+        course_setter = db.session.query(Coursetter.en_lastname.label('en_lastname'),
+                                         Coursetter.en_firstname.label('en_firstname'),
+                                         Nation.name.label('name')) \
+            .filter(Coursetter.id == course.course_coursetter_id,
+                    Coursetter.nation_id == Nation.id).one()
+        # Competitors
+        competitors = db.session.query(Competitor, RaceCompetitor, Nation). \
+            join(RaceCompetitor). \
+            join(Nation, Nation.id == Competitor.nation_code_id). \
+            filter(RaceCompetitor.race_id == race_id). \
+            order_by(RaceCompetitor.bib). \
+            all()
 
-    jury = db.session.query(Jury.en_lastname.label('en_lastname'),
-                             Jury.en_firstname.label('en_firstname'),
-                             JuryType.type.label('type'),
-                             Nation.name).filter(RaceJury.race_id == race_id,
-                                                 JuryType.id == RaceJury.jury_function_id,
-                                                 RaceJury.jury_id == Jury.id,
-                                                 Jury.nation_id == Nation.id).all()
-    # Course
-    course = Course.query.filter(Course.race_id == race_id).first()
+        number_of_NOCs = db.session.query(Nation).distinct(Nation.name). \
+            filter(RaceCompetitor.race_id == race_id,
+                   RaceCompetitor.competitor_id == Competitor.id,
+                   Competitor.nation_code_id == Nation.id). \
+            count()
+        forerunners = db.session.query(Forerunner.en_firstname.label('en_firstname'),
+                                       Forerunner.en_lastname.label('en_lastname'),
+                                       CourseForerunner.order.label('order'),
+                                       Nation.name.label('name')). \
+            filter(Forerunner.nation_id == Nation.id,
+                   CourseForerunner.forerunner_id == Forerunner.id,
+                   CourseForerunner.course_id == course.id). \
+            all()
 
-    course_setter = db.session.query(Coursetter.en_lastname.label('en_lastname'),
-                                        Coursetter.en_firstname.label('en_firstname'),
-                                        Nation.name.label('name'))\
-        .filter(Coursetter.id == course.course_coursetter_id,
-                Coursetter.nation_id == Nation.id).one()
-    # Competitors
-    competitors = db.session.query(Competitor, RaceCompetitor, Nation).\
-        join(RaceCompetitor).\
-        join(Nation, Nation.id == Competitor.nation_code_id).\
-        filter(RaceCompetitor.race_id == race_id).\
-        order_by(RaceCompetitor.bib).\
-        all()
+        html_render = render_template('reports/startlist.html',
+                                      race=race,
+                                      jury=jury,
+                                      course=course,
+                                      course_setter=course_setter,
+                                      competitors=competitors,
+                                      forerunners=forerunners,
+                                      number_of_NOCs=number_of_NOCs)
 
-    number_of_NOCs = db.session.query(Nation).distinct(Nation.name).\
-        filter(RaceCompetitor.race_id==race_id,
-               RaceCompetitor.competitor_id==Competitor.id,
-               Competitor.nation_code_id==Nation.id).\
-        count()
-    forerunners = db.session.query(Forerunner.en_firstname.label('en_firstname'),
-                                   Forerunner.en_lastname.label('en_lastname'),
-                                   CourseForerunner.order.label('order'),
-                                   Nation.name.label('name')).\
-        filter(Forerunner.nation_id == Nation.id,
-               CourseForerunner.forerunner_id == Forerunner.id,
-               CourseForerunner.course_id == course.id).\
-        all()
+        options = {
+            'page-size': 'A4',
+            'dpi': 400,
 
-    html_render = render_template('reports/startlist.html',
-                                  race=race,
-                                  jury=jury,
-                                  course=course,
-                                  course_setter=course_setter,
-                                  competitors=competitors,
-                                  forerunners=forerunners,
-                                  number_of_NOCs=number_of_NOCs)
-
-    options = {
-        'page-size': 'A4',
-        'dpi': 400,
-
-        '--margin-top': '30',
-        #'--margin-bottom':'-20mm',
-        #'--footer-center':'[page]/[topage]'
-    }
-    add_pdf_header(options, race)
-    add_pdf_footer(options, race)
-    if isHTML == 'true':
-        return html_render
-    else:
-        pdf = pdfkit.from_string(html_render, False, options, configuration=pdfkit.configuration(wkhtmltopdf=path))
-        response = make_response(pdf)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=report.pdf'
-        return response
+            '--margin-top': '30',
+            # '--margin-bottom':'-20mm',
+            # '--footer-center':'[page]/[topage]'
+        }
+        add_pdf_header(options, race)
+        add_pdf_footer(options, race)
+        if isHTML == 'true':
+            return html_render
+        else:
+            pdf = pdfkit.from_string(html_render, False, options, configuration=pdfkit.configuration(wkhtmltopdf=path))
+            response = make_response(pdf)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = 'inline; filename=report.pdf'
+            return response
+    except AttributeError:
+        pass
 
 def add_pdf_header(options, race):
 
@@ -117,7 +118,6 @@ def add_pdf_footer(options, race):
                             ).encode('utf-8')
         )
     return
-
 
 @raceinfo.route('/race/<int:race_id>/report/result')
 def get_results__(race_id):
@@ -217,7 +217,6 @@ def number_of_NOCs(race_id):
                Competitor.nation_code_id == Nation.id). \
         count()
 
-
 @raceinfo.route('/race/<int:race_id>/reports')
 def reports_page(race_id):
     startlist_report = None
@@ -292,9 +291,9 @@ def reports_page(race_id):
     options = {
         'page-size': 'A4',
         'dpi': 400,
-        '--header-spacing': '30',
-        '--footer-spacing': '30',
-        '--margin-top': '40',
+        # '--header-spacing': '30',
+        # '--footer-spacing': '30',
+        '--margin-top': '30',
     }
     add_pdf_header(options, race)
     add_pdf_footer(options, race)
@@ -379,7 +378,6 @@ def couresetter_information(course_coursetter_id):
         .filter(Coursetter.id == course_coursetter_id,
                 Coursetter.nation_id == Nation.id).one()
 
-
 def forrunners_information(course_id):
     return db.session.query(Forerunner.en_firstname.label('en_firstname'),
                      Forerunner.en_lastname.label('en_lastname'),
@@ -389,7 +387,6 @@ def forrunners_information(course_id):
                CourseForerunner.forerunner_id == Forerunner.id,
                CourseForerunner.course_id == course_id). \
         all()
-
 
 @raceinfo.route('/race/<int:race_id>/xls')
 def generate_excel(race_id):
@@ -407,7 +404,6 @@ def generate_excel(race_id):
     response.headers['Content-Type'] = 'application/vnd.ms-excel'
     response.headers['Content-Disposition'] = 'inline; filename=report.xls'
     return response
-
 
 class ExcelGenerator:
     cursor = []

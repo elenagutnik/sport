@@ -112,7 +112,10 @@ def generate_results_report(race_id):
                                                             RaceInformation.get_approved_competitor_info(race_id))
         # Create report
 
-        report = RaceResultReport()
+        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
+            filter(RunInfo.race_id == race_id). \
+            count()
+        report = RaceResultReport(run_numbers=run_numbers)
 
         report.set_header(race)
 
@@ -152,8 +155,10 @@ def generate_unofficial_results_report(race_id):
         qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
                                                             RaceInformation.get_approved_competitor_info(race_id))
         # Create report
-
-        report = RaceResultReport()
+        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
+            filter(RunInfo.race_id == race_id). \
+            count()
+        report = RaceResultReport(run_numbers=run_numbers)
 
         report.set_header(race, title="UNOFFICIAL RESULTS")
 
@@ -318,15 +323,17 @@ class RaceResultReport:
     options = {}
     content = None
     title = None
-    def __init__(self):
+    run_numbers = None
+    def __init__(self, run_numbers=2):
         self.options = {
             'page-size': 'A4',
             'dpi': 400,
             '--margin-top': '30'
         }
+        self.run_numbers = run_numbers
 
     def set_header(self, race, title="OFFICIAL RESULTS"):
-        self.title=title
+        self.title = title
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
             self.options['--header-html'] = header.name
             header.write(
@@ -346,7 +353,8 @@ class RaceResultReport:
                                        course_setter=coursesetter,
                                        jury=jury,
                                        weather=weather,
-                                       forerunners=forerunners, F=F, penalty=penalty, reasondesc=reasondesc)
+                                       forerunners=forerunners, F=F, penalty=penalty,
+                                       reasondesc=reasondesc, run_numbers=self.run_numbers)
 
     def set_footer(self, race):
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer:
@@ -506,13 +514,14 @@ class RaceInformation:
                                      RunInfo.number.in_([1, 2])).all()]
 
 def time_convertor(timestamp):
+
     if timestamp == None or timestamp == "None":
         return None
     sss = int(timestamp) % 1000
-    str_sss=str(sss)
+    str_sss = str(sss)
 
     if sss < 100:
-        str_sss="0"+str(str_sss)
+        str_sss = "0"+str(str_sss)
     if sss < 10:
         str_sss="0"+str(str_sss)
     ss=floor(int(timestamp)/1000)%60
@@ -522,7 +531,7 @@ def time_convertor(timestamp):
     if mm < 10:
         mm = "0"+str(mm)
 
-    return mm+":"+str(ss)+"."+str(str_sss)
+    return (mm+":"+str(ss)+"."+str(str_sss))[:-1]
 
 
 
