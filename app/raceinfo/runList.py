@@ -129,3 +129,15 @@ def next_run_list_drop_out(race_id, current_run_id, current_run_number):
         return
     except:
         return
+
+@raceinfo.route('/race/<int:race_id>/run/<int:run_id>/order_list/revers', methods=['GET', 'POST'])
+def revers_first_15(race_id,run_id):
+    run = RunInfo.query.filter(RunInfo.id == run_id).first()
+    if run is not None and run.number !=1:
+        order_list = sorted(RunOrder.query.filter(RunOrder.run_id == run.id).order_by(RunOrder.order.asc()).limit(15).all(), key=lambda item: item.order)
+        for index, item in enumerate(reversed(order_list)):
+            item.order = index + 1
+            db.session.add(item)
+        db.session.commit()
+        return json.dumps(order_list, cls=jsonencoder.AlchemyEncoder)
+    return json.dumps(dict([('error', "Недопустимый заезд")]))

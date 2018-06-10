@@ -46,9 +46,10 @@ def load_competitors(race_id):
                     NSA=item[0],
                     category_id=category.id
                 )
-            db.session.add(competitor)
-            db.session.commit()
-            race_competitor = RaceCompetitor.query.filter_by(competitor_id=competitor.id).first()
+                db.session.add(competitor)
+                db.session.commit()
+            race_competitor = RaceCompetitor.query.filter(RaceCompetitor.competitor_id == competitor.id,
+                                                          RaceCompetitor.race_id == race_id).first()
             if item[1]=='':
                 bib=None
             else:

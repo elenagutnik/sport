@@ -433,10 +433,10 @@ def race_lis_get():
 @admin_required
 def race(id):
     race = Race.query.get_or_404(id)
-    # race.gender=Gender.query.get(race.gender_id)
-    # race.category=Category.query.get(race.category_id)
-    # race.discipline=Discipline.query.get(race.discipline_id)
-    # race.nation=Nation.query.get(race.nation_id)
+    race.gender=Gender.query.get(race.gender_id)
+    race.category=Category.query.get(race.category_id)
+    race.discipline=Discipline.query.get(race.discipline_id)
+    race.nation=Nation.query.get(race.nation_id)
     return render_template('raceinfo/race_view.html', race=race)
 
 
@@ -575,7 +575,7 @@ def edit_race_jury(id):
             jury_function_id=form.function_ref.data,
             phonenbr=selected_jury.phonenbr,
             email=selected_jury.email,
-            is_member=form.is_member.data,
+            is_member=bool(form.is_member.data),
         )
         db.session.add(raceJury)
         db.session.commit()
@@ -1116,7 +1116,6 @@ def race_сourse_add(id):
         course = Course(
             race_id=id,
             course_coursetter_id=form.course_coursetter_ref.data,
-            run=form.run.data,
             ru_name=form.ru_name.data,
             en_name=form.en_name.data,
             homologation=form.homologation.data,
@@ -1177,7 +1176,7 @@ def race_сourse_edit(id, course_id):
     course_forerunners = (db.session.query(CourseForerunner, Forerunner, Course). \
         join(Forerunner).join(Course).filter(Course.race_id == id)).all()
 
-    race_inter_dev = CourseDevice.query.filter(CourseDevice.course_id == course_id).order_by(CourseDevice.order).all()
+    race_inter_dev = db.session.query(CourseDevice, Course.ru_name.label('ru_name')).join(Course).filter(CourseDevice.course_id == course_id).order_by(Course.ru_name,CourseDevice.order).all()
 
     return render_template('raceinfo/course_view.html', course=сourse, race=race,course_forerunners=course_forerunners, race_inter_dev=race_inter_dev)
 

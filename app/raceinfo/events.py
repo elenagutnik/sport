@@ -588,9 +588,9 @@ def socket_get_results(data):
                                                     join(ResultDetail, isouter=True).
                                                     join(RaceCompetitor, isouter=True).
                                                     join(Competitor, isouter=True).
-                                                    join(CourseDevice, DataIn.cource_device_id==CourseDevice.id , isouter=True).
+                                                    join(CourseDevice, DataIn.cource_device_id==CourseDevice.id, isouter=True).
                                                     filter(DataIn.run_id.in_(json.loads(data))).
-                                                    order_by(asc(DataIn.id)).
+                                                    order_by(asc(DataIn.time)).
                                                     all(),
                   cls=jsonencoder.AlchemyEncoder))
 
@@ -634,7 +634,7 @@ def edit_competitor(json_data):
                         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
                         isDataSet = ResultDetail.query.filter(ResultDetail.data_in_id == dataIn.id).count()
                         if isDataSet > 0:
-                            error = {'error': "Duble data", 'data_in_od': item['data_in_id']}
+                            error = {'error': "Double data", 'data_in_od': item['data_in_id']}
                             error_list.append(error)
 
                         competitor_result_detail = ResultDetail.query.filter(ResultDetail.run_id == run_id,

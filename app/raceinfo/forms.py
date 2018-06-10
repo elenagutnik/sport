@@ -107,7 +107,7 @@ class EditRaceJury(FlaskForm):
     function_ref = SelectField('Type', coerce=int, validators=[InputRequired(), FunctionAllowed])
     # phonenbr = StringField('Phone number')
     # email = StringField('E-mail', validators=[Email()])
-    is_member = SelectField('Jury type', coerce=bool, choices=[(True, 'Member'), (False, 'Jury')])
+    is_member = SelectField('Jury type', coerce=int, choices=[(1, 'Member'), (0, 'Jury')])
     submit = SubmitField('Add')
 
 
@@ -164,10 +164,9 @@ class EditJuryBase(FlaskForm):
 
 class EditCourseBase(FlaskForm):
     course_coursetter_ref = SelectField('Coursetter', coerce=int, validators=[InputRequired()])
-    run = IntegerField('Finishelev')
     ru_name = StringField('Russian name', validators=[InputRequired()])
     en_name = StringField('English name', validators=[InputRequired()])
-    homologation =IntegerField('Homologation')
+    homologation =IntegerField('Homologation (0 - No homologation)')
     length = IntegerField('Length')
     gates = IntegerField('Gates')
     tuminggates = IntegerField('Tuminggates')

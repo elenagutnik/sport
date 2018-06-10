@@ -57,7 +57,7 @@
       <thead>
         <tr>
           <td>#id</td>
-          <td>Course</td>
+          <td>Course name</td>
           <td>Order</td>
           <td>Distance</td>
           <td></td>
@@ -66,13 +66,14 @@
       <tbody>
         {% for item in race_inter_dev %}
         <tr>
-          <td>{{ item.id }}</td>
-          <td>{{ item.order }} </td>
-          <td>{{ item.distance }} </td>
+          <td>{{ item[0].id }}</td>
+          <td>{{ item.ru_name }} </td>
+          <td>{{ item[0].order }} </td>
+          <td>{{ item[0].distance }} </td>
           <td>
-            <a href="dev/{{ item.id }}/edit">edit</a>
+            <a href="dev/{{ item[0].id }}/edit">edit</a>
             |
-            <a href="dev/{{ item.id }}/del">del</a>
+            <a href="dev/{{ item[0].id }}/del">del</a>
           </td>
         </tr>
         {% endfor %}
