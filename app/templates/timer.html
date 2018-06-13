@@ -48,6 +48,7 @@ function reqSend(snum,devnum,starttime){
 	$("#data").append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+tform(t-starttime)+"</td><td>"+t+"</td><td>"+dtform(t)+"</td></tr>");
 	$.ajax({
 		  url: "/raceinfo/input/data",
+			type: 'POST',
 		  dataType: 'json',
 			contentType: 'application/json',
 		  data:JSON.stringify({
