@@ -84,7 +84,6 @@ def The_sum_of_two_best_runs(race):
     total_result = sorted(total_result, key=lambda item: item[2])
     return total_result
 
-#
 # Если спортсмен не QLF, то не участвует в формированиие в последующем заезде, остальные
 # сортирутся по rank в обратном порядке
 #

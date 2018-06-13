@@ -121,7 +121,7 @@ class Nation(db.Model):
 class Course(db.Model):
     __tablename__ = 'course'
     id = db.Column(db.Integer, primary_key=True)
-    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     course_coursetter_id = db.Column(db.Integer, db.ForeignKey('coursetter.id'))
     run = db.Column(db.Integer)
     ru_name = db.Column(db.String)
@@ -139,7 +139,7 @@ class CourseForerunner(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order = db.Column(db.Integer)
     forerunner_id = db.Column(db.Integer, db.ForeignKey('forerunner.id'))
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id', ondelete='CASCADE'))
 
 
 class Forerunner(db.Model):
@@ -177,7 +177,7 @@ class RaceJury(db.Model):
     __tablename__ = 'race_jury'
     id = db.Column(db.Integer, primary_key=True)
     jury_id = db.Column(db.Integer, db.ForeignKey('jury.id'))
-    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     jury_function_id = db.Column(db.Integer, db.ForeignKey('jury_type.id'))
     phonenbr = db.Column(db.String)
     email = db.Column(db.String)
@@ -232,7 +232,7 @@ class RaceCompetitor(db.Model):
     __tablename__ = 'race_competitor'
     id = db.Column(db.Integer, primary_key=True)
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
-    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     age_class = db.Column(db.String)
     transponder_1 = db.Column(db.String)
     transponder_2 = db.Column(db.String)
@@ -368,7 +368,7 @@ class Race(db.Model):
 class Weather(db.Model):
     __tablename__ = 'weather'
     id = db.Column(db.Integer, primary_key=True)
-    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     time = db.Column(db.Time)
     place = db.Column(db.String)
     weather = db.Column(db.String)
@@ -427,7 +427,7 @@ class Mark(db.Model):
 class RunInfo(db.Model):
     __tablename__ = 'run_info'
     id = db.Column(db.Integer, primary_key=True)
-    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     number = db.Column(db.Integer)
     starttime = db.Column(db.DateTime)
@@ -444,7 +444,7 @@ class Team(db.Model):
 class RaceTeam(db.Model):
     __tablename__ = 'race_team'
     id = db.Column(db.Integer, primary_key=True)
-    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
     bib = db.Column(db.Integer)
@@ -455,7 +455,7 @@ class RaceTeam(db.Model):
 class CourseDevice(db.Model):
     __tablename__ = 'course_device'
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id', ondelete='CASCADE'))
     order = db.Column(db.Integer)
     distance = db.Column(db.Integer)
     device_id = db.Column(db.Integer, db.ForeignKey('device.id'))
@@ -494,7 +494,7 @@ class DataIn(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     dt = db.Column(db.DateTime)
 
-    race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
     cource_device_id = db.Column(db.Integer, db.ForeignKey('course_device.id'))
     src_sys = db.Column(db.String)
@@ -508,7 +508,7 @@ class ResultDetail(db.Model):
     __tablename__ = 'result_detail'
     id = db.Column(db.Integer, primary_key=True)
     course_device_id = db.Column(db.Integer, db.ForeignKey('course_device.id'))
-    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id',ondelete='CASCADE'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
 
     data_in_id = db.Column(db.Integer, db.ForeignKey('data_in.id'))
@@ -527,7 +527,7 @@ class ResultDetail(db.Model):
 class ResultApproved(db.Model):
     __tablename__ = 'result_approved'
     id = db.Column(db.Integer, primary_key=True)
-    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id', ondelete='CASCADE'))
     result_id = db.Column(db.Integer, db.ForeignKey('result.id'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
     approve_user = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -547,7 +547,7 @@ class ResultApproved(db.Model):
 class Result(db.Model):
     __tablename__ = 'result'
     id = db.Column(db.Integer, primary_key=True)
-    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id', ondelete='CASCADE'))
     status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
     approve_time = db.Column(db.DateTime)
     timerun1 = db.Column(db.BigInteger)
@@ -563,7 +563,7 @@ class RunOrder(db.Model):
     __tablename__ = 'run_order'
     id = db.Column(db.Integer, primary_key=True)
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
-    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id',ondelete='CASCADE'))
     order = db.Column(db.Integer)
     #
     manual_order = db.Column(db.Integer)

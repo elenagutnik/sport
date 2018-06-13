@@ -140,6 +140,51 @@ def generate_results_report(race_id):
         return render_template('custom_error.html', title='Ошибка формирования отчета')
 
 
+@raceinfo.route('/race/<int:race_id>/reports/results/first')
+def generate_results_report_first(race_id):
+    # Prepare data
+    try:
+        ffactor =request.args.get('fields[ffactor]')
+        penalty = request.args.get('fields[penalty]')
+        reasondesc = request.args.get('fields[reasondesc]')
+
+        race = RaceInformation.get_main_race_info(race_id)
+        course = RaceInformation.get_course_info(race_id)
+
+
+        qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
+                                                            RaceInformation.get_approved_competitor_info(race_id))
+        # Create report
+
+        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
+            filter(RunInfo.race_id == race_id). \
+            count()
+        report = RaceResultReport(run_numbers=1)
+
+        report.set_header(race)
+
+        report.set_content(jury=RaceInformation.get_jury_info(race_id),
+                           course=course,
+                           coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                           forerunners=RaceInformation.get_forunners_info(course.id),
+                           qlf_list=qlf_list,
+                           disqlf_list=disqlf_list,
+                           weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
+                           )
+
+
+
+        report.set_footer(race)
+
+        response = make_response(report.get_file())
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
+        return response
+    except:
+        return render_template('custom_error.html', title='Ошибка формирования отчета')
+
+
+
 @raceinfo.route('/race/<int:race_id>/reports/results/unofficial')
 def generate_unofficial_results_report(race_id):
     # Prepare data

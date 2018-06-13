@@ -6,7 +6,6 @@ from .forms import *
 from flask_babel import gettext
 import json
 from .models import *
-from sqlalchemy import and_
 from . import jsonencoder
 from .runList import race_order_buld
 
@@ -439,6 +438,13 @@ def race(id):
     race.nation=Nation.query.get(race.nation_id)
     return render_template('raceinfo/race_view.html', race=race)
 
+@raceinfo.route('/race/<int:id>/del', methods=['GET', 'POST'])
+@admin_required
+def race_del(id):
+    db.session.delete(Race.query.get(id))
+    return redirect(url_for('.race_list'))
+
+
 
 @raceinfo.route('/race/<int:id>/additional', methods=['GET', 'POST'])
 @admin_required
@@ -582,7 +588,7 @@ def edit_race_jury(id):
     race_jury = db.session.query(RaceJury,Jury).\
         outerjoin(Jury,  RaceJury.jury_id==Jury.id).\
         filter(RaceJury.race_id==id).all()
-    return render_template('raceinfo/static-tab/jury_race.html', title='Jury list', form=form, jury=race_jury)
+    return render_template('raceinfo/static-tab/jury_race.html', title='Jury list', form=form, jury=race_jury, race_id=id)
 
 @raceinfo.route('/race/<int:race_id>/jury/<int:jury_id>/del', methods=['GET', 'POST'])
 @admin_required
@@ -830,7 +836,7 @@ def edit_race_competitor(id):
         db.session.commit()
         flash('The competitor has been added')
 
-    return render_template('raceinfo/static-tab/competitors_race.html', form=form, competitors=race_competitors, competitor_form=add_competitor_form)
+    return render_template('raceinfo/static-tab/competitors_race.html', form=form, competitors=race_competitors, competitor_form=add_competitor_form, race_id=id)
 
 @raceinfo.route('/race/<int:race_id>/competitor/<int:competitor_id>/del', methods=['GET', 'POST'])
 @admin_required
@@ -1031,7 +1037,7 @@ def coursetter_del(id):
 @admin_required
 def race_weather(id):
     weathers = Weather.query.filter(Weather.race_id==id).all()
-    return render_template('raceinfo/static-tab/weather_list.html', weathers=weathers)
+    return render_template('raceinfo/static-tab/weather_list.html', weathers=weathers, race_id=id, title='Weather')
 
 @raceinfo.route('/race/<int:id>/weather/add', methods=['GET', 'POST'])
 @admin_required

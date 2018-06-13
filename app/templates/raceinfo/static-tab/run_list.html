@@ -6,7 +6,10 @@
 {% block page_content %}
 
 <div class="page-header">
-    <h1> Run list <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/run/add">Add</a></h1>
+    <h1> Run list
+        <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/run/add">Add</a>
+        <a class="btn btn-success pull-right" href="{{url_for(".race",id=race.id) }}">Done</a>
+    </h1>
 </div>
 
 <table class="table table-striped">
