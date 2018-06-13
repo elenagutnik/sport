@@ -38,7 +38,7 @@ var devlist=[  //список устройств
 	}
 	//форматирование времени
 	function dtform(v){
-		return moment(v).format('DD.MM.YYYY HH:mm:ss.SSS');
+		return moment(v).format('DD.MM.YYYY HH:mm:ss.SSSS');
 	}
 
 function reqSend(snum,devnum,starttime){
@@ -48,6 +48,7 @@ function reqSend(snum,devnum,starttime){
 	$("#data").append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+tform(t-starttime)+"</td><td>"+t+"</td><td>"+dtform(t)+"</td></tr>");
 	$.ajax({
 		  url: "/raceinfo/input/data",
+			type: 'POST',
 		  dataType: 'json',
 		  type: 'POST',
 		  contentType: 'application/json',
