@@ -49,7 +49,7 @@ function reqSend(snum,devnum,starttime){
 	$.ajax({
 		  url: "/raceinfo/input/data",
 		  dataType: 'json',
-		  data: { data: JSON.stringify({
+		  data:JSON.stringify({
 			  'SRC_SYS':devlist[devnum].src_sys,
 			  'SRC_DEV':devlist[devnum].src_dev,
 			  'BIB':startlist[snum],
@@ -57,7 +57,7 @@ function reqSend(snum,devnum,starttime){
 				'GROUP_CODE':'50',
 			  'TIME':dtform(t),
 			  'TOKEN':'pwreutv02n8414yt8'
-			  })}
+			  })
 		}).done(function() {
 //			  $( this ).addClass( "done" );
 		});
