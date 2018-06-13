@@ -49,6 +49,7 @@ function reqSend(snum,devnum,starttime){
 	$.ajax({
 		  url: "/raceinfo/input/data",
 		  dataType: 'json',
+			contentType: 'application/json',
 		  data:JSON.stringify({
 			  'SRC_SYS':devlist[devnum].src_sys,
 			  'SRC_DEV':devlist[devnum].src_dev,
