@@ -50,12 +50,13 @@ function reqSend(snum,devnum,starttime){
 		  url: "/raceinfo/input/data",
 		  dataType: 'json',
 		  data: { data: JSON.stringify({
-			  'src_sys':devlist[devnum].src_sys,
-			  'src_dev':devlist[devnum].src_dev,
-			  'bib':startlist[snum],
-			  'eventcode':'x3',
-			  'time':t,
-			  'reserved':''
+			  'SRC_SYS':devlist[devnum].src_sys,
+			  'SRC_DEV':devlist[devnum].src_dev,
+			  'BIB':startlist[snum],
+			  'EVENT_CODE':'x3',
+				'GROUP_CODE':'50',
+			  'TIME':dtform(t),
+			  'TOKEN':'pwreutv02n8414yt8'
 			  })}
 		}).done(function() {
 //			  $( this ).addClass( "done" );
