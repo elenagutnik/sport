@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_race.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_race.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/timer.html" afterPath="$PROJECT_DIR$/app/templates/timer.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -78,11 +78,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="runList.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="runList.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/runList.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1098">
-              <caret line="30" column="17" lean-forward="false" selection-start-line="30" selection-start-column="17" selection-end-line="30" selection-end-column="17" />
+            <state relative-caret-position="1456">
+              <caret line="132" column="18" lean-forward="false" selection-start-line="132" selection-start-column="18" selection-end-line="132" selection-end-column="71" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="timer.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/templates/timer.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -232,7 +242,6 @@
         <option value="$PROJECT_DIR$/app/templates/reports/report.html" />
         <option value="$PROJECT_DIR$/app/templates/reports/report_info.html" />
         <option value="$PROJECT_DIR$/app/raceinfo/results.py" />
-        <option value="$PROJECT_DIR$/app/templates/timer.html" />
         <option value="$PROJECT_DIR$/app/templates/reports/results.html" />
         <option value="$PROJECT_DIR$/app/raceinfo/models.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/forms.py" />
@@ -240,6 +249,7 @@
         <option value="$PROJECT_DIR$/app/raceinfo/events.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/views.py" />
         <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_race.html" />
+        <option value="$PROJECT_DIR$/app/templates/timer.html" />
       </list>
     </option>
   </component>
@@ -1086,13 +1096,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/timer.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="15" column="30" lean-forward="false" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/templates/jury_page.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="785">
@@ -1237,8 +1240,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/runList.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1098">
-          <caret line="30" column="17" lean-forward="false" selection-start-line="30" selection-start-column="17" selection-end-line="30" selection-end-column="17" />
+        <state relative-caret-position="1456">
+          <caret line="132" column="18" lean-forward="false" selection-start-line="132" selection-start-column="18" selection-end-line="132" selection-end-column="71" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/timer.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
           <folding />
         </state>
       </provider>
