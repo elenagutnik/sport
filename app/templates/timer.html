@@ -5,7 +5,7 @@
 <script>
 var startlist=["1","2","3","4","5","6"]; //стартовый список
 var gap=30; // gap between competitors starts
-var race = '{{ race | safe }}';
+var race =  JSON.parse('{{ race | safe }}');
 
 var devlist = JSON.parse('{{devices | safe }}');
 /*var devlist=[  //список устройств
@@ -92,6 +92,7 @@ function reqSend(snum,devnum,starttime){
 <input type="text" id="delay_val" value="100"><input type="button" value="change delay" onclick="delay=$('#delay_val').val();clearInterval(intervalID);intervalID = window.setInterval(reqSend, delay);">
  -->
 <input type="button" onclick="reqSend(0,0,0);" value="Run">
+<a href="/raceinfo/emulation/1/clear">Clear all results</a>
 <HR>
 <table id="data" style="width:49%; float:left">
 <tr><td>№</td><td>src_dev</td><td>src_sys</td><td>timediff (ms)</td><td>timediff</td><td>current timestamp (ms)</td><td>current datetime</td></tr>

@@ -28,22 +28,25 @@ def device_1get():
 
     return ''
 
+@raceinfo.route('/emulation/<int:race_id>/clear')
+def emulation_clear_results(race_id):
+    db.engine.execute('delete from result_detail; ')
+    db.engine.execute('delete from data_in;')
+    db.engine.execute('delete from result_approved;')
+    db.engine.execute('delete from result;')
+    db.engine.execute('delete from "CASHE";')
+    db.engine.execute('delete from run_order;')
+    db.engine.execute('update run_info set endtime=NULL;')
+    #db.engine.execute('INSERT INTO "CASHE" (id, key, data) VALUES (1,\'Current_competitor\', \'{"run": 1, "order": 0}\')')
+    db.engine.execute('update run_info set starttime=NULL;')
+    db.engine.execute('update run_order set manual_order=NULL;')
+    return "cleared"
+
 @raceinfo.route('/emulation/<int:race_id>')
 def emulation(race_id):
     race = Race.query.get(race_id)
     devices = db.session.query(CourseDevice,Device).join(Device).filter(Course.race_id == race_id,
-                                        CourseDevice.course_id == Course.id).all()
-    #db.engine.execute('delete from result_detail; ')
-    #db.engine.execute('delete from data_in;')
-    #db.engine.execute('delete from result_approved;')
-    #db.engine.execute('delete from result;')
-    #db.engine.execute('delete from "CASHE";')
-    #db.engine.execute('delete from run_order where run_id>1;')
-    #db.engine.execute('update run_info set endtime=NULL;')
-    #db.engine.execute('INSERT INTO "CASHE" (id, key, data) VALUES (1,\'Current_competitor\', \'{"run": 1, "order": 0}\')')
-    #db.engine.execute('update run_info set starttime=NULL where number!=1;')
-    #db.engine.execute('update run_order set manual_order=NULL;')
-
+                                        CourseDevice.course_id == Course.id).order_by(CourseDevice.order).all()
     return render_template('timer.html',
                            race=json.dumps(race, cls=jsonencoder.AlchemyEncoder),
                            devices=json.dumps(devices, cls=jsonencoder.AlchemyEncoder))
