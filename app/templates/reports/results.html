@@ -303,6 +303,7 @@ html{
                     </thead>
                 {% endif %}
 				<tbody>
+                {% if run_numbers ==1%}
                     {% for item in qlf_competitors %}
 					<tr>
 						<td align="right">{{item.rank}}</td>
@@ -312,11 +313,31 @@ html{
 						<td align="center">{{item.birth.year}}</td>
 						<td align="center">{{item.club}}</td>
 						<td align="center">{{item.nation}}</td>
-                        <td align="center">{{item.total}}</td>
+                        <td align="center">{{item.time}}</td>
                         <td align="center">{{item.diff}}</td>
 						<td align="right">{{points}}</td>
 					</tr>
                     {% endfor %}
+				{% else %}
+                    {% for item in qlf_competitors %}
+                    <tr>
+						<td align="right">{{item.rank}}</td>
+						<td align="right">{{item.bib}}</td>
+                        <td align="right">{{item.fiscode}}</td>
+						<td><b><span class="lname">{{item.en_lastname}}</span> {{item.en_firstname}}</b></td>
+						<td align="center">{{item.birth.year}}</td>
+						<td align="center">{{item.club}}</td>
+						<td align="center">{{item.nation}}</td>
+                        <td align="center">{{item.time1}}</td>
+                        <td align="center">({{item.rank1}})</td>
+                        <td align="center">{{item.time2}}</td>
+                        <td align="center">({{item.rank2}})</td>
+                        <td align="center">{{item.total}}</td>
+                        <td align="center">{{item.diff}}</td>
+						<td align="right">{{points}}</td>
+					</tr>
+					{% endfor %}
+                {% endif %}
                     <tr>
                         <td colspan="14">
                             <br>

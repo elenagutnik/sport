@@ -152,8 +152,8 @@ def generate_results_report_first(race_id):
         course = RaceInformation.get_course_info(race_id)
 
 
-        qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
-                                                            RaceInformation.get_approved_competitor_info(race_id))
+        qlf_list, disqlf_list = RaceInformation.get_first_run_results(RaceInformation.get_competitor_info(race_id),
+                                                            RaceInformation.get_first_run_approves(race_id))
         # Create report
 
         run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
@@ -217,7 +217,6 @@ def generate_unofficial_results_report(race_id):
                            )
 
 
-
         report.set_footer(race)
 
         response = make_response(report.get_file())
@@ -242,23 +241,28 @@ class ExcelGenerator:
                    }, {'name': 'Name',
                        'rows_count': 0,
                        'cell_count': 1,
-                       }, {'name': 'Rank',
+                       },
+                          {'name': 'Surname',
                            'rows_count': 0,
                            'cell_count': 1,
-                           }, {'name': 'Time',
+                           },
+                              {'name': 'Rank',
                                'rows_count': 0,
                                'cell_count': 1,
-                               }, {'name': 'Diff',
+                               }, {'name': 'Time',
                                    'rows_count': 0,
                                    'cell_count': 1,
-                                   }, {'name': 'Status',
+                                   }, {'name': 'Diff',
                                        'rows_count': 0,
                                        'cell_count': 1,
-                                       }]
+                                       }, {'name': 'Status',
+                                           'rows_count': 0,
+                                           'cell_count': 1,
+                                           }]
 
         for index, item in enumerate(header):
             self.ws.write_merge(0, 0+item['cell_count'], index + item['rows_count'], index + item['rows_count'], item['name'])
-        self.cursor[1]=6
+        self.cursor[1]=7
         for item in range(run_count):
             self.ws.write_merge(0, 0, self.cursor[1], self.cursor[1]+4,
                                 'Run '+ str(item+1))
@@ -273,12 +277,13 @@ class ExcelGenerator:
     def set_data(self, data):
         for item in data:
             self.ws.write(self.cursor[0], 0, item['bib'])
-            self.ws.write(self.cursor[0], 1, item['ru_firstname']+' '+item['en_firstname'])
-            self.ws.write(self.cursor[0], 2, item['global_rank'])
-            self.ws.write(self.cursor[0], 3, time_convertor(item['result_time']))
-            self.ws.write(self.cursor[0], 4, time_convertor(item['diff']))
-            self.ws.write(self.cursor[0], 5, item['status'])
-            self.cursor[1] = 6
+            self.ws.write(self.cursor[0], 1, item['en_firstname'])
+            self.ws.write(self.cursor[0], 2, item['ru_firstname'])
+            self.ws.write(self.cursor[0], 3, item['global_rank'])
+            self.ws.write(self.cursor[0], 4, time_convertor(item['result_time']))
+            self.ws.write(self.cursor[0], 5, time_convertor(item['diff']))
+            self.ws.write(self.cursor[0], 6, item['status'])
+            self.cursor[1] = 7
             for result_item in item['results']:
 
                 self.ws.write(self.cursor[0], self.cursor[1], result_item['rank'])
@@ -473,7 +478,7 @@ class RaceInformation:
 
     @staticmethod
     def get_competitor_info_for_run(race_id, run_number):
-        run=RunInfo.query.filter(RunInfo.race_id==race_id, RunInfo.number==run_number).first()
+        run = RunInfo.query.filter(RunInfo.race_id==race_id, RunInfo.number==run_number).first()
         return db.session.query(Competitor, RaceCompetitor, Nation, RunOrder). \
             join(RaceCompetitor). \
             join(Nation, Nation.id == Competitor.nation_code_id). \
@@ -537,17 +542,54 @@ class RaceInformation:
         return sorted(qlf_list, key=lambda item: item['rank']), disqlf_list
 
     @staticmethod
+    def get_first_run_results(race_competitors, competitors_approve):
+        qlf_list = []
+        disqlf_list = {}
+        for item in competitors_approve:
+            if item.status_id == 1:
+                competitor = next((competitor for competitor in race_competitors if
+                                   competitor[1].id == item.competitor_id), None)
+                qlf_item = {
+                    'bib': competitor[1].bib,
+                    'fiscode': competitor[0].fiscode,
+                    'en_firstname': competitor[0].en_firstname,
+                    'en_lastname': competitor[0].en_lastname,
+                    'birth': competitor[0].birth,
+                    'club': competitor[1].club,
+                    'nation': competitor[2].name,
+                    'statuc_id': item.status_id,
+                    'time': time_convertor(item.time),
+                    'rank': item.rank,
+                    'diff': time_convertor(item.diff)
+                }
+                qlf_list.append(qlf_item)
+        return sorted(qlf_list, key=lambda item: item['rank']), disqlf_list
+
+    @staticmethod
     def get_approved_competitor_info(race_id):
         return db.session.query(ResultApproved.race_competitor_id.label('competitor_id'),
                                 ResultApproved.time.label('time'),
                                 ResultApproved.rank.label('rank'),
                                 ResultApproved.gate.label('gate'),
+                                ResultApproved.diff.label('diff'),
                                 ResultApproved.reason.label('reason'),
                                 RunInfo.number.label('run_number')).\
             filter(ResultApproved.run_id == RunInfo.id,
                    RunInfo.race_id == race_id,
                    RunInfo.number.in_([1, 2])).all()
-
+    @staticmethod
+    def get_first_run_approves(race_id):
+        return db.session.query(ResultApproved.race_competitor_id.label('competitor_id'),
+                                ResultApproved.time.label('time'),
+                                ResultApproved.rank.label('rank'),
+                                ResultApproved.gate.label('gate'),
+                                ResultApproved.diff.label('diff'),
+                                ResultApproved.status_id.label('status_id'),
+                                ResultApproved.reason.label('reason'),
+                                RunInfo.number.label('run_number')).\
+            filter(ResultApproved.run_id == RunInfo.id,
+                   RunInfo.race_id == race_id,
+                   RunInfo.number == 1).all()
     @staticmethod
     def get_weather_info(race_id):
         return Weather.query.filter(Weather.race_id == race_id).all()
@@ -568,7 +610,7 @@ def time_convertor(timestamp):
     if sss < 100:
         str_sss = "0"+str(str_sss)
     if sss < 10:
-        str_sss="0"+str(str_sss)
+        str_sss = "0"+str(str_sss)
     ss=floor(int(timestamp)/1000)%60
     if ss < 10:
         ss = "0" + str(ss)
