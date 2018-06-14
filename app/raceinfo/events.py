@@ -116,7 +116,7 @@ def load_data_vol2():
                 course_device_id=course_device[0].id,
                 run_id=run.id,
                 data_in_id=device_data.id,
-                race_competitor_id = competitor[0].id,
+                race_competitor_id=competitor[0].id,
                 absolut_time=data['TIME'])
             db.session.add(result)
             db.session.commit()
@@ -173,17 +173,19 @@ def load_data_vol2():
             ResultApproved.query.filter(ResultApproved.race_competitor_id == competitor[0].id, ResultApproved.run_id == run.id).one(),
             course_device[1]
         ],
-            list_of_object=result_details,finished_data=finished_data ), cls=jsonencoder.AlchemyEncoder))
+            list_of_object=result_details,finished_data=finished_data), cls=jsonencoder.AlchemyEncoder))
     except:
         ddata = DataIn(
             src_sys=data['SRC_SYS'],
             src_dev=data['SRC_DEV'],
             event_code=data['EVENT_CODE'],
-            time=data['TIME']
+            time=data['TIME'],
 
         )
+        if course_device is not None:
+            ddata.cource_device_id = course_device[0].id
         if run is not None:
-            ddata.run_id=run.id
+            ddata.run_id = run.id
         db.session.add(ddata)
         db.session.commit()
         socketio.emit("errorData", json.dumps(ddata, cls=jsonencoder.AlchemyEncoder))
@@ -215,7 +217,7 @@ def setDeviceDataInDB(data, run_id, cource_device_id):
         src_dev=data['SRC_DEV'],
         event_code=data['EVENT_CODE'],
         time=data['TIME'],
-        run_id = run_id,
+        run_id=run_id,
         cource_device_id=cource_device_id
     )
     if 'BIB' in data:
@@ -270,6 +272,8 @@ def get_current_competitor(course_device_id, run_id):
                            filter(ResultDetail.run_id == run_id,
                             ResultDetail.course_device_id == course_device_id). \
                             scalar() + 1
+    print('текущий девайс', competitor_order-1)
+    
     competitor = db.session.query(RaceCompetitor, Competitor, RunOrder).\
            join(Competitor).\
            join(RunOrder).\
@@ -668,7 +672,6 @@ def edit_competitor(json_data):
                             resultApproved.status_id = None
                         db.session.add(competitor_result_detail)
                         db.session.commit()
-
         recalculate_run_results(run_id)
         socketio.emit('change/data_in/error', json.dumps(error_list))
     socket_get_results(json.dumps(list(tree_view.keys())))

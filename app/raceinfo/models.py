@@ -30,6 +30,8 @@ class Discipline(db.Model):
     fiscode = db.Column(db.String)
     ru_name = db.Column(db.String)
     en_name = db.Column(db.String)
+    # is_combination = db.Column(db.Boolean)
+
     def __repr__(self):
         return self.fiscode
 
@@ -433,6 +435,8 @@ class RunInfo(db.Model):
     starttime = db.Column(db.DateTime)
     endtime = db.Column(db.DateTime)
 
+    # discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
+
 class Team(db.Model):
     __tablename__ = 'team'
     id = db.Column(db.Integer, primary_key=True)
@@ -584,4 +588,13 @@ class FisPoints(db.Model):
     fispoint = db.Column(db.Float)
     date_update = db.Column(db.DateTime)
     date_expired = db.Column(db.DateTime)
+
+class RaceCompetitorFisPoints(db.Model):
+    __tablename__ = 'race_com_fis_points'
+    id = db.Column(db.Integer, primary_key=True)
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
+    fispoint = db.Column(db.Float)
+
+
 

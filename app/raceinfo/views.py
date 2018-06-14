@@ -8,7 +8,7 @@ import json
 from .models import *
 from . import jsonencoder
 from .runList import race_order_buld
-
+from .competitors import calculate_age_class
 @raceinfo.route('/discipline/', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -822,6 +822,8 @@ def edit_race_competitor(id):
                                 Category.query.all()]
     if form.validate_on_submit():
         # selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
+        fisPoints= FisPoints.query.filter(FisPoints.competitor_id==form.competitor_ref.data,
+                                          FisPoints.discipline_id==race.discipline_id).first()
         raceCompetitor = RaceCompetitor(
             competitor_id= form.competitor_ref.data,
             race_id = id,
@@ -830,6 +832,8 @@ def edit_race_competitor(id):
             transponder_2=form.transponder_2.data,
             bib = form.bib.data
         )
+        if fisPoints is not None:
+            raceCompetitor.fis_points = fisPoints.fispoint
         if race.isTeam:
             raceCompetitor.team_id = form.team_ref.data
         db.session.add(raceCompetitor)
@@ -1329,19 +1333,23 @@ def race_run(id):
     race = Race.query.filter_by(id=id).one()
     course_runs = (db.session.query(RunInfo, Course).join(Course).filter(Course.race_id == id)).all()
     if current_user.lang == 'ru':
-        form.course_ref.choices = [(item.id, item.ru_name ) for item in
+        form.course_ref.choices = [(item.id, item.ru_name) for item in
                                    Course.query.filter_by(race_id=id).all()]
+        # form.discipline_ref.choices = [(item.fiscode, item.ru_name) for item in
+        #                            Discipline.query.all()]
     else:
 
-        form.course_ref.choices = [(item.id, item.ru_name ) for item in
+        form.course_ref.choices = [(item.fiscode, item.en_name) for item in
                                    Course.query.filter_by(race_id=id).all()]
+        # form.discipline_ref.choices = [(item.fiscode, item.ru_name) for item in
+        #                            Discipline.query.all()]
+
     if form.validate_on_submit():
         run_info = RunInfo(
             race_id=id,
             course_id=form.course_ref.data,
             number=form.number.data,
-            starttime=form.starttime.data,
-            endtime=form.endtime.data
+            discipline_id=form.discipline_ref.data
         )
         db.session.add(run_info)
         db.session.commit()
@@ -1663,3 +1671,6 @@ def device_type_del(id):
 @raceinfo.route('/status/get', methods=['GET'])
 def status_get_list():
     return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)
+
+
+# Динамическое добавление field в form RunBase!!!!!
