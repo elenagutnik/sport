@@ -7,8 +7,8 @@ var startlist=["1","2","3","4","5","6"]; //стартовый список
 var gap=30; // gap between competitors starts
 var race = '{{ race | safe }}';
 
-var devices = '{{devices | safe }}';
-var devlist=[  //список устройств
+var devlist = JSON.parse('{{devices | safe }}');
+/*var devlist=[  //список устройств
 		{
 			src_sys:'sys0001',
 			src_dev:'start0001',
@@ -34,7 +34,7 @@ var devlist=[  //список устройств
 			src_dev:'finish0006',
 		}
 	];
-
+*/
 	function tform(v){
 		return moment(v).format('mm:ss.SSSS');
 	}
@@ -55,8 +55,8 @@ function reqSend(snum,devnum,starttime){
 		  type: 'POST',
 		  contentType: 'application/json',
 		  data:JSON.stringify({
-			  'SRC_SYS':devlist[devnum].src_sys,
-			  'SRC_DEV':devlist[devnum].src_dev,
+			  'SRC_SYS':devlist[devnum][1].name,
+			  'SRC_DEV':devlist[devnum][1].name,
 			  'BIB':startlist[snum],
 			  'EVENT_CODE':'x3',
 				'GROUP_CODE':'50',

@@ -31,7 +31,7 @@ def device_1get():
 @raceinfo.route('/emulation/<int:race_id>')
 def emulation(race_id):
     race = Race.query.get(race_id)
-    devices = CourseDevice.query.filter(Course.race_id == race_id,
+    devices = db.session.query(CourseDevice,Device).join(Device).filter(Course.race_id == race_id,
                                         CourseDevice.course_id == Course.id).all()
     #db.engine.execute('delete from result_detail; ')
     #db.engine.execute('delete from data_in;')
@@ -273,7 +273,7 @@ def get_current_competitor(course_device_id, run_id):
                             ResultDetail.course_device_id == course_device_id). \
                             scalar() + 1
     print('текущий девайс', competitor_order-1)
-    
+
     competitor = db.session.query(RaceCompetitor, Competitor, RunOrder).\
            join(Competitor).\
            join(RunOrder).\
