@@ -8,10 +8,12 @@ sock.bind(server_address)
 
 sock.listen(1)
 
+
+connection, client_address = sock.accept()
 while True:
-    connection, client_address = sock.accept()
-    while True:
-        data = connection.recv(1024)
-        print(data)
-        break
+    data = connection.recv(1024)
+    if not data: break
+    print(data)
+
+
 

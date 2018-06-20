@@ -14,8 +14,8 @@ class DataSender:
 
     def send(self, msg):
 
-        try:
-            self.sock.send(msg)
-        except:
-            return ('send_error')
+        # try:
+        self.sock.send(msg)
+        # except:
+        #     return ('send_error')
 

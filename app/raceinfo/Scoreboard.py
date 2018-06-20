@@ -2,12 +2,13 @@ from . import raceinfo
 from .. import ScoreboardSender
 
 class Scoreboard:
-     def __init__(self, bib, firstname, lastname, country_code, time):
-         self.bib = bib
+     time = None
+     def __init__(self, bib, firstname, lastname, country_code, time=0):
+         self.bib = str(bib)
          self.firstname = firstname
          self.lastname = lastname
          self.country_code = country_code
-         self.time = time
+         self.time = str(time)
 
 
      @staticmethod
@@ -17,7 +18,7 @@ class Scoreboard:
          return '0'
 
      def new_best_time(self):
-         return ('CCBestTime;%s;%s;%s%s;!!' % (
+         return ('CCBestTime;%s;%s;%s;%s;!!' % (
              self.bib,
              (self.firstname[0] + '.'+self.lastname),
              self.country_code,
@@ -25,7 +26,7 @@ class Scoreboard:
          )).encode()
 
      def next_competitor(self):
-         return ('CCNextCompetitor;%s;%s;%s%s;!!' % (
+         return ('CCNextCompetitor;%s;%s;%s;%s;!!' % (
              self.bib,
              (self.firstname[0] + '.'+self.lastname),
              self.country_code,
@@ -33,7 +34,7 @@ class Scoreboard:
          )).encode()
 
      def started_competitor(self):
-         return ('CCStart;%s;%s;%s%s;!!' % (
+         return ('CCStart;%s;%s;%s;%s;!!' % (
              self.bib,
              (self.firstname[0] + '.'+self.lastname),
              self.country_code,
@@ -41,7 +42,7 @@ class Scoreboard:
          )).encode()
 
      def crossed_device(self):
-         return ('CCInter;%s;%s;%s%s;!!' % (
+         return ('CCInter;%s;%s;%s;%s;!!' % (
              self.bib,
              (self.firstname[0] + '.'+self.lastname),
              self.country_code,
@@ -49,7 +50,7 @@ class Scoreboard:
          )).encode()
 
      def finished_competitor(self):
-         return ("ССFinish;%s;%s;%s%s;!!" % (
+         return ("CCFinish;%s;%s;%s;%s;!!" % (
              self.bib,
              (self.firstname[0] + '.'+self.lastname),
              self.country_code,
