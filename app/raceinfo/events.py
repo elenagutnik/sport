@@ -3,7 +3,6 @@ from ..decorators import admin_required
 from .models import *
 from . import jsonencoder, raceinfo
 import json
-import fractions
 
 from functools import wraps
 from sqlalchemy import cast, DATE, func, asc,  or_
@@ -11,6 +10,10 @@ from sqlalchemy import cast, DATE, func, asc,  or_
 from flask_login import current_user, login_required
 from datetime import datetime, timedelta
 from flask import request, render_template
+
+
+
+from .Scoreboard import Scoreboard
 
 def exectutiontime(func):
     @wraps(func)
@@ -25,7 +28,6 @@ def exectutiontime(func):
 @raceinfo.route('/d')
 def device_1get():
     db.create_all()
-
     return ''
 
 @raceinfo.route('/emulation/<int:race_id>')
@@ -33,16 +35,16 @@ def emulation(race_id):
     race = Race.query.get(race_id)
     devices = CourseDevice.query.filter(Course.race_id == race_id,
                                         CourseDevice.course_id == Course.id).all()
-    #db.engine.execute('delete from result_detail; ')
-    #db.engine.execute('delete from data_in;')
-    #db.engine.execute('delete from result_approved;')
-    #db.engine.execute('delete from result;')
-    #db.engine.execute('delete from "CASHE";')
-    #db.engine.execute('delete from run_order where run_id>1;')
-    #db.engine.execute('update run_info set endtime=NULL;')
-    #db.engine.execute('INSERT INTO "CASHE" (id, key, data) VALUES (1,\'Current_competitor\', \'{"run": 1, "order": 0}\')')
-    #db.engine.execute('update run_info set starttime=NULL where number!=1;')
-    #db.engine.execute('update run_order set manual_order=NULL;')
+    db.engine.execute('delete from result_detail; ')
+    db.engine.execute('delete from data_in;')
+    db.engine.execute('delete from result_approved;')
+    db.engine.execute('delete from result;')
+    db.engine.execute('delete from "CASHE";')
+    db.engine.execute('delete from run_order where run_id>1;')
+    db.engine.execute('update run_info set endtime=NULL;')
+    db.engine.execute('INSERT INTO "CASHE" (id, key, data) VALUES (1,\'Current_competitor\', \'{"run": 1, "order": 0}\')')
+    db.engine.execute('update run_info set starttime=NULL where number!=1;')
+    db.engine.execute('update run_order set manual_order=NULL;')
 
     return render_template('timer.html',
                            race=json.dumps(race, cls=jsonencoder.AlchemyEncoder),
@@ -118,6 +120,15 @@ def load_data_vol2():
                 data_in_id=device_data.id,
                 race_competitor_id=competitor[0].id,
                 absolut_time=data['TIME'])
+
+            board = Scoreboard(bib=competitor[0].bib,
+                               firstname=competitor[1].en_firstname,
+                               lastname=competitor[1].en_lastname,
+                               country_code=competitor[3].name,
+                               time='0')
+
+            Scoreboard.send(board.started_competitor())
+
             db.session.add(result)
             db.session.commit()
             result.sectortime = 0
@@ -134,6 +145,13 @@ def load_data_vol2():
             # result_details = crutch_result_list(course_device_id=course_device[0].id, run_id=run.id)
         else:
             if competitor is not None:
+
+                board = Scoreboard(bib=competitor[0].bib,
+                                   firstname=competitor[1].en_firstname,
+                                   lastname=competitor[1].en_lastname,
+                                   country_code=competitor[3].name
+                                   )
+
                 result = ResultDetail(
                     course_device_id=course_device[0].id,
                     run_id=run.id,
@@ -145,9 +163,15 @@ def load_data_vol2():
                         filter(ResultDetail.run_id == run.id).all()
                     db.session.add(result)
                     db.session.commit()
-                    competitor_finish(competitor[0].id, run.id, result.absolut_time)
+                    competitor_aprove = competitor_finish(competitor[0].id, run.id, result.absolut_time)
+
+                    board.time = competitor_aprove.time
+                    Scoreboard.send(board.finished_competitor())
+
                     recalculate_run_results(run.id)
                     finished_data = ResultApproved.query.filter(ResultApproved.run_id==run.id).all()
+
+
                 else:
 
                     result_details = db.session.query(ResultDetail). \
@@ -157,8 +181,11 @@ def load_data_vol2():
                     db.session.add(result)
                     db.session.commit()
                     calculate_personal_sector_params(result, course_device[0], run.course_id)
-                    calculate_common_sector_params(result, result_details)
 
+                    board.time = result.time
+                    Scoreboard.send(board.crossed_device())
+
+                    calculate_common_sector_params(result, result_details)
 
             else:
                 socketio.emit('errorData', json.dumps({'ERROR': 'UNKNOWED COMPETITOR', 'DATA': device_data}, cls=jsonencoder.AlchemyEncoder))
@@ -248,9 +275,10 @@ def competitor_start():
     return '', 200
 
 def competitor_start_run(run_id):
-    race_competitors = db.session.query(RaceCompetitor, Competitor, RunOrder). \
+    race_competitors = db.session.query(RaceCompetitor, Competitor, RunOrder, Nation). \
         join(Competitor). \
         join(RunOrder). \
+        join(Nation, Competitor.nation_code_id == Nation.id). \
         filter(RunOrder.run_id == run_id).order_by(asc(RunOrder.order)).all()
     order = sum(item[2].manual_order is not None and item[2].manual_order != 0 for item in race_competitors)
 
@@ -265,8 +293,6 @@ def competitor_start_run(run_id):
     db.session.commit()
     return сompetitor
 
-
-
 def get_current_competitor(course_device_id, run_id):
     competitor_order = db.session.query(func.count('*')).select_from(ResultDetail).\
                            filter(ResultDetail.run_id == run_id,
@@ -274,10 +300,11 @@ def get_current_competitor(course_device_id, run_id):
                             scalar() + 1
     print('текущий девайс', competitor_order-1)
     
-    competitor = db.session.query(RaceCompetitor, Competitor, RunOrder).\
+    competitor = db.session.query(RaceCompetitor, Competitor, RunOrder, Nation).\
            join(Competitor).\
-           join(RunOrder).\
-           filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).first()
+           join(RunOrder). \
+           join(Nation, Competitor.nation_code_id == Nation.id). \
+        filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).first()
     return competitor
 
 def competitor_finish(competitor_id, run_id, finish_time):
@@ -292,9 +319,11 @@ def competitor_finish(competitor_id, run_id, finish_time):
         result_approves.time = result_approves.finish_time - result_approves.start_time
         db.session.add(result_approves)
         db.session.commit()
-        return
+
+
+        return result_approves
     except Exception as err:
-        return
+        return None
 
 @raceinfo.route('/run/competitor/remove', methods=['GET', 'POST'])
 @login_required
@@ -787,3 +816,10 @@ def reestablish_DSQ_competitors(competitor_id, run_id):
         db.session.add(item)
     db.session.commit()
     return ''
+
+# @raceinfo.route('/sum/<int:race_competitor_id>', methods=['POST', 'GET'])
+# def get_competitior_run_time(race_competitor_id):
+#     race = db.session.query(Race).filter(Race.id==RaceCompetitor.race_id, RaceCompetitor.id==race_competitor_id).one()
+#     if race.result_function == 1:
+#         return db.session.query(sum(ResultApproved.time.label('total'))).filter(ResultApproved.race_competitor_id==race_competitor_id).scalar()
+#     return 0

@@ -9,7 +9,7 @@ from flask_babel import Babel
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_socketio import SocketIO
 from .momentjs import momentjs
-
+from .TCPClient import DataSender
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
@@ -17,7 +17,7 @@ db = SQLAlchemy()
 babel = Babel()
 dtb = DebugToolbarExtension()
 socketio = SocketIO()
-
+ScoreboardSender = DataSender()
 
 
 login_manager = LoginManager()

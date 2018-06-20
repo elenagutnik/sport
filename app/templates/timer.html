@@ -5,9 +5,9 @@
 <script>
 var startlist=["1","2","3","4","5","6"]; //стартовый список
 var gap=30; // gap between competitors starts
-var race = '{{ race | safe }}';
+var race = JSON.parse('{{ race | safe }}');
 
-var devices = '{{devices | safe }}';
+var devices = JSON.parse('{{devices | safe }}');
 var devlist=[  //список устройств
 		{
 			src_sys:'sys0001',
