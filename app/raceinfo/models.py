@@ -30,7 +30,7 @@ class Discipline(db.Model):
     fiscode = db.Column(db.String)
     ru_name = db.Column(db.String)
     en_name = db.Column(db.String)
-    # is_combination = db.Column(db.Boolean)
+    is_combination = db.Column(db.Boolean)
 
     def __repr__(self):
         return self.fiscode
@@ -435,7 +435,7 @@ class RunInfo(db.Model):
     starttime = db.Column(db.DateTime)
     endtime = db.Column(db.DateTime)
 
-    # discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
+    discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
 
 class Team(db.Model):
     __tablename__ = 'team'
@@ -572,13 +572,6 @@ class RunOrder(db.Model):
     #
     manual_order = db.Column(db.Integer)
     # course_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
-
-class TempCashe(db.Model):
-    # Вресенный класс,  для кэширования объектов, объекты хранятся в формате JSON
-    __tablename__ = 'CASHE'
-    id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String)
-    data = db.Column(db.String)
 
 class FisPoints(db.Model):
     __tablename__ = 'fis_points'

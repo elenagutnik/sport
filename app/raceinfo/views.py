@@ -716,7 +716,6 @@ def competitor_add():
             return redirect(url_for('.competitor_list',_external=True))
         else:
             return json.dumps(competitor, cls=jsonencoder.AlchemyEncoder)
-    tmp = form.is_ajax
     if form.is_ajax.data is None or form.is_ajax.data =="":
         return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
     else:
@@ -892,8 +891,6 @@ def race_competitor_edit(race_id,competitor_id):
     form.bib.data = race_competitor.bib
 
     return render_template('raceinfo/static-tab/form_page.html', form=form, title='Edit competitor')
-
-
 
 @raceinfo.route('/forerunner/', methods=['GET', 'POST'])
 @login_required
@@ -1389,11 +1386,18 @@ def race_course_run_stop(id,run_id):
 
     return json.dumps({'stop_time': str(run_info.endtime)})
 
-
 @raceinfo.route('/race/<int:id>/run/add', methods=['GET', 'POST'])
 @admin_required
 def race_run_add(id):
-    form = EditRunInfoForm()
+    is_combination = db.session.query(Discipline.is_combination.label('is_combination')).\
+        filter(Discipline.id == Race.discipline_id, Race.id == id).one()
+
+    if is_combination.is_combination == True:
+        form = EditRunInfoDisciplineForm()
+        form.discipline_ref.choices = [(item.id, item.fiscode + '.' + item.en_name) for item in
+                               Discipline.query.filter(Discipline.is_combination == None).all()]
+    else:
+        form = EditRunInfoForm()
 
     if current_user.lang == 'ru':
         form.course_ref.choices = [(item.id, item.ru_name ) for item in
@@ -1408,11 +1412,13 @@ def race_run_add(id):
             course_id=form.course_ref.data,
             number=form.number.data,
         )
+        if is_combination.is_combination == True:
+            run_info.discipline_id=form.discipline_ref.data
         db.session.add(run_info)
         db.session.commit()
         flash('The run has been added.')
-        return redirect(url_for('.race_run', id=id,_external=True))
-    return render_template('raceinfo/static-tab/form_page.html',title='Add run', form=form)
+        return redirect(url_for('.race_run', id=id, _external=True))
+    return render_template('raceinfo/static-tab/form_page.html', title='Add run', form=form)
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/edit', methods=['GET', 'POST'])
 @admin_required
@@ -1471,7 +1477,7 @@ def race_сourse_dev_add(id, course_id):
 
 @raceinfo.route('/race/<int:id>/course/<int:course_id>/dev/<int:dev_id>/edit', methods=['GET', 'POST'])
 @admin_required
-def race_сourse_dev_edit(id,course_id, dev_id):
+def race_сourse_dev_edit(id, course_id, dev_id):
     form = EditCourseDeviceForm()
     dev = CourseDevice.query.filter_by(id=dev_id).one()
     form.device_ref.choices = [(item.id, item.name) for item in
@@ -1671,6 +1677,3 @@ def device_type_del(id):
 @raceinfo.route('/status/get', methods=['GET'])
 def status_get_list():
     return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)
-
-
-# Динамическое добавление field в form RunBase!!!!!

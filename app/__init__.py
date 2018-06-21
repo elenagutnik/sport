@@ -2,6 +2,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_moment import Moment
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import config
@@ -10,6 +11,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_socketio import SocketIO
 from .momentjs import momentjs
 from .TCPClient import DataSender
+
+
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
@@ -18,7 +21,7 @@ babel = Babel()
 dtb = DebugToolbarExtension()
 socketio = SocketIO()
 ScoreboardSender = DataSender()
-
+migrate = Migrate()
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
@@ -41,6 +44,7 @@ def create_app(config_name):
     login_manager.init_app(app)
     dtb.init_app(app)
     socketio.init_app(app)
+    migrate.init_app(app, db)
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)

@@ -226,6 +226,14 @@ class EditRunInfoForm(FlaskForm):
     number = IntegerField('Number', validators=[InputRequired()])
     submit = SubmitField('Submit')
 
+class EditRunInfoDisciplineForm(EditRunInfoForm):
+    discipline_ref = SelectField('Discipline', coerce=int)
+    __order = ('csrf_token', 'discipline_ref', 'course_ref', 'number', 'submit')
+    def __iter__(self):
+        fields = list(super(EditRunInfoDisciplineForm, self).__iter__())
+        get_field = lambda field_id: next((fld for fld in fields if fld.id == field_id))
+        return (get_field(field_id) for field_id in self.__order)
+
 class EditCourseDeviceForm(FlaskForm):
     # course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
     order = IntegerField('Order', validators=[InputRequired()])

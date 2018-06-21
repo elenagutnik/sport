@@ -2,7 +2,6 @@ from . import raceinfo
 from .. import ScoreboardSender
 
 class Scoreboard:
-     time = None
      def __init__(self, bib, firstname, lastname, country_code, time=0):
          self.bib = str(bib)
          self.firstname = firstname

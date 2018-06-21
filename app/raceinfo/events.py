@@ -1,4 +1,5 @@
-from .. import socketio, db
+from .. import socketio, db, migrate
+
 from ..decorators import admin_required
 from .models import *
 from . import jsonencoder, raceinfo
@@ -8,10 +9,10 @@ from functools import wraps
 from sqlalchemy import cast, DATE, func, asc,  or_
 
 from flask_login import current_user, login_required
+from flask_migrate import upgrade as _upgrade
+
 from datetime import datetime, timedelta
 from flask import request, render_template
-
-
 
 from .Scoreboard import Scoreboard
 
@@ -25,9 +26,9 @@ def exectutiontime(func):
         return result
     return wrapper
 
-@raceinfo.route('/d')
+@raceinfo.route('/migrate')
 def device_1get():
-    db.create_all()
+    _upgrade()
     return ''
 
 @raceinfo.route('/emulation/<int:race_id>/clear')
