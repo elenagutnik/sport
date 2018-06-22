@@ -28,7 +28,7 @@ def exectutiontime(func):
 
 @raceinfo.route('/migrate')
 def device_1get():
-    _upgrade()
+    RunOrderFunction.insert()
     return ''
 
 @raceinfo.route('/emulation/<int:race_id>/clear')

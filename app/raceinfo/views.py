@@ -1413,7 +1413,7 @@ def race_run_add(id):
             number=form.number.data,
         )
         if is_combination.is_combination == True:
-            run_info.discipline_id=form.discipline_ref.data
+            run_info.discipline_id = form.discipline_ref.data
         db.session.add(run_info)
         db.session.commit()
         flash('The run has been added.')
@@ -1422,30 +1422,38 @@ def race_run_add(id):
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/edit', methods=['GET', 'POST'])
 @admin_required
-def race_run_edit(id,run_id):
-    form = EditRunInfoForm()
+def race_run_edit(id, run_id):
+    is_combination = db.session.query(Discipline.is_combination.label('is_combination')).\
+        filter(Discipline.id == Race.discipline_id, Race.id == id).one()
+
+    if is_combination.is_combination == True:
+        form = EditRunInfoDisciplineForm()
+        form.discipline_ref.choices = [(item.id, item.fiscode + '.' + item.en_name) for item in
+                               Discipline.query.filter(Discipline.is_combination == None).all()]
+    else:
+        form = EditRunInfoForm()
     run_info = RunInfo.query.filter_by(id=run_id).one()
+
     if current_user.lang == 'ru':
         form.course_ref.choices = [(item.id, item.ru_name ) for item in
                                    Course.query.filter_by(race_id=id).all()]
     else:
-
         form.course_ref.choices = [(item.id, item.ru_name ) for item in
                                    Course.query.filter_by(race_id=id).all()]
     if form.validate_on_submit():
-        run_info.race_id=id
-        run_info.course_id=form.course_ref.data
-        run_info.number=form.number.data
+        run_info.race_id = id
+        run_info.course_id = form.course_ref.data
+        run_info.number = form.number.data
         db.session.add(run_info)
         db.session.commit()
+        if is_combination.is_combination == True:
+            run_info.discipline_id = form.discipline_ref.data
         flash('The run has been updated.')
-        return redirect(url_for('.race_run', id=id,_external=True))
+        return redirect(url_for('.race_run', id=id, _external=True))
 
     form.course_ref.data = run_info.course_id
     form.number.data = run_info.number
     return render_template('raceinfo/static-tab/form_page.html', title='Edit run', form=form)
-
-
 
 @raceinfo.route('/race/<int:id>/course/<int:course_id>/dev/add', methods=['GET', 'POST'])
 @admin_required

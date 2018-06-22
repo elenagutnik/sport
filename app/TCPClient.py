@@ -13,9 +13,8 @@ class DataSender:
         self.sock.connect((Config.SCOREBOARD_HOST, Config.SCOREBOARD_PORT))
 
     def send(self, msg):
-
-        # try:
-        self.sock.send(msg)
-        # except:
-        #     return ('send_error')
+        try:
+            self.sock.send(msg)
+        except:
+            return ('send_error')
 
