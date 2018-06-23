@@ -17,6 +17,9 @@
     <tr>
       <td>Number</td>
       <td>Course name</td>
+      {% if is_combination %}
+        <td>Discipline</td>
+      {% endif %}
       <td>Start time</td>
       <td>End time</td>
       <td></td>
@@ -28,6 +31,9 @@
     <tr>
       <td>{{ run[0].number }} </td>
       <td>{{ run[1].en_name }}</td>
+      {% if is_combination %}
+        <td>{{ run[2]}}</td>
+      {% endif %}
       <td>{{ run[0].starttime }}</td>
       <td>{{ run[0].endtime }}</td>
       <td>
