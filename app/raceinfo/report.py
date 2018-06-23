@@ -395,7 +395,7 @@ class RaceResultReport:
         return
 
     def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
-        self.content = render_template('reports/results.html',
+        self.content = render_template('reports/combination.html',
                                        title= self.title,
                                        qlf_competitors=qlf_list,
                                        disqlf_competitors=disqlf_list,

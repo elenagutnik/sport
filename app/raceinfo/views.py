@@ -1452,6 +1452,8 @@ def race_run_edit(id, run_id):
         return redirect(url_for('.race_run', id=id, _external=True))
 
     form.course_ref.data = run_info.course_id
+    if is_combination.is_combination == True:
+        form.discipline_ref.data = run_info.discipline_id
     form.number.data = run_info.number
     return render_template('raceinfo/static-tab/form_page.html', title='Edit run', form=form)
 

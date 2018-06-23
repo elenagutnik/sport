@@ -148,8 +148,6 @@ def next_run_list_drop_out(race_id, current_run_id, current_run_number):
         return
 
 
-@login_required
-@admin_required
 def next_run_list_combination(race_id, current_run_id, current_run_number):
     try:
         news_run = db.session.query(RunInfo).filter(RunInfo.race_id == race_id,

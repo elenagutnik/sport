@@ -1,0 +1,383 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>{{ title }}</title>
+</head>
+<body>
+<style>
+html{
+
+}
+	body {
+		padding:0;margin:0;width:100%;
+/*padding-top:170px;
+*/		height:100%;
+		font-family:Arial;
+		font-size:14px;
+	}
+	h1,h2,h3 {margin:0; padding:0;text-align:center;}
+	h1,h3 {text-transform:uppercase;}
+	h1 {font-size:20px;}
+	h2,h3 {font-size:17px;}
+	h1.left{margin-top:20px;margin-bottom:5px;font-size:16px;text-align:left;text-transform: none;}
+	div.title {
+		text-align:center;
+		margin:20px 0;
+		font-size:16px;
+		font-weight:bold;
+	}
+	div.title span {
+		margin-right:30px;
+	}
+	table.main {
+		width:100%;
+		border-collapse: collapse;
+{#        height:100%; #}
+        border:none;
+	}
+	table.main thead {
+		display: table-header-group ;
+
+	}
+	table.list thead {
+		display: table-header-group ;
+
+	}
+	tr {
+		page-break-inside: avoid;
+	}
+
+	table.main td {margin:0; padding:0; vertical-align:top;}
+	table.main td.left {width:50% }
+	table.main td.right {width:50%; padding-left:30px;}
+
+	table.main table {width:100%;}
+	table.main table td, th{
+		padding:3px 0;
+	}
+	table.main th {
+		text-align:left;
+		border-top:1px solid #000;
+		border-bottom:1px solid #000;
+		font-weight:bold;
+		font-size:16px;
+	}
+	table.main .lname {text-transform:uppercase;}
+	table.main .title {font-weight:bold;}
+	table.main .starttime td {padding-top:8px;}
+
+	table.list {
+		border:collapse:collapse;
+		margin:0;
+		padding:0;
+	}
+	table.list thead th {
+		border-top:1px solid #000;
+		border-bottom:1px solid #000;
+		padding:5px 15px 5px 0;
+		text-align:center;
+		font-weight:bold;
+		font-size:16px;
+		vertical-align:middle;
+	}
+	table.main table.list td {padding-right:15px;}
+
+	table.list thead th:last {
+		border-right:1px solid #000;
+	}
+	table.list thead th:last {
+		border-right:1px solid #000;
+	}
+	.bordered, .bordered th {border-collapse: collapse;
+		border-left:1px solid #000!important;
+		}
+
+	table.forerunners {
+		border-collapse: collapse;
+		border: 1px solid #000;
+		margin:0 0 30px 0;
+	}
+	table.forerunners th, table.forerunners td {
+		border-collapse: collapse;
+		border-bottom: : 1px solid #000;
+	}
+	.up {
+		text-transform: uppercase;
+	}
+	.footer {
+		width:100%;
+	}
+	.footer td {width:33%}
+
+	table.weather {border:1px solid #000;margin:0 0 30px 0;}
+		table.weather td {border-bottm:1px solid #000;}
+	table.legend {border:1px solid #000;margin:30px 0;}
+</style>
+<table class="main">
+<tbody>
+	<tr>
+		<td class="left">
+			<table>
+				<tr>
+					<th colspan="3">
+						Jury
+					</th>
+				</tr>
+                {% for item in jury %}
+				<tr>
+					<td class="title">{{ item.type}}</td>
+					<td><span class="lname">{{item.en_lastname}}</span> {{item.en_firstname}}</td>
+					<td title="national code">{{item.name}}</td>
+				</tr>
+                {% endfor %}
+			</table>
+		</td>
+		<td class="right">
+			<table>
+				<tr>
+					<th colspan="3">
+						Technical Data
+					</th>
+					<th>
+						Downhill
+					</th>
+					<th>
+						Slalom
+					</th>
+				</tr>
+				<tr>
+					<td colspan="3" class="title">Cource Name</td>
+					<td align=right>{{course.en_name}}</td>
+					<td align=right>{{course.en_name}}</td>
+				</tr>
+				<tr>
+					<td colspan="3" class="title">Start Altitude</td>
+					<td align=right>{{course.startelev}}m</td>
+					<td align=right>{{course.startelev}}m</td>
+				</tr>
+				<tr>
+					<td colspan="3" class="title">Finish Altitude</td>
+					<td align=right>{{course.finishelev}}m</td>
+					<td align=right>{{course.finishelev}}m</td>
+				</tr>
+				<tr>
+					<td colspan="3" class="title">Vertical Drop</td>
+					<td align=right>{{course.startelev - course.finishelev}}m</td>
+					<td align=right>{{course.startelev - course.finishelev}}m</td>
+				</tr>
+				<tr>
+					<td colspan="3" class="title">Course Length</td>
+					<td align=right>{{course.length}}m</td>
+					<td align=right>{{course.length}}m</td>
+				</tr>
+				<tr>
+					<td colspan="3" class="title">Homologation Number</td>
+					<td align=right>{{course.homologation}}</td>
+					<td align=right>{{course.homologation}}</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+    <tr>
+		<td class="left">
+			<table>
+				<tr>
+					<th colspan="3">
+						Race Information Downhill
+					</th>
+				</tr>
+                <tr>
+					<td class="title">Cource Setter</td>
+					<td><span class="lname">{{course_setter.en_lastname}}</span> {{course_setter.en_firstname}}</td>
+					<td title="national code">{{course_setter.name}}</td>
+				</tr>
+				<tr>
+					<td class="title">Gates/Turning Gates</td>
+					<td>{{course.gates}}/{{ course.tuminggates }}</td>
+					<td></td>
+				</tr>
+				<tr class="starttime">
+					<td class="title">Start Time</td>
+					<td>{{start_time}}</td>
+					<td></td>
+				</tr>
+			</table>
+		</td>
+		<td class="right">
+			<table>
+				<tr>
+					<th colspan="3">
+						Race Information Slalom
+					</th>
+				</tr>
+				<tr>
+					<td class="title">Cource Setter</td>
+					<td><span class="lname">{{course_setter.en_lastname}}</span> {{course_setter.en_firstname}}</td>
+					<td title="national code">{{course_setter.name}}</td>
+				</tr>
+				<tr>
+					<td class="title">Gates/Turning Gates</td>
+					<td>{{course.gates}}/{{ course.tuminggates }}</td>
+					<td></td>
+				</tr>
+				<tr class="starttime">
+					<td class="title">Start Time</td>
+					<td>{{start_time}}</td>
+					<td></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="title">
+			<br>
+			<br>
+			Number of Competitors: {{competitors | length}}, Number of NOCs: {{number_of_NOCs}}, FIS List #, Applied Penalty {{penalty}}
+		</td>
+		<td class="title" align=right>
+			<br>
+			<br>
+			F={{F}}
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<table class="list" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th rowspan="2" width="1%" style="border-left:1px solid #000">Rank</th>
+                        <th rowspan="2" width="1%" >Bib</th>
+                        <th rowspan="2" width="5%">FIS Code</th>
+                        <th rowspan="2" style="text-align:left">Name</th>
+                        <th rowspan="2" >YB</th>
+                        <th rowspan="2" width="5%">CLUB</th>
+                        <th rowspan="2" width="5%">NAT</th>
+                        <th colspan="2" class="bordered">Downhill</th>
+                        <th colspan="2" class="bordered">Slalom</th>
+                        <th rowspan="2" >Total</th>
+                        <th rowspan="2" >Diff</th>
+                        <th rowspan="2" >Race Points</th>
+                    </tr>
+                    <tr class="bordered">
+                        <th>Time</th>
+                        <th>Rank</th>
+                        <th>Time</th>
+                        <th>Rank</th>
+                    </tr>
+                </thead>
+				<tbody>
+                    {% for item in qlf_competitors %}
+                    <tr>
+						<td align="right">{{item.rank}}</td>
+						<td align="right">{{item.bib}}</td>
+                        <td align="right">{{item.fiscode}}</td>
+						<td><b><span class="lname">{{item.en_lastname}}</span> {{item.en_firstname}}</b></td>
+						<td align="center">{{item.birth.year}}</td>
+						<td align="center">{{item.club}}</td>
+						<td align="center">{{item.nation}}</td>
+                        <td align="center">{{item.time1}}</td>
+                        <td align="center">({{item.rank1}})</td>
+                        <td align="center">{{item.time2}}</td>
+                        <td align="center">({{item.rank2}})</td>
+                        <td align="center">{{item.total}}</td>
+                        <td align="center">{{item.diff}}</td>
+						<td align="right">{{points}}</td>
+					</tr>
+					{% endfor %}
+                    <tr>
+                        <td colspan="14">
+                            <br>
+                        </td>
+                    </tr>
+				{% for key, item in disqlf_competitors.items() %}
+				<tr>
+					<td colspan="14">
+						<h1 class="left"><span class="up">{{ item.name }}:</span>&nbsp;&nbsp;&nbsp; {{item.competitors|length}} competitor{% if item.competitors|length>1 %}s{% endif %}</h1>
+					</td>
+				</tr>
+				    {% for competitor_item in item.competitors %}
+						<tr>
+								<td></td>
+				        <td align="right">{{competitor_item.bib}}</td>
+				        <td align="right">{{competitor_item.fiscode}}</td>
+				        <td><b><span class="lname">{{competitor_item.en_lastname}}</span> {{competitor_item.en_firstname}}</b></td>
+				        <td align="center">{{competitor_item.birth.year}}</td>
+				        <td align="center">{{competitor_item.club}}</td>
+				        <td align="center">{{competitor_item.nation}}</td>
+								<td align="center" colspan=2>{% if (competitor_item.status==6 or competitor_item.status==9 or competitor_item.status==12) and competitor_item.gate!=None %}{{competitor_item.gate}}{% endif %}</td>
+								<td align="center" colspan=2>{% if (competitor_item.status==7 or competitor_item.status==10) and competitor_item.gate!=None %}{{competitor_item.gate}}{% endif %}</td>
+				        <td align="center" colspan="3">{% if competitor_item.reason!=None %}{{competitor_item.reason}}{% endif %}</td>
+						</tr>
+				    {% endfor %}
+				{% endfor %}
+
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<br>
+			<br>
+			<table class="forerunners">
+				<tr>
+					<th>Forerunners</th>
+					<th colspan="9"></th>
+				</tr>
+				{% for forerunners_row in forerunners | batch(3, '&nbsp;') %}
+						<tr>
+								<td></td>
+						{% for forerunner in forerunners_row %}
+								<td>{{forerunner.order}}</td>
+								<td>
+									<span="lname">
+										{{forerunner.en_lastname}}
+									</span>
+									{{forerunner.en_firstname}}
+								</td>
+								<td>{{forerunner.name}}</td>
+						{% endfor %}
+						</tr>
+				{% endfor %}
+			</table>
+			<b>Conditionals of course</b>
+			<table class="weather">
+				{% for foo in weather %}
+                    <tr>
+                        <!--<h3>{{ foo.time }}</h3>-->
+                        <td width="15%">Run {{loop.index}}: 				<span class="up">{{ foo.weather }}</span></td>
+                        <td width="15%"><b>Snow:</b> 			<span class="up">{{ foo.snow }}</span></td>
+                        <td width="35%"><b>Temperature - Start:</b>	<span class="up">{{ foo.temperatureair }} &deg;C / {{ (9/5* (foo.temperatureair | int )+ 32)| round(2)}} &deg;F</span></td>
+                        <td width="35%"><b>Temperature - Finish:</b>	<span class="up">{{ foo.temperatureair }} &deg;C / {{ (9/5* (foo.temperatureair | int )+ 32)| round(2)}} &deg;F</span></td>
+                    </tr>
+				{% endfor %}
+			</table>
+
+			<table class="legend">
+                <tr>
+                    <td>
+                        <b>Legend</b>
+                        <br>
+                        <b>YB</b> Year of Birth
+                    </td>
+                </tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<table class="footer">
+	<tr>
+		<td align="left">{{date}} / {{place}} ({{country_code}}) / {{codex}}</td>
+		<td></td>
+		<td align="right">Page <span class="page"></span>/<span class="topage"></span></td>
+	</tr>
+	<tr>
+		<td>Data Processing by SLA</td>
+		<td align="center">{{generation_time}}</td>
+		<td align="right">SLA Timing</td>
+	</tr>
+</table>
+
+</body>
+</html>

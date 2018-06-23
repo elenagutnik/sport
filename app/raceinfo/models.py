@@ -289,7 +289,7 @@ class RunOrderFunction(db.Model):
         function = {
             'Drop Off': "Спортсмен не получивший QLF в текущем ране, не участвует в слудующем",
             'All competitors': "Спортсмены участвуют во всех заездах, не зависимо от статуса",
-            'Compination': ""
+            'Combination': ""
         }
         for f in function.keys():
             result_function = RunOrderFunction.query.filter_by(name=f).first()
