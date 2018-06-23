@@ -1366,7 +1366,12 @@ def race_course_run_del(id,run_id):
 @admin_required
 def race_course_run_start(id,run_id):
     try:
+        is_combination = db.session.query(Discipline.is_combination).filter(Discipline.id==Race.discipline_id,
+                                                           Race.id==id).one()
+
         run_info = RunInfo.query.get_or_404(run_id)
+        if is_combination.is_combination is True and run_info.discipline_id is None:
+            return 'fail', 200
         run_info.starttime = datetime.now()
         db.session.add(run_info)
         db.session.commit()
@@ -1682,7 +1687,6 @@ def device_type_del(id):
     db.session.delete(device)
     flash('The device has been deleted.')
     return redirect(url_for('.device_type',_external=True))
-
 
 @raceinfo.route('/status/get', methods=['GET'])
 def status_get_list():

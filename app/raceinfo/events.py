@@ -37,7 +37,7 @@ def emulation_clear_results(race_id):
     db.engine.execute('delete from data_in;')
     db.engine.execute('delete from result_approved;')
     db.engine.execute('delete from result;')
-    db.engine.execute('delete from "CASHE";')
+    # db.engine.execute('delete from "CASHE";')
     db.engine.execute('delete from run_order;')
     db.engine.execute('update run_info set endtime=NULL;')
     #db.engine.execute('INSERT INTO "CASHE" (id, key, data) VALUES (1,\'Current_competitor\', \'{"run": 1, "order": 0}\')')
@@ -821,10 +821,3 @@ def reestablish_DSQ_competitors(competitor_id, run_id):
         db.session.add(item)
     db.session.commit()
     return ''
-
-# @raceinfo.route('/sum/<int:race_competitor_id>', methods=['POST', 'GET'])
-# def get_competitior_run_time(race_competitor_id):
-#     race = db.session.query(Race).filter(Race.id==RaceCompetitor.race_id, RaceCompetitor.id==race_competitor_id).one()
-#     if race.result_function == 1:
-#         return db.session.query(sum(ResultApproved.time.label('total'))).filter(ResultApproved.race_competitor_id==race_competitor_id).scalar()
-#     return 0

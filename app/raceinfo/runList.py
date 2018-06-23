@@ -45,27 +45,44 @@ def race_order_list(race_id):
             join(RaceCompetitorFisPoints, RaceCompetitorFisPoints.race_competitor_id == RaceCompetitor.id).\
             filter(RaceCompetitor.race_id == race_id, RaceCompetitorFisPoints.discipline_id == race.discipline_id).\
             order_by(RaceCompetitorFisPoints.fispoint.desc()).all()
-    else:
-        race_competitors = db.session.query(RaceCompetitor, RaceCompetitorFisPoints).\
-            join(RaceCompetitorFisPoints, RaceCompetitorFisPoints.race_competitor_id == RaceCompetitor.id).\
-            filter(RaceCompetitor.race_id == race_id, RaceCompetitorFisPoints.discipline_id == run.discipline_id).\
-            order_by(RaceCompetitorFisPoints.fispoint.desc()).all()
 
-    for i in range(len(race_competitors)):
-        run_order = RunOrder(
-            race_competitor_id=race_competitors[i][0].id,
-            run_id=run.id,
-            order=i+1
-        )
-        db.session.add(run_order)
+        for i in range(len(race_competitors)):
+            run_order = RunOrder(
+                race_competitor_id=race_competitors[i][0].id,
+                run_id=run.id,
+                order=i+1
+            )
+            db.session.add(run_order)
+    else:
+        if run.discipline_id is None:
+            flash("Ошибка формирования стартового листа: Не указана дисциплина для заезда", "error")
+            return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=[])
+
+        sub_query = db.session.query(RaceCompetitorFisPoints).filter(
+            RaceCompetitorFisPoints.discipline_id == run.discipline_id).subquery()
+
+        race_competitors = db.session.query(RaceCompetitor, sub_query) \
+            .outerjoin(sub_query, and_(sub_query.c.race_competitor_id == RaceCompetitor.id))\
+            .filter(RaceCompetitor.race_id == race_id)\
+            .all()
+
+        race_competitors = sorted(race_competitors, key=lambda item: (item[4] is None, item[4]))
+
+        for index, item in enumerate(race_competitors):
+            run_order = RunOrder(
+                race_competitor_id=item[0].id,
+                run_id=run.id,
+                order=index+1
+            )
+            db.session.add(run_order)
     db.session.commit()
 
     orders_list = db.session.query(Competitor, RaceCompetitor, RunOrder, RaceCompetitorFisPoints).\
         join(RaceCompetitor).\
         join(RunOrder).\
-        join(RaceCompetitorFisPoints, RaceCompetitorFisPoints.race_competitor_id == RaceCompetitor.id).\
-        filter(RunOrder.run_id == run.id, RaceCompetitorFisPoints.discipline_id==run.discipline_id).order_by(RunOrder.order.asc()).all()
-
+        join(RaceCompetitorFisPoints, and_(RaceCompetitorFisPoints.race_competitor_id == RaceCompetitor.id,
+                                           RaceCompetitorFisPoints.discipline_id == run.discipline_id), isouter=True).\
+        filter(RunOrder.run_id == run.id).order_by(RunOrder.order.asc()).all()
     return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=orders_list)
 
 @raceinfo.route('/race/order_list/edit', methods=['GET', 'POST'])
@@ -152,17 +169,19 @@ def next_run_list_combination(race_id, current_run_id, current_run_number):
     try:
         news_run = db.session.query(RunInfo).filter(RunInfo.race_id == race_id,
                                                        RunInfo.number == current_run_number + 1).one()
+        if news_run.discipline_id is None:
+            return "Error: отсутсвиует дисциплина для заезда"
+
         RunOrder.query.filter(RunOrder.run_id == news_run.id).delete()
 
-        race_competitors = db.session.query(RaceCompetitor, ResultApproved, RaceCompetitorFisPoints).\
-            join(ResultApproved). \
-            join(RaceCompetitorFisPoints, RaceCompetitor.id==RaceCompetitorFisPoints.race_competitor_id). \
-            filter(ResultApproved.run_id==current_run_id,
-                   ResultApproved.status_id == 1,
-                   RaceCompetitorFisPoints.discipline_id==news_run.discipline_id).\
-            order_by(RaceCompetitorFisPoints.fispoint.desc()).\
+        race_competitors = db.session.query(RaceCompetitor, ResultApproved, RaceCompetitorFisPoints.fispoint.label('fispoint')).\
+            join(ResultApproved).\
+            join(RaceCompetitorFisPoints, and_(RaceCompetitorFisPoints.race_competitor_id == RaceCompetitor.id,
+                                               RaceCompetitorFisPoints.discipline_id == news_run.discipline_id), isouter=True).\
+            filter(ResultApproved.run_id == current_run_id,
+                   ResultApproved.status_id == 1).\
             all()
-
+        race_competitors = sorted(race_competitors, key=lambda item: (item[2] is None, item[2]))
         for i in range(len(race_competitors)):
             run_order = RunOrder(
                 race_competitor_id=race_competitors[i][0].id,
