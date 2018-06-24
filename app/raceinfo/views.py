@@ -1188,7 +1188,10 @@ def race_сourse_edit(id, course_id):
     course_forerunners = (db.session.query(CourseForerunner, Forerunner, Course). \
         join(Forerunner).join(Course).filter(Course.race_id == id)).all()
 
-    race_inter_dev = db.session.query(CourseDevice, Course.ru_name.label('ru_name')).join(Course).filter(CourseDevice.course_id == course_id).order_by(Course.ru_name,CourseDevice.order).all()
+    race_inter_dev = db.session.query(CourseDevice, Course.ru_name.label('ru_name')).\
+        join(Course).\
+        filter(CourseDevice.course_id == course_id).\
+        order_by(Course.ru_name, CourseDevice.order).all()
 
     return render_template('raceinfo/course_view.html', course=сourse, race=race,course_forerunners=course_forerunners, race_inter_dev=race_inter_dev)
 

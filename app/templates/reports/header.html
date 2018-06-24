@@ -40,7 +40,7 @@
 <h1>{{ title }}</h1>
 <h2>{{race[0].eventname}}</h2>
 <h3>{{race[1].en_name}} {{race[3].en_name}}</h3>
-    {% if run_title != ""  %}
+    {% if run_title is not none  %}
         <h3> RUN {{ run_title  }}</h3>
     {% endif %}
 <div class="title">

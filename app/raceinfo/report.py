@@ -35,196 +35,299 @@ def generate_excel(race_id):
     response.headers['Content-Disposition'] = 'inline; filename=xls_report.xls'
     return response
 
+
 @raceinfo.route('/race/<int:race_id>/reports/orderlist')
 def generate_orderlist_report(race_id):
-    try:
-        # Prepare data
+    # try:
+    # Prepare data
 
-        ffactor =request.args.get('fields[ffactor]')
+    ffactor =request.args.get('fields[ffactor]')
 
-        race = RaceInformation.get_main_race_info(race_id)
-        course = RaceInformation.get_course_info(race_id)
+    race = RaceInformation.get_main_race_info(race_id)
+    course = RaceInformation.get_course_info(race_id)
 
-        # Create report
+    # Create report
 
-        report = OrderListReport()
-        report.set_header(race)
-        report.set_content(race=race,
-                           jury=RaceInformation.get_jury_info(race_id),
-                           course=course,
-                           coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
-                           competitors=RaceInformation.get_competitor_info(race_id),
-                           forerunners=RaceInformation.get_forunners_info(course.id),
-                           number_of_NOCs=RaceInformation.get_number_of_NOCs(race_id), F=ffactor
-                           )
-        report.set_footer(race)
+    report = OrderListReport(race)
+    report.set_header()
+    report.set_content(race=race,
+                       jury=RaceInformation.get_jury_info(race_id),
+                       course=course,
+                       coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                       competitors=RaceInformation.get_competitor_info(race_id),
+                       forerunners=RaceInformation.get_forunners_info(course.id),
+                       number_of_NOCs=RaceInformation.get_number_of_NOCs(race_id), F=ffactor
+                       )
+    report.set_footer()
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=orderlist_report.pdf'
-        return response
-    except:
-        return render_template('custom_error.html', title='Ошибка формирования отчета')
+    response = make_response(report.get_file())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=orderlist_report.pdf'
+    return response
+    # except:
+    #     return render_template('custom_error.html', title='Ошибка формирования отчета')
 
 @raceinfo.route('/race/<int:race_id>/reports/orderlist/<int:run_number>')
 def generate_orderlist_report_for_run(race_id, run_number):
-    try:
-        # Prepare data
-        race = RaceInformation.get_main_race_info(race_id)
-        course = RaceInformation.get_course_info(race_id)
-        ffactor =request.args.get('fields[ffactor]')
+    # try:
+    # Prepare data
+    race = RaceInformation.get_main_race_info(race_id)
+    course = RaceInformation.get_course_info(race_id)
+    ffactor =request.args.get('fields[ffactor]')
 
-        # Create report
+    # Create report
 
-        report = OrderListReport(run_number)
-        report.set_header(race)
-        report.set_content(race=race,
-                           jury=RaceInformation.get_jury_info(race_id),
-                           course=course,
-                           coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
-                           competitors=RaceInformation.get_competitor_info_for_run(race_id, run_number),
-                           forerunners=RaceInformation.get_forunners_info(course.id),
-                           number_of_NOCs=RaceInformation.get_number_of_NOCs(race_id),
-                           runs=RaceInformation.get_runs_starttime(race_id), F=ffactor
-                           )
-        report.set_footer(race)
+    report = OrderListReport(race, run_number)
+    report.set_header()
+    report.set_content(race=race,
+                       jury=RaceInformation.get_jury_info(race_id),
+                       course=course,
+                       coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                       competitors=RaceInformation.get_competitor_info_for_run(race_id, run_number),
+                       forerunners=RaceInformation.get_forunners_info(course.id),
+                       number_of_NOCs=RaceInformation.get_number_of_NOCs(race_id),
+                       runs=RaceInformation.get_runs_starttime(race_id), F=ffactor
+                       )
+    report.set_footer()
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=orderlist_report.pdf'
-        return response
-    except:
-        return render_template('custom_error.html', title='Ошибка формирования отчета')
+    response = make_response(report.get_file())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=orderlist_report.pdf'
+    return response
+    # except:
+    #     return render_template('custom_error.html', title='Ошибка формирования отчета')
 
 @raceinfo.route('/race/<int:race_id>/reports/results')
 def generate_results_report(race_id):
     # Prepare data
-    try:
-        ffactor =request.args.get('fields[ffactor]')
-        penalty = request.args.get('fields[penalty]')
-        reasondesc = request.args.get('fields[reasondesc]')
+    # try:
+    ffactor =request.args.get('fields[ffactor]')
+    penalty = request.args.get('fields[penalty]')
+    reasondesc = request.args.get('fields[reasondesc]')
 
-        race = RaceInformation.get_main_race_info(race_id)
-        course = RaceInformation.get_course_info(race_id)
-
-
-        qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
-                                                            RaceInformation.get_approved_competitor_info(race_id))
-        # Create report
-
-        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
-            filter(RunInfo.race_id == race_id). \
-            count()
-        report = RaceResultReport(run_numbers=run_numbers)
-
-        report.set_header(race)
-
-        report.set_content(jury=RaceInformation.get_jury_info(race_id),
-                           course=course,
-                           coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
-                           forerunners=RaceInformation.get_forunners_info(course.id),
-                           qlf_list=qlf_list,
-                           disqlf_list=disqlf_list,
-                           weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
-                           )
+    race = RaceInformation.get_main_race_info(race_id)
+    course = RaceInformation.get_course_info(race_id)
 
 
+    qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
+                                                        RaceInformation.get_approved_competitor_info(race_id))
+    # Create report
 
-        report.set_footer(race)
+    run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
+        filter(RunInfo.race_id == race_id). \
+        count()
+    report = RaceResultReport(race)
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
-        return response
-    except:
-        return render_template('custom_error.html', title='Ошибка формирования отчета')
+    report.set_header()
 
+    report.set_content(jury=RaceInformation.get_jury_info(race_id),
+                       course=course,
+                       coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                       forerunners=RaceInformation.get_forunners_info(course.id),
+                       qlf_list=qlf_list,
+                       disqlf_list=disqlf_list,
+                       weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
+                       )
+
+    report.set_footer()
+
+    response = make_response(report.get_file())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
+    return response
+    # except:
+    #     return render_template('custom_error.html', title='Ошибка формирования отчета')
 
 @raceinfo.route('/race/<int:race_id>/reports/results/first')
 def generate_results_report_first(race_id):
     # Prepare data
-    try:
-        ffactor =request.args.get('fields[ffactor]')
-        penalty = request.args.get('fields[penalty]')
-        reasondesc = request.args.get('fields[reasondesc]')
+    # try:
+    ffactor =request.args.get('fields[ffactor]')
+    penalty = request.args.get('fields[penalty]')
+    reasondesc = request.args.get('fields[reasondesc]')
 
-        race = RaceInformation.get_main_race_info(race_id)
-        course = RaceInformation.get_course_info(race_id)
-
-
-        qlf_list, disqlf_list = RaceInformation.get_first_run_results(RaceInformation.get_competitor_info(race_id),
-                                                            RaceInformation.get_first_run_approves(race_id))
-        # Create report
-
-        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
-            filter(RunInfo.race_id == race_id). \
-            count()
-        report = RaceResultReport(run_numbers=1)
-
-        report.set_header(race)
-
-        report.set_content(jury=RaceInformation.get_jury_info(race_id),
-                           course=course,
-                           coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
-                           forerunners=RaceInformation.get_forunners_info(course.id),
-                           qlf_list=qlf_list,
-                           disqlf_list=disqlf_list,
-                           weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
-                           )
+    race = RaceInformation.get_main_race_info(race_id)
+    course = RaceInformation.get_course_info(race_id)
 
 
+    qlf_list, disqlf_list = RaceInformation.get_first_run_results(RaceInformation.get_competitor_info(race_id),
+                                                        RaceInformation.get_first_run_approves(race_id))
+    # Create report
 
-        report.set_footer(race)
+    run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
+        filter(RunInfo.race_id == race_id). \
+        count()
+    report = RaceResultReport(race, is_first_run=True)
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
-        return response
-    except:
-        return render_template('custom_error.html', title='Ошибка формирования отчета')
+    report.set_header()
+
+    report.set_content(jury=RaceInformation.get_jury_info(race_id),
+                       course=course,
+                       coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                       forerunners=RaceInformation.get_forunners_info(course.id),
+                       qlf_list=qlf_list,
+                       disqlf_list=disqlf_list,
+                       weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
+                       )
 
 
+
+    report.set_footer()
+
+    response = make_response(report.get_file())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
+    return response
+    # except:
+    #     return render_template('custom_error.html', title='Ошибка формирования отчета')
 
 @raceinfo.route('/race/<int:race_id>/reports/results/unofficial')
 def generate_unofficial_results_report(race_id):
     # Prepare data
-    try:
-        ffactor =request.args.get('fields[ffactor]')
-        penalty = request.args.get('fields[penalty]')
-        reasondesc = request.args.get('fields[reasondesc]')
+    # try:
+    ffactor =request.args.get('fields[ffactor]')
+    penalty = request.args.get('fields[penalty]')
+    reasondesc = request.args.get('fields[reasondesc]')
 
-        race = RaceInformation.get_main_race_info(race_id)
-        course = RaceInformation.get_course_info(race_id)
-
-
-        qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
-                                                            RaceInformation.get_approved_competitor_info(race_id))
-        # Create report
-        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
-            filter(RunInfo.race_id == race_id). \
-            count()
-        report = RaceResultReport(run_numbers=run_numbers)
-
-        report.set_header(race, title="UNOFFICIAL RESULTS")
-
-        report.set_content(jury=RaceInformation.get_jury_info(race_id),
-                           course=course,
-                           coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
-                           forerunners=RaceInformation.get_forunners_info(course.id),
-                           qlf_list=qlf_list,
-                           disqlf_list=disqlf_list,
-                           weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
-                           )
+    race = RaceInformation.get_main_race_info(race_id)
+    course = RaceInformation.get_course_info(race_id)
 
 
-        report.set_footer(race)
+    qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
+                                                        RaceInformation.get_approved_competitor_info(race_id))
+    # Create report
+    run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
+        filter(RunInfo.race_id == race_id). \
+        count()
+    report = RaceResultReport(race, is_first_run=False, is_official=False)
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
-        return response
-    except:
-        return render_template('custom_error.html', title='Ошибка формирования отчета')
+    report.set_header()
+
+    report.set_content(jury=RaceInformation.get_jury_info(race_id),
+                       course=course,
+                       coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                       forerunners=RaceInformation.get_forunners_info(course.id),
+                       qlf_list=qlf_list,
+                       disqlf_list=disqlf_list,
+                       weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
+                       )
+
+
+    report.set_footer()
+
+    response = make_response(report.get_file())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
+    return response
+    # except:
+    #     return render_template('custom_error.html', title='Ошибка формирования отчета')
+    #
+    #
+    #
+
+
+
+class Report:
+    options = {}
+    content = None
+    run_number = None
+    title = None
+
+    def __init__(self, race):
+        self.options = {
+            'page-size': 'A4',
+            'dpi': 400,
+            '--margin-top': '30'
+        }
+        self.race = race
+
+    def set_header(self):
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
+            self.options['--header-html'] = header.name
+            header.write(
+                render_template('reports/header.html', race=self.race,
+                                title=self.title,
+                                run_title=self.run_number,
+                                date=self.race[0].racedate.strftime('%a %d %b %Y'),
+                                time=self.race[0].racedate.strftime('%H:%M')).encode('utf-8')
+            )
+        return
+    def set_footer(self):
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer:
+            self.options['--footer-html'] = footer.name
+            footer.write(
+                render_template('reports/footer.html', race=self.race,
+                                date=self.race[0].racedate.strftime('%a %d %b %Y'),
+                                codex=self.race[0].codex,
+                                place=self.race[0].place,
+                                country_code=self.race[4].name,
+                                generation_time=datetime.datetime.now()
+                                ).encode('utf-8')
+            )
+        return
+
+    def get_file(self):
+        # return pdfkit.from_string(self.content, False, self.options, configuration=pdfkit.configuration(wkhtmltopdf=path))
+        return pdfkit.from_string(self.content, False, self.options)
+
+class OrderListReport(Report):
+    def __init__(self, race, run_number=0):
+        super().__init__(race)
+        self.run_number = run_number
+        self.title = "START LIST"
+
+    def set_content(self, race, jury, course, coursesetter, competitors, forerunners, number_of_NOCs, F, runs=None):
+        self.content = render_template('reports/startlist.html',
+                                       title=self.title,
+                                      race=race,
+                                      jury=jury,
+                                      course=course,
+                                      course_setter=coursesetter,
+                                      competitors=competitors,
+                                      forerunners=forerunners,
+                                      number_of_NOCs=number_of_NOCs,
+                                      run_number=self.run_number,
+                                      runs=runs, F=F)
+
+
+class RaceResultReport(Report):
+
+    is_first_run = None
+
+    def __init__(self, race, is_first_run=False, is_official=True):
+        super().__init__(race)
+        if is_official:
+            self.title = "OFFICIAL RESULTS"
+        else:
+            self.title = "UNOFFICIAL RESULTS"
+        self.is_first_run = is_first_run
+
+    def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
+        if self.race[3].is_combination:
+            course = db.session.query(Course,RunInfo,Discipline.en_name.label('discipline')).\
+                join(RunInfo, RunInfo.course_id==Course.id).\
+                join(Discipline, Discipline.id==RunInfo.discipline_id, isouter=True).filter(Course.race_id==self.race[0].id).order_by(RunInfo.number).all()
+            self.content = render_template('reports/combination.html',
+                                           title=self.title,
+                                           qlf_competitors=qlf_list,
+                                           disqlf_competitors=disqlf_list,
+                                           course=course,
+                                           course_setter=coursesetter,
+                                           jury=jury,
+                                           weather=weather,
+                                           forerunners=forerunners, F=F, penalty=penalty,
+                                           reasondesc=reasondesc, is_first_run=self.is_first_run)
+        else:
+            self.content = render_template('reports/results.html',
+                                           title=self.title,
+                                           qlf_competitors=qlf_list,
+                                           disqlf_competitors=disqlf_list,
+                                           course=course,
+                                           course_setter=coursesetter,
+                                           jury=jury,
+                                           weather=weather,
+                                           forerunners=forerunners, F=F, penalty=penalty,
+                                           reasondesc=reasondesc, is_first_run=self.is_first_run)
 
 class ExcelGenerator:
     cursor = []
@@ -308,121 +411,6 @@ class ExcelGenerator:
         output = io.BytesIO()
         self.wb.save(output)
         return output.getvalue()
-
-class OrderListReport:
-    options = {}
-    content = None
-    run_number = None
-    title = None
-    def __init__(self, run_number=0):
-        self.options = {
-            'page-size': 'A4',
-            'dpi': 400,
-            '--margin-top': '30'
-        }
-        self.run_number = run_number
-
-    def set_header(self, race):
-        self.title=title='START LIST'
-        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
-            self.options['--header-html'] = header.name
-            run_number=""
-            if self.run_number!= 0:
-                run_number = self.run_number
-            header.write(
-                render_template('reports/header.html', race=race,
-                                title='START LIST',
-                                run_title=run_number,
-                                date=race[0].racedate.strftime('%a %d %b %Y'),
-                                time=race[0].racedate.strftime('-%H:%M')).encode('utf-8')
-            )
-        return
-
-    def set_content(self, race, jury, course, coursesetter, competitors, forerunners, number_of_NOCs, F, runs=None):
-        self.content = render_template('reports/startlist.html',
-                                       title=self.title,
-                                      race=race,
-                                      jury=jury,
-                                      course=course,
-                                      course_setter=coursesetter,
-                                      competitors=competitors,
-                                      forerunners=forerunners,
-                                      number_of_NOCs=number_of_NOCs,
-                                      run_number=self.run_number,
-                                      runs=runs, F=F)
-    
-    def set_footer(self, race):
-        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer:
-            self.options['--footer-html'] = footer.name
-            footer.write(
-                render_template('reports/footer.html', race=race,
-                                date=race[0].racedate.strftime('%a %d %b %Y'),
-                                codex=race[0].codex,
-                                place=race[0].place,
-                                country_code=race[4].name,
-                                generation_time=datetime.datetime.now()
-                                ).encode('utf-8')
-            )
-        return
-
-    def get_file(self):
-        # return pdfkit.from_string(self.content, False, self.options, configuration=pdfkit.configuration(wkhtmltopdf=path))
-        return pdfkit.from_string(self.content, False, self.options)
-
-class RaceResultReport:
-    options = {}
-    content = None
-    title = None
-    run_numbers = None
-    def __init__(self, run_numbers=2):
-        self.options = {
-            'page-size': 'A4',
-            'dpi': 400,
-            '--margin-top': '30'
-        }
-        self.run_numbers = run_numbers
-
-    def set_header(self, race, title="OFFICIAL RESULTS"):
-        self.title = title
-        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as header:
-            self.options['--header-html'] = header.name
-            header.write(
-                render_template('reports/header.html', race=race,
-                                title=title,run_title="",
-                                date=race[0].racedate.strftime('%a %d %b %Y'),
-                                time=race[0].racedate.strftime('-%H:%M')).encode('utf-8')
-            )
-        return
-
-    def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
-        self.content = render_template('reports/combination.html',
-                                       title= self.title,
-                                       qlf_competitors=qlf_list,
-                                       disqlf_competitors=disqlf_list,
-                                       course=course,
-                                       course_setter=coursesetter,
-                                       jury=jury,
-                                       weather=weather,
-                                       forerunners=forerunners, F=F, penalty=penalty,
-                                       reasondesc=reasondesc, run_numbers=self.run_numbers)
-
-    def set_footer(self, race):
-        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as footer:
-            self.options['--footer-html'] = footer.name
-            footer.write(
-                render_template('reports/footer.html', race=race,
-                                date=race[0].racedate.strftime('%a %d %b %Y'),
-                                codex=race[0].codex,
-                                place=race[0].place,
-                                country_code=race[4].name,
-                                generation_time=datetime.datetime.now()
-                                ).encode('utf-8')
-            )
-        return
-
-    def get_file(self):
-        # return pdfkit.from_string(self.content, False, self.options, configuration=pdfkit.configuration(wkhtmltopdf=path))
-        return pdfkit.from_string(self.content, False, self.options)
 
 class RaceInformation:
     @staticmethod
