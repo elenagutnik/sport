@@ -39,7 +39,6 @@ def generate_excel(race_id):
 @raceinfo.route('/race/<int:race_id>/reports/orderlist')
 def generate_orderlist_report(race_id):
     try:
-    # Prepare data
 
         ffactor =request.args.get('fields[ffactor]')
 
@@ -60,10 +59,7 @@ def generate_orderlist_report(race_id):
                            )
         report.set_footer()
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=orderlist_report.pdf'
-        return response
+        return report.get_html_response()
     except:
         return render_template('custom_error.html', title='Ошибка формирования отчета')
 
@@ -90,10 +86,7 @@ def generate_orderlist_report_for_run(race_id, run_number):
                            )
         report.set_footer()
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=orderlist_report.pdf'
-        return response
+        return report.get_html_response()
     except:
         return render_template('custom_error.html', title='Ошибка формирования отчета')
 
@@ -131,12 +124,11 @@ def generate_results_report(race_id):
 
         report.set_footer()
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
-        return response
+        return report.get_html_response()
     except:
         return render_template('custom_error.html', title='Ошибка формирования отчета')
+
+
 
 @raceinfo.route('/race/<int:race_id>/reports/results/first')
 def generate_results_report_first(race_id):
@@ -174,10 +166,7 @@ def generate_results_report_first(race_id):
 
         report.set_footer()
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
-        return response
+        return report.get_html_response()
     except:
         return render_template('custom_error.html', title='Ошибка формирования отчета')
 
@@ -215,16 +204,9 @@ def generate_unofficial_results_report(race_id):
 
         report.set_footer()
 
-        response = make_response(report.get_file())
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
-        return response
+        return report.get_html_response()
     except:
         return render_template('custom_error.html', title='Ошибка формирования отчета')
-    #
-    #
-    #
-
 
 
 class Report:
@@ -269,6 +251,12 @@ class Report:
     def get_file(self):
         # return pdfkit.from_string(self.content, False, self.options, configuration=pdfkit.configuration(wkhtmltopdf=path))
         return pdfkit.from_string(self.content, False, self.options)
+
+    def get_html_response(self):
+        response = make_response(self.get_file())
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'inline; filename=results_report.pdf'
+        return response
 
 class OrderListReport(Report):
     def __init__(self, race, run_number=0):

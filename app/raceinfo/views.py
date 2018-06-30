@@ -1470,6 +1470,8 @@ def race_run_edit(id, run_id):
         db.session.commit()
         if is_combination.is_combination == True:
             run_info.discipline_id = form.discipline_ref.data
+        else:
+            run_info.discipline_id = None
         flash('The run has been updated.')
         return redirect(url_for('.race_run', id=id, _external=True))
 
