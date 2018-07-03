@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "_user.html" as macros %}
+
+{% block title %} Получатель{% endblock %}
+
+{% block page_content %}
+<style>
+
+.btn {margin-right: 10px;}
+</style>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+
+    var socket = io.connect('http://127.0.0.1:5000');
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+
+    socket.on('NewDataStart', function(data) {
+      console.log('StartDevice', JSON.parse(data));
+    });
+
+    socket.on('NewDataPoint', function(data) {
+      console.log('PointDevice',JSON.parse(data));
+    });
+
+        socket.on('NewDataFinish', function(data) {
+      console.log('FinishDevice', JSON.parse(data));
+    });
+</script>
+{% endblock %}
