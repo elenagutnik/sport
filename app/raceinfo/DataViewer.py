@@ -55,7 +55,9 @@ class DataViewFactory:
 
 
 def timeConverter(time, format='%M:%S.%f'):
-    return (datetime.datetime.fromtimestamp(time/1000)).strftime(format)[:-3]
+    dt = datetime.datetime(2018, 1, 1)
+    dt.timestamp()
+    return (datetime.datetime.fromtimestamp(dt.timestamp()+time/1000)).strftime(format)[:-3]
     # return time
 
 def ConvertRunResults(tree_view):
