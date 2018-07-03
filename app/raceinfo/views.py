@@ -1457,10 +1457,10 @@ def race_run_edit(id, run_id):
     run_info = RunInfo.query.filter_by(id=run_id).one()
 
     if current_user.lang == 'ru':
-        form.course_ref.choices = [(item.id, item.ru_name ) for item in
+        form.course_ref.choices = [(item.id, item.ru_name) for item in
                                    Course.query.filter_by(race_id=id).all()]
     else:
-        form.course_ref.choices = [(item.id, item.ru_name ) for item in
+        form.course_ref.choices = [(item.id, item.ru_name) for item in
                                    Course.query.filter_by(race_id=id).all()]
     if form.validate_on_submit():
         run_info.race_id = id

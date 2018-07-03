@@ -42,7 +42,7 @@ def race_results(race_id):
 def Sum_of_runs(race):
     result_list = db.session.query(ResultApproved.race_competitor_id, func.count(ResultApproved.id), func.max(ResultApproved.time).label('total')).\
         join(RunInfo). \
-        filter(ResultApproved.time != None, RunInfo.race_id == race.id, ResultApproved.status_id==1).\
+        filter(ResultApproved.time != None, RunInfo.race_id == race.id, ResultApproved.status_id == 1).\
         group_by(ResultApproved.race_competitor_id).order_by(func.count(ResultApproved.id).desc(), func.max(ResultApproved.time).asc()).all()
     return result_list
 

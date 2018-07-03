@@ -37,8 +37,8 @@ class SingleResults(DataViewer):
 
     def get_commpetitor_result(self, current_result):
         return {
-            'time': formatTime(current_result.time),
-            'diff': formatTime(current_result.diff),
+            'time': timeConverter(current_result.time),
+            'diff': timeConverter(current_result.diff),
             'rank': current_result.rank,
             'race_competitor_id': current_result.race_competitor_id
         }
@@ -54,5 +54,46 @@ class DataViewFactory:
             return SingleResults(race, run)
 
 
-def formatTime(time):
-    return (datetime.datetime.fromtimestamp(time/1000)).strftime('%M:%S.%f')[:-3]
+def timeConverter(time, format='%M:%S.%f'):
+    return (datetime.datetime.fromtimestamp(time/1000)).strftime(format)[:-3]
+    # return time
+
+def ConvertRunResults(tree_view):
+    for device_number in tree_view:
+        for competitor_id in tree_view[device_number]:
+            result_item = {
+                'sectorrank': tree_view[device_number][competitor_id][0].sectorrank,
+                'sectortime': timeConverter(tree_view[device_number][competitor_id][0].sectortime),
+                'sectordiff': timeConverter(tree_view[device_number][competitor_id][0].sectordiff),
+                'rank': tree_view[device_number][competitor_id][0].rank,
+                'time': timeConverter(tree_view[device_number][competitor_id][0].time),
+                'diff': timeConverter(tree_view[device_number][competitor_id][0].diff),
+                'speed': tree_view[device_number][competitor_id][0].speed,
+                'absoluttime': timeConverter(tree_view[device_number][competitor_id][0].absolut_time, '%H:%M:%S.%f'),
+            }
+            tree_view[device_number][competitor_id] = result_item
+    return tree_view
+
+
+def ConvertCompetitorStart(resultDetail, courseDevice):
+    return {
+        resultDetail.race_competitor_id:
+            {
+                'sectortime': timeConverter(resultDetail.sectortime),
+                'sectordiff': timeConverter(resultDetail.sectordiff),
+                'time': timeConverter(resultDetail.time),
+                'diff': timeConverter(resultDetail.diff),
+                'speed': resultDetail.speed,
+                'absoluttime': timeConverter(resultDetail.absolut_time, '%H:%M:%S.%f'),
+                'course_device_id': courseDevice.id
+            }
+    }
+
+def ConvertCompetitorsRankList(result_details):
+    rank_list = {}
+    for item in result_details:
+        rank_list[item.race_competitor_id] = {
+            'sectorrank': item.sectorrank,
+            'rank': item.rank,
+        }
+    return rank_list
