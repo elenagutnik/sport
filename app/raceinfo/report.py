@@ -3,7 +3,7 @@ import pdfkit
 from .models import *
 import tempfile
 import datetime
-
+from .DataViewer import timeConverter
 import io
 from . import raceinfo
 from .results import get_results
@@ -40,7 +40,7 @@ def generate_excel(race_id):
 def generate_orderlist_report(race_id):
     try:
 
-        ffactor =request.args.get('fields[ffactor]')
+        ffactor = request.args.get('fields[ffactor]')
 
         race = RaceInformation.get_main_race_info(race_id)
         course = RaceInformation.get_course_info(race_id)
@@ -106,9 +106,6 @@ def generate_results_report(race_id):
                                                             RaceInformation.get_approved_competitor_info(race_id))
         # Create report
 
-        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
-            filter(RunInfo.race_id == race_id). \
-            count()
         report = RaceResultReport(race)
 
         report.set_header()
@@ -146,9 +143,6 @@ def generate_results_report_first(race_id):
                                                             RaceInformation.get_first_run_approves(race_id))
         # Create report
 
-        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
-            filter(RunInfo.race_id == race_id). \
-            count()
         report = RaceResultReport(race, is_first_run=True)
 
         report.set_header()
@@ -185,9 +179,6 @@ def generate_unofficial_results_report(race_id):
         qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
                                                             RaceInformation.get_approved_competitor_info(race_id))
         # Create report
-        run_numbers = db.session.query(RunInfo).distinct(RunInfo.id). \
-            filter(RunInfo.race_id == race_id). \
-            count()
         report = RaceResultReport(race, is_first_run=False, is_official=False)
 
         report.set_header()
@@ -487,8 +478,8 @@ class RaceInformation:
                     'nation': item[2].name,
                     # 'total': (datetime.datetime.fromtimestamp(item[1].time).strftime("%m:%S.%f"))[:-3],
                     # 'diff': (datetime.datetime.fromtimestamp(item[1].diff).strftime("%m:%S.%f"))[:-3]
-                    'total': time_convertor(item[1].time),
-                    'diff': time_convertor(item[1].diff)
+                    'total': timeConverter(item[1].time),
+                    'diff': timeConverter(item[1].diff)
                 }
                 for approve in competitors_approve:
                     if item[1].id == approve.competitor_id:
@@ -534,9 +525,9 @@ class RaceInformation:
                     'club': competitor[1].club,
                     'nation': competitor[2].name,
                     'statuc_id': item.status_id,
-                    'time': time_convertor(item.time),
+                    'time': timeConverter(item.time),
                     'rank': item.rank,
-                    'diff': time_convertor(item.diff)
+                    'diff': timeConverter(item.diff)
                 }
                 qlf_list.append(qlf_item)
         return sorted(qlf_list, key=lambda item: item['rank']), disqlf_list

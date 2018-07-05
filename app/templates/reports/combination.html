@@ -330,7 +330,7 @@ html{
 				{% for key, item in disqlf_competitors.items() %}
 				<tr>
 					<td colspan="14">
-						<h1 class="left"><span class="up">{{ item.name }}:</span>&nbsp;&nbsp;&nbsp; {{item.competitors|length}} competitor{% if item.competitors|length>1 %}s{% endif %}</h1>
+						<h1 class="left"><span class="up">{{ item.status }}:</span>&nbsp;&nbsp;&nbsp; {{item.competitors|length}} competitor{% if item.competitors|length>1 %}s{% endif %}</h1>
 					</td>
 				</tr>
 				    {% for competitor_item in item.competitors %}

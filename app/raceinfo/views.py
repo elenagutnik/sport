@@ -722,7 +722,7 @@ def competitor_add():
         else:
             return json.dumps(competitor, cls=jsonencoder.AlchemyEncoder)
     if form.is_ajax.data is None or form.is_ajax.data =="":
-        return render_template('raceinfo/static-tab/comptitors_add.html', form=form)
+        return render_template('raceinfo/static-tab/form_page.html', title='Add competitor', form=form)
     else:
         form_rener = render_template('raceinfo/static-tab/form_render.html', form=form)
         return json.dumps(dict(form=form_rener, result='form'))
@@ -769,14 +769,14 @@ def competitor_edit(id):
     form.ru_lastname.data = competitor.ru_lastname
     form.en_lastname.data = competitor.en_lastname
     form.gender_ref.data = competitor.gender_id
-    form.birth.dat = competitor.birth
+    form.birth.data = competitor.birth
     form.nation_code_ref.data = competitor.nation_code_id
 
     form.national_code.data = competitor.national_code
     form.NSA.data = competitor.NSA
     form.category_ref.data = competitor.category_id
 
-    return render_template('raceinfo/static-tab/comptitors_add.html', form=form, competitor=competitor)
+    return render_template('raceinfo/static-tab/form_page.html', title='Edit competitor', form=form, competitor=competitor)
 
 @raceinfo.route('/competitor/<int:id>/del/', methods=['GET', 'POST'])
 @login_required
