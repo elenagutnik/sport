@@ -85,6 +85,8 @@ def ConvertCompetitorStart(resultDetail, courseDevice):
                 'sectordiff': timeConverter(resultDetail.sectordiff),
                 'time': timeConverter(resultDetail.time),
                 'diff': timeConverter(resultDetail.diff),
+                'rank': resultDetail.rank,
+                'sectorrank': resultDetail.sectorrank,
                 'speed': resultDetail.speed,
                 'absoluttime': timeConverter(resultDetail.absolut_time, '%H:%M:%S.%f'),
                 'course_device_id': courseDevice.id
