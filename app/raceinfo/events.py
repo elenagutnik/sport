@@ -31,7 +31,7 @@ def exectutiontime(message):
 
 @raceinfo.route('/migrate')
 def device_1get():
-    RunOrderFunction.insert()
+    db.create_all()
     return ''
 
 @raceinfo.route('/emulation/<int:race_id>/clear')
@@ -70,19 +70,6 @@ def receiver_jury():
 def jury_page():
     return render_template('jury_page.html')
 
-@raceinfo.route('/run/get/', methods=['POST', 'GET'])
-def run_get():
-    try:
-        race_id = request.args['race_id']
-        data = json.dumps(RunInfo.query.filter(RunInfo.race_id == race_id).all(), cls=jsonencoder.AlchemyEncoder)
-        return data
-    except:
-        db.session.flush()
-        db.session.commit()
-        return json.dumps(RunInfo.query.
-                          filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).
-                          all(),
-                          cls=jsonencoder.AlchemyEncoder)
 
 @raceinfo.route('/device/get/course/<int:course_id>')
 def device_get(course_id):
@@ -526,7 +513,6 @@ def calculate_common_sector_params(current_competitor, competitors_list):
                                             error='Count common params: sectorrank, sectordiff'))
 
 @raceinfo.route('/recalculate/<int:run_id>', methods=['GET'])
-@exectutiontime('Recalculate time')
 def recalculate_run_results(run_id):
     tree_view = {}
 
@@ -921,17 +907,6 @@ def crutch_result_list(race_id):
 #         result[1].finishtime = result[0].absolut_time
 
 
-
-def  trysmthnew():
-    """
-        NewDataStart (Информация о старте спортсмена (race_competitor_id, absolut_time, run_id))
-        NewDataPoint (Текущий спортсмен + список пересчитанных рангов (sectorrank, rank) на текущем устройсве)
-        NewDataFinish
-    """
-
-    socketio.emit('NewDataStart')
-    socketio.emit('NewDataPoint')
-    socketio.emit('NewDataFinish')
 
 @raceinfo.route('/input/data', methods=['POST', 'GET'])
 @exectutiontime('Full time')
