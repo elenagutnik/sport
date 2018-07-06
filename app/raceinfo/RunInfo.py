@@ -158,7 +158,7 @@ def forerunner_run_create(id):
     return ''
 
 
-@raceinfo.route('/race/<int:id>/run/<int:run_id>/forerunner/del', methods=['GET', 'POST'])
+@raceinfo.route('/race/<int:id>/run/<int:run_id>/forerunners/del', methods=['GET', 'POST'])
 @admin_required
 def forerunner_run_delete(id, run_id):
     db.session.delete(RunInfo.query.get(run_id))

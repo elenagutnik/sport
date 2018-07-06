@@ -581,6 +581,7 @@ class RunOrder(db.Model):
     race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id', ondelete='CASCADE'))
     order = db.Column(db.Integer)
     #
+    is_participate = db.Column(db.Boolean)
     manual_order = db.Column(db.Integer)
     # course_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
 

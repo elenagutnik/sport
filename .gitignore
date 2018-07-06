@@ -42,3 +42,4 @@ nosetests.xml
 venv
 
 app/templates/receiver_jury.html
+migrations/
