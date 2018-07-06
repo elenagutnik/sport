@@ -61,6 +61,98 @@
     socket.on('get/results/current', function(data){
       add2datasrc(JSON.parse(data)[0]);
     });
+    socket.on('NewDataPoint', function(data) {
+      var data=JSON.parse(data);
+      NewDataPoint_update_arr(data);
+    });
+    function NewDataPoint_update_arr(data){
+      $.each(data, function(run,arr){
+        $.each(arr, function(course,arr){
+          $.each(arr[0], function(comp,val){
+            var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
+            for(var i=0;i<fields.length;i++){
+                $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+val.course_device_id).html(val[fields[i]]);
+            }
+          });
+          var fields=Array("rank", "sectorrank");
+          $.each(arr[1], function(dev,allcomps){
+            $.each(allcomps, function(comp,val){
+              for(var i=0;i<fields.length;i++){
+                $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+dev).html(val[fields[i]]);
+              }
+    //          $.each(val, function(field_k, field_val){
+    //            $("tr.comp_"+comp+"_"+field_k+" td.dev_"+.course_device_id).html(val[fields[i]]);
+    //          });
+            });
+          });
+        });
+      });
+    }
+    socket.on('NewDataStart', function(data) {
+      var data=JSON.parse(data);
+      NewDataStart(data);
+    });
+    function NewDataStart(data){
+      var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
+      console.log(data);
+      $.each(data, function(run,arr){
+        $.each(arr, function(course,arr){
+          $.each(arr, function(comp,val){
+            $("#tab_summarytable .div_run"+run+" tbody").append("<tr class='comp_"+comp+"'><td class='name' colspan='"+device_list["course_"+course].length+"'>id="+comp+"Bib - name - status</td></tr>");
+            for(var i=0;i<fields.length;i++){
+                $("#tab_summarytable .div_run"+run+" tbody").append("<tr class='comp_"+comp+"_"+fields[i]+"'><th class='title'>"+fields[i]+"</th></tr>");
+                for(var d=0;d<device_list["course_"+course].length;d++){
+                  $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+fields[i]).append("<td class='dev_"+device_list["course_"+course][d][0].device_id+"'></td>");
+                }//проход по всем девайсам, создани загтовки для данныхъъ
+                //$("#tab_summarytable .div_run"+data.run_id+" tbody").append("<tr class='comp_"+data.race_competitor_id+"_sectortime row_competitor'></tr>");
+
+                $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+val.course_device_id).html(val[fields[i]]);
+            }
+          });
+        });
+      });
+    }
+    socket.on('NewDataFinish', function(data) {
+      var data=JSON.parse(data);
+      NewDataFinish(data);
+    });
+    function NewDataFinish(data){
+//      var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
+      $.each(data, function(run,arr){
+        $.each(arr, function(course,arr){
+          var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
+          $.each(arr[0], function(comp,val){
+            for(var i=0;i<fields.length;i++){
+                $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+val.course_device_id).html(val[fields[i]]);
+            }
+            $("#tab_summarytable .div_run"+run+" tbody td_"+comp+"_status").html(val.status_id);
+          });
+          var fields=Array("rank", "diff", "sectorrank", "sectordiff");
+          $.each(arr[1], function(dev,allcomps){
+            $.each(allcomps, function(comp,val){
+              for(var i=0;i<fields.length;i++){
+                $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+dev).html(val[fields[i]]);
+              }
+    //          $.each(val, function(field_k, field_val){
+    //            $("tr.comp_"+comp+"_"+field_k+" td.dev_"+.course_device_id).html(val[fields[i]]);
+    //          });
+            });
+          });
+        });
+      });
+    }
+    function Refresh_update_arr(data){
+      var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
+      $.each(data[0], function(run,arr){
+        $.each(arr, function(dev,allcomps){
+          $.each(allcomps, function(comp,val){
+            $.each(val, function(field_k, field_val){
+              $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+field_k+" td.dev_"+dev).html(field_val);
+            });
+          });
+        });
+      });
+    }
 
     socket.on('newData', function(data) {
 
@@ -191,7 +283,8 @@
         console.log("+++");
         if(!$("#tab_summarytable .div_run"+data.run_id+" tbody tr.comp_"+data.race_competitor_id+"_sectortime").length){
           $("#tab_summarytable .div_run"+data.run_id+" tbody").append("<tr class='comp_"+data.race_competitor_id+"_sectortime row_competitor'></tr>");
-          var arr= new Array("sectortime", "sectorrank", "sectordiff","speed");
+          //$("#tab_summarytable .div_run"+data.run_id+" tbody").append("<tr class='comp_"+data.race_competitor_id+"_sectortime row_competitor'></tr>");
+          var arr= new Array("absolute_time", "sectortime", "sectorrank", "sectordiff","speed");
           var total_arr=new Array("time","rank", "diff");
           // tr time
           var data=glob_arr["run"+data.run_id]["comp_"+data.race_competitor_id]
@@ -390,6 +483,10 @@
         <div id="tab_startlist" class="tab-pane fade"></div>
         <div id="tab_summarytable" class="tab-pane fade">
           <h2>Summary tables</h2>
+          <table class="div_run1 table table-hover">
+            <tbody>
+            </tbody>
+          </table>
         </div>
         <div id="tab_curcompetitor" class="tab-pane fade">
           <h2>Controls</h2>
@@ -682,7 +779,7 @@
           arr.push(run_list[i].id)
         }
         console.log("socket.emit "+JSON.stringify(arr));
-        return socket.emit('get/results',JSON.stringify(arr)); //result=>get_current_data(race_id)
+        //return socket.emit('get/results',JSON.stringify(arr)); //result=>get_current_data(race_id)
       }
 
    /*
