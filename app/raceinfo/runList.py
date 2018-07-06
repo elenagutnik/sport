@@ -192,7 +192,7 @@ def revers_first_15(race_id,run_id):
 
 
 def rebuild_startlist(run_id):
-    RunOrder.query.filter(RunOrder.run_id == run_id, RunOrder.is_participate is False).delete()
+    RunOrder.query.filter(RunOrder.run_id == run_id, RunOrder.is_participate == False).delete()
     start_list = RunOrder.query.filter(RunOrder.run_id == run_id).order_by(RunOrder.order.asc()).all()
     for index, item in enumerate(start_list):
         item.order = index+1

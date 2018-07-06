@@ -113,7 +113,7 @@ def race_course_run_start(id, run_id):
     except:
         return 'fail', 200
     return json.dumps({'start_time': str(run_info.starttime)})
-
+#
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/stop', methods=['GET', 'POST'])
 @admin_required
 def race_course_run_stop(id,run_id):
