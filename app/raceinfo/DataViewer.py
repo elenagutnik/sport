@@ -117,4 +117,4 @@ def ConvertCompetitorsRankList(result_details, courseDevice):
             'sectorrank': item.sectorrank,
             'rank': item.rank,
         }
-    return {courseDevice.course_device_id: rank_list}
+    return {courseDevice.id: rank_list}
