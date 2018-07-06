@@ -88,6 +88,7 @@ def race_order_list_edit():
         runOrder = RunOrder.query.filter(RunOrder.run_id == data['run_id'],
                               RunOrder.id == order[0]).first()
         runOrder.order = order[1]
+        runOrder.is_participate = order[2]
         db.session.add(runOrder)
     db.session.commit()
     return '', 200
@@ -188,3 +189,11 @@ def revers_first_15(race_id,run_id):
         db.session.commit()
         return json.dumps(order_list, cls=jsonencoder.AlchemyEncoder)
     return json.dumps(dict([('error', "Недопустимый заезд")]))
+
+
+def rebuild_startlist(run_id):
+    RunOrder.query.filter(RunOrder.run_id == run_id, RunOrder.is_participate is False).delete()
+    start_list = RunOrder.query.filter(RunOrder.run_id == run_id).order_by(RunOrder.order.asc()).all()
+    for index, item in enumerate(start_list):
+        item.order = index+1
+

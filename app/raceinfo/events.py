@@ -964,7 +964,9 @@ def load_data_vol2():
             sectordiff=0,
             is_start=True
         )
-        socketio.emit("NewDataStart", json.dumps({run.id: ConvertCompetitorStart(result, course_device[0])}))
+        socketio.emit("NewDataStart", json.dumps({run.id: {
+            course_device[0].course_id: ConvertCompetitorStart(result, course_device[0])}
+        }))
 
         # scoreboard = Scoreboard(result, run)
         # scoreboard.started_competitor()
@@ -994,7 +996,12 @@ def load_data_vol2():
                 db.session.add(result)
                 db.session.commit()
                 results=json.loads(recalculate_run_results(run.id))
-                socketio.emit("NewDataFinish", json.dumps({run.id:[ConvertCompetitorFinish(result, course_device[0], approve), results]}))
+
+                socketio.emit("NewDataFinish", json.dumps({
+                    run.id: {
+                        course_device[0].course_id: [ConvertCompetitorFinish(result, course_device[0], approve), results]
+                    }
+                }))
 
                 # scoreboard = Scoreboard(result, run)
                 # if result.rank == 1:
@@ -1011,8 +1018,14 @@ def load_data_vol2():
                     ResultDetail.course_device_id == course_device[0].id,
                     ResultDetail.run_id == run.id).all()
                 calculate_common_sector_params(result, result_details)
-                socketio.emit("NewDataPoint", json.dumps({run.id: [ConvertCompetitorStart(result, course_device[0]),
-                                                         ConvertCompetitorsRankList(result_details, course_device[0])]}))
+                socketio.emit("NewDataPoint", json.dumps({
+                    run.id: {
+                        course_device[0].course_id: [
+                            ConvertCompetitorStart(result, course_device[0]),
+                            ConvertCompetitorsRankList(result_details, course_device[0])
+                        ]
+                    }
+                }))
                 db.session.add(result)
                 db.session.commit()
                 # scoreboard = Scoreboard(result, run)

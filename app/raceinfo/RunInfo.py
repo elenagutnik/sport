@@ -6,7 +6,7 @@ from .forms import *
 import json
 from .models import *
 from . import jsonencoder
-from .runList import race_order_buld
+from .runList import race_order_buld, rebuild_startlist
 from sqlalchemy import cast, DATE
 from sqlalchemy import func
 
@@ -98,8 +98,9 @@ def race_run_edit(id, run_id):
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/start', methods=['GET', 'POST'])
 @admin_required
-def race_course_run_start(id,run_id):
+def race_course_run_start(id, run_id):
     try:
+        rebuild_startlist(run_id)
         is_combination = db.session.query(Discipline.is_combination).filter(Discipline.id == Race.discipline_id,
                                                            Race.id == id).one()
 
