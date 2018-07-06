@@ -72,6 +72,7 @@ def ConvertRunResults(tree_view):
                 'diff': timeConverter(tree_view[device_number][competitor_id][0].diff),
                 'speed': tree_view[device_number][competitor_id][0].speed,
                 'absoluttime': timeConverter(tree_view[device_number][competitor_id][0].absolut_time, '%H:%M:%S.%f'),
+                'status_id': tree_view[device_number][competitor_id][1].status_id
             }
             tree_view[device_number][competitor_id] = result_item
     return tree_view
@@ -92,12 +93,28 @@ def ConvertCompetitorStart(resultDetail, courseDevice):
                 'course_device_id': courseDevice.id
             }
     }
+def ConvertCompetitorFinish(resultDetail, courseDevice, resultApproved):
+    return {
+        resultDetail.race_competitor_id:
+            {
+                'sectortime': timeConverter(resultDetail.sectortime),
+                'sectordiff': timeConverter(resultDetail.sectordiff),
+                'time': timeConverter(resultDetail.time),
+                'diff': timeConverter(resultDetail.diff),
+                'rank': resultDetail.rank,
+                'sectorrank': resultDetail.sectorrank,
+                'speed': resultDetail.speed,
+                'absoluttime': timeConverter(resultDetail.absolut_time, '%H:%M:%S.%f'),
+                'course_device_id': courseDevice.id,
+                'status_id': resultApproved.status_id
+            }
+    }
 
-def ConvertCompetitorsRankList(result_details):
+def ConvertCompetitorsRankList(result_details, courseDevice):
     rank_list = {}
     for item in result_details:
         rank_list[item.race_competitor_id] = {
             'sectorrank': item.sectorrank,
             'rank': item.rank,
         }
-    return rank_list
+    return {courseDevice.course_device_id: rank_list}

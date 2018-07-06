@@ -9,7 +9,7 @@ from functools import wraps
 from sqlalchemy import cast, DATE, func, asc,  or_
 
 from flask_login import current_user, login_required
-from .DataViewer import ConvertRunResults, ConvertCompetitorStart, ConvertCompetitorsRankList
+from .DataViewer import ConvertRunResults, ConvertCompetitorStart, ConvertCompetitorsRankList, ConvertCompetitorFinish
 
 from datetime import datetime, timedelta
 from flask import request, render_template
@@ -31,7 +31,6 @@ def exectutiontime(message):
 
 @raceinfo.route('/migrate')
 def device_1get():
-    db.create_all()
     return ''
 
 @raceinfo.route('/emulation/<int:race_id>/clear')
@@ -70,6 +69,19 @@ def receiver_jury():
 def jury_page():
     return render_template('jury_page.html')
 
+@raceinfo.route('/run/get/', methods=['POST', 'GET'])
+def run_get():
+    try:
+        race_id = request.args['race_id']
+        data = json.dumps(RunInfo.query.filter(RunInfo.race_id == race_id).all(), cls=jsonencoder.AlchemyEncoder)
+        return data
+    except:
+        db.session.flush()
+        db.session.commit()
+        return json.dumps(RunInfo.query.
+                          filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).
+                          all(),
+                          cls=jsonencoder.AlchemyEncoder)
 
 @raceinfo.route('/device/get/course/<int:course_id>')
 def device_get(course_id):
@@ -266,21 +278,19 @@ def competitor_start():
     return '', 200
 
 def competitor_start_run(run):
-    race_competitors = db.session.query(RaceCompetitor, Competitor, RunOrder, Nation). \
-        join(Competitor). \
+    race_competitors = db.session.query(RaceCompetitor ,RunOrder). \
         join(RunOrder). \
-        join(Nation, Competitor.nation_code_id == Nation.id). \
         filter(RunOrder.run_id == run.id).order_by(asc(RunOrder.order)).all()
-    order = sum(item[2].manual_order is not None and item[2].manual_order != 0 for item in race_competitors)
+    order = sum(item[1].manual_order is not None and item[1].manual_order != 0 for item in race_competitors)
 
 
-    сompetitor = next(item for item in race_competitors if item[2].manual_order is None)
-    сompetitor[2].manual_order = order + 1
+    сompetitor = next(item for item in race_competitors if item[1].manual_order is None)
+    сompetitor[1].manual_order = order + 1
     result_approves = ResultApproved(run_id=run.id,
                                      is_start=True,
                                      race_competitor_id=сompetitor[0].id)
 
-    db.session.add(сompetitor[2])
+    db.session.add(сompetitor[1])
     db.session.add(result_approves)
     db.session.commit()
     return сompetitor
@@ -292,10 +302,8 @@ def get_current_competitor(course_device_id, run_id):
                             scalar() + 1
     print('текущий девайс', competitor_order-1)
 
-    competitor = db.session.query(RaceCompetitor, Competitor, RunOrder, Nation).\
-           join(Competitor).\
+    competitor = db.session.query(RaceCompetitor, RunOrder).\
            join(RunOrder). \
-           join(Nation, Competitor.nation_code_id == Nation.id). \
         filter(RunOrder.manual_order == competitor_order, RunOrder.run_id == run_id).first()
     return competitor
 
@@ -958,9 +966,9 @@ def load_data_vol2():
         )
         socketio.emit("NewDataStart", json.dumps(ConvertCompetitorStart(result, course_device[0])))
 
-        scoreboard = Scoreboard(result, run)
-        scoreboard.started_competitor()
-        scoreboard.send()
+        # scoreboard = Scoreboard(result, run)
+        # scoreboard.started_competitor()
+        # scoreboard.send()
 
         db.session.add(result)
         db.session.commit()
@@ -982,19 +990,19 @@ def load_data_vol2():
 
             calculate_personal_sector_params(result, course_device[0], run.course_id)
             if course_device[1].name == "Finish":
-                competitor_finish(competitor[0].id, run, result.absolut_time, result)
+                approve=competitor_finish(competitor[0].id, run, result.absolut_time, result)
                 db.session.add(result)
                 db.session.commit()
-                socketio.emit("NewDataFinish", recalculate_run_results(run.id))
+                socketio.emit("NewDataFinish", json.dumps([ConvertCompetitorFinish(result, course_device[0], approve), json.loads(recalculate_run_results(run.id)])))
 
-                scoreboard = Scoreboard(result, run)
-                if result.rank == 1:
-                    scoreboard.new_best_time()
-                    scoreboard.send()
-                scoreboard.finished_competitor()
-                scoreboard.send()
-                scoreboard.finished_list()
-                scoreboard.send()
+                # scoreboard = Scoreboard(result, run)
+                # if result.rank == 1:
+                #     scoreboard.new_best_time()
+                #     scoreboard.send()
+                # scoreboard.finished_competitor()
+                # scoreboard.send()
+                # scoreboard.finished_list()
+                # scoreboard.send()
 
             else:
                 result_details = db.session.query(ResultDetail). \
@@ -1003,12 +1011,12 @@ def load_data_vol2():
                     ResultDetail.run_id == run.id).all()
                 calculate_common_sector_params(result, result_details)
                 socketio.emit("NewDataPoint", json.dumps([ConvertCompetitorStart(result, course_device[0]),
-                                                         ConvertCompetitorsRankList(result_details)]))
+                                                         ConvertCompetitorsRankList(result_details, course_device[0])]))
                 db.session.add(result)
                 db.session.commit()
-                scoreboard = Scoreboard(result, run)
-                scoreboard.crossed_device()
-                scoreboard.send()
+                # scoreboard = Scoreboard(result, run)
+                # scoreboard.crossed_device()
+                # scoreboard.send()
 
         else:
             socketio.emit('errorData', json.dumps({'ERROR': 'UNKNOWED COMPETITOR', 'DATA': device_data}, cls=jsonencoder.AlchemyEncoder))
