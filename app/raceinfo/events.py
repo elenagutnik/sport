@@ -493,7 +493,7 @@ def calculate_personal_sector_params(current_competitor, device, course_id):
     #                                         error='Count personal params: speed, sectortime'))
 
 def calculate_common_sector_params(current_competitor, competitors_list):
-    try:
+    # try:
         if len(competitors_list) != 0:
             min_сompetitor_sectortime = min(competitors_list, key=lambda item: item.sectortime)
             min_сompetitor_time = min(competitors_list, key=lambda item: item.time)
@@ -516,9 +516,9 @@ def calculate_common_sector_params(current_competitor, competitors_list):
             current_competitor.sectorrank = 1
             current_competitor.diff = 0
             current_competitor.rank = 1
-    except:
-        socketio.emit('recount/error', dict(competitor_id=current_competitor.id,
-                                            error='Count common params: sectorrank, sectordiff'))
+    # except:
+    #     socketio.emit('recount/error', dict(competitor_id=current_competitor.id,
+    #                                         error='Count common params: sectorrank, sectordiff'))
 
 @raceinfo.route('/recalculate/<int:run_id>', methods=['GET'])
 def recalculate_run_results(run_id):
@@ -993,7 +993,8 @@ def load_data_vol2():
                 approve=competitor_finish(competitor[0].id, run, result.absolut_time, result)
                 db.session.add(result)
                 db.session.commit()
-                socketio.emit("NewDataFinish", json.dumps([ConvertCompetitorFinish(result, course_device[0], approve), json.loads(recalculate_run_results(run.id)])))
+                results=json.loads(recalculate_run_results(run.id))
+                socketio.emit("NewDataFinish", json.dumps([ConvertCompetitorFinish(result, course_device[0], approve), results]))
 
                 # scoreboard = Scoreboard(result, run)
                 # if result.rank == 1:
