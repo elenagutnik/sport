@@ -13,4 +13,7 @@ from . import jsonencoder
 from . import validators
 from . import report
 
+from . import RunInfo
+
+
 

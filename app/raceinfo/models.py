@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import current_app
 from .. import db
+import enum
 
 class Gender(db.Model):
     __tablename__ = 'gender'
@@ -234,6 +235,7 @@ class RaceCompetitor(db.Model):
     __tablename__ = 'race_competitor'
     id = db.Column(db.Integer, primary_key=True)
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
+    forerunner_id = db.Column(db.Integer, db.ForeignKey('forerunner.id'))
     race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     age_class = db.Column(db.String)
     transponder_1 = db.Column(db.String)
@@ -246,7 +248,8 @@ class RaceCompetitor(db.Model):
     time = db.Column(db.BigInteger)
 
     order = db.Column(db.Integer)
-    run_id =db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    # я об этом пожалею
+    run_id =db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
     # переделать в связь с run_info, team_id
     gate = db.Column(db.String)
     reason = db.Column(db.String)
@@ -427,6 +430,12 @@ class Mark(db.Model):
     name = db.Column(db.String(4))
     description = db.Column(db.String(100))
 
+
+class RunType(enum.Enum):
+    normal = 1
+    test = 2
+    forerunner = 3
+
 class RunInfo(db.Model):
     __tablename__ = 'run_info'
     id = db.Column(db.Integer, primary_key=True)
@@ -437,6 +446,7 @@ class RunInfo(db.Model):
     endtime = db.Column(db.DateTime)
 
     discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
+    run_type = db.Column(db.Enum(RunType))
 
 class Team(db.Model):
     __tablename__ = 'team'
@@ -500,7 +510,7 @@ class DataIn(db.Model):
     dt = db.Column(db.DateTime)
 
     race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
-    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
     cource_device_id = db.Column(db.Integer, db.ForeignKey('course_device.id'))
     src_sys = db.Column(db.String)
     src_dev = db.Column(db.String)
@@ -513,8 +523,8 @@ class ResultDetail(db.Model):
     __tablename__ = 'result_detail'
     id = db.Column(db.Integer, primary_key=True)
     course_device_id = db.Column(db.Integer, db.ForeignKey('course_device.id'))
-    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id',ondelete='CASCADE'))
-    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id', ondelete='CASCADE'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
 
     data_in_id = db.Column(db.Integer, db.ForeignKey('data_in.id'))
 
@@ -534,7 +544,7 @@ class ResultApproved(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id', ondelete='CASCADE'))
     result_id = db.Column(db.Integer, db.ForeignKey('result.id'))
-    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
     approve_user = db.Column(db.Integer, db.ForeignKey('users.id'))
     status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
     approve_time = db.Column(db.DateTime)
@@ -567,8 +577,8 @@ class Result(db.Model):
 class RunOrder(db.Model):
     __tablename__ = 'run_order'
     id = db.Column(db.Integer, primary_key=True)
-    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
-    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id',ondelete='CASCADE'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id', ondelete='CASCADE'))
     order = db.Column(db.Integer)
     #
     manual_order = db.Column(db.Integer)
