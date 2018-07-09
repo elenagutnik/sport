@@ -539,6 +539,17 @@ class ResultDetail(db.Model):
     absolut_time = db.Column(db.BigInteger)
     is_start = db.Column(db.Boolean)
 
+    def resetResult(self):
+        self.data_in_id = None
+        self.diff = None
+        self.time = None
+        self.rank = None
+        self.speed = None
+        self.sectortime = None
+        self.sectordiff = None
+        self.sectorrank = None
+        self.absolut_time = None
+
 class ResultApproved(db.Model):
     __tablename__ = 'result_approved'
     id = db.Column(db.Integer, primary_key=True)
@@ -549,6 +560,8 @@ class ResultApproved(db.Model):
     status_id = db.Column(db.Integer, db.ForeignKey('status.id'))
     approve_time = db.Column(db.DateTime)
     time = db.Column(db.BigInteger)
+    adder_time = db.Column(db.BigInteger, default=0)
+    adder_diff = db.Column(db.BigInteger, default=0)
     diff = db.Column(db.BigInteger)
     start_time = db.Column(db.BigInteger)
     finish_time = db.Column(db.BigInteger)
