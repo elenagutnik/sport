@@ -221,10 +221,17 @@ class EditRaceTeamForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class EditRunInfoForm(FlaskForm):
-    course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
+    # course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
     # discipline_ref = SelectField('Discipline', coerce=int)
     number = IntegerField('Number', validators=[InputRequired()])
     submit = SubmitField('Submit')
+
+class EditCoutseRunForm(FlaskForm):
+    # course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
+    run_ref = SelectField('Run', coerce=int)
+    # number = IntegerField('Number', validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
 
 class EditRunInfoDisciplineForm(EditRunInfoForm):
     discipline_ref = SelectField('Discipline', coerce=int)

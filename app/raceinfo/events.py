@@ -31,6 +31,7 @@ def exectutiontime(message):
 
 @raceinfo.route('/migrate')
 def device_1get():
+    db.create_all()
     return ''
 
 @raceinfo.route('/emulation/<int:race_id>/clear')
@@ -516,8 +517,6 @@ def socket_get_results(data):
     else:
         return
 
-
-
 @socketio.on('change/data_in/competitors')
 def edit_competitor(json_data):
     error_list = []
@@ -662,7 +661,12 @@ def load_data_vol2():
     courses = db.session.query(Course.id).filter(Course.id.in_(course_devices))
     # Заезд с пришли данные
     # try:
-    run = RunInfo.query.filter(RunInfo.course_id.in_(courses), RunInfo.starttime < datetime.now(), RunInfo.endtime == None).one()
+
+    run = RunInfo.query.filter(RunCourses.course_id.in_(courses),
+                               RunInfo.id==RunCourses.run_id,
+                               RunInfo.starttime < datetime.now(),
+                               RunInfo.endtime == None).\
+        one()
 
     # Сам девайс с которого пришли данные
     course_device = db.session.query(CourseDevice, CourseDeviceType).join(CourseDeviceType).\

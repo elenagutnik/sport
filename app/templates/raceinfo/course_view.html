@@ -23,6 +23,32 @@
       </tbody>
     </table>
 
+    <h4>{{ _('Course runs') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/{{course.id}}/run/add">Add</a></h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <td>#id</td>
+          <td>Number</td>
+          <td>Start time</td>
+          <td>Finish time</td>
+          <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for run in race_runs %}
+        <tr>
+          <td>{{ run.id }}</td>
+          <td>{{ run.number }} </td>
+          <td>{{ run.starttime }}</td>
+           <td>{{ run.endtime }}</td>
+           <td>
+            <a href="run/{{ run.id }}/del">del</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
     <h4>{{ _('Course forerunner') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/{{course.id}}/forerunner/add">edit</a></h4>
     <table class="table table-striped">
       <thead>

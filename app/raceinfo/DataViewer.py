@@ -63,6 +63,13 @@ def timeConverter(time, format='%M:%S.%f'):
     except:
         return None
     # return time
+def speedConverter(speed):
+    try:
+        return '%.3f' % round(speed, 3)
+    except:
+        return None
+    # return time
+
 
 def ConvertRunResults(tree_view, manual_list):
     keys = list(tree_view.keys())
@@ -75,10 +82,11 @@ def ConvertRunResults(tree_view, manual_list):
                 'rank': tree_view[device_number][competitor_id][1].rank,
                 'time': timeConverter(tree_view[device_number][competitor_id][1].time),
                 'diff': timeConverter(tree_view[device_number][competitor_id][1].diff),
-                'speed': tree_view[device_number][competitor_id][1].speed,
+                'speed': speedConverter(tree_view[keys[device_number]][competitor_id][1].speed),
                 'absoluttime': timeConverter(tree_view[device_number][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
             }
             tree_view[device_number][competitor_id] = result_item
+
 
     for competitor_id in tree_view[keys[-1]]:
         result_item = {
@@ -88,7 +96,7 @@ def ConvertRunResults(tree_view, manual_list):
             'rank': tree_view[keys[-1]][competitor_id][0].rank,
             'time': timeConverter(tree_view[keys[-1]][competitor_id][0].time+tree_view[keys[-1]][competitor_id][0].adder_time),
             'diff': timeConverter(tree_view[keys[-1]][competitor_id][0].diff+tree_view[keys[-1]][competitor_id][0].adder_diff),
-            'speed': tree_view[keys[-1]][competitor_id][1].speed,
+            'speed': speedConverter(tree_view[keys[-1]][competitor_id][1].speed),
             'absoluttime': timeConverter(tree_view[keys[-1]][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
             'status_id': tree_view[keys[-1]][competitor_id][0].status_id
         }
@@ -120,7 +128,7 @@ def ConvertCompetitorStart(resultDetail, courseDevice):
                 'diff': timeConverter(resultDetail.diff),
                 'rank': resultDetail.rank,
                 'sectorrank': resultDetail.sectorrank,
-                'speed': resultDetail.speed,
+                'speed': speedConverter(resultDetail.speed),
                 'absoluttime': timeConverter(resultDetail.absolut_time, '%H:%M:%S.%f'),
                 'course_device_id': courseDevice.id
             }
@@ -135,7 +143,7 @@ def ConvertCompetitorFinish(resultDetail, courseDevice, resultApproved):
                 'diff': timeConverter(resultDetail.diff),
                 'rank': resultDetail.rank,
                 'sectorrank': resultDetail.sectorrank,
-                'speed': resultDetail.speed,
+                'speed':  speedConverter(resultDetail.speed),
                 'absoluttime': timeConverter(resultDetail.absolut_time, '%H:%M:%S.%f'),
                 'course_device_id': courseDevice.id,
                 'status_id': resultApproved.status_id

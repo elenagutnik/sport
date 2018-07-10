@@ -448,6 +448,12 @@ class RunInfo(db.Model):
     discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
     run_type = db.Column(db.Enum(RunType))
 
+class RunCourses(db.Model):
+    __tablename__ = 'run_courses'
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+
 class Team(db.Model):
     __tablename__ = 'team'
     id = db.Column(db.Integer, primary_key=True)
@@ -614,5 +620,8 @@ class RaceCompetitorFisPoints(db.Model):
     discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
     fispoint = db.Column(db.Float)
 
-
-
+class System(db.Model):
+    __tablename__ = 'system_table'
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String, unique=True)
+    value = db.Column(db.String)

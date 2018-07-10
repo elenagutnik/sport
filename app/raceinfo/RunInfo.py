@@ -34,17 +34,10 @@ def race_run_add(id):
     else:
         form = EditRunInfoForm()
 
-    if current_user.lang == 'ru':
-        form.course_ref.choices = [(item.id, item.ru_name ) for item in
-                                   Course.query.filter_by(race_id=id).all()]
-    else:
 
-        form.course_ref.choices = [(item.id, item.ru_name ) for item in
-                                   Course.query.filter_by(race_id=id).all()]
     if form.validate_on_submit():
         run_info = RunInfo(
             race_id=id,
-            course_id=form.course_ref.data,
             number=form.number.data,
         )
         if is_combination.is_combination == True:
@@ -68,16 +61,8 @@ def race_run_edit(id, run_id):
     else:
         form = EditRunInfoForm()
     run_info = RunInfo.query.filter_by(id=run_id).one()
-
-    if current_user.lang == 'ru':
-        form.course_ref.choices = [(item.id, item.ru_name) for item in
-                                   Course.query.filter_by(race_id=id).all()]
-    else:
-        form.course_ref.choices = [(item.id, item.ru_name) for item in
-                                   Course.query.filter_by(race_id=id).all()]
     if form.validate_on_submit():
         run_info.race_id = id
-        run_info.course_id = form.course_ref.data
         run_info.number = form.number.data
         db.session.add(run_info)
         db.session.commit()
@@ -87,8 +72,6 @@ def race_run_edit(id, run_id):
             run_info.discipline_id = None
         flash('The run has been updated.')
         return redirect(url_for('.race_run', id=id, _external=True))
-
-    form.course_ref.data = run_info.course_id
     if is_combination.is_combination == True:
         form.discipline_ref.data = run_info.discipline_id
     form.number.data = run_info.number

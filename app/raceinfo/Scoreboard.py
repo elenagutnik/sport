@@ -2,6 +2,7 @@ from . import raceinfo
 from .. import ScoreboardSender
 from .models import *
 from . DataViewer import timeConverter
+from distutils.util import strtobool
 class Scoreboard:
      def __init__(self,  resultDetail=None, run=None):
          self.competitor = db.session.query(RaceCompetitor.bib.label('bib'),
@@ -40,46 +41,67 @@ class Scoreboard:
                     RaceCompetitor.competitor_id == Competitor.id,
                     ResultApproved.run_id == run.id
                     ).all()
-
-
+         state=System.query.filter(System.key == "Scoreboard").fisrt()
+         if state is None:
+             self.is_active = True
+         else:
+             self.is_active = strtobool(state.value)
 
      @staticmethod
      @raceinfo.route('/scoreboard/connect')
      def connect():
          return ScoreboardSender.connect()
 
+     @staticmethod
+     @raceinfo.route('/scoreboard/active/<string:is_active>')
+     def is_active(is_active):
+         if is_active in ['true', 'false']:
+            state = System.query.filter(System.key == "Scoreboard").first()
+            if state is None:
+                state = System(key='Scoreboard',
+                               value=is_active)
+            else:
+                state.value = is_active
+            db.session.add(state)
+            db.session.commit()
+         return ''
+
      def new_best_time(self):
-         self.message = 'CCBestTime;%s;%s;%s;%s;!!' % (
-             self.competitor.bib,
-             (self.competitor.firstname[0] + '.' + self.competitor.lastname),
-             self.competitor.country_code,
-             timeConverter(self.result.time, '%H:%M:%S.%f')
-         )
+         if self.is_active:
+             self.message = 'CCBestTime;%s;%s;%s;%s;!!' % (
+                 self.competitor.bib,
+                 (self.competitor.firstname[0] + '.' + self.competitor.lastname),
+                 self.competitor.country_code,
+                 timeConverter(self.result.time, '%H:%M:%S.%f')
+             )
 
      def next_competitor(self):
-         self.message = 'CCNextCompetitor;%s;%s;%s;%s;!!' % (
-             self.competitor.bib,
-             (self.competitor.firstname[0] + '.' + self.competitor.lastname),
-             self.competitor.country_code,
-             timeConverter(self.result.time, '%H:%M:%S.%f')
-         )
+         if self.is_active:
+             self.message = 'CCNextCompetitor;%s;%s;%s;%s;!!' % (
+                 self.competitor.bib,
+                 (self.competitor.firstname[0] + '.' + self.competitor.lastname),
+                 self.competitor.country_code,
+                 timeConverter(self.result.time, '%H:%M:%S.%f')
+             )
      def started_competitor(self):
-         self.message = 'CCStart;%s;%s;%s;%s;!!' % (
-             self.competitor.bib,
-             (self.competitor.firstname[0] + '.' + self.competitor.lastname),
-             self.competitor.country_code,
-             timeConverter(self.result.time, '%H:%M:%S.%f')
-         )
+         if self.is_active:
+             self.message = 'CCStart;%s;%s;%s;%s;!!' % (
+                 self.competitor.bib,
+                 (self.competitor.firstname[0] + '.' + self.competitor.lastname),
+                 self.competitor.country_code,
+                 timeConverter(self.result.time, '%H:%M:%S.%f')
+             )
 
      def crossed_device(self):
-         self.message = 'CCInter;%s;%s;%s;%s;%s;%s;!!' % (
-             self.competitor.bib,
-             (self.competitor.firstname[0] + '.'+self.competitor.lastname),
-             self.competitor.country_code,
-             timeConverter(self.result.time),
-             timeConverter(self.result.diff),
-             self.result.rank
-         )
+         if self.is_active:
+             self.message = 'CCInter;%s;%s;%s;%s;%s;%s;!!' % (
+                 self.competitor.bib,
+                 (self.competitor.firstname[0] + '.'+self.competitor.lastname),
+                 self.competitor.country_code,
+                 timeConverter(self.result.time),
+                 timeConverter(self.result.diff),
+                 self.result.rank
+             )
 
      def finished_competitor(self):
          self.message = "CCFinish;%s;%s;%s;%s;%s;%s;!!" % (
@@ -91,24 +113,27 @@ class Scoreboard:
              self.result.rank
          )
      def finished_list(self):
-         self.message = "CCfinishlist;" + \
-                        self.race.racedate.strftime('%d:%m:%Y') + ';' + \
-                        self.race.eventname + ';' + \
-                        self.race.discipline + ';' + str(self.run.number) + ';'
-         for item in self.finish_list:
-             self.message += str(item.rank) + ';' + \
-             str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';' + timeConverter(item.diff) + ';'
-         self.message += '!!'
+         if self.is_active:
+             self.message = "CCfinishlist;" + \
+                            self.race.racedate.strftime('%d:%m:%Y') + ';' + \
+                            self.race.eventname + ';' + \
+                            self.race.discipline + ';' + str(self.run.number) + ';'
+             for item in self.finish_list:
+                 self.message += str(item.rank) + ';' + \
+                 str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';' + timeConverter(item.diff) + ';'
+             self.message += '!!'
 
      def start_list(self):
-         self.message = "CCstartlist;" + \
-                        self.race.racedate.strftime('%d:%m:%Y') + ';' + \
-                        self.race.eventname + ';' + \
-                        self.race.discipline + ';' + str(self.run.number) + ';'
-         for item in self.start_list:
-             self.message += str(item.order) + ';' + \
-             str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';'
-         self.message += '!!'
+         if self.is_active:
+             self.message = "CCstartlist;" + \
+                            self.race.racedate.strftime('%d:%m:%Y') + ';' + \
+                            self.race.eventname + ';' + \
+                            self.race.discipline + ';' + str(self.run.number) + ';'
+             for item in self.start_list:
+                 self.message += str(item.order) + ';' + \
+                 str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';'
+             self.message += '!!'
 
      def send(self):
-         ScoreboardSender.send(self.message.encode())
+         if self.is_active:
+            ScoreboardSender.send(self.message.encode())
