@@ -21,14 +21,18 @@
      <tbody>
      {% for c in competitors %}
         <tr>
-          <td>{{ c[0].bib}}</td>
-          <td>{{ c[1].fiscode }}</td>
-          <td>{{ c[0].fis_points }}</td>
-          <td>{{ c[1].ru_lastname }} {{ c[1].ru_firstname }}</td>
-          <td>{{ c[1].en_firstname }} {{ c[1].en_lastname }}</td>
+          <td>{{ c.bib}}</td>
+          <td>{{ c.fiscode }}</td>
           <td>
-            <a href="competitor/{{ c[0].id }}/edit">edit</a>
-            <a href="competitor/{{ c[0].id }}/del">del</a>
+            {% for key, value in c.fispoints.items() %}
+                {{key}}-{{ value | abs}}
+            {% endfor %}
+          </td>
+          <td>{{ c.ru_lastname }} {{ c.ru_firstname }}</td>
+          <td>{{ c.en_firstname }} {{ c.en_lastname }}</td>
+          <td>
+            <a href="competitor/{{ c.id }}/edit">edit</a>
+            <a href="competitor/{{ c.id }}/del">del</a>
           </td>
         </tr>
         {% endfor %}

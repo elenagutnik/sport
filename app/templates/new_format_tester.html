@@ -46,7 +46,7 @@ React.render(<Runlist_item order='1' bib='1' name="Sasha"/>, document.getElement
     socket.emit('GetResults', {run_id: '1'});
 
     socket.on('Results', function(data) {
-      console.log('PointDevice',JSON.parse(data));
+      console.log('Results',JSON.parse(data));
     });
 </script>
 {% endblock %}

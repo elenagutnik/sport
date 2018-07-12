@@ -39,6 +39,7 @@ def race_run_add(id):
         run_info = RunInfo(
             race_id=id,
             number=form.number.data,
+            run_type=RunType.normal
         )
         if is_combination.is_combination == True:
             run_info.discipline_id = form.discipline_ref.data

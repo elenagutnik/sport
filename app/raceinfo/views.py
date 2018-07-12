@@ -9,6 +9,7 @@ from .models import *
 from . import jsonencoder
 from .runList import race_order_buld
 from .competitors import calculate_age_class
+
 @raceinfo.route('/discipline/', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -798,15 +799,21 @@ def edit_race_competitor(id):
     if race.isTeam:
         form = EditRaceCompetitorTeamForm()
 
-        race_competitors = db.session.query(RaceCompetitor, Competitor). \
+        race_competitors = db.session.query(RaceCompetitor.bib.label('bib'), Competitor.fiscode.label('fiscode'),
+                                            Competitor.en_firstname.label('en_firstname'), Competitor.en_lastname.label('en_lastname'),
+                                            Competitor.ru_firstname.label('ru_firstname'), Competitor.ru_firstname.label('ru_firstname'),
+                                            RaceCompetitor.id.label('id')). \
             outerjoin(Competitor, RaceCompetitor.competitor_id == Competitor.id). \
-            filter(RaceCompetitor.race_id == id, RaceCompetitor.team_id==request.args.get('team_id')).all()
+            filter(RaceCompetitor.race_id == id, RaceCompetitor.team_id == request.args.get('team_id')).all()
 
         form.team_ref.data = request.args.get('team_id')
 
     else:
         form = EditRaceCompetitor()
-        race_competitors = db.session.query(RaceCompetitor, Competitor). \
+        race_competitors = db.session.query(RaceCompetitor.bib.label('bib'), Competitor.fiscode.label('fiscode'),
+                                            Competitor.en_firstname.label('en_firstname'), Competitor.en_lastname.label('en_lastname'),
+                                            Competitor.ru_firstname.label('ru_firstname'), Competitor.ru_firstname.label('ru_firstname'),
+                                            RaceCompetitor.id.label('id')). \
             outerjoin(Competitor, RaceCompetitor.competitor_id == Competitor.id). \
             filter(RaceCompetitor.race_id == id).all()
 
@@ -824,6 +831,39 @@ def edit_race_competitor(id):
                                    Gender.query.all()]
     add_competitor_form.category_ref.choices = [(item.id, item.name) for item in
                                 Category.query.all()]
+
+    discipline = Discipline.query.get(race.discipline_id)
+    if discipline.is_combination:
+
+        fis_points = db.session.query(RaceCompetitorFisPoints.fispoint.label('fispoint'),
+                                      RaceCompetitorFisPoints.race_competitor_id.label('id'),
+                                      Discipline.fiscode.label('fiscode')
+                                      ).filter(RaceCompetitorFisPoints.discipline_id.in_(db.session.query(RunInfo.discipline_id).
+                                                                                         filter(RunInfo.race_id==id).
+                                                                                         all()),
+                                               RaceCompetitorFisPoints.discipline_id == Discipline.id,
+                                               RaceCompetitorFisPoints.race_competitor_id.in_(
+                                                   [item.id for item in race_competitors]
+                                                          )).all()
+
+    else:
+        fis_points = db.session.query(RaceCompetitorFisPoints.fispoint.label('fispoint'),
+                                      RaceCompetitorFisPoints.race_competitor_id.label('id'),
+                                      Discipline.fiscode.label('fiscode')
+                                      ).filter(RaceCompetitorFisPoints.discipline_id==discipline.id,
+                                               RaceCompetitorFisPoints.discipline_id==Discipline.id,
+                                                          RaceCompetitorFisPoints.race_competitor_id.in_(
+                                                              [item.id for item in race_competitors]
+                                                          )). all()
+    competitor_list=[]
+    for item in race_competitors:
+        temp = item._asdict()
+        temp['fispoints']={}
+        gen = (x for x in fis_points if x.id == item.id)
+        for fis in gen:
+            temp['fispoints'][str(fis.fiscode)] = fis.fispoint
+        competitor_list.append(temp)
+
     if form.validate_on_submit():
         # selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
         fisPoints= FisPoints.query.filter(FisPoints.competitor_id==form.competitor_ref.data,
@@ -844,7 +884,7 @@ def edit_race_competitor(id):
         db.session.commit()
         flash('The competitor has been added')
 
-    return render_template('raceinfo/static-tab/competitors_race.html', form=form, competitors=race_competitors, competitor_form=add_competitor_form, race_id=id)
+    return render_template('raceinfo/static-tab/competitors_race.html', form=form, competitors=competitor_list, competitor_form=add_competitor_form, race_id=id)
 
 @raceinfo.route('/race/<int:race_id>/competitor/<int:competitor_id>/del', methods=['GET', 'POST'])
 @admin_required
@@ -1155,7 +1195,6 @@ def race_сourse_base_edit(id, course_id):
     if form.validate_on_submit():
         сourse.race_id= id
         сourse.course_coursetter_id = form.course_coursetter_ref.data
-        сourse.run = form.run.data
         сourse.ru_name = form.ru_name.data
         сourse.en_name =form.en_name.data
         сourse.homologation = form.homologation.data
@@ -1169,7 +1208,6 @@ def race_сourse_base_edit(id, course_id):
         flash('The course has been updated.')
         return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id,_external=True))
     form.course_coursetter_ref.data = сourse.course_coursetter_id
-    form.run.data = сourse.run
     form.ru_name.data = сourse.ru_name
     form.en_name.data = сourse.en_name
     form.homologation.data = сourse.homologation
@@ -1364,11 +1402,11 @@ def race_run(id):
     discipline = Discipline.query.get(race.discipline_id)
     if discipline.is_combination:
         course_runs = (db.session.query(RunInfo, Course, Discipline.en_name).
-                       join(Course).
+                       join(Course, isouter=True).
                        join(Discipline, Discipline.id == RunInfo.discipline_id, isouter=True).
-                       filter(Course.race_id == id)).all()
+                       filter(RunInfo.race_id == id)).all()
     else:
-        course_runs = (db.session.query(RunInfo, Course).join(Course).filter(Course.race_id == id)).all()
+        course_runs = (db.session.query(RunInfo, Course).join(Course, isouter=True).filter(RunInfo.race_id == id)).all()
 
     return render_template('raceinfo/static-tab/run_list.html', is_combination=discipline.is_combination, race=race, course_runs=course_runs)
 

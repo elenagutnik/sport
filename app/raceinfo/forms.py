@@ -6,6 +6,7 @@ from wtforms_components import TimeField
 from wtforms.validators import Required, Email, InputRequired, Optional, NumberRange, Regexp
 from .validators import FunctionAllowed
 
+
 class EditDisciplineForm(FlaskForm):
     ru_name = StringField('Название дисциплины', validators=[Required()])
     en_name = StringField('Discipline title', validators=[Required()])
@@ -235,7 +236,9 @@ class EditCoutseRunForm(FlaskForm):
 
 class EditRunInfoDisciplineForm(EditRunInfoForm):
     discipline_ref = SelectField('Discipline', coerce=int)
-    __order = ('csrf_token', 'discipline_ref', 'course_ref', 'number', 'submit')
+
+    __order = ('csrf_token', 'discipline_ref', 'number', 'submit')
+
     def __iter__(self):
         fields = list(super(EditRunInfoDisciplineForm, self).__iter__())
         get_field = lambda field_id: next((fld for fld in fields if fld.id == field_id))

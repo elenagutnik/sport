@@ -3,6 +3,9 @@ from .. import ScoreboardSender
 from .models import *
 from . DataViewer import timeConverter
 from distutils.util import strtobool
+
+import json
+
 class Scoreboard:
      def __init__(self,  resultDetail=None, run=None):
          self.competitor = db.session.query(RaceCompetitor.bib.label('bib'),
@@ -41,7 +44,7 @@ class Scoreboard:
                     RaceCompetitor.competitor_id == Competitor.id,
                     ResultApproved.run_id == run.id
                     ).all()
-         state=System.query.filter(System.key == "Scoreboard").fisrt()
+         state=System.query.filter(System.key == "Scoreboard").first()
          if state is None:
              self.is_active = True
          else:
@@ -70,7 +73,7 @@ class Scoreboard:
      @raceinfo.route('/scoreboard/status')
      def status():
          state = System.query.filter(System.key == "Scoreboard").first()
-         return {'is_active': state.value}
+         return json.dumps({'is_active': state.value})
 
 
      def new_best_time(self):

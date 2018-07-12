@@ -505,14 +505,10 @@ def socket_get_results(data):
         }))
     if 'race_id' in data.keys():
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None).all()
-        result_list = []
+        result_list = {}
         for run in run_list:
             results, manual = TreeView(run.id)
-            result_list.append({
-                run.id: {
-                    run.course_id: ConvertRunResults(results, manual)
-                }
-            })
+            result_list[run.id] = { run.course_id: ConvertRunResults(results, manual) }
         socketio.emit('Results', json.dumps(result_list))
     else:
         return

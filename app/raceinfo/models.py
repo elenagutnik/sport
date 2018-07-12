@@ -613,6 +613,17 @@ class FisPoints(db.Model):
     date_update = db.Column(db.DateTime)
     date_expired = db.Column(db.DateTime)
 
+    @property
+    def point(self):
+        return self.fispoint
+
+    @point.setter
+    def point(self, fispoint):
+        if str(fispoint) == '999.99':
+            self.fispoint = fispoint * -1
+        else:
+            self.fispoint = fispoint
+
 class RaceCompetitorFisPoints(db.Model):
     __tablename__ = 'race_com_fis_points'
     id = db.Column(db.Integer, primary_key=True)
@@ -620,6 +631,16 @@ class RaceCompetitorFisPoints(db.Model):
     discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
     fispoint = db.Column(db.Float)
 
+    @property
+    def point(self):
+        return self.fispoint
+
+    @point.setter
+    def point(self, fispoint):
+        if str(fispoint) == '999.99':
+            self.fispoint = fispoint * -1
+        else:
+            self.fispoint = fispoint
 class System(db.Model):
     __tablename__ = 'system_table'
     id = db.Column(db.Integer, primary_key=True)

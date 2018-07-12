@@ -73,7 +73,7 @@ def load_competitors(race_id):
             db.session.commit()
 
             for index in range(13, 25):
-                if type(item[index]) is int:
+                if type(item[index]) is float or type(item[index]) is int:
                     discipline_id = ((sheet.to_array()[0][index]).split('-'))[0]
                     fis_point = FisPoints.query.filter(FisPoints.competitor_id == competitor.id,
                                                        FisPoints.discipline_id == discipline_id).first()
@@ -83,7 +83,7 @@ def load_competitors(race_id):
                         fis_point = FisPoints(
                             competitor_id=competitor.id,
                             discipline_id=discipline_id,
-                            fispoint=item[index]
+                            point=item[index]
                         )
                     else:
                         fis_point.fispoint = item[index]
@@ -92,10 +92,10 @@ def load_competitors(race_id):
                         race_competitor_fispoints = RaceCompetitorFisPoints(
                             race_competitor_id=race_competitor.id,
                             discipline_id=discipline_id,
-                            fispoint=item[index]
+                            point=item[index]
                         )
                     else:
-                        race_competitor_fispoints.fispoint = item[index]
+                        race_competitor_fispoints.point = item[index]
                     db.session.add(fis_point)
                     db.session.add(race_competitor_fispoints)
                     db.session.commit()
