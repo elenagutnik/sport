@@ -66,6 +66,13 @@ class Scoreboard:
             db.session.commit()
          return ''
 
+     @staticmethod
+     @raceinfo.route('/scoreboard/status')
+     def status():
+         state = System.query.filter(System.key == "Scoreboard").first()
+         return {'is_active': state.value}
+
+
      def new_best_time(self):
          if self.is_active:
              self.message = 'CCBestTime;%s;%s;%s;%s;!!' % (
