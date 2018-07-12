@@ -428,7 +428,7 @@ def calculate_common_sector_params(current_competitor, competitors_list):
     #                                         error='Count common params: sectorrank, sectordiff'))
 
 def recalculate_run_results(run_id):
-    tree_view, manual_list = TreeView(run_id)
+    tree_view, manual_list , devices= TreeView(run_id)
     if len(tree_view) > 0:
         for key, item in tree_view.items():
             if key == 1:
@@ -436,7 +436,7 @@ def recalculate_run_results(run_id):
             else:
                 recalculate_sector_results(item, tree_view[key-1])
         recalculate_finished_results(run_id)
-    return ConvertRunResults(tree_view, manual_list)
+    return ConvertRunResults(tree_view, manual_list, devices)
 
 def recalculate_sector_results(current_results=None, previous_results=None):
     #  пересчитать  параметры speed, sectortime, time
@@ -497,18 +497,18 @@ def socket_get_results(data):
     # data = json.loads(json_data)
     if 'run_id' in data.keys():
         run = RunInfo.query.get(data['run_id'])
-        results, manual = TreeView(data['run_id'])
+        results, manual, devices = TreeView(data['run_id'])
         socketio.emit('Results', json.dumps({
             run.id: {
-                run.course_id: ConvertRunResults(results, manual)
+                run.course_id: ConvertRunResults(results, manual, devices)
             }
         }))
     if 'race_id' in data.keys():
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None).all()
         result_list = {}
         for run in run_list:
-            results, manual = TreeView(run.id)
-            result_list[run.id] = { run.course_id: ConvertRunResults(results, manual) }
+            results, manual , devices = TreeView(run.id)
+            result_list[run.id] = {run.course_id: ConvertRunResults(results, manual, devices)}
         socketio.emit('Results', json.dumps(result_list))
     else:
         return
