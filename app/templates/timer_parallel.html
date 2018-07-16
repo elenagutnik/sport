@@ -8,7 +8,11 @@ var gap=30; // gap between competitors starts
 
 var race =  JSON.parse('{{ race | safe }}');
 
-var devlist = JSON.parse('{{devices | safe }}');
+var courses = JSON.parse('{"4": [[{"course_device_type_id": 1, "course_id": 4, "device_id": 1, "distance": 0, "id": 15, "order": 1, "query": null, "query_class": null}, {"id": 1, "name": "start0001", "query": null, "query_class": null, "src_dev": "start0001", "type_id": 1}], [{"course_device_type_id": 3, "course_id": 4, "device_id": 2, "distance": 200, "id": 16, "order": 2, "query": null, "query_class": null}, {"id": 2, "name": "int0002", "query": null, "query_class": null, "src_dev": "int0002", "type_id": 1}], [{"course_device_type_id": 3, "course_id": 4, "device_id": 3, "distance": 300, "id": 17, "order": 3, "query": null, "query_class": null}, {"id": 3, "name": "int0003", "query": null, "query_class": null, "src_dev": "int0003", "type_id": 1}], [{"course_device_type_id": 3, "course_id": 4, "device_id": 4, "distance": 400, "id": 18, "order": 4, "query": null, "query_class": null}, {"id": 4, "name": "int0004", "query": null, "query_class": null, "src_dev": "int0004", "type_id": 1}], [{"course_device_type_id": 3, "course_id": 4, "device_id": 5, "distance": 500, "id": 19, "order": 5, "query": null, "query_class": null}, {"id": 5, "name": "int0005", "query": null, "query_class": null, "src_dev": "int0005", "type_id": 1}], [{"course_device_type_id": 2, "course_id": 4, "device_id": 6, "distance": 600, "id": 20, "order": 6, "query": null, "query_class": null}, {"id": 6, "name": "finish0006", "query": null, "query_class": null, "src_dev": "finish0006", "type_id": 1}]], "5": [[{"course_device_type_id": 1, "course_id": 5, "device_id": 15, "distance": 0, "id": 21, "order": 1, "query": null, "query_class": null}, {"id": 15, "name": "start1001", "query": null, "query_class": null, "src_dev": "start1001", "type_id": 1}], [{"course_device_type_id": 1, "course_id": 5, "device_id": 16, "distance": 200, "id": 22, "order": 2, "query": null, "query_class": null}, {"id": 16, "name": "int1002", "query": null, "query_class": null, "src_dev": "int1002", "type_id": 1}], [{"course_device_type_id": 3, "course_id": 5, "device_id": 17, "distance": 300, "id": 23, "order": 3, "query": null, "query_class": null}, {"id": 17, "name": "int1003", "query": null, "query_class": null, "src_dev": "int1003", "type_id": 1}], [{"course_device_type_id": 3, "course_id": 5, "device_id": 18, "distance": 400, "id": 24, "order": 4, "query": null, "query_class": null}, {"id": 18, "name": "int1004", "query": null, "query_class": null, "src_dev": "int1004", "type_id": 1}], [{"course_device_type_id": 1, "course_id": 5, "device_id": 19, "distance": 500, "id": 25, "order": 5, "query": null, "query_class": null}, {"id": 19, "name": "int1005", "query": null, "query_class": null, "src_dev": "int1005", "type_id": 1}], [{"course_device_type_id": 2, "course_id": 5, "device_id": 20, "distance": 600, "id": 26, "order": 6, "query": null, "query_class": null}, {"id": 20, "name": "finish1006", "query": null, "query_class": null, "src_dev": "finish1006", "type_id": 1}]]}');
+
+var keys = Object.keys(courses);
+
+//console.log(courses);
 /*var devlist=[  //список устройств
 		{
 			src_sys:'sys0001',
@@ -43,12 +47,19 @@ var devlist = JSON.parse('{{devices | safe }}');
 	function dtform(v){
 		return moment(v).format('DD.MM.YYYY HH:mm:ss.SSSS');
 	}
-
-function reqSend(snum,devnum,starttime){
+function run(){
+	reqSend(0,0,0,keys[0]);
+	reqSend(0,0,0,keys[1]);
+}
+function reqSend(snum,devnum,starttime,course){
+	var devlist=courses[course];
+	console.log(snum+" "+devnum+" "+starttime+" "+course);
+	console.log(devlist);
+	console.log(courses);
 	var t=new Date().getTime() ; // 12.850 - 12.859
 	if(starttime==0)
 		starttime= new Date().getTime();
-	$("#data").append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+tform(t-starttime)+"</td><td>"+t+"</td><td>"+dtform(t)+"</td></tr>");
+	$("#data"+course).append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+tform(t-starttime)+"</td><td>"+t+"</td><td>"+dtform(t)+"</td></tr>");
 	$.ajax({
 		  url: "/raceinfo/input/data",
 			type: 'POST',
@@ -75,11 +86,11 @@ function reqSend(snum,devnum,starttime){
 		devnum=0;
 		snum++;
 		starttime=0;
-		$("#data").append("<tr><td colspan=5><button class='btn' onclick='setTimeout(reqSend, 100+(Math.random()*1840), "+snum+", "+devnum+",0)'>Next competitor</button></td></tr>");
+		$("#data"+course).append("<tr><td colspan=7><hr><!--<button class='btn' onclick='setTimeout(reqSend, 100+(Math.random()*1840), "+snum+", "+devnum+",0)'>Next competitor</button>--></td></tr>");
 	}else{
 		devnum++;
 		//if(snum<=startlist.length-1)
-			setTimeout(reqSend, sectordelay+(Math.random()*1840), snum, devnum,starttime);
+			setTimeout(reqSend, sectordelay+(Math.random()*1840), snum, devnum,starttime,course);
 
 	}
 
@@ -92,10 +103,13 @@ function reqSend(snum,devnum,starttime){
 <input type="button" onclick="clearInterval(intervalID);" value="stop"> |
 <input type="text" id="delay_val" value="100"><input type="button" value="change delay" onclick="delay=$('#delay_val').val();clearInterval(intervalID);intervalID = window.setInterval(reqSend, delay);">
  -->
-<input type="button" onclick="reqSend(0,0,0);" value="Run">
+<input type="button" onclick="run();" value="Run">
 <a href="/raceinfo/emulation/1/clear">Clear all results</a>
 <HR>
-<table id="data" style="width:49%; float:left">
+<table id="data4" style="width:49%; float:left">
+<tr><td>№</td><td>src_dev</td><td>src_sys</td><td>timediff (ms)</td><td>timediff</td><td>current timestamp (ms)</td><td>current datetime</td></tr>
+</table>
+<table id="data5" style="width:49%; float:left">
 <tr><td>№</td><td>src_dev</td><td>src_sys</td><td>timediff (ms)</td><td>timediff</td><td>current timestamp (ms)</td><td>current datetime</td></tr>
 </table>
 <!-- <table id="log" style="width:49%; margin-left:1%; float:left">
