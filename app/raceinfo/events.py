@@ -4,7 +4,7 @@ from ..decorators import admin_required
 from .models import *
 from . import jsonencoder, raceinfo
 import json
-
+from distutils.util import strtobool
 from functools import wraps
 from sqlalchemy import cast, DATE, func, asc,  or_, and_
 
@@ -46,15 +46,28 @@ def emulation_clear_results(race_id):
     db.engine.execute('update run_order set manual_order=NULL;')
     return "cleared"
 
-@raceinfo.route('/emulation/<int:race_id>')
-def emulation(race_id):
+@raceinfo.route('/emulation/<int:race_id>/<string:is_parallel>')
+def emulation(race_id,is_parallel):
     race = Race.query.get(race_id)
 
     devices = db.session.query(CourseDevice,Device).join(Device).filter(Course.race_id == race_id,
                                         CourseDevice.course_id == Course.id).order_by(CourseDevice.order).all()
+    if strtobool(is_parallel):
+        devices_dict = {}
+        for item in devices:
+            if item[0].course_id not in devices_dict.keys():
+                devices_dict[item[0].course_id] = []
+            devices_dict[item[0].course_id].append(item)
+            return render_template('timer_parallel.html',
+                                   race=json.dumps(race, cls=jsonencoder.AlchemyEncoder),
+                                   devices=json.dumps(devices_dict, cls=jsonencoder.AlchemyEncoder))
     return render_template('timer.html',
                            race=json.dumps(race, cls=jsonencoder.AlchemyEncoder),
                            devices=json.dumps(devices, cls=jsonencoder.AlchemyEncoder))
+
+
+
+
 
 @raceinfo.route('/receiver')
 def receiver():
