@@ -5,7 +5,14 @@
 {% block page_content %}
 
 <div class="page-header">
-    <h1>{{ _(' Course') }}</h1>
+
+    <h1>{{ _(' Course') }}
+        <div class="btn-group pull-right" role="group" >
+            <a class="btn btn-info" href="/raceinfo/race/{{ race.id }}/course">Courses list</a>
+            <a class="btn btn-success" href="{{url_for(".race",id=race_id) }}">Race page</a>
+        </div>
+    </h1>
+
     <h4>{{ _(' Parameters') }}  <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course/{{course.id}}/base/edit">edit</a></h4>
 
     <table class="table table-striped">

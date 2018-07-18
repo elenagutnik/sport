@@ -14,6 +14,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
+      <td>bib</td>
       <td>Name</td>
       <td>Order</td>
       <td>FIS Points</td>
@@ -22,6 +23,7 @@
   <tbody>
     {% for competitor in competitors %}
     <tr>
+      <td>{{competitor[1].bib}}</td>
       <td>{{ competitor[0].en_firstname }} {{ competitor[0].en_lastname }}</td>
       <td>{{ competitor[2].order }}</td>
           <td>{{ competitor[3].fispoint }}</td>

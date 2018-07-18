@@ -12,7 +12,7 @@ sock.listen(1)
 connection, client_address = sock.accept()
 while True:
     data = connection.recv(1024)
-    if not data: break
+    if not data:break
     print(data)
 
 

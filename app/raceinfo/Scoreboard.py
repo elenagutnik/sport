@@ -3,7 +3,7 @@ from .. import ScoreboardSender
 from .models import *
 from . DataViewer import timeConverter
 from distutils.util import strtobool
-
+from .. import socketio
 import json
 
 class Scoreboard:
@@ -42,7 +42,8 @@ class Scoreboard:
                                              ResultApproved.diff.label('diff')).\
              filter(ResultApproved.race_competitor_id == RaceCompetitor.id,
                     RaceCompetitor.competitor_id == Competitor.id,
-                    ResultApproved.run_id == run.id
+                    ResultApproved.run_id == run.id,
+                    ResultApproved.is_finish==True
                     ).all()
          state=System.query.filter(System.key == "Scoreboard").first()
          if state is None:
@@ -51,29 +52,31 @@ class Scoreboard:
              self.is_active = strtobool(state.value)
 
      @staticmethod
-     @raceinfo.route('/scoreboard/connect')
+     @socketio.on('ScoreboardConnect')
      def connect():
-         return ScoreboardSender.connect()
+         status = ScoreboardSender.connect()
+         socketio.emit('ScoreboardStatus', json.dumps({'is_connected': status}))
 
      @staticmethod
-     @raceinfo.route('/scoreboard/active/<string:is_active>')
+     @socketio.on('ScoreboardActive')
      def is_active(is_active):
+         is_connected = ScoreboardSender.send('test;!!'.encode())
          if is_active in ['true', 'false']:
-            state = System.query.filter(System.key == "Scoreboard").first()
-            if state is None:
-                state = System(key='Scoreboard',
-                               value=is_active)
-            else:
-                state.value = is_active
-            db.session.add(state)
-            db.session.commit()
-         return ''
+             state = System.query.filter(System.key == "Scoreboard").first()
+             if state is None:
+                 state = System(key='Scoreboard', value=is_active)
+             else:
+                 state.value = is_active
+             db.session.add(state)
+             db.session.commit()
+             socketio.emit('ScoreboardStatus', json.dumps({'is_active': state.value, 'is_connected': is_connected}))
 
      @staticmethod
-     @raceinfo.route('/scoreboard/status')
+     @raceinfo.route('GetScoreboardStatus')
      def status():
+         is_connected = ScoreboardSender.send('test;!!'.encode())
          state = System.query.filter(System.key == "Scoreboard").first()
-         return json.dumps({'is_active': state.value})
+         socketio.emit('ScoreboardStatus', json.dumps({'is_active': state.value, 'is_connected': is_connected}))
 
 
      def new_best_time(self):

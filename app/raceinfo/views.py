@@ -812,7 +812,7 @@ def edit_race_competitor(id):
         form = EditRaceCompetitor()
         race_competitors = db.session.query(RaceCompetitor.bib.label('bib'), Competitor.fiscode.label('fiscode'),
                                             Competitor.en_firstname.label('en_firstname'), Competitor.en_lastname.label('en_lastname'),
-                                            Competitor.ru_firstname.label('ru_firstname'), Competitor.ru_firstname.label('ru_firstname'),
+                                            Competitor.ru_firstname.label('ru_firstname'), Competitor.ru_lastname.label('ru_lastname'),
                                             RaceCompetitor.id.label('id')). \
             outerjoin(Competitor, RaceCompetitor.competitor_id == Competitor.id). \
             filter(RaceCompetitor.race_id == id).all()
@@ -1238,14 +1238,16 @@ def race_сourse_edit(id, course_id):
         order_by(RunInfo.number.asc()).all()
     return render_template('raceinfo/course_view.html',
                            course=сourse, race=race, course_forerunners=course_forerunners,
-                           race_inter_dev=race_inter_dev, race_runs=race_runs)
+                           race_inter_dev=race_inter_dev, race_runs=race_runs, race_id=id)
 
 
 @raceinfo.route('/race/<int:id>/course/<int:course_id>/run/add', methods=['GET', 'POST'])
 @admin_required
 def race_сourse_run_add(id, course_id):
     form = EditCoutseRunForm()
-    form.run_ref.choices = [(item.id, 'Run number ' + str(item.number)) for item in RunInfo.query.filter(RunInfo.race_id == id).all()]
+    form.run_ref.choices = [(item[0].id, 'Number: ' + str(item[0].number) +'   Type: '+ str(item[1].name))
+                            for item in db.session.query(RunInfo,RunType).join(RunType, RunType.id==RunInfo.run_type_id).
+                                filter(RunInfo.race_id == id, RunInfo.run_type_id.in_([1,4])).order_by(RunInfo.number.asc()).all()]
     if form.validate_on_submit():
         runCourses = RunCourses(
             run_id=form.run_ref.data,

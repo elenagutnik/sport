@@ -307,6 +307,37 @@ class RaceResultReport(Report):
                                            weather=weather,
                                            forerunners=forerunners, F=F, penalty=penalty,
                                            reasondesc=reasondesc, is_first_run=self.is_first_run)
+class RaceQualificationReport(Report):
+    def __init__(self, race, is_first_run=False):
+        super().__init__(race)
+        self.title = "RESULTS QUALIFICATION RACE"
+
+    def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
+        if self.race[3].is_combination:
+            course = db.session.query(Course,RunInfo,Discipline.en_name.label('discipline')).\
+                join(RunInfo, RunInfo.course_id==Course.id).\
+                join(Discipline, Discipline.id==RunInfo.discipline_id, isouter=True).filter(Course.race_id==self.race[0].id).order_by(RunInfo.number).all()
+            self.content = render_template('reports/combination.html',
+                                           title=self.title,
+                                           qlf_competitors=qlf_list,
+                                           disqlf_competitors=disqlf_list,
+                                           course=course,
+                                           course_setter=coursesetter,
+                                           jury=jury,
+                                           weather=weather,
+                                           forerunners=forerunners, F=F, penalty=penalty,
+                                           reasondesc=reasondesc, is_first_run=self.is_first_run)
+        else:
+            self.content = render_template('reports/results.html',
+                                           title=self.title,
+                                           qlf_competitors=qlf_list,
+                                           disqlf_competitors=disqlf_list,
+                                           course=course,
+                                           course_setter=coursesetter,
+                                           jury=jury,
+                                           weather=weather,
+                                           forerunners=forerunners, F=F, penalty=penalty,
+                                           reasondesc=reasondesc, is_first_run=self.is_first_run)
 
 class ExcelGenerator:
     cursor = []

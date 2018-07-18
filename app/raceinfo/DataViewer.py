@@ -1,7 +1,11 @@
 from.models import Race,RaceCompetitor, ResultApproved, ResultDetail,RunInfo, CourseDevice, CourseDeviceType
 from .. import db
 from sqlalchemy import or_, and_, asc
-import datetime
+import datetime, json
+
+
+from .jsonencoder import AlchemyEncoder
+
 class DataViewer:
     race = None
     def __init__(self, race, run):
@@ -14,20 +18,6 @@ class SummationResults(DataViewer):
 
     def get_run_result(self):
         return
-
-    def get_commpetitor_result(self, current_result):
-        db_results = db.session.query(ResultApproved.time.label('time'),
-                                      ResultApproved.diff.label('diff')).\
-            order_by(RunInfo.number.desc()).\
-            filter(RunInfo.number < self.run.number, ResultApproved.run_id == RunInfo.id,
-                   ResultApproved.race_competitor_id == current_result.race_competitor_id).\
-            first()
-        return {
-            'time': formatTime(db_results.time + current_result.time),
-            'diff': formatTime(db_results.diff + current_result.diff),
-            'rank': current_result.rank,
-            'race_competitor_id': current_result.race_competitor_id
-        }
 
 class SingleResults(DataViewer):
     def __init__(self, race, run):
@@ -114,7 +104,6 @@ def ConvertCompetitorsRankList(result_details, courseDevice):
         }
     return {courseDevice.id: rank_list}
 
-
 def TreeView(run_id):
     tree_view = {}
     manual_list = []
@@ -125,67 +114,69 @@ def TreeView(run_id):
         filter(ResultApproved.run_id == run_id,  or_(ResultApproved.status_id == None, ResultApproved.status_id == 1)).\
         order_by(asc(CourseDevice.order)).\
         all()
-    devices = {}
+
     if len(data) > 0:
         for item in data:
-            try:
-                if item[2].order not in tree_view.keys():
-                    tree_view[item[2].order] = {}
-                    devices[item[2].order] = item[2].id
-                if item[0].race_competitor_id not in tree_view[item[2].order].keys():
-                    tree_view[item[2].order][item[0].race_competitor_id] = item
-            except:
-                if item[0].is_manual:
-                    manual_list.append(item)
-        return tree_view, manual_list, devices
-    return {}, [], {}
+            # try:
+                if item[2].course_id not in tree_view.keys():
+                    tree_view[item[2].course_id] = {}
+                if item[2].order not in tree_view[item[2].course_id].keys():
+                    tree_view[item[2].course_id][item[2].order] = {}
+                if item[0].race_competitor_id not in tree_view[item[2].course_id][item[2].order].keys():
+                    tree_view[item[2].course_id][item[2].order][item[0].race_competitor_id] = item
+            # except:
+            #     if item[0].is_manual:
+            #         manual_list.append(item)
+        return tree_view, manual_list
+    return {}, []
 
-def ConvertRunResults(tree_view, manual_list, devices):
-    keys = list(tree_view.keys())
+def ConvertRunResults(tree_view, manual_list):
+    courses_id = list(tree_view.keys())
+    for course_id in courses_id:
+        keys = list(tree_view[course_id].keys())
+        for device_number in keys[:-1]:
+            for competitor_id in tree_view[course_id][device_number]:
+                result_item = {
+                    'sectorrank': tree_view[course_id][device_number][competitor_id][1].sectorrank,
+                    'sectortime': timeConverter(tree_view[course_id][device_number][competitor_id][1].sectortime),
+                    'sectordiff': timeConverter(tree_view[course_id][device_number][competitor_id][1].sectordiff),
+                    'rank': tree_view[course_id][device_number][competitor_id][1].rank,
+                    'time': timeConverter(tree_view[course_id][device_number][competitor_id][1].time),
+                    'diff': timeConverter(tree_view[course_id][device_number][competitor_id][1].diff),
+                    'speed': speedConverter(tree_view[course_id][device_number][competitor_id][1].speed),
+                    'absoluttime': timeConverter(tree_view[course_id][device_number][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
+                }
+                tree_view[course_id][device_number][competitor_id] = result_item
 
-    for device_number in keys[:-1]:
-        for competitor_id in tree_view[device_number]:
-            result_item = {
-                'sectorrank': tree_view[device_number][competitor_id][1].sectorrank,
-                'sectortime': timeConverter(tree_view[device_number][competitor_id][1].sectortime),
-                'sectordiff': timeConverter(tree_view[device_number][competitor_id][1].sectordiff),
-                'rank': tree_view[device_number][competitor_id][1].rank,
-                'time': timeConverter(tree_view[device_number][competitor_id][1].time),
-                'diff': timeConverter(tree_view[device_number][competitor_id][1].diff),
-                'speed': speedConverter(tree_view[keys[device_number]][competitor_id][1].speed),
-                'absoluttime': timeConverter(tree_view[device_number][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
-            }
-            tree_view[device_number][competitor_id] = result_item
+        for competitor_id in tree_view[course_id][keys[-1]]:
+            if tree_view[course_id][keys[-1]][competitor_id][0].is_finish is True:
+                result_item = {
+                    'sectorrank': tree_view[course_id][keys[-1]][competitor_id][1].sectorrank,
+                    'sectortime': timeConverter(tree_view[course_id][keys[-1]][competitor_id][1].sectortime),
+                    'sectordiff': timeConverter(tree_view[course_id][keys[-1]][competitor_id][1].sectordiff),
+                    'rank': tree_view[course_id][keys[-1]][competitor_id][0].rank,
+                    'time': timeConverter(tree_view[course_id][keys[-1]][competitor_id][0].time+tree_view[course_id][keys[-1]][competitor_id][0].adder_time),
+                    'diff': timeConverter(tree_view[course_id][keys[-1]][competitor_id][0].diff+tree_view[course_id][keys[-1]][competitor_id][0].adder_diff),
+                    'speed': speedConverter(tree_view[course_id][keys[-1]][competitor_id][1].speed),
+                    'absoluttime': timeConverter(tree_view[course_id][keys[-1]][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
+                    'status_id': tree_view[course_id][keys[-1]][competitor_id][0].status_id
+                }
+                tree_view[course_id][keys[-1]][competitor_id] = result_item
+            else:
+                tree_view[course_id][keys[-1]][competitor_id] = None
+        # for item in manual_list:
+        #     tree_view[keys[0]][item[0].race_competitor_id] = {
+        #         'absoluttime': timeConverter(item[0].start_time, '%H:%M:%S.%f'),
+        #         'time': timeConverter(item[0].adder_time),
+        #         'diff': timeConverter(item[0].adder_diff),
+        #     }
+        #     tree_view[keys[-1]][item[0].race_competitor_id] = {
+        #         'time': timeConverter(item[0].time+item[0].adder_time),
+        #         'diff': timeConverter(item[0].diff+item[0].adder_diff),
+        #         'absoluttime': timeConverter(item[0].finish_time, '%H:%M:%S.%f'),
+        #         'status_id': item[0].status_id,
+        #         'rank': item[0].rank,
+        #         'is_manual': item[0].is_manual
+        #     }
 
-    for competitor_id in tree_view[keys[-1]]:
-        result_item = {
-            'sectorrank': tree_view[keys[-1]][competitor_id][1].sectorrank,
-            'sectortime': timeConverter(tree_view[keys[-1]][competitor_id][1].sectortime),
-            'sectordiff': timeConverter(tree_view[keys[-1]][competitor_id][1].sectordiff),
-            'rank': tree_view[keys[-1]][competitor_id][0].rank,
-            'time': timeConverter(tree_view[keys[-1]][competitor_id][0].time+tree_view[keys[-1]][competitor_id][0].adder_time),
-            'diff': timeConverter(tree_view[keys[-1]][competitor_id][0].diff+tree_view[keys[-1]][competitor_id][0].adder_diff),
-            'speed': speedConverter(tree_view[keys[-1]][competitor_id][1].speed),
-            'absoluttime': timeConverter(tree_view[keys[-1]][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
-            'status_id': tree_view[keys[-1]][competitor_id][0].status_id
-        }
-        tree_view[keys[-1]][competitor_id] = result_item
-
-    for item in manual_list:
-        tree_view[keys[0]][item[0].race_competitor_id] = {
-            'absoluttime': timeConverter(item[0].start_time, '%H:%M:%S.%f'),
-            'time': timeConverter(item[0].adder_time),
-            'diff': timeConverter(item[0].adder_diff),
-        }
-        tree_view[keys[-1]][item[0].race_competitor_id] = {
-            'time': timeConverter(item[0].time+item[0].adder_time),
-            'diff': timeConverter(item[0].diff+item[0].adder_diff),
-            'absoluttime': timeConverter(item[0].finish_time, '%H:%M:%S.%f'),
-            'status_id': item[0].status_id,
-            'rank': item[0].rank,
-            'is_manual': item[0].is_manual
-        }
-    result = {}
-    for item in keys:
-        result[devices[item]]=tree_view[item]
-    return result
+    return tree_view

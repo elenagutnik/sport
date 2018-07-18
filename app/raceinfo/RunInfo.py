@@ -39,7 +39,7 @@ def race_run_add(id):
         run_info = RunInfo(
             race_id=id,
             number=form.number.data,
-            run_type=RunType.normal
+            run_type_id=1
         )
         if is_combination.is_combination == True:
             run_info.discipline_id = form.discipline_ref.data
@@ -114,12 +114,15 @@ def race_course_run_stop(id,run_id):
 @raceinfo.route('/race/<int:id>/run/forerunner/build', methods=['GET', 'POST'])
 @admin_required
 def forerunner_run_create(id):
-    nextRun = db.session.query(RunInfo).filter(RunInfo.starttime == None, RunInfo.race_id==id).order_by(RunInfo.number.asc()).first()
-
+    try:
+        nextRun = db.session.query(RunInfo).filter(RunInfo.starttime == None, RunInfo.race_id==id).order_by(RunInfo.number.asc()).one()
+    except:
+        flash('Невозможно сформировать заезд')
+        return ''
     run = RunInfo(
-        course_id=nextRun.course_id,
+        course_id=db.session.query(RunCourses.course_id).filter(RunCourses.run_id==nextRun.id).scalar(),
         race_id=id,
-        run_type=RunType.forerunner,
+        run_type_id=db.session.query(RunType.id).filter(RunType.is_forerunner == True).scalar(),
         starttime=datetime.now()
     )
     db.session.add(run)
@@ -146,7 +149,11 @@ def forerunner_run_create(id):
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/forerunners/del', methods=['GET', 'POST'])
 @admin_required
 def forerunner_run_delete(id, run_id):
-    db.session.delete(RunInfo.query.get(run_id))
+    run = db.session.query(RunInfo, RunType).\
+        join(RunType, RunType.id == RunInfo.run_type_id).\
+        filter(RunInfo.id == run_id).one()
+    if run[1].is_forerunner:
+        db.session.delete(run[0])
     return '0'
 
 

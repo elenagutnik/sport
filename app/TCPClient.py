@@ -12,9 +12,9 @@ class DataSender:
     def connect(self):
         try:
             self.sock.connect((Config.SCOREBOARD_HOST, Config.SCOREBOARD_PORT))
-            return "Connection success"
-        except socket.error as e:
-            return "Caught exception socket.error : %s" % e
+            return True
+        except socket.error:
+            return False
 
     def send(self, msg):
         try:

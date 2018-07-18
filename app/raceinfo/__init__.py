@@ -16,4 +16,6 @@ from . import report
 from . import RunInfo
 
 
+from . import Race
+
 

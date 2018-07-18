@@ -32,6 +32,7 @@ class Discipline(db.Model):
     ru_name = db.Column(db.String)
     en_name = db.Column(db.String)
     is_combination = db.Column(db.Boolean)
+    is_parallel = db.Column(db.Boolean)
 
     def __repr__(self):
         return self.fiscode
@@ -431,11 +432,28 @@ class Mark(db.Model):
     description = db.Column(db.String(100))
 
 
-class RunType(enum.Enum):
-    normal = 1
-    test = 2
-    forerunner = 3
+class RunType(db.Model):
+    __tablename__ = 'run_type'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    is_parralel = db.Column(db.Boolean)
+    is_forerunner = db.Column(db.Boolean)
+    is_test = db.Column(db.Boolean)
+    is_qualification = db.Column(db.Boolean)
+    # normal = 1
+    # test = 2
+    # forerunner = 3
+    # qualification = 4
+    @staticmethod
+    def insert():
+        types = ['normal', 'test', 'forerunner', 'qualification']
 
+        for t in types:
+            type = RunType.query.filter_by(name=t).first()
+            if type is None:
+                type = RunType(name=t)
+            db.session.add(type)
+        db.session.commit()
 class RunInfo(db.Model):
     __tablename__ = 'run_info'
     id = db.Column(db.Integer, primary_key=True)
@@ -446,7 +464,7 @@ class RunInfo(db.Model):
     endtime = db.Column(db.DateTime)
 
     discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
-    run_type = db.Column(db.Enum(RunType))
+    run_type_id = db.Column(db.Integer, db.ForeignKey('run_type.id'))
 
 class RunCourses(db.Model):
     __tablename__ = 'run_courses'
@@ -602,7 +620,8 @@ class RunOrder(db.Model):
     #
     is_participate = db.Column(db.Boolean)
     manual_order = db.Column(db.Integer)
-    # course_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
 
 class FisPoints(db.Model):
     __tablename__ = 'fis_points'
@@ -627,7 +646,7 @@ class FisPoints(db.Model):
 class RaceCompetitorFisPoints(db.Model):
     __tablename__ = 'race_com_fis_points'
     id = db.Column(db.Integer, primary_key=True)
-    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id'))
+    race_competitor_id = db.Column(db.Integer, db.ForeignKey('race_competitor.id', ondelete='CASCADE'))
     discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
     fispoint = db.Column(db.Float)
 
