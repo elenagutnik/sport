@@ -161,7 +161,6 @@ def competitor_start():
 def competitor_start_run(run, course_id):
 
     race = Race.query.get(run.race_id)
-
     race_competitors = db.session.query(RaceCompetitor, RunOrder). \
         join(RunOrder). \
         filter(RunOrder.run_id == run.id, RunOrder.course_id==course_id).order_by(asc(RunOrder.order)).all()
@@ -537,8 +536,36 @@ def socket_get_results(data):
         socketio.emit('Results', json.dumps(result_list))
     else:
         return
+@socketio.on('GetRaceInfo')
+def get_race_info(data):
+    if 'race_id' in data.keys():
+        run_list = db.session.query(RunInfo, RunType).join(RunType, RunInfo.run_type_id == RunType.id).filter(RunInfo.race_id == data['race_id']).all()
 
-
+        race_info = {}
+        for run in run_list:
+            race_info[run[0].id] = {
+                'starttime': str(run[0].starttime),
+                'endtime': str(run[0].endtime),
+                'number': run[0].number,
+                'type': run[1].name,
+                'courses': {}
+            }
+            courses = db.session.query(Course).filter(Course.id==RunCourses.course_id,
+                                                      RunCourses.run_id==run[0].id).all()
+            for course in courses:
+                race_info[run[0].id]['courses'][course.id]={
+                    'name': course.en_name,
+                    'devices': []
+                }
+                devices = db.session.query(CourseDevice,CourseDeviceType).join(CourseDeviceType, CourseDevice.course_device_type_id==CourseDeviceType.id).filter(CourseDevice.course_id == course.id).all()
+                for device in devices:
+                    race_info[run[0].id]['courses'][course.id]['devices'].append({
+                        'id': device[0].id,
+                        'order': device[0].order,
+                        'distance': device[0].distance,
+                        'type': device[1].name,
+                    })
+        socketio.emit('RaceInfo', json.dumps(race_info))
 
 @socketio.on('change/data_in/competitors')
 def edit_competitor(json_data):
