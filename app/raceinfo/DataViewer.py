@@ -1,4 +1,4 @@
-from.models import Race,RaceCompetitor, ResultApproved, ResultDetail,RunInfo, CourseDevice, CourseDeviceType
+from.models import Race,RaceCompetitor, ResultApproved, ResultDetail,RunOrder, CourseDevice, CourseDeviceType
 from .. import db
 from sqlalchemy import or_, and_, asc
 import datetime, json
@@ -117,18 +117,51 @@ def TreeView(run_id):
 
     if len(data) > 0:
         for item in data:
-            # try:
+            try:
                 if item[2].course_id not in tree_view.keys():
                     tree_view[item[2].course_id] = {}
                 if item[2].order not in tree_view[item[2].course_id].keys():
                     tree_view[item[2].course_id][item[2].order] = {}
                 if item[0].race_competitor_id not in tree_view[item[2].course_id][item[2].order].keys():
                     tree_view[item[2].course_id][item[2].order][item[0].race_competitor_id] = item
-            # except:
-            #     if item[0].is_manual:
-            #         manual_list.append(item)
+            except:
+                if item[0].is_manual:
+                    manual_list.append(item)
         return tree_view, manual_list
     return {}, []
+
+def TreeView2(run_id):
+    tree_view = {}
+    manual_list = []
+    data = db.session.query(ResultApproved, ResultDetail, CourseDevice, CourseDeviceType, RunOrder). \
+        join(ResultDetail, and_(ResultApproved.race_competitor_id == ResultDetail.race_competitor_id, ResultDetail.run_id == run_id), isouter=True). \
+        join(CourseDevice, CourseDevice.id == ResultDetail.course_device_id, isouter=True). \
+        join(CourseDeviceType, CourseDevice.course_device_type_id == CourseDeviceType.id, isouter=True). \
+        join(RunOrder, and_(ResultApproved.race_competitor_id == RunOrder.race_competitor_id, RunOrder.run_id == run_id), isouter=True). \
+        filter(ResultApproved.run_id == run_id,  or_(ResultApproved.status_id == None, ResultApproved.status_id == 1)).\
+        order_by(asc(CourseDevice.order)).\
+        all()
+    if len(data) > 0:
+        for item in data:
+            try:
+                if item[2].course_id not in tree_view.keys():
+                    tree_view[item[2].course_id] = {}
+                if item[2].order not in tree_view[item[2].course_id].keys():
+                    tree_view[item[2].course_id][item[2].order] = {}
+                if item[0].race_competitor_id not in tree_view[item[2].course_id][item[2].order].keys():
+                    tree_view[item[2].course_id][item[2].order][item[0].race_competitor_id] = item
+            except:
+                if item[0].is_manual:
+                    manual_list.append(item)
+        for item in manual_list:
+            keys = list(tree_view[item[4].course_id].keys())
+            tree_view[item[4].course_id][keys[0]][item[0].race_competitor_id] = item
+            tree_view[item[4].course_id][keys[-1]][item[0].race_competitor_id] = item
+
+        return tree_view
+    return {}
+
+
 
 def ConvertRunResults(tree_view, manual_list):
     courses_id = list(tree_view.keys())

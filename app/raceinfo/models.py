@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import current_app
 from .. import db
-import enum
+from sqlalchemy import func
 
 class Gender(db.Model):
     __tablename__ = 'gender'
@@ -303,6 +303,11 @@ class RunOrderFunction(db.Model):
             db.session.add(result_function)
         db.session.commit()
 
+    @staticmethod
+    def get(competitor_id,run_id):
+        return RunOrder.query.filter(RunOrder.race_competitor_id == competitor_id,
+                              RunOrder.run_id == run_id).one()
+
 class Race(db.Model):
     __tablename__ = 'race'
     id = db.Column(db.Integer, primary_key=True)
@@ -574,6 +579,13 @@ class ResultDetail(db.Model):
         self.sectorrank = None
         self.absolut_time = None
 
+    @staticmethod
+    def remove(competitor_id,run_id):
+        ResultDetail.query.filter(
+            ResultDetail.race_competitor_id == competitor_id,
+            ResultDetail.run_id == run_id
+        ).delete()
+
 class ResultApproved(db.Model):
     __tablename__ = 'result_approved'
     id = db.Column(db.Integer, primary_key=True)
@@ -595,6 +607,32 @@ class ResultApproved(db.Model):
     reason = db.Column(db.String)
     is_start = db.Column(db.Boolean)
     is_finish = db.Column(db.Boolean)
+
+
+    def set_competitor_adder(self, run_number):
+        adder = db.session.query(func.sum(ResultApproved.time).label('time'),
+                                 func.sum(ResultApproved.diff).label('diff')).\
+            filter(ResultApproved.race_competitor_id == self.race_competitor_id,
+                   ResultApproved.run_id == RunInfo.id,
+                   RunInfo.number < run_number).first()
+        if adder.time is not None:
+            self.adder_time = adder.time
+            self.adder_diff = adder.diff
+
+    @staticmethod
+    def get(competitor_id, run_id):
+        return ResultApproved.query.filter_by(
+            race_competitor_id=competitor_id,
+            run_id=run_id).one()
+
+    @staticmethod
+    def remove(competitor_id,run_id):
+        ResultApproved.query.filter(
+            ResultApproved.race_competitor_id ==competitor_id,
+            ResultApproved.run_id == run_id
+        ).delete()
+
+
 
 class Result(db.Model):
     __tablename__ = 'result'
@@ -622,6 +660,11 @@ class RunOrder(db.Model):
     manual_order = db.Column(db.Integer)
 
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+
+    @staticmethod
+    def get(competitor_id, run_id):
+        return RunOrder.query.filter(RunOrder.race_competitor_id == competitor_id,
+                                     RunOrder.run_id == run_id).one()
 
 class FisPoints(db.Model):
     __tablename__ = 'fis_points'
