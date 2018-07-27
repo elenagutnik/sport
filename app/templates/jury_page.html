@@ -18,6 +18,8 @@
 #tab_summarytable table  th.row1  div.btn {float:right; border:none; width:3%; margin:0; }
 #tab_summarytable table td {width:auto;}
 
+#tab_startlist table tbody tr.disabled td{color:#bbbbbb}
+
 #ScoreBoard {
   text-align: right;
   margin: 0 0 20px 0;
@@ -1108,6 +1110,7 @@
 
             $("#tab_startlist_run"+r+" .btn_edit_startlist").hide();
             $("#tab_startlist_run"+r+" .btn_save_startlist").show();
+            $("#tab_startlist_run"+r+" .edit_btns").show();
             $("#tab_startlist_run"+r+" .btn_canceledit_startlist").show();
         });
         // обработка кнопки выхова редактирования стартлиста
@@ -1128,6 +1131,23 @@
             })
         });
         // обработка кнопки отмены редактирования стартлиста
+        $("body").on("click", ".btn_startlist_on", function () {
+          var r=$(this).attr('run_id');
+          console.log($(this).val);
+          if($(this).attr('value')=="all")
+            $("#tab_startlist_run"+r+" table .edit .participate").bootstrapToggle('on')
+          else if($(this).attr('value')=="")
+              $("#tab_startlist_run"+r+" table .edit .participate").bootstrapToggle('off')
+          else{
+            var n=$(this).attr('value');
+            var arr=$("#tab_startlist_run"+r+" table .edit .participate");
+            $("#tab_startlist_run"+r+" table .edit .participate").bootstrapToggle('off')
+            for(var i=0;i<n;i++)
+              $($("#tab_startlist_run"+r+" table .edit .participate")[i]).bootstrapToggle('on');
+          }
+        });
+
+        // обработка кнопки отмены редактирования стартлиста
         $("body").on("click", ".btn_canceledit_startlist", function () {
           var r=$(this).attr('run_id');
           $("#tab_startlist_run"+r+" table .edit").hide();
@@ -1135,6 +1155,7 @@
 
           $("#tab_startlist_run"+r+" .btn_edit_startlist").show();
           $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
+          $("#tab_startlist_run"+r+" .edit_btns").hide();
           $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
         });
         // обработка кнопки сохнанения изменений в стартлисте
@@ -1142,7 +1163,7 @@
             var r=$(this).attr('run_id');
             var arr = [];
             $("#tab_startlist_run"+r+" table .edit input[type='text']").each(function() {
-              arr.push([this.name, parseInt(this.value)]);
+              arr.push([this.name, parseInt(this.value), $("#participate_"+r+"_"+this.name).prop('checked')]);
             });
             if(arr.length){
               console.log("sort");
@@ -1152,6 +1173,7 @@
                 arr[i][1]=i+1;
               }
               console.log(arr);
+
               $.ajax({
                 type: "GET",
                 url: "/raceinfo/race/order_list/edit",
@@ -1169,6 +1191,7 @@
 
                   $("#tab_startlist_run"+r+" .btn_edit_startlist").show();
                   $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
+                  $("#tab_startlist_run"+r+" .edit_btns").hide();
                   $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
                   Promise.all([get_startlist(r)]).then(
                         result=>get_startlist(r)
@@ -1504,15 +1527,43 @@ function set_html_startlist(run_id){
     if(run.start_list && run.start_list.length){
       $("#tab_startlist #tab_startlist_run"+run.id+" table tbody").html('');
       for(var j=0;j<run.start_list.length;j++){
-        $("#tab_startlist #tab_startlist_run"+run.id+" table tbody").append('<tr class="racecompetitor_'+run.start_list[j][1].id+'"><td>'+(j+1)+'</td><td class="edit"><input type="text" name="'+run.start_list[j][2].id+'" value="'+(j+1)+'" style="width:30px;"></td><td>'+run.start_list[j][1].bib+'</td><td>'+run.start_list[j][0]['ru_lastname']+' '+ run.start_list[j][0]['ru_firstname']+' / '+run.start_list[j][0]['en_lastname']+' '+ run.start_list[j][0]['en_firstname']+'</td></tr>');
+        $("#tab_startlist #tab_startlist_run"+run.id+" table tbody").append('\
+          <tr class="racecompetitor_'+run.start_list[j][1].id+' '+(run.start_list[j][2].is_participate?'':'disabled')+'">\
+            <td>'+(j+1)+'</td>\
+            <td class="edit">\
+              <input type="text" name="'+run.start_list[j][2].id+'" value="'+(j+1)+'" style="width:30px;">\
+              <input type="checkbox" id="participate_'+run_id+'_'+run.start_list[j][2].id+'" class="participate" data-toggle="toggle" data-size="mini" name="'+run.start_list[j][2].id+'" '+(run.start_list[j][2].is_participate?'checked':'')+'>\
+            </td>\
+            <td>'+run.start_list[j][1].bib+'</td>\
+            <td>'+run.start_list[j][0]['ru_lastname']+' '+ run.start_list[j][0]['ru_firstname']+' / '+run.start_list[j][0]['en_lastname']+' '+ run.start_list[j][0]['en_firstname']+'</td>\
+          </tr>\
+          ');
       }
+      $(function() {
+        $("#tab_startlist #tab_startlist_run"+run.id+" table tbody tr td.edit .participate").bootstrapToggle();
+      })
       //кнопка редактирования стартового списка
       if(!$("#tab_startlist #tab_startlist_run"+run.id+" .btn_edit_startlist").length){
       $("#tab_startlist #tab_startlist_run"+run.id).append("<button value='' class='btn btn-primary btn-sm btn_edit_startlist' run_id='"+run.id+"'>edit</button>");
       console.log("set_html_startlist run.number="+run.number);
-      if(run.number&&run.number>1)$("#tab_startlist #tab_startlist_run"+run.id).append("<button value='' class='btn btn-primary btn-sm btn_reverse_startlist' run_id='"+run.id+"'>reverse top 15</button>");
-      $("#tab_startlist #tab_startlist_run"+run.id).append("<button value='' class='btn btn-danger btn-sm btn_save_startlist' run_id='"+run.id+"'>save</button>");
-      $("#tab_startlist #tab_startlist_run"+run.id).append("<button value='' class='btn btn-defaul btn-sm btn_canceledit_startlist' run_id='"+run.id+"'>cancel</button>");
+      if(run.number&&run.number>1)
+        $("#tab_startlist #tab_startlist_run"+run.id).append("<button value='' class='btn btn-primary btn-sm btn_reverse_startlist' run_id='"+run.id+"'>reverse top 15</button>");
+
+      $("#tab_startlist #tab_startlist_run"+run.id).append("\
+        <div class='edit_btns'>\
+        All:\
+        <button value='all' class='btn btn-info btn-sm btn_startlist_on' run_id='"+run.id+"'>On</button>\
+        <button value='' class='btn btn-default btn-sm btn_startlist_on' run_id='"+run.id+"'>Off</button>\
+        Turn on first:\
+        <button value='15' class='btn btn-default btn-sm btn_startlist_on' run_id='"+run.id+"'>15</button>\
+        <button value='30' class='btn btn-default btn-sm btn_startlist_on' run_id='"+run.id+"'>30</button>\
+        <button value='45' class='btn btn-default btn-sm btn_startlist_on' run_id='"+run.id+"'>45</button>\
+        <br><hr>\
+        </div>\
+        <button value='' class='btn btn-danger btn-sm btn_save_startlist' run_id='"+run.id+"'>save</button>\
+        <button value='' class='btn btn-defaul btn-sm btn_canceledit_startlist' run_id='"+run.id+"'>cancel</button>\
+        ");
+      $("#tab_startlist #tab_startlist_run"+run.id+" .edit_btns").hide();
       $("#tab_startlist #tab_startlist_run"+run.id+" .btn_save_startlist").hide();
       $("#tab_startlist #tab_startlist_run"+run.id+" .btn_canceledit_startlist").hide();
       }

@@ -51,6 +51,12 @@ function run(){
 	reqSend(0,0,0,keys[0]);
 	reqSend(0,0,0,keys[1]);
 }
+function run_blue(){
+	reqSend(0,0,0,keys[0]);
+}
+function run_red(){
+	reqSend(0,0,0,keys[1]);
+}
 function reqSend(snum,devnum,starttime,course){
 	var devlist=courses[course];
 	console.log(snum+" "+devnum+" "+starttime+" "+course);
@@ -103,7 +109,9 @@ function reqSend(snum,devnum,starttime,course){
 <input type="button" onclick="clearInterval(intervalID);" value="stop"> |
 <input type="text" id="delay_val" value="100"><input type="button" value="change delay" onclick="delay=$('#delay_val').val();clearInterval(intervalID);intervalID = window.setInterval(reqSend, delay);">
  -->
-<input type="button" onclick="run();" value="Run">
+<input type="button" onclick="run();" value="Run Both">
+<input type="button" onclick="run_blue();" value="Run Blue">
+<input type="button" onclick="run_red();" value="Run Red">
 <a href="/raceinfo/emulation/1/clear">Clear all results</a>
 <HR>
 <table id="data4" style="width:49%; float:left">

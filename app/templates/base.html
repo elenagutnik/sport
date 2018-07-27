@@ -6,7 +6,7 @@
 {{ super() }}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}" />
-
+<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
@@ -145,6 +145,7 @@
 {{ moment.include_moment() }}
 <script src="{{ url_for('static', filename='js/moment-with-locales.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 <script>
   $(document).ready(function () {
     $("form.form input#birth").datetimepicker({format: 'DD.MM.YYYY'});
