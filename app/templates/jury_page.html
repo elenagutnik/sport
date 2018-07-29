@@ -77,6 +77,10 @@
     socket.on('get/results/current', function(data){
       add2datasrc(JSON.parse(data)[0]);
     });
+    socket.on('ScoreboardStatus', function(data) {
+      var data=JSON.parse(data);
+      console.log("ScoreboardStatus(data)",data);
+    });
     socket.on('NewDataPoint', function(data) {
       var data=JSON.parse(data);
       NewDataPoint(data);
@@ -288,7 +292,6 @@
               console.log("comp="+comp);
               console.log(val);
               $.each(val, function(field_k, field_val){
-                console.log("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+field_k+" td.dev_"+dev+").html("+field_val+");");
                 $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+field_k+" td.dev_"+dev).html(field_val);
               });
           //    tab_summarytable_set_status(run,comp,status_name,val.status_id);
@@ -929,6 +932,8 @@
             result=>socket_emit('GetRaceInfo',{'race_id': race_id})//socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
       ).then(
             result=>socket_emit('GetResults',{'race_id':race_id})//socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
+      ).then(
+            result=>socket_emit('GetScoreboardStatus')
       );
       function socket_emit(s, obj){
         socket.emit(s, obj);
@@ -947,7 +952,6 @@
 
 */
 
-
     //prepare page ßßß
       // получение и вывод на странице инфы о всех заездах (race_id - задан глобально)
   //    runinfo_get();
@@ -959,18 +963,8 @@
     $("body").on("click", ".nav nav-tabs li", function () {
       document.cookie = "tab="+$(this).id;
     });
-        $("body").on("click", "#ScoreBoard", function () {
-          $.ajax({
-            url:"/raceinfo/scoreboard/connect",
-            success: function(data) {
-                console.log(data);
-                alert('success');
-            },
-            error: function(data) {
-              console.log(data);
-                alert('error');
-            }
-          })
+        $("body").on("click", "#btn_ScoreBoardConnect", function () {
+          socket.emit("ScoreboardConnect");
         });
         $("body").on("click", "#ScoreBoardSwitcher", function () {
           $.ajax({
