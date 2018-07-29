@@ -24,13 +24,17 @@ def race_course_run_del(id,run_id):
 @raceinfo.route('/race/<int:id>/run/add', methods=['GET', 'POST'])
 @admin_required
 def race_run_add(id):
-    is_combination = db.session.query(Discipline.is_combination.label('is_combination')).\
-        filter(Discipline.id == Race.discipline_id, Race.id == id).one()
+    discipline = Discipline.query.filter(Discipline.id == Race.discipline_id, Race.id == id).one()
 
-    if is_combination.is_combination == True:
+    if discipline.is_combination == True:
         form = EditRunInfoDisciplineForm()
         form.discipline_ref.choices = [(item.id, item.fiscode + '.' + item.en_name) for item in
                                Discipline.query.filter(Discipline.is_combination == None).all()]
+
+    elif discipline.is_parallel:
+        form = EditRunInfoParallelForm()
+        form.runtype_ref.choices = [(item.id, item.name) for item in
+                                    RunType.query.filter(RunType.is_parralel == True).all()]
     else:
         form = EditRunInfoForm()
 
@@ -41,8 +45,17 @@ def race_run_add(id):
             number=form.number.data,
             run_type_id=1
         )
-        if is_combination.is_combination == True:
+        if discipline.is_combination == True:
             run_info.discipline_id = form.discipline_ref.data
+        elif discipline.is_parallel:
+            run_info.run_type_id = form.runtype_ref.data
+            second_run = RunInfo(
+                race_id=id,
+                number=form.number.data,
+                run_type_id=form.runtype_ref.data,
+                is_second=True
+            )
+            db.session.add(second_run)
         db.session.add(run_info)
         db.session.commit()
         flash('The run has been added.')
@@ -111,26 +124,38 @@ def race_course_run_stop(id,run_id):
 
 
 
-@raceinfo.route('/race/<int:id>/run/forerunner/build', methods=['GET', 'POST'])
+@raceinfo.route('/race/<int:id>/run/forerunners/build', methods=['GET', 'POST'])
 @admin_required
 def forerunner_run_create(id):
+    forerunner_runs = db.session.query(RunInfo).filter(RunInfo.run_type_id == 3, RunInfo.race_id == id).order_by(
+        RunInfo.number.asc()).first()
+
+    if forerunner_runs is not None:
+        return 'Невозможно сформировать заезд'
+
     try:
-        nextRun = db.session.query(RunInfo).filter(RunInfo.starttime == None, RunInfo.race_id==id).order_by(RunInfo.number.asc()).one()
+        next_run = db.session.query(RunInfo).filter(RunInfo.starttime == None, RunInfo.race_id == id).order_by(RunInfo.number.asc()).limit(1).one()
+        run_courses_list = RunCourses.query.filter(RunCourses.run_id == next_run.id).all()
     except:
-        flash('Невозможно сформировать заезд')
-        return ''
+        return 'Невозможно сформировать заезд'
     run = RunInfo(
-        course_id=db.session.query(RunCourses.course_id).filter(RunCourses.run_id==nextRun.id).scalar(),
         race_id=id,
         run_type_id=db.session.query(RunType.id).filter(RunType.is_forerunner == True).scalar(),
         starttime=datetime.now()
     )
     db.session.add(run)
     db.session.commit()
-    CourseForerunner_list = CourseForerunner.query.filter(CourseForerunner.course_id == run.course_id).all()
+    for item in run_courses_list:
+        forerunner_course = RunCourses(
+            run_id=run.id,
+            course_id=item.course_id
+        )
+        db.session.add(forerunner_course)
+    db.session.commit()
+    CourseForerunner_list = CourseForerunner.query.filter(CourseForerunner.course_id.in_([item.course_id for item in run_courses_list])).all()
     for item in CourseForerunner_list:
         tmp = RaceCompetitor(
-            forerunner_id=item.forerunner_id,
+            forerunner_id=item.id,
             race_id=id,
             run_id=run.id
         )
@@ -139,11 +164,32 @@ def forerunner_run_create(id):
         run_order = RunOrder(
             race_competitor_id=tmp.id,
             run_id=run.id,
-            order=item.order
+            order=item.order,
+            course_id=item.course_id
         )
         db.session.add(run_order)
     db.session.commit()
-    return ''
+    start_list = db.session.query(Forerunner.en_lastname.label('en_lastname'),
+                                  Forerunner.en_firstname.label('en_firstname'),
+                                  RaceCompetitor.id.label('id'),
+                                  RunOrder.order.label('order'),
+                                  RunOrder.course_id.label('course_id')).\
+        filter(Forerunner.id == CourseForerunner.forerunner_id,
+               CourseForerunner.course_id == RunCourses.course_id,
+               RunOrder.run_id==RunCourses.run_id,
+               RunCourses.run_id == run.id).\
+        all()
+    response_start_list = []
+    for item in start_list:
+        response_start_list.append({
+            'id': item.id,
+            'en_lastname': item.en_lastname,
+            'en_firstname': item.en_firstname,
+            'order': item.order,
+            'course_id': item.course_id,
+
+        })
+    return json.dumps(response_start_list)
 
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/forerunners/del', methods=['GET', 'POST'])

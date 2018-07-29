@@ -236,7 +236,7 @@ class RaceCompetitor(db.Model):
     __tablename__ = 'race_competitor'
     id = db.Column(db.Integer, primary_key=True)
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
-    forerunner_id = db.Column(db.Integer, db.ForeignKey('forerunner.id'))
+    forerunner_id = db.Column(db.Integer, db.ForeignKey('course_forerunner.id'))
     race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     age_class = db.Column(db.String)
     transponder_1 = db.Column(db.String)
@@ -451,7 +451,7 @@ class RunType(db.Model):
     # qualification = 4
     @staticmethod
     def insert():
-        types = ['normal', 'test', 'forerunner', 'qualification']
+        types = ['normal', 'test', 'forerunner', 'qualification', 'final']
 
         for t in types:
             type = RunType.query.filter_by(name=t).first()
@@ -459,6 +459,7 @@ class RunType(db.Model):
                 type = RunType(name=t)
             db.session.add(type)
         db.session.commit()
+
 class RunInfo(db.Model):
     __tablename__ = 'run_info'
     id = db.Column(db.Integer, primary_key=True)
@@ -467,15 +468,15 @@ class RunInfo(db.Model):
     number = db.Column(db.Integer)
     starttime = db.Column(db.DateTime)
     endtime = db.Column(db.DateTime)
-
     discipline_id = db.Column(db.Integer, db.ForeignKey('discipline.id'))
     run_type_id = db.Column(db.Integer, db.ForeignKey('run_type.id'))
+    is_second = db.Column(db.Boolean)
 
 class RunCourses(db.Model):
     __tablename__ = 'run_courses'
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id', ondelete='CASCADE'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
 
 class Team(db.Model):
     __tablename__ = 'team'
@@ -495,6 +496,7 @@ class RaceTeam(db.Model):
     classified = db.Column(db.Boolean)
     en_teamname = db.Column(db.String)
     ru_teamname = db.Column(db.String)
+    parent_race_id = db.Column(db.Integer, db.ForeignKey('race.id'))
 
 class CourseDevice(db.Model):
     __tablename__ = 'course_device'

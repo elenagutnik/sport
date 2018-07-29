@@ -1246,13 +1246,25 @@ def race_сourse_edit(id, course_id):
 def race_сourse_run_add(id, course_id):
     form = EditCoutseRunForm()
     form.run_ref.choices = [(item[0].id, 'Number: ' + str(item[0].number) +'   Type: '+ str(item[1].name))
-                            for item in db.session.query(RunInfo,RunType).join(RunType, RunType.id==RunInfo.run_type_id).
-                                filter(RunInfo.race_id == id, RunInfo.run_type_id.in_([1,4])).order_by(RunInfo.number.asc()).all()]
+                            for item in db.session.query(RunInfo,RunType).join(RunType, RunType.id == RunInfo.run_type_id).
+                                filter(RunInfo.race_id == id, RunInfo.is_second == None,
+                                       RunInfo.run_type_id.in_([1,4])).
+                                order_by(RunInfo.number.asc()).all()]
     if form.validate_on_submit():
+
+        first_run = RunInfo.query.filter(RunInfo.id==form.run_ref.data).first()
+        second_run = RunInfo.query.filter(RunInfo.race_id==id, RunInfo.is_second==True,
+                                          RunInfo.number==first_run.number).first()
         runCourses = RunCourses(
             run_id=form.run_ref.data,
             course_id=course_id
         )
+        if second_run is not None:
+            runCourses_second = RunCourses(
+                run_id=second_run.id,
+                course_id=course_id
+            )
+            db.session.add(runCourses_second)
         db.session.add(runCourses)
         db.session.commit()
         return redirect(url_for('.race_сourse_edit', id=id, course_id=course_id, _external=True))
@@ -1635,3 +1647,6 @@ def device_type_del(id):
 @raceinfo.route('/status/get', methods=['GET'])
 def status_get_list():
     return json.dumps(Status.query.all(), cls=jsonencoder.AlchemyEncoder)
+@raceinfo.route('/temp/jury_page')
+def test_newFormat_page():
+    return render_template('new_format_tester.html')

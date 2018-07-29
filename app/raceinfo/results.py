@@ -1,5 +1,5 @@
 from . import raceinfo, jsonencoder
-from .models import Race, ResultDetail, RunInfo, RaceCompetitor, ResultApproved, Competitor, Status
+from .models import Race, Discipline, RunInfo, RaceCompetitor, ResultApproved, Competitor, Status
 from .. import db
 from sqlalchemy import func
 import json
@@ -20,18 +20,21 @@ def race_results(race_id):
         })
     db.session.commit()
 
-    race = Race.query.filter(Race.id == race_id).one()
+    race = db.session.query(Race, Discipline).join(Discipline, Discipline.id == Race.discipline_id).filter(Race.id == race_id).one()
 
     Competitors_list = db.session.query(RaceCompetitor, Competitor).join(Competitor).filter(RaceCompetitor.race_id == race_id).all()
     QLF_list=[]
-    if race.result_function == 1:
-        QLF_list = Sum_of_runs(race, db.session.query(func.count(RunInfo.id)).filter(RunInfo.race_id == race_id).scalar())
-    elif race.result_function == 2:
-        QLF_list = The_best_one(race)
-    elif race.result_function == 3:
-        QLF_list = The_sum_of_two_best_runs(race)
-    elif race.result_function == 4:
-        QLF_list = The_sum_of_three_best_runs(race)
+    if race[1].is_combination:
+        QLF_list = Sum_of_runs_Combination(race[0],
+                               db.session.query(func.count(RunInfo.id)).filter(RunInfo.race_id == race_id).scalar())
+    elif race[0].result_function == 1:
+        QLF_list = Sum_of_runs(race[0], db.session.query(func.count(RunInfo.id)).filter(RunInfo.race_id == race_id).scalar())
+    elif race[0].result_function == 2:
+        QLF_list = The_best_one(race[0])
+    elif race[0].result_function == 3:
+        QLF_list = The_sum_of_two_best_runs(race[0])
+    elif race[0].result_function == 4:
+        QLF_list = The_sum_of_three_best_runs(race[0])
 
     QLF_competitors = [item[0] for item in QLF_list]
 
@@ -44,6 +47,13 @@ def race_results(race_id):
     set_results_to_DB(QLF_list, DNQ_list, Competitors_list)
 
     return get_results(race_id, Competitors_list)
+
+def Sum_of_runs_Combination(race, run_count):
+    QLF_list = db.session.query(ResultApproved.race_competitor_id, func.count(ResultApproved.id), func.sum(ResultApproved.time).label('total')).\
+        join(RunInfo). \
+        filter(ResultApproved.time != None, RunInfo.race_id == race.id, ResultApproved.status_id == 1).\
+        group_by(ResultApproved.race_competitor_id).having(func.count(ResultApproved.id) == run_count).order_by(func.count(ResultApproved.id).asc(), func.sum(ResultApproved.time).asc()).all()
+    return QLF_list
 
 def Sum_of_runs(race, run_count):
     QLF_list = db.session.query(ResultApproved.race_competitor_id, func.count(ResultApproved.id), func.min(ResultApproved.time).label('total')).\

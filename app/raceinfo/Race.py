@@ -363,6 +363,33 @@ class BaseRace:
             return False
         else:
             return True
+    def get_competitor_info(self):
+        return db.session.query(RaceCompetitor.bib.label('bib'),
+                                Competitor.en_firstname.label('firstname'),
+                                Competitor.en_lastname.label('lastname'),
+                         Nation.name.label('country_code')). \
+            filter(RaceCompetitor.competitor_id == Competitor.id,
+                   Competitor.nation_code_id == Nation.id,
+                   RaceCompetitor.id == self.competitor.id).first()
+    def start_list_info(self):
+        return db.session.query(RunOrder.order.label('order'),
+                                RaceCompetitor.bib.label('bib'),
+                                Competitor.en_firstname.label('firstname'),
+                                Competitor.en_lastname.label('lastname')).\
+            filter(RunOrder.race_competitor_id == RaceCompetitor.id,
+                   RaceCompetitor.competitor_id == Competitor.id,
+                   RunOrder.run_id == self.run.id).all()
+
+    def finish_list_info(self):
+        return db.session.query(ResultApproved.rank.label('rank'),
+                                RaceCompetitor.bib.label('bib'),
+                                Competitor.en_firstname.label('firstname'),
+                                Competitor.en_lastname.label('lastname'),
+                                ResultApproved.diff.label('diff')). \
+            filter(ResultApproved.race_competitor_id == RaceCompetitor.id,
+                   RaceCompetitor.competitor_id == Competitor.id,
+                   ResultApproved.run_id == self.run.id,
+                   ResultApproved.is_finish == True).all()
 
 class ClassicRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
@@ -396,18 +423,63 @@ class QualificationRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
 
+    def competitor_autostart(self):
+        super().competitor_autostart()
+        self.resultApprove.set_competitor_adder(self.run.number)
+
+    def competitor_manualstart(self, competitor_id):
+        super().competitor_manualstart(competitor_id)
+        self.resultApprove.set_competitor_adder(self.run.number)
 
     def recalculate_run_results(self):
         tree_view, manual = TreeView(self.run.id)
         if len(tree_view) > 0:
             courses = list(tree_view.keys())
-            for (key, item), (key2, item_2) in zip(list(tree_view[courses[0]].items()), list(tree_view[courses[1]].items())):
-                if key == 1:
-                    continue
-                else:
-                    self.recalculate_sector_results({**item, **item_2}, {**tree_view[courses[0]][key-1], **tree_view[courses[1]][key2-1]})
-            self.recalculate_finished_results()
+            if len(courses) == 1:
+                super().recalculate_run_results()
+            else:
+                for (key, item), (key2, item_2) in zip(list(tree_view[courses[0]].items()), list(tree_view[courses[1]].items())):
+                    if key == 1:
+                        continue
+                    else:
+                        self.recalculate_sector_results({**item, **item_2}, {**tree_view[courses[0]][key-1], **tree_view[courses[1]][key2-1]})
+                self.recalculate_finished_results()
+        return tree_view, manual
 
+class ForerunnerRace(BaseRace):
+    def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
+        super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
+        pass
+    def get_competitor_info(self):
+        return db.session.query(CourseForerunner.order.label('bib'),
+                                Forerunner.en_firstname.label('firstname'),
+                                Forerunner.en_lastname.label('lastname'),
+                                Nation.name.label('country_code')).\
+            filter(RaceCompetitor.competitor_id == CourseForerunner.id,
+                   CourseForerunner.forerunner_id == Forerunner.id,
+                   Forerunner.nation_id == Nation.id,
+                   RaceCompetitor.id == self.competitor.id).first()
+    def start_list_info(self):
+        return db.session.query(CourseForerunner.order.label('bib'),
+                                Forerunner.en_firstname.label('firstname'),
+                                Forerunner.en_lastname.label('lastname'),
+                                Nation.name.label('country_code')).\
+            filter(RaceCompetitor.competitor_id == CourseForerunner.id,
+                   CourseForerunner.forerunner_id == Forerunner.id,
+                   Forerunner.nation_id == Nation.id,
+                   RaceCompetitor.id == self.competitor.id).first()
+
+    def finish_list_info(self):
+        return db.session.query(ResultApproved.rank.label('rank'),
+                                RaceCompetitor.bib.label('bib'),
+                                Forerunner.en_firstname.label('firstname'),
+                                Forerunner.en_lastname.label('lastname'),
+                                ResultApproved.diff.label('diff')).\
+            filter(ResultApproved.race_competitor_id == RaceCompetitor.id,
+                   RaceCompetitor.competitor_id == CourseForerunner.id,
+                   CourseForerunner.forerunner_id==Forerunner.id,
+                   ResultApproved.run_id == self.run.id,
+                   ResultApproved.is_finish == True).all()
 class RaceGetter:
 
     @staticmethod
@@ -416,6 +488,8 @@ class RaceGetter:
         :param device_data:
         :return: BaseRace object
         """
+
+        print(device_data)
         race_info = db.session.query(RunInfo,
                                      CourseDeviceType,
                                      CourseDevice,
@@ -524,6 +598,12 @@ class RaceGetter:
                                      runInfo=race_info[0],
                                      runType=race_info[2],
                                      discipline=race_info[4])
+        elif race_info[0].run_type_id == 3:
+            print('ForerunnerRace')
+            return ForerunnerRace(race=race_info[3],
+                                  runInfo=race_info[0],
+                                  runType=race_info[2],
+                                  discipline=race_info[4])
         else:
             print('ClassicRace')
             return ClassicRace(race=race_info[3],
