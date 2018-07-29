@@ -49,10 +49,10 @@ React.render(<Runlist_item order='1' bib='1' name="Sasha"/>, document.getElement
 //      console.log('Results',JSON.parse(data));
 //    });
 //
-    socket.emit('GetRaceInfo', {race_id: '1'});
+    socket.emit('ScoreboardConnect');
 
-    socket.on('RaceInfo', function(data) {
-      console.log('RaceInfo',JSON.parse(data));
+    socket.on('ScoreboardStatus', function(data) {
+      console.log('ScoreboardStatus',JSON.parse(data));
     });
 
 </script>

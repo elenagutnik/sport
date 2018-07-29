@@ -244,6 +244,17 @@ class EditRunInfoDisciplineForm(EditRunInfoForm):
         get_field = lambda field_id: next((fld for fld in fields if fld.id == field_id))
         return (get_field(field_id) for field_id in self.__order)
 
+class EditRunInfoParallelForm(EditRunInfoForm):
+    runtype_ref = SelectField('Run type', coerce=int)
+
+    __order = ('csrf_token', 'runtype_ref', 'number', 'submit')
+
+    def __iter__(self):
+        fields = list(super(EditRunInfoParallelForm, self).__iter__())
+        get_field = lambda field_id: next((fld for fld in fields if fld.id == field_id))
+        return (get_field(field_id) for field_id in self.__order)
+
+
 class EditCourseDeviceForm(FlaskForm):
     # course_ref = SelectField('Course', coerce=int, validators=[InputRequired()])
     order = IntegerField('Order', validators=[InputRequired()])

@@ -192,10 +192,10 @@ def load_data_vol3():
             raceHandler.courseDevice.course_id: ConvertCompetitorStart(raceHandler.result, raceHandler.courseDevice)}
         }))
 
-        # scoreboard = Scoreboard(result, run)
-        # scoreboard.started_competitor()
-        # scoreboard.send()
-        #
+        scoreboard = Scoreboard(raceHandler)
+        scoreboard.started_competitor()
+        scoreboard.send()
+
         db.session.add(raceHandler.result)
         db.session.commit()
 
@@ -220,14 +220,14 @@ def load_data_vol3():
                         ConvertRunResults(tree_view, manual_list)
                     ]
                 }))
-                # scoreboard = Scoreboard(result, run)
-                # if result.rank == 1:
-                #     scoreboard.new_best_time()
-                #     scoreboard.send()
-                # scoreboard.finished_competitor()
-                # scoreboard.send()
-                # scoreboard.finished_list()
-                # scoreboard.send()
+                scoreboard = Scoreboard(raceHandler)
+                if raceHandler.result.rank == 1:
+                    scoreboard.new_best_time()
+                    scoreboard.send()
+                scoreboard.finished_competitor()
+                scoreboard.send()
+                scoreboard.finished_list()
+                scoreboard.send()
 
             else:
                 result_details = db.session.query(ResultDetail). \
@@ -247,7 +247,7 @@ def load_data_vol3():
 
                 db.session.add(raceHandler.result)
                 db.session.commit()
-                # scoreboard = Scoreboard(result, run)
-                # scoreboard.crossed_device()
-                # scoreboard.send()
+                scoreboard = Scoreboard(raceHandler)
+                scoreboard.crossed_device()
+                scoreboard.send()
     return '', 200

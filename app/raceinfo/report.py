@@ -7,7 +7,7 @@ from .DataViewer import timeConverter
 import io
 from . import raceinfo
 from .results import get_results
-
+from sqlalchemy import and_, func, sql
 import xlwt
 import json
 from math import floor
@@ -125,7 +125,72 @@ def generate_results_report(race_id):
     except:
         return render_template('custom_error.html', title='Ошибка формирования отчета')
 
+@raceinfo.route('/race/<int:race_id>/reports/combination')
+def generate_combination_results_report(race_id):
+    # Prepare data
+    # try:
+        ffactor =request.args.get('fields[ffactor]')
+        penalty = request.args.get('fields[penalty]')
+        reasondesc = request.args.get('fields[reasondesc]')
 
+        race = RaceInformation.get_main_race_info(race_id)
+        course = RaceInformation.get_course_info(race_id)
+
+
+        qlf_list, disqlf_list = RaceInformation.get_results(RaceInformation.get_competitor_info(race_id),
+                                                            RaceInformation.get_approved_competitor_info(race_id))
+        # Create report
+
+        report = RaceResultCombinationReport(race)
+
+        report.set_header()
+
+        report.set_content(jury=RaceInformation.get_jury_info(race_id),
+                           course=course,
+                           coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                           forerunners=RaceInformation.get_forunners_info(course.id),
+                           qlf_list=qlf_list,
+                           disqlf_list=disqlf_list,
+                           weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
+                           )
+
+        report.set_footer()
+    #
+        return report.get_html_response()
+    # except:
+    #     return render_template('custom_error.html', title='Ошибка формирования отчета')
+    #
+
+@raceinfo.route('/race/<int:race_id>/reports/qualification')
+def generate_qualification_results_report(race_id):
+    # Prepare data
+    # try:
+        ffactor =request.args.get('fields[ffactor]')
+        penalty = request.args.get('fields[penalty]')
+        reasondesc = request.args.get('fields[reasondesc]')
+
+        race = RaceInformation.get_main_race_info(race_id)
+        course = RaceInformation.get_course_info(race_id)
+
+
+        # Create report
+
+        report = RaceQualificationReport(race)
+
+        report.set_header()
+
+        report.set_content(jury=RaceInformation.get_jury_info(race_id),
+                           coursesetter=RaceInformation.get_coursesetter_info(course.course_coursetter_id),
+                           forerunners=RaceInformation.get_forunners_info(course.id),
+                           weather=RaceInformation.get_weather_info(race_id), F=ffactor, penalty=penalty, reasondesc=reasondesc
+                           )
+
+        report.set_footer()
+    #
+        return report.get_html_response()
+    # except:
+    #     return render_template('custom_error.html', title='Ошибка формирования отчета')
+    #
 
 @raceinfo.route('/race/<int:race_id>/reports/results/first')
 def generate_results_report_first(race_id):
@@ -270,9 +335,7 @@ class OrderListReport(Report):
 
 
 class RaceResultReport(Report):
-
     is_first_run = None
-
     def __init__(self, race, is_first_run=False, is_official=True):
         super().__init__(race)
         if is_official:
@@ -284,7 +347,7 @@ class RaceResultReport(Report):
     def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
         if self.race[3].is_combination:
             course = db.session.query(Course,RunInfo,Discipline.en_name.label('discipline')).\
-                join(RunInfo, RunInfo.course_id==Course.id).\
+                join(RunInfo, RunInfo.id==Course.id).\
                 join(Discipline, Discipline.id==RunInfo.discipline_id, isouter=True).filter(Course.race_id==self.race[0].id).order_by(RunInfo.number).all()
             self.content = render_template('reports/combination.html',
                                            title=self.title,
@@ -307,37 +370,116 @@ class RaceResultReport(Report):
                                            weather=weather,
                                            forerunners=forerunners, F=F, penalty=penalty,
                                            reasondesc=reasondesc, is_first_run=self.is_first_run)
+class RaceResultCombinationReport(Report):
+    is_first_run = None
+    def __init__(self, race, is_first_run=False, is_official=True):
+        super().__init__(race)
+        if is_official:
+            self.title = "OFFICIAL RESULTS"
+        else:
+            self.title = "UNOFFICIAL RESULTS"
+        self.is_first_run = is_first_run
+
+    def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
+
+        course = db.session.query(Discipline.en_name.label('discipline'),
+                                  Course.en_name.label('course_name'),
+                                  Course.startelev.label('startelev'),
+                                  Course.finishelev.label('finishelev'),
+                                  Course.length.label('length'),
+                                  Course.homologation.label('homologation'),
+                                  Course.gates.label('gates'),
+                                  Course.tuminggates.label('tuminggates'),
+                                  Coursetter.en_lastname.label('en_lastname'), Coursetter.en_firstname.label('en_firstname'),
+                                  Nation.name.label('coursetter_nation'),
+                                  RunInfo.starttime.label('starttime')
+                                  ).filter(Discipline.id == RunInfo.discipline_id,
+                                           RunInfo.id==RunCourses.run_id,
+                                           RunCourses.course_id==Course.id,
+                                           Course.course_coursetter_id==Coursetter.id,
+                                           Coursetter.nation_id==Nation.id,
+                                           RunInfo.race_id==self.race[0].id).order_by(RunInfo.number.asc()).all()
+
+        self.content = render_template('reports/combination.html',
+                                       title=self.title,
+                                       qlf_competitors=qlf_list,
+                                       disqlf_competitors=disqlf_list,
+                                       course=course,
+                                       course_setter=coursesetter,
+                                       jury=jury,
+                                       weather=weather,
+                                       forerunners=forerunners, F=F, penalty=penalty,
+                                       reasondesc=reasondesc, is_first_run=self.is_first_run)
+
 class RaceQualificationReport(Report):
     def __init__(self, race, is_first_run=False):
         super().__init__(race)
         self.title = "RESULTS QUALIFICATION RACE"
 
-    def set_content(self, jury, course, coursesetter, forerunners, qlf_list, disqlf_list, weather, F, penalty, reasondesc):
-        if self.race[3].is_combination:
-            course = db.session.query(Course,RunInfo,Discipline.en_name.label('discipline')).\
-                join(RunInfo, RunInfo.course_id==Course.id).\
-                join(Discipline, Discipline.id==RunInfo.discipline_id, isouter=True).filter(Course.race_id==self.race[0].id).order_by(RunInfo.number).all()
-            self.content = render_template('reports/combination.html',
-                                           title=self.title,
-                                           qlf_competitors=qlf_list,
-                                           disqlf_competitors=disqlf_list,
-                                           course=course,
-                                           course_setter=coursesetter,
-                                           jury=jury,
-                                           weather=weather,
-                                           forerunners=forerunners, F=F, penalty=penalty,
-                                           reasondesc=reasondesc, is_first_run=self.is_first_run)
-        else:
-            self.content = render_template('reports/results.html',
-                                           title=self.title,
-                                           qlf_competitors=qlf_list,
-                                           disqlf_competitors=disqlf_list,
-                                           course=course,
-                                           course_setter=coursesetter,
-                                           jury=jury,
-                                           weather=weather,
-                                           forerunners=forerunners, F=F, penalty=penalty,
-                                           reasondesc=reasondesc, is_first_run=self.is_first_run)
+    def set_content(self, jury, coursesetter, forerunners, weather, F, penalty, reasondesc):
+        course = db.session.query(Course.en_name.label('course_name'),
+                                  Course.startelev.label('startelev'),
+                                  Course.finishelev.label('finishelev'),
+                                  Course.length.label('length'),
+                                  Course.homologation.label('homologation'),
+                                  Course.gates.label('gates'),
+                                  Course.tuminggates.label('tuminggates'),
+                                  Coursetter.en_lastname.label('en_lastname'),
+                                  Coursetter.en_firstname.label('en_firstname'),
+                                  Nation.name.label('coursetter_nation'),
+                                  RunInfo.starttime.label('starttime')
+                                  ).filter(RunInfo.id == RunCourses.run_id,
+                                           RunCourses.course_id == Course.id,
+                                           Course.course_coursetter_id == Coursetter.id,
+                                           Coursetter.nation_id == Nation.id,
+                                           RunInfo.race_id == self.race[0].id).order_by(RunInfo.number.asc()).all()
+
+        runs = RunInfo.query.filter(RunInfo.run_type_id == 4,
+                                   RunInfo.race_id == self.race[0].id).\
+            order_by(RunInfo.number.desc()).all()
+
+        results = db.session.query(Competitor.fiscode.label('fiscode'),
+                                   Competitor.en_firstname.label('en_firstname'),
+                                   Competitor.en_lastname.label('en_lastname'),
+                                   Competitor.birth.label('birth'),
+                                   RaceCompetitor.bib.label('bib'),
+                                   Nation.name.label('nation'),
+                                   sql.label('time', ResultApproved.time+ResultApproved.adder_time),
+                                   sql.label('diff', ResultApproved.diff + ResultApproved.adder_diff),
+                                   ResultApproved.rank.label('rank')).\
+            filter(ResultApproved.run_id == runs[0].id,
+                   ResultApproved.race_competitor_id == RaceCompetitor.id,
+                   RaceCompetitor.competitor_id == Competitor.id,
+                   Competitor.nation_code_id == Nation.id).order_by(ResultApproved.rank.asc()).all()
+        qlf_competitors = []
+        for item in results:
+            item = item._asdict()
+            item['diff'] = timeConverter(item['diff'])
+            item['time'] = timeConverter(item['time'])
+            qlf_competitors.append(item)
+        dnf_competitors = db.session.query(Competitor.fiscode.label('fiscode'),
+                                   Competitor.en_firstname.label('en_firstname'),
+                                   Competitor.en_lastname.label('en_lastname'),
+                                   Competitor.birth.label('birth'),
+                                   RaceCompetitor.bib.label('bib'),
+                                   Nation.name.label('nation'),
+                                   Status.name.label('status')).\
+            filter(ResultApproved.run_id.in_([item.id for item in runs]),
+                   ResultApproved.race_competitor_id == RaceCompetitor.id,
+                   RaceCompetitor.competitor_id == Competitor.id,
+                   Competitor.nation_code_id == Nation.id,
+                   Status.id == ResultApproved.status_id,
+                   ResultApproved.status_id!=1).order_by(ResultApproved.status_id.asc()).all()
+        self.content = render_template('reports/qualification.html',
+                                       title=self.title,
+                                       course=course,
+                                       qlf_competitors=qlf_competitors,
+                                       dnf_competitors=dnf_competitors,
+                                       course_setter=coursesetter,
+                                       jury=jury,
+                                       weather=weather,
+                                       forerunners=forerunners, F=F, penalty=penalty,
+                                       reasondesc=reasondesc)
 
 class ExcelGenerator:
     cursor = []

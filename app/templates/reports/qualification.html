@@ -139,30 +139,42 @@ html{
 					<th colspan="3">
 						Technical Data
 					</th>
+					<th>
+						{{course[0].discipline}}
+					</th>
+					<th>
+						{{course[1].discipline}}
+					</th>
 				</tr>
 				<tr>
-					<td class="title">Cource Name</td>
-					<td align=right>{{course.en_name}}</td>
+					<td colspan="3" class="title">Cource Name</td>
+					<td align=right>{{course[0].course_name}}</td>
+					<td align=right>{{course[1].course_name}}</td>
 				</tr>
 				<tr>
-					<td class="title">Start Altitude</td>
-					<td align=right>{{course.startelev}}m</td>
+					<td colspan="3" class="title">Start Altitude</td>
+					<td align=right>{{course[0].startelev}}m</td>
+					<td align=right>{{course[1].startelev}}m</td>
 				</tr>
 				<tr>
-					<td class="title">Finish Altitude</td>
-					<td align=right>{{course.finishelev}}m</td>
+					<td colspan="3" class="title">Finish Altitude</td>
+					<td align=right>{{course[0].finishelev}}m</td>
+					<td align=right>{{course[1].finishelev}}m</td>
 				</tr>
 				<tr>
-					<td class="title">Vertical Drop</td>
-					<td align=right>{{course.startelev - course.finishelev}}m</td>
+					<td colspan="3" class="title">Vertical Drop</td>
+					<td align=right>{{course[0].startelev - course[0].finishelev}}m</td>
+					<td align=right>{{course[1].startelev - course[1].finishelev}}m</td>
 				</tr>
 				<tr>
-					<td class="title">Course Length</td>
-					<td align=right>{{course.length}}m</td>
+					<td colspan="3" class="title">Course Length</td>
+					<td align=right>{{course[0].length}}m</td>
+					<td align=right>{{course[1].length}}m</td>
 				</tr>
 				<tr>
-					<td class="title">Homologation Number</td>
-					<td align=right>{{course.homologation}}</td>
+					<td colspan="3" class="title">Homologation Number</td>
+					<td align=right>{{course[0].homologation}}</td>
+					<td align=right>{{course[1].homologation}}</td>
 				</tr>
 			</table>
 		</td>
@@ -173,22 +185,22 @@ html{
 			<table>
 				<tr>
 					<th colspan="3">
-						Race Information
+						Race Information {{course[0].discipline}}
 					</th>
 				</tr>
                 <tr>
 					<td class="title">Cource Setter</td>
-					<td><span class="lname">{{course_setter.en_lastname}}</span> {{course_setter.en_firstname}}</td>
-					<td title="national code">{{course_setter.name}}</td>
+					<td><span class="lname">{{course[0].en_lastname}}</span> {{course_setter.en_firstname}}</td>
+					<td title="national code">{{course[0].coursetter_nation}}</td>
 				</tr>
 				<tr>
 					<td class="title">Gates/Turning Gates</td>
-					<td>{{course.gates}}/{{ course.tuminggates }}</td>
+					<td>{{course[0].gates}}/{{ course[0].tuminggates }}</td>
 					<td></td>
 				</tr>
 				<tr class="starttime">
 					<td class="title">Start Time</td>
-					<td>{{start_time}}</td>
+					<td>{{course[0].starttime.strftime('%H:%M')}}</td>
 					<td></td>
 				</tr>
 			</table>
@@ -240,32 +252,24 @@ html{
 						<td align="right">{{points}}</td>
 					</tr>
                     {% endfor %}
+                    {% for item in dnf_competitors %}
+					<tr>
+						<td align="right"></td>
+						<td align="right">{{item.bib}}</td>
+                        <td align="right">{{item.fiscode}}</td>
+						<td><b><span class="lname">{{item.en_lastname}}</span> {{item.en_firstname}}</b></td>
+						<td align="center">{{item.birth.year}}</td>
+						<td align="center">{{item.nation}}</td>
+                        <td align="center">{{item.status}}</td>
+                        <td align="center"></td>
+						<td align="right">{{points}}</td>
+					</tr>
+                    {% endfor %}
                     <tr>
                         <td colspan="14">
                             <br>
                         </td>
                     </tr>
-				{% for key, item in disqlf_competitors.items() %}
-				<tr>
-					<td colspan="14">
-						<h1 class="left"><span class="up">{{ item.status }}:</span>&nbsp;&nbsp;&nbsp; {{item.competitors|length}} competitor{% if item.competitors|length>1 %}s{% endif %}</h1>
-					</td>
-				</tr>
-				    {% for competitor_item in item.competitors %}
-						<tr>
-								<td></td>
-				        <td align="right">{{competitor_item.bib}}</td>
-				        <td align="right">{{competitor_item.fiscode}}</td>
-				        <td><b><span class="lname">{{competitor_item.en_lastname}}</span> {{competitor_item.en_firstname}}</b></td>
-				        <td align="center">{{competitor_item.birth.year}}</td>
-				        <td align="center">{{competitor_item.club}}</td>
-				        <td align="center">{{competitor_item.nation}}</td>
-								<td align="center" colspan=2>{% if (competitor_item.status==6 or competitor_item.status==9 or competitor_item.status==12) and competitor_item.gate!=None %}{{competitor_item.gate}}{% endif %}</td>
-								<td align="center" colspan=2>{% if (competitor_item.status==7 or competitor_item.status==10) and competitor_item.gate!=None %}{{competitor_item.gate}}{% endif %}</td>
-				        <td align="center" colspan="3">{% if competitor_item.reason!=None %}{{competitor_item.reason}}{% endif %}</td>
-						</tr>
-				    {% endfor %}
-				{% endfor %}
 
 			</table>
 		</td>
