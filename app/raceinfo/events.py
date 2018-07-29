@@ -174,6 +174,7 @@ def load_data_vol3():
         NewDataStart (Информация о старте спортсмена (race_competitor_id, absolut_time, run_id))
         NewDataPoint (Текущий спортсмен + список пересчитанных рангов (sectorrank, rank) на текущем устройсве)
         NewDataFinish (Полный набор данных для всего заезда)
+        d
     """
     data = request.json
     data['TIME'] = int(datetime.strptime(data['TIME'], '%d.%m.%Y %H:%M:%S.%f').timestamp()*1000)
