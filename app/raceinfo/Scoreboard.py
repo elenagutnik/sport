@@ -48,14 +48,17 @@ class Scoreboard:
          #            ).all()
          state = System.query.filter(System.key == "Scoreboard").first()
          if state is None:
-             self.is_active = True
+             state = System(key='Scoreboard', value=False)
+             self.is_active = False
+             db.session.add(state)
          else:
              self.is_active = strtobool(state.value)
          is_connected = System.query.filter(System.key == "ScoreboardConnect").first()
-         if state is None:
+         if is_connected is None:
              is_connected = System(key='ScoreboardConnect', value=False)
+             self.is_connected = False
              db.session.add(is_connected)
-             db.session.commit()
+         db.session.commit()
 
      @staticmethod
      @socketio.on('ScoreboardConnect')
@@ -163,8 +166,8 @@ class Scoreboard:
          if self.is_active:
              self.message = "CCfinishlist;" + \
                             self.raceHandler.race.racedate.strftime('%d:%m:%Y') + ';' + \
-                            self.raceHandler.race.eventname + ';'
-                            # self.raceHandler.race.discipline + ';' + str(self.raceHandler.run.number) + ';'
+                            self.raceHandler.race.eventname + ';' + \
+                            self.raceHandler.discipline.name + ';' + str(self.raceHandler.run.number) + ';'
              for item in self.raceHandler.finish_list_info():
                  self.message += str(item.rank) + ';' + \
                  str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';' + timeConverter(item.diff) + ';'
