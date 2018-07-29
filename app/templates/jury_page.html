@@ -273,15 +273,16 @@
     }
     function RefreshResults(data){
       var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
+      //?????
       if(typeof $("#tab_summarytable .div_run"+run.id) == "undefined" || $("#tab_summarytable .div_run"+run.id).length==0){
-        prepare_result_tables();
+        prepare_result_tables_for_run(run.id);
       }
 
       console.log(data);
       $.each(data, function(run,arr){
         console.log("run="+run);
         if(!$("#tab_summarytable .div_run"+run) || !$("#tab_summarytable .div_run"+run).length){
-          prepare_result_tables(run);
+          prepare_result_tables(run,arr);
         }
         $("#tab_summarytable .div_run"+run+" tbody").html("");
         $.each(arr, function(course,arr){
@@ -1671,27 +1672,29 @@ function set_html_startlist(run_id){
       }
       return course_list;
     }
-
     function prepare_result_tables(){
-      var run=run_list[run_list_ids["id"+run_id]];
+      $.each(race_info.run_list, function(run_id,run_arr){
+        prepare_result_tables_for_run(run_id,run_arr);
+      });
+    }
+
+    function prepare_result_tables_for_run(run_id, run_arr=null){
+      if(!run_arr)
+        var run_arr=race_info.run_list[run_id];
+
       console.log("PREPARE_RESULT_TABLES: run_list:"+run_list.length);
-      console.log(device_list["course_1"]);
-      console.log(run_list);
-      for(var j=0;j<run_list.length;j++){
-        var run=run_list[j];
 
-        if(Object.keys(race_info.run_list[run_list[j].id].courses).length==1){
-          var cid = Object.keys(race_info.run_list[run_list[j].id].courses)[0];
-          var d = race_info.run_list[run_list[j].id].courses[Object.keys(race_info.run_list[run_list[j].id].courses)[0]].devices;
-          var width = 100/Object.keys(d).length;
+        if(Object.keys(run_arr.courses).length==1){
+            var cid = Object.keys(run_arr.courses)[0];
+            var d = run_arr.courses[cid].devices;
+            var width = 100/Object.keys(d).length;
         }
-        var run_id=run_list[j].id;
 
-        if(!$("#tab_summarytable .div_run"+run.id).length){
+        if(!$("#tab_summarytable .div_run"+run_id).length){
           $("#tab_summarytable").append("\
-            <div class='div_run"+run.id+"'>\
+            <div class='div_run"+run_id+"'>\
               <h3>Run: "+((run.number)?run.number:" Forerunners")+"</h3>\
-              <table style='width:100%;' class='table table-bordered table_run"+run.id+"'>\
+              <table style='width:100%;' class='table table-bordered table_run"+run_id+"'>\
                 <thead>\
                   <tr>\
                     <th class='row1' colspan='"+Object.keys(d).length+1+"'>\
@@ -1706,13 +1709,13 @@ function set_html_startlist(run_id){
                 <tbody></tbody>\
               </table>\
             </div>");
-          thead[run.id]={};
+          thead[run_id]={};
           $.each(d, function(idx,dev){
             //console.log("dev",dev);
-            thead[run.id][cid]+="<th style='width:"+width+"%'>"+dev.type+" - "+dev.distance+(dev.order>1?"<br>Sector "+(dev.order-1):"")+"</th>";
+            thead[run_id][cid]+="<th style='width:"+width+"%'>"+dev.type+" - "+dev.distance+(dev.order>1?"<br>Sector "+(dev.order-1):"")+"</th>";
           });
         }
-      }
+
       return true;
     }
     function refresh_status(run_id,comp_id,status_id){
