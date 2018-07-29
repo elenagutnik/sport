@@ -167,7 +167,7 @@ class Scoreboard:
              self.message = "CCfinishlist;" + \
                             self.raceHandler.race.racedate.strftime('%d:%m:%Y') + ';' + \
                             self.raceHandler.race.eventname + ';' + \
-                            self.raceHandler.discipline.name + ';' + str(self.raceHandler.run.number) + ';'
+                            self.raceHandler.discipline.fiscode + ';' + str(self.raceHandler.run.number) + ';'
              for item in self.raceHandler.finish_list_info():
                  self.message += str(item.rank) + ';' + \
                  str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';' + timeConverter(item.diff) + ';'
@@ -178,7 +178,7 @@ class Scoreboard:
              self.message = "CCstartlist;" + \
                             self.raceHandler.race.racedate.strftime('%d:%m:%Y') + ';' + \
                             self.raceHandler.race.eventname + ';' + \
-                            self.raceHandler.race.discipline + ';' + str(self.raceHandler.run.number) + ';'
+                            self.raceHandler.discipline.fiscode + ';' + str(self.raceHandler.run.number) + ';'
              # for item in self.raceHandler.finish_list_info():
              #     self.message += str(item.order) + ';' + \
              #     str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';'
