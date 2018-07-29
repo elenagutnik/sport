@@ -29,9 +29,10 @@
 <script type="text/javascript" charset="utf-8">
 
     var socket = io.connect('http://127.0.0.1:5000');
-    socket.on('connect', function() {
+/*    socket.on('connect', function() {
         socket.emit('my event', {data: 'I\'m connected!'});
     });
+*/
     var finish_res= new Array(); // del
 
     socket.on('errorHandler', function(data) {
@@ -933,10 +934,13 @@
       ).then(
             result=>socket_emit('GetResults',{'race_id':race_id})//socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
       ).then(
-            result=>socket_emit('GetScoreboardStatus')
+            result=>socket_emit_emptyobj('GetScoreboardStatus')
       );
       function socket_emit(s, obj){
-        socket.emit(s, obj);
+          socket.emit(s, obj);
+      }
+      function socket_emit_emptyobj(s){
+          socket.emit(s);
       }
 
    /*
