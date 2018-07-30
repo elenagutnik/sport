@@ -50,6 +50,7 @@ React.render(<Runlist_item order='1' bib='1' name="Sasha"/>, document.getElement
 //    });
 //
     socket.emit('ScoreboardConnect');
+    socket.emit('CompetitorManualApprove', {run_id:1,competitor_id:12, status_id:1, finish_time:1245678866, start_time:1245678866});
 
     socket.on('ScoreboardStatus', function(data) {
       console.log('ScoreboardStatus',JSON.parse(data));

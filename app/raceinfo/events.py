@@ -91,6 +91,19 @@ def run_get():
                           all(),
                           cls=jsonencoder.AlchemyEncoder)
 
+# /approve/edit/run/18/competitor/9?
+# @raceinfo.route('/approve/edit/run/<int:run_id>/competitor/<int:competitor_id>', methods=['POST', 'GET'])
+@socketio.on('CompetitorManualApprove')
+def manual_approve(data):
+    raceHandler = RaceGetter.getRaceByRunid(data['run_id'])
+    raceHandler.competitor_manualapprove(data['competitor_id'],
+                                         data['status_id'],
+                                         data['finish_time'],
+                                         data['start_time'],
+                                         data['gate'],
+                                         data['reason'])
+
+
 @socketio.on('GetResults')
 def socket_get_results(data):
     # data = json.loads(json_data)
@@ -117,11 +130,13 @@ def scoreboard_send_start_list(data):
     scoreboard = Scoreboard(raceHandler)
     scoreboard.start_list()
     scoreboard.send()
+
 @socketio.on('GetRaceInfo')
 def get_race_info(data):
     if 'race_id' in data.keys():
-        run_list = db.session.query(RunInfo, RunType).\
-            join(RunType, RunInfo.run_type_id == RunType.id).\
+        run_list = db.session.query(RunInfo, RunType, Discipline).\
+            join(RunType, RunInfo.run_type_id == RunType.id). \
+            join(Discipline, RunInfo.discipline_id == Discipline.id, isouter=True). \
             filter(RunInfo.race_id == data['race_id']).all()
 
         race_info = {}
@@ -131,6 +146,10 @@ def get_race_info(data):
                 'endtime': str(run[0].endtime),
                 'number': run[0].number,
                 'type': run[1].name,
+                'discipline': (None if run[2] is None
+          else run[2].en_name),
+                'discipline_fiscode': (None if run[2] is None
+                               else run[2].fiscode),
                 'courses': {}
             }
             courses = db.session.query(Course).filter(Course.id == RunCourses.course_id,
@@ -250,10 +269,10 @@ def load_data_vol3():
                     ]
 
                 }))
-
                 db.session.add(raceHandler.result)
                 db.session.commit()
                 scoreboard = Scoreboard(raceHandler)
                 scoreboard.crossed_device()
                 scoreboard.send()
+
     return '', 200
