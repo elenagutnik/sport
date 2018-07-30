@@ -77,6 +77,20 @@ def receiver_jury():
 def jury_page():
     return render_template('jury_page.html')
 
+@raceinfo.route('/run/get/', methods=['POST', 'GET'])
+def run_get():
+    try:
+        race_id = request.args['race_id']
+        data = json.dumps(RunInfo.query.filter(RunInfo.race_id == race_id).all(), cls=jsonencoder.AlchemyEncoder)
+        return data
+    except:
+        db.session.flush()
+        db.session.commit()
+        return json.dumps(RunInfo.query.
+                          filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).
+                          all(),
+                          cls=jsonencoder.AlchemyEncoder)
+
 @socketio.on('GetResults')
 def socket_get_results(data):
     # data = json.loads(json_data)
@@ -97,20 +111,12 @@ def socket_get_results(data):
     else:
         return
 
-@raceinfo.route('/run/get/', methods=['POST', 'GET'])
-def run_get():
-    try:
-        race_id = request.args['race_id']
-        data = json.dumps(RunInfo.query.filter(RunInfo.race_id == race_id).all(), cls=jsonencoder.AlchemyEncoder)
-        return data
-    except:
-        db.session.flush()
-        db.session.commit()
-        return json.dumps(RunInfo.query.
-                          filter(cast(RunInfo.starttime, DATE) == datetime.now().date()).
-                          all(),
-                          cls=jsonencoder.AlchemyEncoder)
-
+@socketio.on('ScoreboardSendStartlist')
+def scoreboard_send_start_list(data):
+    raceHandler = RaceGetter.getRaceByRunid(data['run_id'])
+    scoreboard = Scoreboard(raceHandler)
+    scoreboard.start_list()
+    scoreboard.send()
 @socketio.on('GetRaceInfo')
 def get_race_info(data):
     if 'race_id' in data.keys():
@@ -182,7 +188,6 @@ def load_data_vol3():
     raceHandler = RaceGetter.getRace(data)
     raceHandler.setDeviceDataInDB(data)
     raceHandler.competitor_get_current()
-
     if raceHandler.is_start():
         if raceHandler.competitor is None:
             raceHandler.competitor_autostart()
@@ -192,7 +197,7 @@ def load_data_vol3():
         socketio.emit("NewDataStart", json.dumps({raceHandler.run.id: {
             raceHandler.courseDevice.course_id: ConvertCompetitorStart(raceHandler.result, raceHandler.courseDevice)}
         }))
-
+        print(str(raceHandler.get_competitor_info()))
         scoreboard = Scoreboard(raceHandler)
         scoreboard.started_competitor()
         scoreboard.send()

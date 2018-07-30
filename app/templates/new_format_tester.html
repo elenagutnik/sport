@@ -42,9 +42,9 @@ React.render(<Runlist_item order='1' bib='1' name="Sasha"/>, document.getElement
 //        socket.on('NewDataFinish', function(data) {
 //      console.log('FinishDevice', JSON.parse(data));
 //    });
-//    socket.emit('GetResults', {race_id: '1'});
-//    socket.emit('GetResults', {run_id: '1'});
-//
+    socket.emit('ScoreboardSendStartlist', {run_id: 50});
+    socket.emit('ScoreboardSendStartlist', {run_id: 2});
+
 //    socket.on('Results', function(data) {
 //      console.log('Results',JSON.parse(data));
 //    });

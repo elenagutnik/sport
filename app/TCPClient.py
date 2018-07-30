@@ -17,17 +17,7 @@ class DataSender:
             return False
 
     def send(self, msg):
-        try:
-            self.sock.send(msg)
-        except:
-            # recreate the socket and reconnect
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((Config.SCOREBOARD_HOST, Config.SCOREBOARD_PORT))
-            self.sock.send(msg)
-
-
-
-
+        self.sock.send(msg)
 
     def close(self):
         self.sock.close()

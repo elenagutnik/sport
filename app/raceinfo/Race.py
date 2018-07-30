@@ -1,6 +1,6 @@
 from .models import *
 from .DataViewer import TreeView
-from sqlalchemy import cast, DATE, func, asc, and_
+from sqlalchemy import cast, DATE, func, asc, and_, sql
 
 from datetime import datetime
 
@@ -371,6 +371,7 @@ class BaseRace:
             filter(RaceCompetitor.competitor_id == Competitor.id,
                    Competitor.nation_code_id == Nation.id,
                    RaceCompetitor.id == self.competitor.id).first()
+
     def start_list_info(self):
         return db.session.query(RunOrder.order.label('order'),
                                 RaceCompetitor.bib.label('bib'),
@@ -455,19 +456,19 @@ class ForerunnerRace(BaseRace):
                                 Forerunner.en_firstname.label('firstname'),
                                 Forerunner.en_lastname.label('lastname'),
                                 Nation.name.label('country_code')).\
-            filter(RaceCompetitor.competitor_id == CourseForerunner.id,
+            filter(RaceCompetitor.forerunner_id == CourseForerunner.id,
                    CourseForerunner.forerunner_id == Forerunner.id,
                    Forerunner.nation_id == Nation.id,
                    RaceCompetitor.id == self.competitor.id).first()
     def start_list_info(self):
-        return db.session.query(CourseForerunner.order.label('bib'),
+        return db.session.query(sql.label('order', RunOrder.order),
+                                CourseForerunner.order.label('bib'),
                                 Forerunner.en_firstname.label('firstname'),
                                 Forerunner.en_lastname.label('lastname'),
                                 Nation.name.label('country_code')).\
-            filter(RaceCompetitor.competitor_id == CourseForerunner.id,
-                   CourseForerunner.forerunner_id == Forerunner.id,
-                   Forerunner.nation_id == Nation.id,
-                   RaceCompetitor.id == self.competitor.id).first()
+            filter(RunOrder.race_competitor_id == RaceCompetitor.id,
+                   RaceCompetitor.forerunner_id == CourseForerunner.id,
+                   RunOrder.run_id == self.run.id).all()
 
     def finish_list_info(self):
         return db.session.query(ResultApproved.rank.label('rank'),
@@ -477,7 +478,7 @@ class ForerunnerRace(BaseRace):
                                 ResultApproved.diff.label('diff')).\
             filter(ResultApproved.race_competitor_id == RaceCompetitor.id,
                    RaceCompetitor.competitor_id == CourseForerunner.id,
-                   CourseForerunner.forerunner_id==Forerunner.id,
+                   CourseForerunner.forerunner_id == Forerunner.id,
                    ResultApproved.run_id == self.run.id,
                    ResultApproved.is_finish == True).all()
 class RaceGetter:
@@ -511,7 +512,16 @@ class RaceGetter:
             Race.discipline_id == Discipline.id
         ).one()
 
-        if race_info[6].is_parallel:
+
+        if race_info[4].is_forerunner:
+            print('ForerunnerRace')
+            return ForerunnerRace(race=race_info[5],
+                                  runInfo=race_info[0],
+                                  runType=race_info[4],
+                                  discipline=race_info[6],
+                                  courseDevice=race_info[2],
+                                  courseDeviceType=race_info[1])
+        elif race_info[6].is_parallel:
             if race_info[4].is_qualification:
                 print('QualificationRace')
                 return QualificationRace(race=race_info[5],
@@ -573,7 +583,14 @@ class RaceGetter:
             RunInfo.id == run_id
         ).one()
 
-        if race_info[4].is_parallel:
+        if race_info[0].run_type_id == 3:
+            print('ForerunnerRace')
+            return ForerunnerRace(race=race_info[3],
+                                  runInfo=race_info[0],
+                                  runType=race_info[2],
+                                  discipline=race_info[4])
+
+        elif race_info[4].is_parallel:
             if race_info[2].is_qualification:
                 print('QualificationRace')
                 return QualificationRace(race=race_info[3],
@@ -598,12 +615,6 @@ class RaceGetter:
                                      runInfo=race_info[0],
                                      runType=race_info[2],
                                      discipline=race_info[4])
-        elif race_info[0].run_type_id == 3:
-            print('ForerunnerRace')
-            return ForerunnerRace(race=race_info[3],
-                                  runInfo=race_info[0],
-                                  runType=race_info[2],
-                                  discipline=race_info[4])
         else:
             print('ClassicRace')
             return ClassicRace(race=race_info[3],

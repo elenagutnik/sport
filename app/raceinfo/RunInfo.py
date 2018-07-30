@@ -169,16 +169,16 @@ def forerunner_run_create(id):
         )
         db.session.add(run_order)
     db.session.commit()
+
     start_list = db.session.query(Forerunner.en_lastname.label('en_lastname'),
                                   Forerunner.en_firstname.label('en_firstname'),
                                   RaceCompetitor.id.label('id'),
                                   RunOrder.order.label('order'),
                                   RunOrder.course_id.label('course_id')).\
-        filter(Forerunner.id == CourseForerunner.forerunner_id,
-               CourseForerunner.course_id == RunCourses.course_id,
-               RunOrder.run_id==RunCourses.run_id,
-               RunCourses.run_id == run.id).\
-        all()
+        filter(RunOrder.run_id == run.id,
+               RunOrder.race_competitor_id == RaceCompetitor.id,
+               RaceCompetitor.forerunner_id == CourseForerunner.id,
+               CourseForerunner.forerunner_id == Forerunner.id).all()
     response_start_list = []
     for item in start_list:
         response_start_list.append({
@@ -192,14 +192,11 @@ def forerunner_run_create(id):
     return json.dumps(response_start_list)
 
 
-@raceinfo.route('/race/<int:id>/run/<int:run_id>/forerunners/del', methods=['GET', 'POST'])
+@raceinfo.route('/race/<int:id>/run/forerunners/del', methods=['GET', 'POST'])
 @admin_required
-def forerunner_run_delete(id, run_id):
-    run = db.session.query(RunInfo, RunType).\
-        join(RunType, RunType.id == RunInfo.run_type_id).\
-        filter(RunInfo.id == run_id).one()
-    if run[1].is_forerunner:
-        db.session.delete(run[0])
+def forerunner_run_delete(id):
+    db.session.query(RunInfo).filter(RunInfo.race_id == id, RunInfo.run_type_id == 3).delete()
+    db.session.commit()
     return '0'
 
 

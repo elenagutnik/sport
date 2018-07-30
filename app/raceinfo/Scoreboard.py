@@ -58,6 +58,8 @@ class Scoreboard:
              is_connected = System(key='ScoreboardConnect', value=False)
              self.is_connected = False
              db.session.add(is_connected)
+         else:
+             self.is_connected=strtobool(is_connected.value)
          db.session.commit()
 
      @staticmethod
@@ -110,6 +112,8 @@ class Scoreboard:
                                                        'is_connected': is_connected.value}))
 
 
+     def send_start_list(self):
+         pass
      def new_best_time(self):
          if self.is_active:
              competitor = self.raceHandler.get_competitor_info()
@@ -179,13 +183,14 @@ class Scoreboard:
                             self.raceHandler.race.racedate.strftime('%d:%m:%Y') + ';' + \
                             self.raceHandler.race.eventname + ';' + \
                             self.raceHandler.discipline.fiscode + ';' + str(self.raceHandler.run.number) + ';'
-             # for item in self.raceHandler.finish_list_info():
-             #     self.message += str(item.order) + ';' + \
-             #     str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';'
-             # self.message += '!!'
+             for item in self.raceHandler.start_list_info():
+                 self.message += str(item.order) + ';' + \
+                 str(item.bib) + ';' + item.firstname + ';' + item.lastname + ';'
+             self.message += '!!'
 
      def send(self):
-         if self.is_active:
+         print(self.message)
+         if self.is_active and self.is_connected:
              try:
                  ScoreboardSender.send(self.message.encode())
              except:
