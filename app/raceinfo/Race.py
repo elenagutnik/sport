@@ -173,6 +173,7 @@ class BaseRace:
                         finish_device[0].absolute_time = finish_time
                         db.session.add(finish_device)
                     resultApproved.finish_time = finish_time
+                    resultApproved.is_finish=True
                 if start_time != '':
                     start_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType). \
                         join(CourseDevice). \
@@ -266,7 +267,7 @@ class BaseRace:
             self.result.rank = 1
 
     def recalculate_run_results(self):
-        tree_view, manual_list = TreeView(self.run.id)
+        tree_view, manual_list, dql_list = TreeView(self.run.id)
         if len(tree_view) > 0:
             courses = list(tree_view.keys())
             for key, item in tree_view[courses[0]].items():
@@ -275,7 +276,7 @@ class BaseRace:
                 else:
                     self.recalculate_sector_results(item, tree_view[courses[0]][key - 1])
             self.recalculate_finished_results()
-        return tree_view, manual_list
+        return tree_view, manual_list, dql_list
 
     def recalculate_sector_results(self, current_results=None, previous_results=None):
         #  пересчитать  параметры speed, sectortime, time
@@ -421,7 +422,7 @@ class QualificationRace(BaseRace):
         self.resultApprove.set_competitor_adder(self.run.number)
 
     def recalculate_run_results(self):
-        tree_view, manual = TreeView(self.run.id)
+        tree_view, manual, dql_list = TreeView(self.run.id)
         if len(tree_view) > 0:
             courses = list(tree_view.keys())
             if len(courses) == 1:
@@ -433,7 +434,7 @@ class QualificationRace(BaseRace):
                     else:
                         self.recalculate_sector_results({**item, **item_2}, {**tree_view[courses[0]][key-1], **tree_view[courses[1]][key2-1]})
                 self.recalculate_finished_results()
-        return tree_view, manual
+        return tree_view, manual, dql_list
 
 class ForerunnerRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
@@ -558,54 +559,52 @@ class RaceGetter:
         :return: BaseRace object
         """
         race_info = db.session.query(RunInfo,
-                                     Course,
                                      RunType,
                                      Race,
                                      Discipline,
-                                     ).filter(
-            Course.id == RunCourses.course_id,
-            RunCourses.run_id == RunInfo.id,
-            RunInfo.run_type_id == RunType.id,
-            RunInfo.race_id == Race.id,
-            Race.discipline_id == Discipline.id,
-            RunInfo.id == run_id
+                                     ).\
+            filter(
+                RunInfo.run_type_id == RunType.id,
+                RunInfo.race_id == Race.id,
+                Race.discipline_id == Discipline.id,
+                RunInfo.id == run_id
         ).one()
 
         if race_info[0].run_type_id == 3:
             print('ForerunnerRace')
-            return ForerunnerRace(race=race_info[3],
+            return ForerunnerRace(race=race_info[2],
                                   runInfo=race_info[0],
-                                  runType=race_info[2],
-                                  discipline=race_info[4])
+                                  runType=race_info[1],
+                                  discipline=race_info[3])
 
-        elif race_info[4].is_parallel:
-            if race_info[2].is_qualification:
+        elif race_info[3].is_parallel:
+            if race_info[1].is_qualification:
                 print('QualificationRace')
-                return QualificationRace(race=race_info[3],
+                return QualificationRace(race=race_info[2],
                                          runInfo=race_info[0],
-                                         runType=race_info[2],
-                                         discipline=race_info[4])
+                                         runType=race_info[1],
+                                         discipline=race_info[3])
             else:
                 print('ParallelRace')
-                return ParallelRace(race=race_info[3],
+                return ParallelRace(race=race_info[2],
                                     runInfo=race_info[0],
-                                    runType=race_info[2],
-                                    discipline=race_info[4])
-        elif race_info[4].is_combination:
+                                    runType=race_info[1],
+                                    discipline=race_info[3])
+        elif race_info[3].is_combination:
             print('Combination')
-            return Combination(race=race_info[3],
+            return Combination(race=race_info[2],
                                runInfo=race_info[0],
-                               runType=race_info[2],
-                               discipline=race_info[4])
-        elif race_info[3].result_function == 1:
+                               runType=race_info[1],
+                               discipline=race_info[3])
+        elif race_info[2].result_function == 1:
             print('SummationTimeRace')
-            return SummationTimeRace(race=race_info[3],
+            return SummationTimeRace(race=race_info[2],
                                      runInfo=race_info[0],
-                                     runType=race_info[2],
-                                     discipline=race_info[4])
+                                     runType=race_info[1],
+                                     discipline=race_info[3])
         else:
             print('ClassicRace')
-            return ClassicRace(race=race_info[3],
+            return ClassicRace(race=race_info[1],
                                runInfo=race_info[0],
-                               runType=race_info[2],
-                               discipline=race_info[4])
+                               runType=race_info[1],
+                               discipline=race_info[3])

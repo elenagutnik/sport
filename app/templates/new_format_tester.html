@@ -32,24 +32,26 @@ React.render(<Runlist_item order='1' bib='1' name="Sasha"/>, document.getElement
         socket.emit('my event', {data: 'I\'m connected!'});
     });
 
-    socket.on('NewDataStart', function(data) {
-      console.log('StartDevice', JSON.parse(data));
+//    socket.on('NewDataStart', function(data) {
+//      console.log('StartDevice', JSON.parse(data));
+//    });
+//
+//    socket.on('NewDataPoint', function(data) {
+//      console.log('PointDevice',JSON.parse(data));
+//    });
+//    socket.on('NewDataFinish', function(data) {
+//      console.log('FinishDevice', JSON.parse(data));
+//    });
+//    socket.on('ErrorData', function(data) {
+//      console.log('ErrorData', data);
+//    });
+//    socket.on('NewDataManual', function(data) {
+//      console.log('NewDataManual', JSON.parse(data));
+//    });
+//
+    socket.emit('GetResults', {race_id: 8});
+    socket.on('Results', function(data) {
+      console.log('Results', JSON.parse(data));
     });
-
-    socket.on('NewDataPoint', function(data) {
-      console.log('PointDevice',JSON.parse(data));
-    });
-    socket.on('NewDataFinish', function(data) {
-      console.log('FinishDevice', JSON.parse(data));
-    });
-    socket.on('ErrorData', function(data) {
-      console.log('ErrorData', data);
-    });
-    socket.on('NewDataManual', function(data) {
-      console.log('NewDataManual', JSON.parse(data));
-    });
-
-
-
 </script>
 {% endblock %}

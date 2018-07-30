@@ -103,7 +103,7 @@ def manual_approve(data):
                                          data['gate'],
                                          data['reason'])
     if result:
-        tree_view, manual_list = raceHandler.recalculate_run_results()
+        tree_view, manual_list, dql_list = raceHandler.recalculate_run_results()
         socketio.emit("NewDataManual", json.dumps({
             data['run_id']: {
                 db.session.query(RunOrder.course_id).filter(RunOrder.run_id == data['run_id'],
@@ -113,7 +113,7 @@ def manual_approve(data):
                             'is_manual': True,
                             'race_competitor_id': data['competitor_id']
                         },
-                        ConvertRunResults(tree_view, manual_list)
+                        ConvertRunResults(tree_view, manual_list, dql_list)
                 ]
             }
         }))
@@ -124,17 +124,17 @@ def socket_get_results(data):
     # data = json.loads(json_data)
     if 'run_id' in data.keys():
         run = RunInfo.query.get(data['run_id'])
-        results, manual = TreeView(data['run_id'])
+        results, manual, dql_list = TreeView(data['run_id'])
         socketio.emit('Results', json.dumps({
-            run.id: ConvertRunResults(results, manual)
+            run.id: ConvertRunResults(results, manual, dql_list)
 
         }))
     if 'race_id' in data.keys():
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None).all()
         result_list = {}
         for run in run_list:
-            results, manual = TreeView(run.id)
-            result_list[run.id] = ConvertRunResults(results, manual)
+            results, manual, dql_list = TreeView(run.id)
+            result_list[run.id] = ConvertRunResults(results, manual, dql_list)
         socketio.emit('Results', json.dumps(result_list))
     else:
         return
@@ -251,14 +251,14 @@ def load_data_vol3():
                     raceHandler.competitor_finish()
                     db.session.add(raceHandler.result)
                     db.session.commit()
-                    tree_view, manual_list = raceHandler.recalculate_run_results()
+                    tree_view, manual_list, dql_list = raceHandler.recalculate_run_results()
 
                     socketio.emit("NewDataFinish", json.dumps({
                         raceHandler.run.id: [
                             {
                                 raceHandler.courseDevice.course_id: ConvertCompetitorFinish(raceHandler.result, raceHandler.courseDevice, raceHandler.resultApprove)
                             },
-                            ConvertRunResults(tree_view, manual_list)
+                            ConvertRunResults(tree_view, manual_list, dql_list)
                         ]
                     }))
                     scoreboard = Scoreboard(raceHandler)
