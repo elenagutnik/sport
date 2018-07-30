@@ -23,11 +23,13 @@ class BaseRace:
             src_dev=data['SRC_DEV'],
             event_code=data['EVENT_CODE'],
             time=data['TIME'],
-            run_id=self.run.id,
-            cource_device_id=self.courseDevice.id
         )
         if 'BIB' in data:
             self.data_in.bib = data['BIB']
+        if self.run is not None:
+            self.data_in.run_id = self.run.id
+        if self.courseDevice is not None:
+            self.data_in.cource_device_id = self.courseDevice.id
         db.session.add(self.data_in)
         db.session.commit()
 
@@ -147,51 +149,50 @@ class BaseRace:
         resultApproved.is_manual = True
         resultApproved.approve_time = datetime.now()
         resultApproved.status_id = status_id
-        # try:
-        if resultApproved.status_id == '1':
-            if self.race.result_function == 1 and self.run.number > 1:
-                resultApproved.set_competitor_adder(self.run.number)
+        try:
+            if resultApproved.status_id == '1':
+                if self.race.result_function == 1 and self.run.number > 1:
+                    resultApproved.set_competitor_adder(self.run.number)
 
-            if resultApproved.is_start == False:
-                competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id ==competitor_id,
-                                                        RunOrder.run_id == self.run.id). \
-                    first()
-                competitorOrder.manual_order = 0
-                db.session.add(competitorOrder)
-                db.session.commit()
-            if finish_time != '':
-                finish_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType). \
-                    join(CourseDevice). \
-                    join(CourseDeviceType). \
-                    filter(ResultDetail.race_competitor_id == competitor_id,
-                           ResultDetail.run_id == self.run.id, CourseDeviceType == 3). \
-                    first()
-                if finish_device is not None:
-                    finish_device[0].data_in_id = None
-                    finish_device[0].absolute_time = finish_time
-                    db.session.add(finish_device)
-                resultApproved.finish_time = finish_time
-            if start_time != '':
-                start_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType). \
-                    join(CourseDevice). \
-                    join(CourseDeviceType). \
-                    filter(ResultDetail.race_competitor_id == competitor_id,
-                           ResultDetail.run_id == self.run.id, CourseDeviceType == 1). \
-                    first()
-                if start_device is not None:
-                    start_device[0].data_in_id = None
-                    start_device[0].absolute_time = start_time
-                    db.session.add(start_device)
-                resultApproved.start_time = start_time
+                if resultApproved.is_start == False:
+                    competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id ==competitor_id,
+                                                            RunOrder.run_id == self.run.id). \
+                        first()
+                    competitorOrder.manual_order = 0
+                    db.session.add(competitorOrder)
+                    db.session.commit()
+                if finish_time != '':
+                    finish_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType). \
+                        join(CourseDevice). \
+                        join(CourseDeviceType). \
+                        filter(ResultDetail.race_competitor_id == competitor_id,
+                               ResultDetail.run_id == self.run.id, CourseDeviceType == 3). \
+                        first()
+                    if finish_device is not None:
+                        finish_device[0].data_in_id = None
+                        finish_device[0].absolute_time = finish_time
+                        db.session.add(finish_device)
+                    resultApproved.finish_time = finish_time
+                if start_time != '':
+                    start_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType). \
+                        join(CourseDevice). \
+                        join(CourseDeviceType). \
+                        filter(ResultDetail.race_competitor_id == competitor_id,
+                               ResultDetail.run_id == self.run.id, CourseDeviceType == 1). \
+                        first()
+                    if start_device is not None:
+                        start_device[0].data_in_id = None
+                        start_device[0].absolute_time = start_time
+                        db.session.add(start_device)
+                    resultApproved.start_time = start_time
 
-            resultApproved.time = int(resultApproved.finish_time) - int(resultApproved.start_time)
-        else:
-            resultApproved.gate = gate
-            resultApproved.reason = reason
-        db.session.add(resultApproved)
-
-        # except:
-        #     pass
+                resultApproved.time = int(resultApproved.finish_time) - int(resultApproved.start_time)
+            else:
+                resultApproved.gate = gate
+                resultApproved.reason = reason
+            db.session.add(resultApproved)
+        except:
+            return False
 
         if resultApproved.is_start == True:
             results_list = db.session.query(CourseDevice, ResultDetail). \
@@ -211,20 +212,7 @@ class BaseRace:
                 else:
                     item[0].reset()
         db.session.commit()
-
-        # results = recalculate_run_results(resultApproved.run_id)
-        #
-        # socketio.emit("NewDataManual", json.dumps({
-        #     data['run_id']: {
-        #         db.session.query(RunInfo.course_id).filter(RunInfo.id == data['run_id']).scalar(): [
-        #             {
-        #                 'is_manual': True,
-        #                 'race_competitor_id': data['competitor_id']
-        #             },
-        #             results
-        #         ]
-        #     }
-        # }))
+        return True
 
     def set_result_detail(self):
         self.result = ResultDetail(

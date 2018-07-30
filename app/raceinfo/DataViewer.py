@@ -213,3 +213,16 @@ def ConvertRunResults(tree_view, manual_list):
         #     }
 
     return tree_view
+
+
+def ConvertErrorData(dataIn):
+    return {
+        'id': dataIn.id,
+        'run_id': dataIn.run_id,
+        'src_sys': dataIn.src_sys,
+        'src_dev': dataIn.src_dev,
+        'event_code': dataIn.event_code,
+        'time': dataIn.time,
+        'cource_device_id': dataIn.cource_device_id
+
+    }

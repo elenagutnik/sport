@@ -31,30 +31,25 @@ React.render(<Runlist_item order='1' bib='1' name="Sasha"/>, document.getElement
     socket.on('connect', function() {
         socket.emit('my event', {data: 'I\'m connected!'});
     });
-//
-//    socket.on('NewDataStart', function(data) {
-//      console.log('StartDevice', JSON.parse(data));
-//    });
-//
-//    socket.on('NewDataPoint', function(data) {
-//      console.log('PointDevice',JSON.parse(data));
-//    });
-//        socket.on('NewDataFinish', function(data) {
-//      console.log('FinishDevice', JSON.parse(data));
-//    });
-    socket.emit('ScoreboardSendStartlist', {run_id: 50});
-    socket.emit('ScoreboardSendStartlist', {run_id: 2});
 
-//    socket.on('Results', function(data) {
-//      console.log('Results',JSON.parse(data));
-//    });
-//
-    socket.emit('ScoreboardConnect');
-    socket.emit('CompetitorManualApprove', {run_id:1,competitor_id:12, status_id:1, finish_time:1245678866, start_time:1245678866});
-
-    socket.on('ScoreboardStatus', function(data) {
-      console.log('ScoreboardStatus',JSON.parse(data));
+    socket.on('NewDataStart', function(data) {
+      console.log('StartDevice', JSON.parse(data));
     });
+
+    socket.on('NewDataPoint', function(data) {
+      console.log('PointDevice',JSON.parse(data));
+    });
+    socket.on('NewDataFinish', function(data) {
+      console.log('FinishDevice', JSON.parse(data));
+    });
+    socket.on('ErrorData', function(data) {
+      console.log('ErrorData', data);
+    });
+    socket.on('NewDataManual', function(data) {
+      console.log('NewDataManual', JSON.parse(data));
+    });
+
+
 
 </script>
 {% endblock %}

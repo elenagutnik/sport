@@ -6,9 +6,9 @@ import json
 from distutils.util import strtobool
 from functools import wraps
 from sqlalchemy import cast, DATE, func, asc, and_
-from flask_login import current_user, login_required
+from flask_login import login_required
 from .DataViewer import ConvertRunResults, ConvertCompetitorStart, ConvertCompetitorsRankList, ConvertCompetitorFinish, \
-    TreeView, TreeView2
+    TreeView, ConvertErrorData
 from datetime import datetime, timedelta
 from flask import request, render_template
 from .Scoreboard import Scoreboard
@@ -96,12 +96,27 @@ def run_get():
 @socketio.on('CompetitorManualApprove')
 def manual_approve(data):
     raceHandler = RaceGetter.getRaceByRunid(data['run_id'])
-    raceHandler.competitor_manualapprove(data['competitor_id'],
+    result = raceHandler.competitor_manualapprove(data['competitor_id'],
                                          data['status_id'],
                                          data['finish_time'],
                                          data['start_time'],
                                          data['gate'],
                                          data['reason'])
+    if result:
+        tree_view, manual_list = raceHandler.recalculate_run_results()
+        socketio.emit("NewDataManual", json.dumps({
+            data['run_id']: {
+                db.session.query(RunOrder.course_id).filter(RunOrder.run_id == data['run_id'],
+                                                            RunOrder.race_competitor_id == data['competitor_id']).scalar():
+                    [
+                        {
+                            'is_manual': True,
+                            'race_competitor_id': data['competitor_id']
+                        },
+                        ConvertRunResults(tree_view, manual_list)
+                ]
+            }
+        }))
 
 
 @socketio.on('GetResults')
@@ -201,78 +216,89 @@ def load_data_vol3():
         NewDataFinish (Полный набор данных для всего заезда)
         d
     """
+
     data = request.json
     data['TIME'] = int(datetime.strptime(data['TIME'], '%d.%m.%Y %H:%M:%S.%f').timestamp()*1000)
+    try:
+        raceHandler = RaceGetter.getRace(data)
+        raceHandler.setDeviceDataInDB(data)
+        raceHandler.competitor_get_current()
+        if raceHandler.is_start():
+            if raceHandler.competitor is None:
+                raceHandler.competitor_autostart()
+            raceHandler.resultApprove.is_start = True
+            raceHandler.set_start_result_detail()
 
-    raceHandler = RaceGetter.getRace(data)
-    raceHandler.setDeviceDataInDB(data)
-    raceHandler.competitor_get_current()
-    if raceHandler.is_start():
-        if raceHandler.competitor is None:
-            raceHandler.competitor_autostart()
-        raceHandler.resultApprove.is_start = True
-        raceHandler.set_start_result_detail()
+            socketio.emit("NewDataStart", json.dumps({raceHandler.run.id: {
+                raceHandler.courseDevice.course_id: ConvertCompetitorStart(raceHandler.result, raceHandler.courseDevice)}
+            }))
+            print(str(raceHandler.get_competitor_info()))
+            scoreboard = Scoreboard(raceHandler)
+            scoreboard.started_competitor()
+            scoreboard.send()
 
-        socketio.emit("NewDataStart", json.dumps({raceHandler.run.id: {
-            raceHandler.courseDevice.course_id: ConvertCompetitorStart(raceHandler.result, raceHandler.courseDevice)}
-        }))
-        print(str(raceHandler.get_competitor_info()))
-        scoreboard = Scoreboard(raceHandler)
-        scoreboard.started_competitor()
-        scoreboard.send()
+            db.session.add(raceHandler.result)
+            db.session.commit()
 
-        db.session.add(raceHandler.result)
-        db.session.commit()
+            raceHandler.resultApprove.start_time = raceHandler.result.absolut_time
+            return ''
+        else:
+            if raceHandler.is_competitor():
+                raceHandler.set_result_detail()
 
-        raceHandler.resultApprove.start_time = raceHandler.result.absolut_time
-        return ''
-    else:
-        if raceHandler.is_competitor():
-            raceHandler.set_result_detail()
+                raceHandler.calculate_personal_sector_params()
+                if raceHandler.is_finish_():
+                    raceHandler.competitor_finish()
+                    db.session.add(raceHandler.result)
+                    db.session.commit()
+                    tree_view, manual_list = raceHandler.recalculate_run_results()
 
-            raceHandler.calculate_personal_sector_params()
-            if raceHandler.is_finish_():
-                raceHandler.competitor_finish()
-                db.session.add(raceHandler.result)
-                db.session.commit()
-                tree_view, manual_list = raceHandler.recalculate_run_results()
-
-                socketio.emit("NewDataFinish", json.dumps({
-                    raceHandler.run.id: [
-                        {
-                            raceHandler.courseDevice.course_id: ConvertCompetitorFinish(raceHandler.result, raceHandler.courseDevice, raceHandler.resultApprove)
-                        },
-                        ConvertRunResults(tree_view, manual_list)
-                    ]
-                }))
-                scoreboard = Scoreboard(raceHandler)
-                if raceHandler.result.rank == 1:
-                    scoreboard.new_best_time()
+                    socketio.emit("NewDataFinish", json.dumps({
+                        raceHandler.run.id: [
+                            {
+                                raceHandler.courseDevice.course_id: ConvertCompetitorFinish(raceHandler.result, raceHandler.courseDevice, raceHandler.resultApprove)
+                            },
+                            ConvertRunResults(tree_view, manual_list)
+                        ]
+                    }))
+                    scoreboard = Scoreboard(raceHandler)
+                    if raceHandler.result.rank == 1:
+                        scoreboard.new_best_time()
+                        scoreboard.send()
+                    scoreboard.finished_competitor()
                     scoreboard.send()
-                scoreboard.finished_competitor()
-                scoreboard.send()
-                scoreboard.finished_list()
-                scoreboard.send()
+                    scoreboard.finished_list()
+                    scoreboard.send()
 
-            else:
-                result_details = db.session.query(ResultDetail). \
-                    filter(
-                    ResultDetail.course_device_id == raceHandler.courseDevice.id,
-                    ResultDetail.run_id == raceHandler.run.id).all()
-                raceHandler.calculate_common_sector_params(result_details)
+                else:
+                    result_details = db.session.query(ResultDetail). \
+                        filter(
+                        ResultDetail.course_device_id == raceHandler.courseDevice.id,
+                        ResultDetail.run_id == raceHandler.run.id).all()
+                    raceHandler.calculate_common_sector_params(result_details)
 
-                socketio.emit("NewDataPoint", json.dumps({
-                    raceHandler.run.id: [
-                        {
-                            raceHandler.courseDevice.course_id: ConvertCompetitorStart(raceHandler.result, raceHandler.courseDevice)},
-                            ConvertCompetitorsRankList(result_details, raceHandler.courseDevice)
-                    ]
+                    socketio.emit("NewDataPoint", json.dumps({
+                        raceHandler.run.id: [
+                            {
+                                raceHandler.courseDevice.course_id: ConvertCompetitorStart(raceHandler.result, raceHandler.courseDevice)},
+                                ConvertCompetitorsRankList(result_details, raceHandler.courseDevice)
+                        ]
 
-                }))
-                db.session.add(raceHandler.result)
-                db.session.commit()
-                scoreboard = Scoreboard(raceHandler)
-                scoreboard.crossed_device()
-                scoreboard.send()
+                    }))
+                    db.session.add(raceHandler.result)
+                    db.session.commit()
+                    scoreboard = Scoreboard(raceHandler)
+                    scoreboard.crossed_device()
+                    scoreboard.send()
+    except:
+        data_in = DataIn(
+            src_sys=data['SRC_SYS'],
+            src_dev=data['SRC_DEV'],
+            event_code=data['EVENT_CODE'],
+            time=data['TIME'],
+        )
+        db.session.add(data_in)
+        db.session.commit()
+        socketio.emit("ErrorData", ConvertErrorData(data_in))
 
     return '', 200
