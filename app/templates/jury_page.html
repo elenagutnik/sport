@@ -274,15 +274,17 @@
     function RefreshResults(data){
       var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
       //?????
-      if(typeof $("#tab_summarytable .div_run"+run.id) == "undefined" || $("#tab_summarytable .div_run"+run.id).length==0){
+      prepare_result_tables();
+      /*if(typeof $("#tab_summarytable .div_run"+run.id) == "undefined" || $("#tab_summarytable .div_run"+run.id).length==0){
         prepare_result_tables_for_run(run.id);
       }
+      */
 
       console.log(data);
       $.each(data, function(run,arr){
         console.log("run="+run);
         if(!$("#tab_summarytable .div_run"+run) || !$("#tab_summarytable .div_run"+run).length){
-          prepare_result_tables(run,arr);
+          prepare_result_tables_for_run(run,arr);
         }
         $("#tab_summarytable .div_run"+run+" tbody").html("");
         $.each(arr, function(course,arr){
@@ -1056,8 +1058,13 @@
           $("#popup_editresult").modal('show');
         });
         // обработка кнопки сохранения и апрува для ручного ввода результата
+        socket.on('NewDataManual', function(data){
+          var data=JSON.parse(data);
+          console.log("data", data);
+        });
+
         $("body").on("click", ".editform_approve", function () {
-            var stime="";
+            /*var stime="";
             var ftime="";
             if($("#form_starttime").val()){
               if(glob_arr["run"+$("#form_run_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()]&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time&&glob_arr["run"+$("#form_run_id").val()]["comp_"+$("#form_competitor_id").val()].start_time!=$("#form_starttime").val()){
@@ -1073,7 +1080,21 @@
                 ftime=$("#form_finishtime").val();
               }
             }
-            console.log("stime="+stime+" ftime="+ftime);
+            */
+          //  console.log("stime="+stime+" ftime="+ftime);
+            var obj={
+              'run_id' : $("#form_run_id").val(),
+              'competitor_id' : $("#form_competitor_id").val(),
+              'status_id' : $("#form_status").val(),
+              'finish_time' : $("#form_finishtime").val()?$("#form_finishtime").val():false,
+              'start_time' : $("#form_starttime").val()?$("#form_starttime").val():false,
+              'reason' : $("#form_reason").val(),
+              'gate' : $("#form_gate").val()
+              //'course_id': race_info.run_list[$("#form_run_id").val()].courses[].course_id
+            };
+            console.log("obj",obj);
+            socket.emit('CompetitorManualApprove', obj);
+            /*
             $.ajax({
               type: "GET",
               url: "/raceinfo/approve/edit/run/"+$("#form_run_id").val()+"/competitor/"+$("#form_competitor_id").val(),
@@ -1099,6 +1120,7 @@
                 alert('error');
               }
             })
+            */
         });
 
         // обработка кнопки выхова редактирования стартлиста
@@ -1504,7 +1526,8 @@ function get_startlist(run_id){
             "race_competitor_id":start_list[i][2].race_competitor_id,
             "name":start_list[i][0].ru_lastname+" "+start_list[i][0].ru_firstname+" / "+start_list[i][0].en_firstname+" "+start_list[i][0].en_lastname,
             "bib":start_list[i][1].bib,
-            "fiscode":start_list[i][1].fiscode
+            "fiscode":start_list[i][1].fiscode,
+            "course_id":start_list[i][2].course_id
           };
       }
       for(var i=0;i<run_list.length;i++){
@@ -1682,7 +1705,8 @@ function set_html_startlist(run_id){
       if(!run_arr)
         var run_arr=race_info.run_list[run_id];
 
-      console.log("PREPARE_RESULT_TABLES: run_list:"+run_list.length);
+      console.log("PREPARE_RESULT_TABLES: run_id:"+run_id);
+      console.log("run_arr", run_arr);
 
         if(Object.keys(run_arr.courses).length==1){
             var cid = Object.keys(run_arr.courses)[0];
@@ -1693,7 +1717,7 @@ function set_html_startlist(run_id){
         if(!$("#tab_summarytable .div_run"+run_id).length){
           $("#tab_summarytable").append("\
             <div class='div_run"+run_id+"'>\
-              <h3>Run: "+((run.number)?run.number:" Forerunners")+"</h3>\
+              <h3>Run: "+((run_arr.number)?run_arr.number:" Forerunners")+"</h3>\
               <table style='width:100%;' class='table table-bordered table_run"+run_id+"'>\
                 <thead>\
                   <tr>\
