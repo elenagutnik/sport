@@ -33,12 +33,13 @@ class Discipline(db.Model):
     en_name = db.Column(db.String)
     is_combination = db.Column(db.Boolean)
     is_parallel = db.Column(db.Boolean)
+    is_qualification = db.Column(db.Boolean)
 
     def __repr__(self):
         return self.fiscode
 
     @staticmethod
-    def insert_discipline():
+    def insert():
         disciplines = {
             'DH': "Downhill",
             'SL': "Slalom",
@@ -53,7 +54,8 @@ class Discipline(db.Model):
             'CE': "City Event",
             'IND': "Indoor",
             'P': "Parallel",
-            'CAR': "Carving"
+            'CAR': "Carving",
+            'QLF': "Qualification (Parallel)"
         }
         for d in disciplines.keys():
             discipline = Discipline.query.filter_by(fiscode=d).first()
@@ -375,7 +377,7 @@ class Race(db.Model):
     isTeam = db.Column(db.Boolean)
 
     def __repr__(self):
-        return self.name
+        return self.eventname
 
 class Weather(db.Model):
     __tablename__ = 'weather'

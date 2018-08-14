@@ -20,20 +20,16 @@ def startlist_get(run_id):
 def race_order_buld(race_id, current_run_id, current_run_number):
     race = db.session.query(Race).filter(Race.id == race_id).first()
     discipline = Discipline.query.filter(Discipline.id == race.discipline_id).first()
-    if discipline.is_parallel:
-        run = db.session.query(RunInfo).filter(RunInfo.run_type_id == 4,
-                                               RunInfo.number == 2, RunInfo.race_id == race_id).first()
+    if discipline.is_parallel or discipline.is_qualification:
+        run = db.session.query(RunInfo).filter(RunInfo.race_id == race_id,
+                                               RunInfo.starttime == None).\
+            order_by(RunInfo.number.asc(), RunInfo.is_second.desc()).\
+            limit(1).first()
         if run is not None:
-            parallel_qualification_second_run_list(race_id, current_run_id, run)
-        else:
-            run = RunInfo.query.filter(RunInfo.race_id == race_id,
-                                       RunType.id == 6,
-                                       RunInfo.starttime is None).\
-                order_by(RunInfo.number.asc()).limit(1).first()
-            if run.is_second:
-                pass
+            if run.is_second is not None or discipline.is_qualification:
+                second_run_list_reverse(race_id, current_run_id, run)
             else:
-                buld_final_list(current_run_id, run)
+                final_next_run_list(race_id, current_run_id, run)
     else:
         if race.run_order_function == 1:
             next_run_list_drop_out(race_id, current_run_id, current_run_number)
@@ -50,16 +46,14 @@ def race_order_list(race_id):
     race = Race.query.filter_by(id=race_id).one()
 
     discipline = Discipline.query.filter(Discipline.id == race.discipline_id).first()
-
-    if discipline.is_parallel:
-        try:
-            run = RunInfo.query.filter_by(race_id=race_id, number=1, run_type_id=4).one()
-        except:
-            flash('Отсутсвует заезд, невозможно сформировать стартовый список')
-            return redirect(url_for('.race', id=race_id, _external=True))
-
+    try:
+        run = RunInfo.query.filter_by(race_id=race_id, number=1, is_second=None).one()
+    except:
+        flash('Отсутсвует заезд, невозможно сформировать стартовый список')
+        return redirect(url_for('.race', id=race_id, _external=True))
+    if discipline.is_qualification or discipline.is_parallel:
         RunOrder.query.filter(RunOrder.run_id == run.id).delete()
-        parallel_start_list(run)
+        qualification_start_list(run)
     else:
         try:
             run = RunInfo.query.filter_by(race_id=race_id, number=1).one()
@@ -219,7 +213,7 @@ def next_run_list_combination(race_id, current_run_id, current_run_number):
     except:
         return
 
-def parallel_start_list(run):
+def qualification_start_list(run):
     # try:
 
         if run is not None:
@@ -256,7 +250,7 @@ def parallel_start_list(run):
         return
     # except:
     #     return
-def parallel_qualification_second_run_list(race_id, current_run_id, run):
+def second_run_list_reverse(race_id, current_run_id, run):
     run_courses = db.session.query(RunCourses).filter(RunInfo.id==RunCourses.run_id,
                                                      RunInfo.id==run.id,
                                                      RunInfo.race_id==race_id).limit(2).all()
@@ -327,5 +321,34 @@ def rebuild_startlist(run_id):
     #         item.order = index+1
     pass
 
-def buld_final_list(current_run_id, run):
-    start_list = RunOrder.query.filter(RunOrder.run_id == current_run_id).all()
+def final_next_run_list(race_id, current_run_id, run):
+    competitors_list = db.session.query(ResultApproved, RaceCompetitor).\
+        join(RaceCompetitor, RaceCompetitor.id == ResultApproved.race_competitor_id).\
+        filter(ResultApproved.run_id == current_run_id,
+               ResultApproved.rank == None).\
+        order_by(RaceCompetitor.bib.asc()).all()
+    print(len(competitors_list)/2)
+    first_path=competitors_list[:int(len(competitors_list)/2)]
+    second_path=competitors_list[int(len(competitors_list)/2):]
+    run_courses = db.session.query(RunCourses).filter(RunInfo.id==RunCourses.run_id,
+                                                     RunInfo.id==run.id,
+                                                     RunInfo.race_id==race_id).limit(2).all()
+
+    for index, (odd_item, even_item) in enumerate(itertools.zip_longest(first_path, second_path[::-1])):
+        if odd_item is not None:
+            first_course_order = RunOrder(
+                race_competitor_id=odd_item[1].id,
+                run_id=run_courses[0].run_id,
+                order=index + 1,
+                course_id=run_courses[0].course_id
+            )
+            db.session.add(first_course_order)
+        if even_item is not None:
+            second_course_order = RunOrder(
+                race_competitor_id=even_item[1].id,
+                run_id=run_courses[0].run_id,
+                order=index + 1,
+                course_id=run_courses[1].course_id
+            )
+            db.session.add(second_course_order)
+    db.session.commit()

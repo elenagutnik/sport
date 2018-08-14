@@ -31,10 +31,10 @@ def race_run_add(id):
         form.discipline_ref.choices = [(item.id, item.fiscode + '.' + item.en_name) for item in
                                Discipline.query.filter(Discipline.is_combination == None).all()]
 
-    elif discipline.is_parallel:
-        form = EditRunInfoParallelForm()
-        form.runtype_ref.choices = [(item.id, item.name) for item in
-                                    RunType.query.filter(RunType.is_parralel == True).all()]
+    # elif discipline.is_parallel:
+    #     form = EditRunInfoParallelForm()
+    #     form.runtype_ref.choices = [(item.id, item.name) for item in
+    #                                 RunType.query.filter(RunType.is_parralel == True).all()]
     else:
         form = EditRunInfoForm()
 
@@ -48,11 +48,11 @@ def race_run_add(id):
         if discipline.is_combination == True:
             run_info.discipline_id = form.discipline_ref.data
         elif discipline.is_parallel:
-            run_info.run_type_id = form.runtype_ref.data
+            # run_info.run_type_id = form.runtype_ref.data
             second_run = RunInfo(
                 race_id=id,
                 number=form.number.data,
-                run_type_id=form.runtype_ref.data,
+                run_type_id=1,
                 is_second=True
             )
             db.session.add(second_run)

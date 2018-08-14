@@ -1245,11 +1245,8 @@ def race_сourse_edit(id, course_id):
 @admin_required
 def race_сourse_run_add(id, course_id):
     form = EditCoutseRunForm()
-    form.run_ref.choices = [(item[0].id, 'Number: ' + str(item[0].number) +'   Type: '+ str(item[1].name))
-                            for item in db.session.query(RunInfo,RunType).join(RunType, RunType.id == RunInfo.run_type_id).
-                                filter(RunInfo.race_id == id, RunInfo.is_second == None,
-                                       RunInfo.run_type_id.in_([1,4])).
-                                order_by(RunInfo.number.asc()).all()]
+    form.run_ref.choices = [(item.id, 'Number: ' + str(item.number))
+                            for item in db.session.query(RunInfo).filter(RunInfo.race_id == id, RunInfo.is_second == None).order_by(RunInfo.number.asc()).all()]
     if form.validate_on_submit():
 
         first_run = RunInfo.query.filter(RunInfo.id==form.run_ref.data).first()
