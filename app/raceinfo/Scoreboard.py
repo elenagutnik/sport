@@ -189,7 +189,7 @@ class Scoreboard:
              self.message += '!!'
 
      def send(self):
-         print(self.message)
+         # print(self.message)
          if self.is_active and self.is_connected:
              try:
                  ScoreboardSender.send(self.message.encode())

@@ -417,10 +417,12 @@ class SummationTimeRace(ClassicRace):
         super().competitor_manualstart(competitor_id)
         self.resultApprove.set_competitor_adder(self.run.number)
 
-class ParallelRace(BaseRace):
+class ParallelRace(SummationTimeRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
         pass
+
+
 
     def get_sector_results(self):
 
@@ -466,6 +468,7 @@ class ParallelRace(BaseRace):
         сompetitors_list = sorted(finish_results, key=lambda item: (item.time is None,
                                                                     item.status_id is None, item.status_id,
                                                                     item.finish_time - item.start_time+item.adder_time))
+        сompetitors_list.reverse()
         ResultApproved_min_time = min(сompetitors_list, key=lambda item:(item.time))
         for index, item in enumerate(сompetitors_list):
             try:
@@ -475,8 +478,20 @@ class ParallelRace(BaseRace):
                 else:
                     item.diff = None
                     item.rank = None
-                if item.diff > 0 and self.run.is_second:
-                    item.rank = db.session.query(func.count(RunOrder.id)).filter(RunOrder.run_id == self.run.id).scalar() / 2 + 1
+                if self.run.is_second:
+                    run_competitors_count = db.session.query(func.count(RunOrder.id)).filter(RunOrder.run_id == self.run.id).scalar()
+                    if run_competitors_count / 2 > 2 and item.diff > 0:
+                        item.rank = run_competitors_count/2 + 1
+
+                    elif run_competitors_count / 2 < 2:
+                        last_rank = db.session.query(ResultApproved.rank).filter(RunInfo.race_id == self.race.id,
+                                                                                 RunInfo.id!=self.run.id,
+                                                                                 RunInfo.id == ResultApproved.run_id).\
+                            order_by(ResultApproved.rank.asc()).limit(1).scalar()
+                        item.rank = last_rank-index-1
+                        db.session.add(item)
+                        db.session.commit()
+
             except:
                 item.diff = None
                 item.rank = None
@@ -554,7 +569,7 @@ class RaceGetter:
         :return: BaseRace object
         """
 
-        print(device_data)
+        # print(device_data)
         race_info = db.session.query(RunInfo,
                                      CourseDeviceType,
                                      CourseDevice,
@@ -578,7 +593,7 @@ class RaceGetter:
 
 
         if race_info[4].is_forerunner:
-            print('ForerunnerRace')
+            # print('ForerunnerRace')
             return ForerunnerRace(race=race_info[5],
                                   runInfo=race_info[0],
                                   runType=race_info[4],
@@ -586,7 +601,7 @@ class RaceGetter:
                                   courseDevice=race_info[2],
                                   courseDeviceType=race_info[1])
         elif race_info[6].is_parallel:
-            print('ParallelRace')
+            # print('ParallelRace')
             return ParallelRace(race=race_info[5],
                                      runInfo=race_info[0],
                                      runType=race_info[4],
@@ -594,7 +609,7 @@ class RaceGetter:
                                      courseDevice=race_info[2],
                                      courseDeviceType=race_info[1])
         elif race_info[6].is_qualification:
-            print('QualificationRace')
+            # print('QualificationRace')
             return QualificationRace(race=race_info[5],
                                      runInfo=race_info[0],
                                      runType=race_info[4],
@@ -603,7 +618,7 @@ class RaceGetter:
                                      courseDeviceType=race_info[1])
 
         elif race_info[6].is_combination:
-            print('Combination')
+            # print('Combination')
             return Combination(race=race_info[5],
                                      runInfo=race_info[0],
                                      runType=race_info[4],
@@ -611,7 +626,7 @@ class RaceGetter:
                                      courseDevice=race_info[2],
                                      courseDeviceType=race_info[1])
         elif race_info[5].result_function == 1:
-            print('SummationTimeRace')
+            # print('SummationTimeRace')
             return SummationTimeRace(race=race_info[5],
                                      runInfo=race_info[0],
                                      runType=race_info[4],
@@ -619,7 +634,7 @@ class RaceGetter:
                                      courseDevice=race_info[2],
                                      courseDeviceType=race_info[1])
         else:
-            print('ClassicRace')
+            # print('ClassicRace')
             return ClassicRace(race=race_info[5],
                                      runInfo=race_info[0],
                                      runType=race_info[4],
