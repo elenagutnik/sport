@@ -517,8 +517,25 @@ def race_add():
             race.place = form.place.data
         if form.speedcodex.data != "":
             race.speedcodex = form.speedcodex.data
+
         db.session.add(race)
         db.session.commit()
+
+        discipline = Discipline.query.get(form.discipline_ref.data)
+        if discipline.is_parallel:
+            flash('For parallel race runs will be generated after generation of start list')
+        elif discipline.is_qualification:
+
+            pass
+        else:
+            for i in range(form.numbers_of_runs.data):
+                run_info = RunInfo(
+                    race_id=race.id,
+                    number=i+1,
+                    run_type_id=1
+                )
+                db.session.add(run_info)
+            db.session.commit()
 
         flash('The Race has been added.')
         return redirect(url_for('.race_list',_external=True))

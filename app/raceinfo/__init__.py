@@ -17,5 +17,5 @@ from . import RunInfo
 
 
 from . import Race
-
+from . import FisLiveTiming
 
