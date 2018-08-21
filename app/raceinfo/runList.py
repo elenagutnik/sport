@@ -9,13 +9,27 @@ from . import jsonencoder
 from .models import *
 
 from math import log2
+
 @raceinfo.route('/startlist/run/<int:run_id>/get/', methods=['POST', 'GET'])
 def startlist_get(run_id):
-    data = json.dumps(db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor).
-                      join(RunOrder).filter(RunOrder.run_id == run_id).
-                      order_by(RunOrder.order).all(),
-                      cls=jsonencoder.AlchemyEncoder)
-    return data
+    data = db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor).\
+        join(RunOrder).filter(RunOrder.run_id == run_id).\
+        order_by(RunOrder.order).all()
+    # Имя Фамилия Биб, номер старта, мануал ордер, id
+    result={}
+    for item in data:
+        if item[2].course_id not in result.keys():
+            result[item[2].course_id]=[]
+        result[item[2].course_id].append({
+            'en_firstname': item[0].en_firstname,
+            'en_lastname': item[0].en_lastname,
+            'bib': item[1].bib,
+            'order': item[2].order,
+            'manual_order': item[2].manual_order,
+            'run_order_id': item[2].id,
+            'race_competitor_id': item[1].id,
+        })
+    return json.dumps(result)
 
 
 def race_order_buld(race_id, current_run_id, current_run_number):

@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/DataViewer.py" afterPath="$PROJECT_DIR$/app/raceinfo/DataViewer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/events.py" afterPath="$PROJECT_DIR$/app/raceinfo/events.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/runList.py" afterPath="$PROJECT_DIR$/app/raceinfo/runList.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -29,8 +27,8 @@
       <file leaf-file-name="events.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
-              <caret line="259" column="76" lean-forward="true" selection-start-line="259" selection-start-column="76" selection-end-line="259" selection-end-column="76" />
+            <state relative-caret-position="749">
+              <caret line="163" column="26" lean-forward="false" selection-start-line="163" selection-start-column="26" selection-end-line="163" selection-end-column="26" />
               <folding>
                 <marker date="1534893331176" expanded="true" signature="1242:1267" ph="delete from " />
                 <marker date="1534893331176" expanded="true" signature="1295:1314" ph="delete from " />
@@ -48,8 +46,8 @@
       <file leaf-file-name="Race.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/Race.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5070">
-              <caret line="407" column="37" lean-forward="false" selection-start-line="407" selection-start-column="37" selection-end-line="407" selection-end-column="37" />
+            <state relative-caret-position="225">
+              <caret line="15" column="27" lean-forward="true" selection-start-line="15" selection-start-column="27" selection-end-line="15" selection-end-column="27" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
                 <element signature="e#2218#3068#0" expanded="false" />
@@ -128,21 +126,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataViewer.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="DataViewer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/DataViewer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="149">
-              <caret line="95" column="39" lean-forward="false" selection-start-line="95" selection-start-column="39" selection-end-line="95" selection-end-column="39" />
+            <state relative-caret-position="599">
+              <caret line="185" column="40" lean-forward="false" selection-start-line="185" selection-start-column="40" selection-end-line="185" selection-end-column="40" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="runList.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="runList.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/raceinfo/runList.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="586">
-              <caret line="80" column="8" lean-forward="false" selection-start-line="80" selection-start-column="8" selection-end-line="80" selection-end-column="8" />
+            <state relative-caret-position="525">
+              <caret line="35" column="33" lean-forward="false" selection-start-line="35" selection-start-column="33" selection-end-line="35" selection-end-column="33" />
               <folding>
                 <element signature="e#0#68#0" expanded="true" />
               </folding>
@@ -253,10 +251,10 @@
         <option value="$PROJECT_DIR$/app/raceinfo/__init__.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/FisLiveTiming.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/forms.py" />
-        <option value="$PROJECT_DIR$/app/raceinfo/runList.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/views.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/events.py" />
         <option value="$PROJECT_DIR$/app/raceinfo/DataViewer.py" />
+        <option value="$PROJECT_DIR$/app/raceinfo/runList.py" />
       </list>
     </option>
   </component>
@@ -733,7 +731,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/runList.py</url>
-          <line>226</line>
+          <line>240</line>
           <option name="timeStamp" value="654" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -778,17 +776,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/runList.py</url>
-          <line>359</line>
+          <line>373</line>
           <option name="timeStamp" value="890" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/runList.py</url>
-          <line>354</line>
+          <line>368</line>
           <option name="timeStamp" value="891" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/runList.py</url>
-          <line>348</line>
+          <line>362</line>
           <option name="timeStamp" value="892" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="jinja2-line">
@@ -1122,16 +1120,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/raceinfo/runList.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="586">
-          <caret line="80" column="8" lean-forward="false" selection-start-line="80" selection-start-column="8" selection-end-line="80" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#68#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/Scoreboard.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1600">
@@ -1156,10 +1144,35 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="580">
+          <caret line="546" column="34" lean-forward="true" selection-start-line="546" selection-start-column="34" selection-end-line="546" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="749">
+          <caret line="163" column="26" lean-forward="false" selection-start-line="163" selection-start-column="26" selection-end-line="163" selection-end-column="26" />
+          <folding>
+            <marker date="1534893331176" expanded="true" signature="1242:1267" ph="delete from " />
+            <marker date="1534893331176" expanded="true" signature="1295:1314" ph="delete from " />
+            <marker date="1534893331176" expanded="true" signature="1341:1368" ph="delete from " />
+            <marker date="1534893331176" expanded="true" signature="1395:1413" ph="delete from " />
+            <marker date="1534893331176" expanded="true" signature="1440:1461" ph="delete from " />
+            <marker date="1534893331176" expanded="true" signature="1488:1520" ph="update run_i... " />
+            <marker date="1534893331176" expanded="true" signature="1547:1581" ph="update run_i... " />
+            <marker date="1534893331176" expanded="true" signature="1608:1646" ph="update run_o... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/Race.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5070">
-          <caret line="407" column="37" lean-forward="false" selection-start-line="407" selection-start-column="37" selection-end-line="407" selection-end-column="37" />
+        <state relative-caret-position="225">
+          <caret line="15" column="27" lean-forward="true" selection-start-line="15" selection-start-column="27" selection-end-line="15" selection-end-column="27" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
             <element signature="e#2218#3068#0" expanded="false" />
@@ -1177,36 +1190,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="580">
-          <caret line="546" column="34" lean-forward="true" selection-start-line="546" selection-start-column="34" selection-end-line="546" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="259" column="76" lean-forward="true" selection-start-line="259" selection-start-column="76" selection-end-line="259" selection-end-column="76" />
-          <folding>
-            <marker date="1534893331176" expanded="true" signature="1242:1267" ph="delete from " />
-            <marker date="1534893331176" expanded="true" signature="1295:1314" ph="delete from " />
-            <marker date="1534893331176" expanded="true" signature="1341:1368" ph="delete from " />
-            <marker date="1534893331176" expanded="true" signature="1395:1413" ph="delete from " />
-            <marker date="1534893331176" expanded="true" signature="1440:1461" ph="delete from " />
-            <marker date="1534893331176" expanded="true" signature="1488:1520" ph="update run_i... " />
-            <marker date="1534893331176" expanded="true" signature="1547:1581" ph="update run_i... " />
-            <marker date="1534893331176" expanded="true" signature="1608:1646" ph="update run_o... " />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/DataViewer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="95" column="39" lean-forward="false" selection-start-line="95" selection-start-column="39" selection-end-line="95" selection-end-column="39" />
+        <state relative-caret-position="599">
+          <caret line="185" column="40" lean-forward="false" selection-start-line="185" selection-start-column="40" selection-end-line="185" selection-end-column="40" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/runList.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="35" column="33" lean-forward="false" selection-start-line="35" selection-start-column="33" selection-end-line="35" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#68#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
