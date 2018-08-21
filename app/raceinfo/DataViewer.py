@@ -63,7 +63,7 @@ def speedConverter(speed):
 
 
 
-def ConvertCompetitorStart(resultDetail, courseDevice):
+def ConvertCompetitorStart(resultDetail, courseDevice, dataIn):
     return {
         resultDetail.race_competitor_id:
             {
@@ -75,10 +75,11 @@ def ConvertCompetitorStart(resultDetail, courseDevice):
                 'sectorrank': resultDetail.sectorrank,
                 'speed': speedConverter(resultDetail.speed),
                 'absoluttime': timeConverter(resultDetail.absolut_time, '%H:%M:%S.%f'),
-                'course_device_id': courseDevice.id
+                'course_device_id': courseDevice.id,
+                'data_in_id': dataIn.id
             }
     }
-def ConvertCompetitorFinish(resultDetail, courseDevice, resultApproved):
+def ConvertCompetitorFinish(resultDetail, courseDevice, resultApproved, dataIn):
     return {
         resultDetail.race_competitor_id:
             {
@@ -91,7 +92,8 @@ def ConvertCompetitorFinish(resultDetail, courseDevice, resultApproved):
                 'speed':  speedConverter(resultDetail.speed),
                 'absoluttime': timeConverter(resultDetail.absolut_time, '%H:%M:%S.%f'),
                 'course_device_id': courseDevice.id,
-                'status_id': resultApproved.status_id
+                'status_id': resultApproved.status_id,
+                'data_in_id': dataIn.id
             }
     }
 
