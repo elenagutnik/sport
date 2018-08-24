@@ -525,8 +525,28 @@ def race_add():
         if discipline.is_parallel:
             flash('For parallel race runs will be generated after generation of start list')
         elif discipline.is_qualification:
-
-            pass
+            if form.numbers_of_runs.data == 1:
+                run_info = RunInfo(
+                    race_id=race.id,
+                    number=1,
+                    run_type_id=1
+                )
+                db.session.add(run_info)
+            elif form.numbers_of_runs.data % 2 == 0:
+                for i in range(form.numbers_of_runs.data / 2):
+                    run_info = RunInfo(
+                        race_id=race.id,
+                        number=i + 1,
+                        run_type_id=1
+                    )
+                    db.session.add(run_info)
+                    run_info_second = RunInfo(
+                        race_id=race.id,
+                        number=i + 1,
+                        run_type_id=1,
+                        is_secind=True
+                    )
+                    db.session.add(run_info_second)
         else:
             for i in range(form.numbers_of_runs.data):
                 run_info = RunInfo(
@@ -535,8 +555,7 @@ def race_add():
                     run_type_id=1
                 )
                 db.session.add(run_info)
-            db.session.commit()
-
+        db.session.commit()
         flash('The Race has been added.')
         return redirect(url_for('.race_list',_external=True))
     return render_template('raceinfo/static-tab/simpleform.html', form=form, title=gettext('Add Race'))
@@ -544,7 +563,7 @@ def race_add():
 @raceinfo.route('/race/<int:id>/editbase', methods=['GET', 'POST'])
 @admin_required
 def race_editbase(id):
-    race=Race.query.get_or_404(id)
+    race = Race.query.get_or_404(id)
     form = EditRaceBase(race=race)
     if(current_user.lang == 'ru'):
         form.gender_ref.choices = [(item.id, item.fiscode + ' - ' + item.ru_name) for item in Gender.query.all()]
