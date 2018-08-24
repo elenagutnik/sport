@@ -8,7 +8,7 @@ from functools import wraps
 from sqlalchemy import cast, DATE, func, asc, and_
 from flask_login import login_required
 from .DataViewer import ConvertRunResults, ConvertCompetitorStart, ConvertCompetitorsRankList, ConvertCompetitorFinish, \
-    TreeView, ConvertErrorData
+    TreeView, ConvertErrorData, DataInView
 from datetime import datetime, timedelta
 from flask import request, render_template
 from .Scoreboard import Scoreboard
@@ -29,8 +29,8 @@ def exectutiontime(message):
 
 @raceinfo.route('/migrate')
 def device_1get():
-    Discipline.insert()
     return ''
+
 
 @raceinfo.route('/emulation/<int:race_id>/clear')
 def emulation_clear_results(race_id):
@@ -126,15 +126,17 @@ def socket_get_results(data):
         run = RunInfo.query.get(data['run_id'])
         results, manual, dql_list = TreeView(data['run_id'])
         socketio.emit('Results', json.dumps({
-            run.id: ConvertRunResults(results, manual, dql_list)
-
+            run.id: [
+                ConvertRunResults(results, manual, dql_list),
+                DataInView(run.id)
+            ]
         }))
     if 'race_id' in data.keys():
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None).all()
         result_list = {}
         for run in run_list:
             results, manual, dql_list = TreeView(run.id)
-            result_list[run.id] = ConvertRunResults(results, manual, dql_list)
+            result_list[run.id] = [ConvertRunResults(results, manual, dql_list), DataInView(run.id)]
         socketio.emit('Results', json.dumps(result_list))
     else:
         return

@@ -1,4 +1,4 @@
-from.models import Race,RaceCompetitor, ResultApproved, ResultDetail,RunOrder, CourseDevice, CourseDeviceType
+from.models import Race,RaceCompetitor, ResultApproved, ResultDetail,RunOrder, CourseDevice, CourseDeviceType, DataIn
 from .. import db
 from sqlalchemy import or_, and_, asc
 import datetime, json
@@ -198,6 +198,21 @@ def TreeView2(run_id):
 
         return tree_view
     return {}
+
+
+def DataInView(run_id):
+    result = db.session.query(DataIn.id.label('data_in_id'),
+                               DataIn.time.label('time'),
+                               ResultDetail.race_competitor_id.label('race_competitor_id')).\
+        filter(DataIn.id == ResultDetail.data_in_id, ResultDetail.run_id == run_id).order_by(DataIn.time.asc()).all()
+    result_converted = []
+    for item in result:
+        result_converted.append({
+            'data_in_id':item.data_in_id,
+            'time':item.time,
+            'race_competitor_id':item.race_competitor_id
+        })
+    return json.dumps(result_converted)
 
 
 
