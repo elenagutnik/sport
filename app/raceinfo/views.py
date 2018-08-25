@@ -10,6 +10,13 @@ from . import jsonencoder
 from .runList import race_order_buld
 from .competitors import calculate_age_class
 
+
+@raceinfo.route('/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def index():
+    return render_template('raceinfo/index.html')
+
 @raceinfo.route('/discipline/', methods=['GET', 'POST'])
 @login_required
 @admin_required

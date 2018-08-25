@@ -55,4 +55,6 @@ def create_app(config_name):
     from .raceinfo import raceinfo as raceinfo_blueprint
     app.register_blueprint(raceinfo_blueprint, url_prefix='/raceinfo')
 
+    from .shorttrack import shorttrack as shorttrack_blueprint
+    app.register_blueprint(shorttrack_blueprint, url_prefix='/shorttrack')
     return app

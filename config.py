@@ -32,16 +32,20 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'postgresql://postgres:123123@localhost:5432/sport'
 
+    SQLALCHEMY_BINDS = {'shorttrack': 'postgresql://postgres:123123@localhost:5432/shorttrack'}
+
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
         'postgresql://postgres:123123@localhost:5432/sport'
+    SQLALCHEMY_BINDS = {'shorttrack': 'postgresql://postgres:123123@localhost:5432/shorttrack'}
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'postgresql://postgres:123123@localhost:5432/sport'
+    SQLALCHEMY_BINDS = {'shorttrack': 'postgresql://postgres:123123@localhost:5432/shorttrack'}
 
 
 config = {
