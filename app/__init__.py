@@ -17,6 +17,7 @@ bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
+db_shorttrack = SQLAlchemy()
 babel = Babel()
 dtb = DebugToolbarExtension()
 socketio = SocketIO()
@@ -41,9 +42,11 @@ def create_app(config_name):
     mail.init_app(app)
     moment.init_app(app)
     db.init_app(app)
+    db_shorttrack.init_app(app)
     login_manager.init_app(app)
     dtb.init_app(app)
     socketio.init_app(app)
+
     migrate.init_app(app, db)
 
     from .main import main as main_blueprint

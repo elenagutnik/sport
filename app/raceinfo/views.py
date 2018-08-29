@@ -50,7 +50,7 @@ def discipline_edit(id):
         discipline.en_name = form.en_name.data
         db.session.add(discipline)
         flash('The discipline has been updated.')
-        return redirect(url_for('.discipline_list',_external=True))
+        return redirect(url_for('.discipline_list', _external=True))
     form.fiscode.data = discipline.fiscode
     form.ru_name.data = discipline.ru_name
     form.en_name.data = discipline.en_name

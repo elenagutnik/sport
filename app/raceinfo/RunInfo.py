@@ -131,7 +131,7 @@ def forerunner_run_create(id):
         RunInfo.number.asc()).first()
 
     if forerunner_runs is not None:
-        return 'Невозможно сформировать заезд'
+        return 'Невозможно сформировать заезд. Заезд уже начат '
 
     try:
         next_run = db.session.query(RunInfo).filter(RunInfo.starttime == None, RunInfo.race_id == id).order_by(RunInfo.number.asc()).limit(1).one()

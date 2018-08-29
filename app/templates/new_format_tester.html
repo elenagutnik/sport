@@ -45,9 +45,9 @@ React.render(<Runlist_item order='1' bib='1' name="Sasha"/>, document.getElement
 //    socket.on('ErrorData', function(data) {
 //      console.log('ErrorData', data);
 //    });
-//    socket.on('NewDataManual', function(data) {
-//      console.log('NewDataManual', JSON.parse(data));
-//    });
+    socket.on('ForerunnersResults', function(data) {
+      console.log('ForerunnersResults', JSON.parse(data));
+    });
 //
     socket.emit('GetResults', {race_id: 8});
     socket.on('Results', function(data) {

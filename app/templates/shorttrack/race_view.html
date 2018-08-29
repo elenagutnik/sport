@@ -1,0 +1,31 @@
+{% extends "raceinfo/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Race {{ race.eventname }} {{ race.racedate }}{% endblock %}
+{% block page_content %}
+
+<div class="page-header">
+    <h1>{{ race.eventname }} {{ race.racedate }}
+        <a class="btn btn-info pull-right" href="/shorttrack/race">Race list</a>
+    </h1>
+    <h4>{{ _('Basic properties') }}  <a class="btn btn-default" href="{{ race.id }}/editbase">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+        <tr><td>{{ _('Event Name') }}</td><td>{{ race.eventname}}</td></tr>
+        <tr><td>{{ _('Race date') }}</td><td>{{ race.racedate}}</td></tr>
+        <tr><td>{{ _('Place') }}</td><td>{{ race.place}}</td></tr>
+      </tbody>
+    </table>
+    <h4>{{ _('Competitors') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/competitors">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+    <h4>{{ _('Runs') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/run">edit</a></h4>
+    <table class="table table-striped">
+      <tbody>
+      </tbody>
+    </table>
+
+</div>
+{% endblock %}

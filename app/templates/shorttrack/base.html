@@ -33,54 +33,18 @@
                     <ul class="dropdown-menu">
                       <li><a href="{{ url_for('raceinfo.gender_list') }}">{{ _('Gender') }}</a></li>
                       <li><a href="{{ url_for('raceinfo.discipline_list') }}">{{ _('Discipline') }}</a></li>
-{#                      <li><a href="{{ url_for('raceinfo.tdrole_list') }}">{{ _('TD types') }}</a></li>#}
                       <li><a href="{{ url_for('raceinfo.category_list') }}">{{ _('Category') }}</a></li>
                       <li><a href="{{ url_for('raceinfo.status_list') }}">{{ _('Status') }}</a></li>
-{#                      <li><a href="{{ url_for('raceinfo.mark_list') }}">{{ _('Marks') }}</a></li>#}
                       <li><a href="{{ url_for('raceinfo.nation_list') }}">{{ _('Nations') }}</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Race') }} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                      <li><a href="{{ url_for('raceinfo.race_add') }}">{{ _('Create New Race') }}</a></li>
-{#                      <li><a href="">{{ _('Finished Race') }}</a></li>#}
-{#                      <li><a href="">{{ _('Opened Race') }}</a></li>#}
-                      <li><a href="{{ url_for('raceinfo.race_list') }}">{{ _('Race list') }}</a></li>
+                      <li><a href="{{ url_for('shorttrack.race_add') }}">{{ _('Create New Race') }}</a></li>
+                      <li><a href="{{ url_for('shorttrack.race_list') }}">{{ _('Race list') }}</a></li>
                     </ul>
                 </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Peoples') }} <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="{{ url_for('raceinfo.competitor_list') }}">{{ _('Competitors list') }}</a></li>
-                      <li><a href="{{ url_for('raceinfo.coursetter_list') }}">{{ _('Coursetters list') }}</a></li>
-                      <li><a href="{{ url_for('raceinfo.forerunner_list') }}">{{ _('Forerunner list') }}</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Devices') }} <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="{{ url_for('raceinfo.device_add') }}">{{ _('Device create') }}</a></li>
-                      <li><a href="{{ url_for('raceinfo.device_list') }}">{{ _('Devices list') }}</a></li>
-                      <li><a href="{{ url_for('raceinfo.device_type') }}">{{ _('Devices types') }}</a></li>
-                    </ul>
-                </li>
-                <li>
-                  <a href="{{ url_for('raceinfo.jury_list', username=current_user.username)}}">{{ _('Jury') }}</a>
-                </li>
-                <li>
-                  <a href="{{ url_for('raceinfo.team_list', username=current_user.username)}}">{{ _('Team') }}</a>
-                </li>
-                <li>
-                  <a href="/raceinfo/jury_page">Jury Panel</a>
-                </li>
-
-{#                <li>#}
-{#                  <a href="#reports">{{ _('Reports') }}</a>#}
-{#                </li>#}
-{#                <li>#}
-{#                  <a href="#log">{{ _('Log') }}</a>#}
-{#                </li>#}
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">

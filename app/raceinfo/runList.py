@@ -15,11 +15,13 @@ def startlist_get(run_id):
     data = db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor).\
         join(RunOrder).filter(RunOrder.run_id == run_id).\
         order_by(RunOrder.order).all()
-    # Имя Фамилия Биб, номер старта, мануал ордер, id
+    return json.dumps(runList_view(data))
+
+def runList_view(data):
     result={}
     for item in data:
         if item[2].course_id not in result.keys():
-            result[item[2].course_id]=[]
+            result[item[2].course_id] = []
         result[item[2].course_id].append({
             'en_firstname': item[0].en_firstname,
             'en_lastname': item[0].en_lastname,
@@ -29,8 +31,7 @@ def startlist_get(run_id):
             'run_order_id': item[2].id,
             'race_competitor_id': item[1].id,
         })
-    return json.dumps(result)
-
+    return result
 
 def race_order_buld(race_id, current_run_id, current_run_number):
     race = db.session.query(Race).filter(Race.id == race_id).first()

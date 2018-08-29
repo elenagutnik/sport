@@ -2,62 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/shorttrack/models.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/shorttrack/views.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/templates/raceinfo/index.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/shorttrack/forms.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/templates/shorttrack/form_page.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/templates/shorttrack/race_view.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/templates/shorttrack/static-tab/race_list.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/migrations/README" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/migrations/alembic.ini" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/migrations/env.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/migrations/script.py.mako" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/migrations/versions/f422a70e14f7_.py" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/__init__.py" afterPath="$PROJECT_DIR$/app/__init__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/RunInfo.py" afterPath="$PROJECT_DIR$/app/raceinfo/RunInfo.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/events.py" afterPath="$PROJECT_DIR$/app/raceinfo/events.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/runList.py" afterPath="$PROJECT_DIR$/app/raceinfo/runList.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/views.py" afterPath="$PROJECT_DIR$/app/raceinfo/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/shorttrack/__init__.py" afterPath="$PROJECT_DIR$/app/shorttrack/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/base.html" afterPath="$PROJECT_DIR$/app/templates/base.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/shorttrack/models.py" afterPath="$PROJECT_DIR$/app/shorttrack/models.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/shorttrack/views.py" afterPath="$PROJECT_DIR$/app/shorttrack/views.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/index.html" afterPath="$PROJECT_DIR$/app/templates/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/course_view.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/course_view.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/jury.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/jury.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/race_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/race_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/race_view.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/race_view.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/category_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/category_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_race.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_race.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/comptitors_add.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/comptitors_add.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/cource_forerunner_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/cource_forerunner_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/course_edit.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/course_edit.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/course_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/course_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/coursetter_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/coursetter_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/device_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/device_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/device_type_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/device_type_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_add.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_add.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_edit.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_edit.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/forerunner_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/forerunner_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/form_page.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/form_page.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/form_render.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/form_render.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/gender_add.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/gender_add.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/gender_edit.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/gender_edit.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/gender_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/gender_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/jury_add.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/jury_add.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/jury_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/jury_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/jury_race.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/jury_race.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/mark_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/mark_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/nation_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/nation_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/order_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/order_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/race_team_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/race_team_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/run_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/run_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/simpleform.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/simpleform.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/status_add.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/status_add.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/status_edit.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/status_edit.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/status_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/status_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/td_add.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/td_add.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/td_edit.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/td_edit.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/td_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/td_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/tdrole_add.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/tdrole_add.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/tdrole_edit.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/tdrole_edit.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/tdrole_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/tdrole_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/team_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/team_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/weather_list.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/static-tab/weather_list.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/team_view.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/team_view.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/raceinfo/upload_table_form.html" afterPath="$PROJECT_DIR$/app/templates/raceinfo/upload_table_form.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/receiver_jury.html" afterPath="$PROJECT_DIR$/app/templates/receiver_jury.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.py" afterPath="$PROJECT_DIR$/config.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/new_format_tester.html" afterPath="$PROJECT_DIR$/app/templates/new_format_tester.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/shorttrack/base.html" afterPath="$PROJECT_DIR$/app/templates/shorttrack/base.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -68,7 +32,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/sport$Unittests_in_manage_py.coverage" NAME="Unittests in manage.py Coverage Results" MODIFIED="1511445914995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sport$sport.coverage" NAME="sport Coverage Results" MODIFIED="1535151176966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sport$sport.coverage" NAME="sport Coverage Results" MODIFIED="1535504531753" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
@@ -78,18 +42,134 @@
     <favorites_list name="sport" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/templates/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="29" column="10" lean-forward="false" selection-start-line="29" selection-start-column="10" selection-end-line="29" selection-end-column="10" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="horizontal" split-proportion="0.6432375">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/shorttrack/views.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="410">
+                  <caret line="55" column="40" lean-forward="true" selection-start-line="55" selection-start-column="40" selection-end-line="55" selection-end-column="40" />
+                  <folding>
+                    <element signature="e#0#68#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/raceinfo/models.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="448">
+                  <caret line="243" column="25" lean-forward="true" selection-start-line="243" selection-start-column="25" selection-end-line="243" selection-end-column="25" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="race_view.html" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/race_view.html">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="390">
+                  <caret line="26" column="14" lean-forward="true" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="RunInfo.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/raceinfo/RunInfo.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="276">
+                  <caret line="132" column="35" lean-forward="true" selection-start-line="132" selection-start-column="35" selection-end-line="132" selection-end-column="35" />
+                  <folding>
+                    <element signature="e#0#68#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="381">
+                  <caret line="138" column="47" lean-forward="true" selection-start-line="138" selection-start-column="47" selection-end-line="138" selection-end-column="47" />
+                  <folding>
+                    <element signature="e#0#23#0" expanded="true" />
+                    <marker date="1535504531634" expanded="true" signature="1264:1289" ph="delete from " />
+                    <marker date="1535504531634" expanded="true" signature="1317:1336" ph="delete from " />
+                    <marker date="1535504531634" expanded="true" signature="1363:1390" ph="delete from " />
+                    <marker date="1535504531634" expanded="true" signature="1417:1435" ph="delete from " />
+                    <marker date="1535504531634" expanded="true" signature="1462:1483" ph="delete from " />
+                    <marker date="1535504531634" expanded="true" signature="1510:1542" ph="update run_i... " />
+                    <marker date="1535504531634" expanded="true" signature="1569:1603" ph="update run_i... " />
+                    <marker date="1535504531634" expanded="true" signature="1630:1668" ph="update run_o... " />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="base.html" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/base.html">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="395">
+                  <caret line="48" column="17" lean-forward="false" selection-start-line="48" selection-start-column="17" selection-end-line="48" selection-end-column="17" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="config.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/config.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="315">
+                  <caret line="21" column="24" lean-forward="false" selection-start-line="21" selection-start-column="24" selection-end-line="21" selection-end-column="24" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="race_list.html" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/static-tab/race_list.html">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="345">
+                  <caret line="23" column="45" lean-forward="false" selection-start-line="23" selection-start-column="45" selection-end-line="23" selection-end-column="45" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/shorttrack/forms.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="210">
+                  <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+                  <folding>
+                    <element signature="e#0#31#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="runList.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/app/raceinfo/runList.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="255">
+                  <caret line="17" column="41" lean-forward="true" selection-start-line="17" selection-start-column="41" selection-end-line="17" selection-end-column="41" />
+                  <folding>
+                    <element signature="e#0#68#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -101,20 +181,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>sql.</find>
-      <find>DataI</find>
-      <find>manua</find>
-      <find>TreeView</find>
-      <find>set</find>
-      <find>getRaceByRunid</find>
-      <find>ConvertRunResults</find>
-      <find>get_sector_results</find>
-      <find>calculate_common_sector_params</find>
-      <find>sectordiff</find>
-      <find>qualification_second_run_list</find>
-      <find>Run t</find>
-      <find>EditRunInfoParallelForm</find>
-      <find>run/add</find>
       <find>auto</find>
       <find>recalculate_run_results</find>
       <find>print</find>
@@ -131,6 +197,20 @@
       <find>Date</find>
       <find>Race(</find>
       <find>racedate</find>
+      <find>RunIn</find>
+      <find>RunOr</find>
+      <find>ResultD</find>
+      <find>ResultA</find>
+      <find>Course</find>
+      <find>Devi</find>
+      <find>race_i</find>
+      <find>race/</find>
+      <find>flush</find>
+      <find>deleted</find>
+      <find>edit</find>
+      <find>get</find>
+      <find>/edit</find>
+      <find>RaceC</find>
     </findStrings>
     <replaceStrings>
       <replace>EditRunInfoDisciplineForm</replace>
@@ -145,14 +225,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/templates/raceinfo/course_view.html" />
-        <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/weather_list.html" />
-        <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/team_list.html" />
-        <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/tdrole_list.html" />
-        <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/tdrole_edit.html" />
-        <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/category_list.html" />
-        <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_list.html" />
-        <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_race.html" />
         <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/comptitors_add.html" />
         <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/cource_forerunner_list.html" />
         <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/course_edit.html" />
@@ -187,15 +259,23 @@
         <option value="$PROJECT_DIR$/app/templates/raceinfo/static-tab/td_add.html" />
         <option value="$PROJECT_DIR$/app/templates/raceinfo/index.html" />
         <option value="$PROJECT_DIR$/app/templates/receiver_jury.html" />
-        <option value="$PROJECT_DIR$/app/raceinfo/views.py" />
         <option value="$PROJECT_DIR$/app/templates/shorttrack/index.html" />
         <option value="$PROJECT_DIR$/app/templates/base.html" />
+        <option value="$PROJECT_DIR$/app/shorttrack/__init__.py" />
+        <option value="$PROJECT_DIR$/app/templates/index.html" />
+        <option value="$PROJECT_DIR$/app/templates/shorttrack/form_page.html" />
+        <option value="$PROJECT_DIR$/app/shorttrack/forms.py" />
         <option value="$PROJECT_DIR$/app/__init__.py" />
+        <option value="$PROJECT_DIR$/app/shorttrack/models.py" />
+        <option value="$PROJECT_DIR$/app/templates/shorttrack/static-tab/race_list.html" />
+        <option value="$PROJECT_DIR$/app/raceinfo/views.py" />
         <option value="$PROJECT_DIR$/app/shorttrack/views.py" />
         <option value="$PROJECT_DIR$/app/templates/shorttrack/base.html" />
-        <option value="$PROJECT_DIR$/app/shorttrack/__init__.py" />
-        <option value="$PROJECT_DIR$/app/shorttrack/models.py" />
-        <option value="$PROJECT_DIR$/app/templates/index.html" />
+        <option value="$PROJECT_DIR$/app/templates/shorttrack/race_view.html" />
+        <option value="$PROJECT_DIR$/app/raceinfo/runList.py" />
+        <option value="$PROJECT_DIR$/app/templates/new_format_tester.html" />
+        <option value="$PROJECT_DIR$/app/raceinfo/RunInfo.py" />
+        <option value="$PROJECT_DIR$/app/raceinfo/events.py" />
       </list>
     </option>
   </component>
@@ -206,8 +286,9 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
+    <option name="y" value="23" />
     <option name="width" value="1920" />
-    <option name="height" value="1200" />
+    <option name="height" value="1177" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -224,7 +305,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -265,48 +345,13 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="templates" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sport" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sport" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="static" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sport" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sport" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="shorttrack" />
+              <option name="myItemId" value="raceinfo" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -317,10 +362,10 @@
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///Users/aleksandrkarasev/Documents/sport/app/raceinfo/views.py" />
-    <property name="FullScreen" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/templates/shorttrack/static-tab" />
       <recent name="$PROJECT_DIR$/app/static" />
       <recent name="$PROJECT_DIR$/app/templates" />
       <recent name="$PROJECT_DIR$/app/templates/raceinfo" />
@@ -328,10 +373,10 @@
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/templates/shorttrack" />
+      <recent name="$PROJECT_DIR$/app/templates/shorttrack/static-tab" />
       <recent name="$PROJECT_DIR$/app/templates/raceinfo" />
       <recent name="$PROJECT_DIR$/app/templates/reports" />
       <recent name="$PROJECT_DIR$/app/templates" />
-      <recent name="$PROJECT_DIR$/app/templates/raceinfo/static-tab" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -571,14 +616,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1200" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1920" height="1177" extended-state="0" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23216188" sideWeight="0.8328729" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15654951" sideWeight="0.8328729" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27264494" sideWeight="0.3599574" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2807971" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.48725212" sideWeight="0.6400426" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32789856" sideWeight="0.4978701" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2719547" sideWeight="0.48935038" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -679,7 +723,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/runList.py</url>
-          <line>240</line>
+          <line>241</line>
           <option name="timeStamp" value="654" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -724,22 +768,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/runList.py</url>
-          <line>373</line>
+          <line>374</line>
           <option name="timeStamp" value="890" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/runList.py</url>
-          <line>368</line>
+          <line>369</line>
           <option name="timeStamp" value="891" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/raceinfo/runList.py</url>
-          <line>362</line>
+          <line>363</line>
           <option name="timeStamp" value="892" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/__init__.py</url>
-          <option name="timeStamp" value="898" />
+        <line-breakpoint enabled="true" log-message="true" suspend="NONE" type="python-line">
+          <url>file://$PROJECT_DIR$/app/shorttrack/forms.py</url>
+          <line>11</line>
+          <option name="timeStamp" value="899" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="jinja2-line">
           <url>file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/cource_forerunner_list.html</url>
@@ -757,104 +802,15 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="899" />
+      <option name="time" value="905" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/competitors_race.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/comptitors_add.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/cource_forerunner_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/course_edit.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/course_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="12" lean-forward="true" selection-start-line="15" selection-start-column="12" selection-end-line="15" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/coursetter_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="24" lean-forward="true" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/device_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/device_type_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_add.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_edit.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/discipline_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="20" lean-forward="true" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/templates/raceinfo/static-tab/forerunner_list.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
           <caret line="36" column="0" lean-forward="true" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -862,7 +818,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="17" column="0" lean-forward="true" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -870,7 +825,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -878,7 +832,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -886,7 +839,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
           <caret line="14" column="27" lean-forward="true" selection-start-line="14" selection-start-column="27" selection-end-line="14" selection-end-column="27" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -894,7 +846,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -902,7 +853,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -910,7 +860,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -918,7 +867,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -926,7 +874,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="1" lean-forward="false" selection-start-line="2" selection-start-column="1" selection-end-line="2" selection-end-column="1" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -934,7 +881,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -942,7 +888,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -950,7 +895,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -958,7 +902,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -966,7 +909,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -974,7 +916,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -982,7 +923,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -990,7 +930,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -998,7 +937,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1006,7 +944,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="34" lean-forward="false" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1014,7 +951,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1022,7 +958,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1030,7 +965,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1042,22 +976,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/templates/receiver_jury.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
           <caret line="14" column="29" lean-forward="false" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="29" />
-          <folding>
-            <marker date="1535146589961" expanded="true" signature="34479:34490" ph="..." />
-            <marker date="1535146589961" expanded="true" signature="38328:38339" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1071,63 +993,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="768">
-          <caret line="60" column="0" lean-forward="true" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="438">
-          <caret line="34" column="35" lean-forward="false" selection-start-line="34" selection-start-column="25" selection-end-line="34" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="615">
-          <caret line="528" column="27" lean-forward="false" selection-start-line="528" selection-start-column="27" selection-end-line="528" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#68#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/shorttrack/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/static/ski.jpg">
       <provider selected="true" editor-type-id="images">
         <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/raceinfo/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="349" column="4" lean-forward="false" selection-start-line="349" selection-start-column="4" selection-end-line="349" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/base.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="32" column="46" lean-forward="false" selection-start-line="32" selection-start-column="46" selection-end-line="32" selection-end-column="46" />
-          <folding />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/shorttrack/__init__.py">
@@ -1142,7 +1010,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1150,17 +1017,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-48">
           <caret line="20" column="25" lean-forward="true" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/shorttrack/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="535">
-          <caret line="66" column="31" lean-forward="false" selection-start-line="66" selection-start-column="31" selection-end-line="66" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1173,7 +1029,173 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="400">
           <caret line="29" column="10" lean-forward="false" selection-start-line="29" selection-start-column="10" selection-end-line="29" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="14" lean-forward="true" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/Race.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="457">
+          <caret line="33" column="51" lean-forward="false" selection-start-line="33" selection-start-column="51" selection-end-line="33" selection-end-column="51" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="43" column="18" lean-forward="false" selection-start-line="43" selection-start-column="18" selection-end-line="43" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#23#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/form_page.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="16" lean-forward="false" selection-start-line="7" selection-start-column="11" selection-end-line="7" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/race_list.html" />
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="254">
+          <caret line="115" column="6" lean-forward="false" selection-start-line="115" selection-start-column="6" selection-end-line="115" selection-end-column="6" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/shorttrack/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="370">
+          <caret line="67" column="0" lean-forward="false" selection-start-line="67" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="716" column="17" lean-forward="false" selection-start-line="716" selection-start-column="17" selection-end-line="716" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#68#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="24" lean-forward="false" selection-start-line="21" selection-start-column="24" selection-end-line="21" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="395">
+          <caret line="48" column="17" lean-forward="false" selection-start-line="48" selection-start-column="17" selection-end-line="48" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/static-tab/race_list.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="45" lean-forward="false" selection-start-line="23" selection-start-column="45" selection-end-line="23" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/new_format_tester.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="19" column="34" lean-forward="true" selection-start-line="19" selection-start-column="34" selection-end-line="19" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/shorttrack/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/RunInfo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="132" column="35" lean-forward="true" selection-start-line="132" selection-start-column="35" selection-end-line="132" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#68#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="243" column="25" lean-forward="true" selection-start-line="243" selection-start-column="25" selection-end-line="243" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/runList.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="41" lean-forward="true" selection-start-line="17" selection-start-column="41" selection-end-line="17" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#68#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/race_view.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" column="14" lean-forward="true" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/shorttrack/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="410">
+          <caret line="55" column="40" lean-forward="true" selection-start-line="55" selection-start-column="40" selection-end-line="55" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#68#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="381">
+          <caret line="138" column="47" lean-forward="true" selection-start-line="138" selection-start-column="47" selection-end-line="138" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <marker date="1535504531634" expanded="true" signature="1264:1289" ph="delete from " />
+            <marker date="1535504531634" expanded="true" signature="1317:1336" ph="delete from " />
+            <marker date="1535504531634" expanded="true" signature="1363:1390" ph="delete from " />
+            <marker date="1535504531634" expanded="true" signature="1417:1435" ph="delete from " />
+            <marker date="1535504531634" expanded="true" signature="1462:1483" ph="delete from " />
+            <marker date="1535504531634" expanded="true" signature="1510:1542" ph="update run_i... " />
+            <marker date="1535504531634" expanded="true" signature="1569:1603" ph="update run_i... " />
+            <marker date="1535504531634" expanded="true" signature="1630:1668" ph="update run_o... " />
+          </folding>
         </state>
       </provider>
     </entry>
