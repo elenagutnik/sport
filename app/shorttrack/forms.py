@@ -10,5 +10,11 @@ class RaceBaseForm(FlaskForm):
     eventname = StringField('Event Name (in FIS Calendar)', validators=[InputRequired()])
     racedate = DateTimeField('Race date', format='%d.%m.%Y %H:%M', render_kw={"class": "race_datepicker"})
     place = StringField('Place')
+    distance = IntegerField('Distance')
     description = StringField('Description')
+    submit = SubmitField('Submit')
+
+class DeviceBaseForm(FlaskForm):
+    src_dev = StringField('src_dev', validators=[InputRequired()])
+    name = StringField('Device Name', validators=[InputRequired()])
     submit = SubmitField('Submit')

@@ -1,0 +1,102 @@
+{% extends "shorttrack/base.html" %}
+{% import "_user.html" as macros %}
+
+{% block title %} Получатель{% endblock %}
+
+{% block page_content %}
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <ul class="nav nav-tabs">
+      <li id="li_tab_results"><a href="#tab_results" data-toggle="tab">Результаты</a></li>
+      <li id="li_tab_runs"><a href="#tab_runs" data-toggle="tab">Заезды</a></li>
+      <li id="li_tab_runlists"><a href="#tab_runlists" data-toggle="tab">Заезды</a></li>
+    </ul>
+    <div class="tab-content">
+      <div id="tab_results" class="tab-pane fade in active">
+        <h2>Результаты</h2>
+        {% for key, list in competitors.items() %}
+            <div class="row">
+                <h3>Группа - {{key}}</h3>
+            </div>
+            <div class="row">
+            {% for item in list %}
+                <table id="Competitor--{{item.id}}" style="width:19%; float:left">
+                    <tr>
+                        <th colspan="3">{{item.ru_lastname}} {{item.ru_firstname}}</th>
+                    </tr>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Time</th>
+                        <th>Diff</th>
+                    </tr>
+                </table>
+            {% endfor %}
+            </div>
+        {% endfor %}
+      </div>
+      <div id="tab_runs" class="tab-pane fade">
+          <h2>Заезды</h2>
+                <table style="width:100%;" class="run_list table table-bordered">
+                    <tr>
+                        <th>№</th>
+                        <th>Order</th>
+                        <th>Name</th>
+                        <th>starttime</th>
+                        <th>endtime</th>
+                        <th></th>
+                    </tr>
+               {% for item in runs %}
+                    <tr run_id='{{item.id}}'>
+                        <td>{{item.id}}</td>
+                        <td>{{item.number}}</td>
+                        <td>{{item.name}}</td>
+                        <td class="start__time">{{item.starttime}}</td>
+                        <td class="finish__time">{{item.endtime}}</td>
+                        <td>
+                            <button type="button" class="run__start btn btn-success">Start</button>
+                            <button type="button" class="run__finish btn btn-danger" >Finish</button>
+                        </td>
+                    </tr>
+               {% endfor %}
+                </table>
+
+      </div>
+      <div id="tab_runlists" class="tab-pane fade">
+          <h2>Стартовые списки</h2>
+
+
+      </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script>
+  var socket = io.connect('http://127.0.0.1:5000');
+  var race_id ={{race_id}};
+  var daa;
+    socket.on('STNewDataPoint', function(data) {
+     data= JSON.parse(data);
+     $("#Competitor--"+data.competitor_id).append("<tr><td>"+data.rank+"</td><td>"+data.time+"</td><td>"+data.diff+"</td></tr>");
+    });
+    socket.emit('GetResults', {race_id: 8});
+
+    socket.on('Results', function(data) {
+      console.log('Results', JSON.parse(data));
+    });
+
+    $('.run__start').click(function() {
+        var cid=$(this).closest('tr').attr('run_id');
+        $.post( '/shorttrack/race/'+race_id+'/run/'+cid+'/start').
+            done(function(data) {
+               $( "tr[run_id='"+cid+"']").children('.start__time').html(data);
+            });
+    });
+    $('.run__finish').click(function() {
+        var cid=$(this).closest('tr').attr('run_id');
+        $.post( '/shorttrack/race/'+race_id+'/run/'+cid+'/stop').
+            done(function(data) {
+               $( "tr[run_id='"+cid+"']").children('.finish__time').html(data);
+            });
+    });
+
+</script>
+{% endblock %}

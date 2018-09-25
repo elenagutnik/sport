@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 import os
-from app import create_app, socketio, db
+from app import create_app, socketio, db, db_shorttrack
 from flask_script import Manager, Server as _Server, Option
 from flask_migrate import Migrate, MigrateCommand
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
 manager = Manager(app)
-migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
+migrate_st = Migrate(app, db_shorttrack)
 
 class Server(_Server):
     help = description = 'Runs the Socket.IO web server'

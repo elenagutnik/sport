@@ -590,8 +590,6 @@ class RaceGetter:
             RunInfo.race_id == Race.id,
             Race.discipline_id == Discipline.id
         ).one()
-
-
         if race_info[4].is_forerunner:
             # print('ForerunnerRace')
             return ForerunnerRace(race=race_info[5],

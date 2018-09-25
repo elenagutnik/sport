@@ -16,16 +16,27 @@
         <tr><td>{{ _('Place') }}</td><td>{{ race.place}}</td></tr>
       </tbody>
     </table>
-    <h4>{{ _('Competitors') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/competitors">edit</a></h4>
-    <table class="table table-striped">
-      <tbody>
-      </tbody>
-    </table>
-    <h4>{{ _('Runs') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/run">edit</a></h4>
-    <table class="table table-striped">
-      <tbody>
-      </tbody>
-    </table>
-
+    <div class="row">
+        <div class="col-md-6">
+            <h4>{{ _('Competitors') }} <a class="btn btn-default" href="/shorttrack/race/{{ race.id }}/competitors/">edit</a></h4>
+            <table class="table table-striped">
+              <tbody>
+              </tbody>
+            </table>
+            <h4>{{ _('Runs') }} <a class="btn btn-default" href="/shorttrack/race/{{ race.id }}/run">edit</a></h4>
+            <table class="table table-striped">
+              <tbody>
+              </tbody>
+            </table>
+            <h4>{{ _('Devices') }} <a class="btn btn-default" href="/shorttrack/race/{{ race.id }}/devices/">edit</a></h4>
+            <table class="table table-striped">
+              <tbody>
+              </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h4>{{ _('Order list') }} <a class="btn btn-default" href="/shorttrack/race/{{ race.id }}/runlist/build">build</a></h4>
+        </div>
+    </div>
 </div>
 {% endblock %}

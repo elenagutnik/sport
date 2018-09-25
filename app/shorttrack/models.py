@@ -1,7 +1,6 @@
 from .. import db_shorttrack as db
 
 
-
 class Gender(db.Model):
     __tablename__ = 'gender'
     __bind_key__ = 'shorttrack'
@@ -49,7 +48,7 @@ class Competitor(db.Model):
     gender_id = db.Column(db.Integer, db.ForeignKey('gender.id'))
     best_season_time = db.Column(db.Time)
     bib = db.Column(db.String)
-
+    points = db.Column(db.Float)
     ru_firstname = db.Column(db.String)
     en_firstname = db.Column(db.String)
     ru_lastname = db.Column(db.String)
@@ -68,7 +67,7 @@ class Race(db.Model):
     eventname = db.Column(db.String)
     place = db.Column(db.String)
     racedate = db.Column(db.DateTime)
-
+    distance = db.Column(db.Integer)
     description = db.Column(db.String)
 
 class RunInfo(db.Model):
@@ -77,8 +76,19 @@ class RunInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
     number = db.Column(db.Integer)
+    name = db.Column(db.String)
     starttime = db.Column(db.DateTime)
     endtime = db.Column(db.DateTime)
+
+
+class RunGroup(db.Model):
+    __tablename__ = 'run_group'
+    __bind_key__ = 'shorttrack'
+    id = db.Column(db.Integer, primary_key=True)
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
+    number = db.Column(db.Integer)
+    is_start = db.Column(db.Boolean)
+    is_finish = db.Column(db.Boolean)
 
 class RunOrder(db.Model):
     __bind_key__ = 'shorttrack'
@@ -87,24 +97,27 @@ class RunOrder(db.Model):
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id', ondelete='CASCADE'))
     order = db.Column(db.Integer)
+    group_id = db.Column(db.Integer, db.ForeignKey('run_group.id', ondelete='CASCADE'))
 
 class ResultDetail(db.Model):
     __tablename__ = 'result_detail'
     __bind_key__ = 'shorttrack'
+
     id = db.Column(db.Integer, primary_key=True)
-    # course_device_id = db.Column(db.Integer, db.ForeignKey('course_device.id'))
+    virtual_device_id = db.Column(db.Integer, db.ForeignKey('virtual_devices.id'))
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id', ondelete='CASCADE'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
-
+    group_id = db.Column(db.Integer, db.ForeignKey('run_group.id', ondelete='CASCADE'))
     data_in_id = db.Column(db.Integer, db.ForeignKey('data_in.id'))
-
-    diff = db.Column(db.BigInteger)
-    time = db.Column(db.BigInteger)
+    diff = db.Column(db.Time)
+    time = db.Column(db.Time)
     rank = db.Column(db.Integer)
     speed = db.Column(db.Float)
     sectortime = db.Column(db.BigInteger)
     sectordiff = db.Column(db.BigInteger)
-    sectorrank = db.Column(db.Integer)
+    grouprank = db.Column(db.Integer)
+
+    is_first = db.Column(db.Boolean)
 
 
 class ResultApproved(db.Model):
@@ -117,6 +130,7 @@ class ResultApproved(db.Model):
     diff = db.Column(db.BigInteger)
     time = db.Column(db.BigInteger)
     rank = db.Column(db.Integer)
+
 class Device(db.Model):
     __bind_key__ = 'shorttrack'
     __tablename__ = 'course_device'
@@ -126,7 +140,19 @@ class Device(db.Model):
     src_dev = db.Column(db.String)
     name = db.Column(db.String)
 
+class VirtualDevice(db.Model):
+    __bind_key__ = 'shorttrack'
+    __tablename__ = 'virtual_devices'
+    id = db.Column(db.Integer, primary_key=True)
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
+    order = db.Column(db.Integer)
+    distance = db.Column(db.Integer)
+    is_finish = db.Column(db.Boolean)
+
 class DataIn(db.Model):
     __bind_key__ = 'shorttrack'
     __tablename__ = 'data_in'
     id = db.Column(db.Integer, primary_key=True)
+    transponder = db.Column(db.String)
+    src_dev = db.Column(db.String)
+    time = db.Column(db.Time)

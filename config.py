@@ -22,6 +22,7 @@ class Config:
         'en': 'English',
         'ru': 'Русский'
     }
+
     @staticmethod
     def init_app(app):
         pass

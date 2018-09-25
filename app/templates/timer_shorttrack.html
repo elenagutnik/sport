@@ -1,0 +1,112 @@
+<html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.3.1/moment-with-langs.min.js"></script>
+</html>
+<script>
+
+
+var device =  JSON.parse('{{ device | safe }}');
+
+var competitors =  JSON.parse('{{ competitors | safe }}');
+
+var circle_count = {{ circle_count }};
+
+function tform(v){
+    return moment(v).format('mm:ss.SSSS');
+}
+//форматирование времени
+function dtform(v){
+    return moment(v).format('DD.MM.YYYY HH:mm:ss.SSSS');
+}
+
+
+function run(){
+    $.ajax({
+      url: "/shorttrack/race/"+{{ race_id }}+"/run/"+{{ run_id }}+"/group/start",
+      type: 'GET'
+    }).done(function() {
+        reqSend(0,0);
+    });
+
+}
+
+function reqSend(devnum,starttime){
+
+//	var t = new Date().getTime() ; // 12.850 - 12.859
+	if(starttime==0)
+		starttime= new Date().getTime();
+	for (i=0; i<competitors.length; i++)
+	    {
+
+	        setTimeout(sendCompetitor,randomDelay(),competitors[i], devnum, starttime);
+	    }
+//	$("#data"+course).append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+tform(t-starttime)+"</td><td>"+t+"</td><td>"+dtform(t)+"</td></tr>");
+	var sectordelay=6000; //1sec
+	if(devnum==circle_count){
+		devnum=0;
+		starttime=0;
+//		$("#data"+course).append("<tr><td colspan=7><hr><!--<button class='btn' onclick='setTimeout(reqSend, 100+(Math.random()*1840), "+snum+", "+devnum+",0)'>Next competitor</button>--></td></tr>");
+	}else{
+		devnum++;
+		//if(snum<=startlist.length-1)
+			setTimeout(reqSend, sectordelay+(Math.random()*1040),  devnum, starttime);
+	}
+}
+function sendCompetitor(competitor, devnum, starttime) {
+    setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_1, devnum,starttime);
+	setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_2, devnum, starttime);
+}
+function sendLeg(i,transponder, devnum, starttime) {
+    var t = new Date().getTime() ; // 12.850 - 12.859
+    console.log(i,transponder, t);
+    $("#data"+i).append("<tr><td>"+i+"</td><td>"+devnum+"</td><td>"+transponder+"</td><td>"+tform(t-starttime)+"</td></tr>");
+  	$.ajax({
+		  url: "/shorttrack/input/data",
+		  dataType: 'json',
+		  type: 'POST',
+		  contentType: 'application/json',
+		  data:JSON.stringify({
+			  'SRC_DEV':device['src_dev'],
+			  'TIME':tform(t-starttime),
+			  'TRANSPONDER':transponder
+			  })
+		}).done(function() {
+//			  $( this ).addClass( "done" );
+		});
+}
+function randomDelay() {
+    var rand = 100 - 0.5 + Math.random() * (1501 - 100 + 1);
+    rand = Math.round(rand);
+    return rand;
+  }
+
+</script>
+<!--
+<input type="button" onclick="clearInterval(intervalID);" value="stop"> |
+<input type="text" id="delay_val" value="100"><input type="button" value="change delay" onclick="delay=$('#delay_val').val();clearInterval(intervalID);intervalID = window.setInterval(reqSend, delay);">
+ -->
+<input type="button" onclick="run();" value="Хакуна Матата!">
+
+<a href='/shorttrack/emulation/1/clear'>Clear all results</a>
+<HR>
+<table id="data1" style="width:19%; float:left">
+<tr><td>№</td><td>circle</td><td>transponder</td><td>time</td></tr>
+</table>
+<table id="data2" style="width:19%; float:left">
+<tr><td>№</td><td>circle</td><td>transponder</td><td>time</td></tr>
+</table>
+<table id="data3" style="width:19%; float:left">
+<tr><td>№</td><td>circle</td><td>transponder</td><td>time</td></tr>
+</table>
+<table id="data4" style="width:19%; float:left">
+<tr><td>№</td><td>circle</td><td>transponder</td><td>time</td></tr>
+</table>
+<table id="data5" style="width:19%; float:left">
+<tr><td>№</td><td>circle</td><td>transponder</td><td>time</td></tr>
+</table>
+
+<!-- <table id="log" style="width:49%; margin-left:1%; float:left">
+<tr><td>#</td><td>delay</td><td>time s.ms</td></tr>
+</table>
+ -->
+ </html>

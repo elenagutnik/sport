@@ -1,0 +1,103 @@
+{% extends "shorttrack/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SKI - Races List{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Races</h1>
+</div>
+<style>
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+</style>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Name</th>
+      <th>Start time</th>
+      <th>End time</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody class="run_list">
+    {% for run in items %}
+    <tr>
+      <td>{{ run.number }} </td>
+      <td>{{ run.name }}</td>
+      <td>{{ run.starttime }}</td>
+      <td>{{ run.endtime }}</td>
+      <td>
+      <td>
+        <a href="{{ run.id }}/results" class="btn btn-success">Download run results</a>
+      </td>
+      <td>
+        <form id="" action="/shorttrack/race/{{race_id}}/run/{{run.id}}/startlist/upload" enctype="multipart/form-data" method="post">
+            <span class="btn btn-default btn-file">
+                Upload start list <input type="file" name="list" class="upload">
+            </span>
+        </form>
+      </td>
+      <td>
+        <a href="run/{{ run.id }}/edit">edit</a>
+        |
+        <a href="run/{{ run.id }}/del">del</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    <div class="row">
+      <div class="form-group  col-md-6 row">
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="new_run__name" placeholder="New run name">
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="form-control btn-info" id="new_run__add">Add</button>
+        </div>
+      </div>
+    </div>
+<a class="btn btn-default" href="{{ url_for('shorttrack.race_add') }}">Add</a>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+var tm;
+   $('.upload').change(function() {
+       console.log('хакуна матата');
+       $(this).closest('form').submit();
+    });
+  $('#new_run__add').click(function() {
+        var run_name=$('#new_run__name').val();
+        console.log(run_name);
+        $.post( '/shorttrack/race/'+{{race_id}}+'/run/add', {'new_run__name': run_name}).
+            done(function(data) {
+                data = JSON.parse(data);
+//               $( ".run_list").append("<tr run_id='"+data['id']+"'><td>"+data['id']+"</td><td>"+data['number']+"</td><td>"+data['name']+"</td><td></td><td></td><td><button type='button' class='run__start btn btn-success'>Start</button><button type='button' class='run__finish btn btn-danger' >Finish</button></td></tr>");
+location.reload();
+            });
+    });
+</script>
+{% endblock %}

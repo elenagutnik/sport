@@ -256,7 +256,7 @@ class RaceCompetitor(db.Model):
     # переделать в связь с run_info, team_id
     gate = db.Column(db.String)
     reason = db.Column(db.String)
-    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id',ondelete='CASCADE' ))
     fis_points = db.Column(db.Float)
 
     club = db.Column(db.String)
