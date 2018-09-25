@@ -10,6 +10,7 @@ CIRCLE_LENGHT = 111.12
 class RunList:
     def __init__(self, race_id):
         self.race_id = race_id
+        self.run=None
         generateVirtualDevices(race_id)
 
     def builder_1st_run(self):
@@ -30,7 +31,7 @@ class RunList:
             db.session.add(run)
             db.session.commit()
 
-
+        self.run=run
         reversed = False
         
         count = math.ceil(len(competitors_list)/4)

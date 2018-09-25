@@ -6,7 +6,7 @@ from sqlalchemy import or_, func, distinct
 import json
 import pyexcel
 
-from  flask import request
+from  flask import request, flash, redirect,url_for
 
 TIME_DELTA = timedelta(seconds=4)
 
@@ -69,11 +69,11 @@ class ShrortTrack:
             filter(ResultDetail.run_id == self.runInfo.id, ResultDetail.competitor_id == self.competitor.id).\
             scalar()
         if CrossedCirclesCount > 1:
-            print('Пересеченные девайсы:', CrossedCirclesCount)
+
             previousResults = self.getPreviousDeviceData(CrossedCirclesCount)
-            print(len(previousResults))
+
             if len(previousResults) < 2:
-                print('len(previousResults) < 2:', len(previousResults) < 2)
+
                 if (datetime.combine(date(1,1,1), previousResults[0].time) + TIME_DELTA).time() < (datetime.strptime(device_data['TIME'], '%M:%S.%f')).time():
                     self.getDevice(CrossedCirclesCount)
                     self.setResultDetail(device_data, self.virtualDevice.id)
@@ -83,16 +83,14 @@ class ShrortTrack:
                     self.isDataForSend = False
                     self.setResultDetail(device_data, previousResults[0].virtual_device_id)
             else:
-                print('len(previousResults) < 2:', len(previousResults) < 2)
+
                 self.getDevice(CrossedCirclesCount)
                 self.setResultDetail(device_data, self.virtualDevice.id)
                 self.FirstLeg()
                 self.calculateRanks()
         else:
-            print('Пересеченные девайсы:', CrossedCirclesCount)
-            print('Совпадение старта с  первым девайсом?')
             if (datetime.min + TIME_DELTA).time() < (datetime.strptime(device_data['TIME'], '%M:%S.%f')).time():
-                print('разные девайсы, вносим ногу как новый круг')
+
                 self.getDevice(1)
                 self.setResultDetail(device_data, self.virtualDevice.id)
                 self.FirstLeg()
@@ -151,7 +149,9 @@ class ShrortTrack:
             'competitor_id': self.competitor.id,
             'time': timeConverter(self.resultDetail.time),
             'diff': timeConverter(self.resultDetail.diff),
-            'rank': self.resultDetail.grouprank
+            'rank': self.resultDetail.grouprank,
+            'run_id':self.runInfo.id,
+            'device_order': self.virtualDevice.order
         }
 
 def timeConverter(time, format='%M:%S.%f'):
@@ -180,6 +180,15 @@ def race_add_run(id):
         'number': newRun.number,
         'name': newRun.name
     })
+@shorttrack.route('/race/<int:id>/run/<int:run_id>/del', methods=['GET', 'POST'])
+def race_del_run(id, run_id):
+    run_info = RunInfo.query.get_or_404(run_id)
+    db.session.delete(run_info)
+    flash('The run has been deleted.')
+    return redirect(url_for('.race_runs', race_id=id,_external=True))
+
+
+
 
 @shorttrack.route('/race/<int:id>/run/<int:run_id>/start', methods=['GET', 'POST'])
 def race_course_run_start(id, run_id):
@@ -223,7 +232,7 @@ def race_run_startlist_upload(id, run_id):
     runList = RunGroup.query.filter(RunGroup.run_id == run_id).all()
     db.session.query(RunOrder).filter(RunOrder.run_id == run_id).delete()
     for item in sheet.to_array()[1:]:
-        if item[6] !='':
+        if item[6] != '':
             group = next((itm for itm in runList if itm.number == item[6]), None)
             if group is None:
                 group = RunGroup(
@@ -242,10 +251,10 @@ def race_run_startlist_upload(id, run_id):
             )
             db.session.add(runOrder)
     db.session.commit()
-    return
+    return redirect(url_for('.race_run_orderlist',race_id=id, run_id=run_id, _external=True))
 
 
-def createStartDeviceResults(race_id,run_id,group_id):
+def createStartDeviceResults(race_id, run_id, group_id):
     virtualStartDevice = VirtualDevice.query.filter(VirtualDevice.race_id == race_id,
                                                     VirtualDevice.order == 0).first()
     runCompetitorsList= db.session.query(Competitor, RunOrder).\

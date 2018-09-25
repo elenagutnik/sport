@@ -214,13 +214,33 @@ def race_device_del(race_id, device_id):
     flash('The device has been updated.')
     return redirect(url_for('.race_device', race_id=race_id, _external=True))
 
+
+@shorttrack.route('/race/<int:race_id>/run/<int:run_id>/orderlist', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def race_run_orderlist(race_id, run_id):
+    сompetitors_list = db.session.query(Competitor, RunOrder). \
+        join(RunOrder, RunOrder.competitor_id == Competitor.id, isouter=True). \
+        filter(RunOrder.run_id == run_id, ). \
+        order_by(RunOrder.group_id.asc(), RunOrder.order.asc()).all()
+
+    treeView = {}
+    for item in сompetitors_list:
+        print(item[1].run_id, item[1].group_id)
+        if item[1].group_id not in treeView.keys():
+            treeView[item[1].group_id] = []
+        treeView[item[1].group_id].append(item)
+
+    return render_template('shorttrack/static-tab/runorder_list.html', race_id=race_id, item_list=treeView)
+
+
 @shorttrack.route('/race/<int:race_id>/runlist/build', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def race_runlist_build(race_id):
     list = RunList(race_id)
     list.builder_1st_run()
-    return redirect(url_for('.race_device', race_id=race_id, _external=True))
+    return redirect(url_for('.race_run_orderlist', race_id=race_id, run_id=list.run.id, _external=True))
 
 
 @shorttrack.route('/race/<int:race_id>/run/<int:run_id>/results', methods=['GET', 'POST'])
@@ -228,7 +248,6 @@ def race_runlist_build(race_id):
 @admin_required
 def xcl_run_results(race_id, run_id):
     required_run = RunInfo.query.filter(RunInfo.id == run_id).first()
-
     if required_run.endtime == None:
         flash('Невозможно сформировать результаты. Заезд не завершен ')
         return redirect(url_for('.race_runs', race_id=race_id, _external=True))

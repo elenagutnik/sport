@@ -6,7 +6,7 @@
 {% block page_content %}
 
 <div class="page-header">
-    <h1>Races</h1>
+    <h1>Runs <a class="btn btn-success pull-right" href="{{url_for("shorttrack.race_edit",race_id=race_id) }}">Race page</a> </h1>
 </div>
 <style>
 .btn-file {
@@ -49,35 +49,39 @@
       <td>{{ run.endtime }}</td>
       <td>
       <td>
+      {% if not run.endtime == None%}
         <a href="{{ run.id }}/results" class="btn btn-success">Download run results</a>
+        {% endif %}
       </td>
       <td>
+       {% if not loop.first%}
         <form id="" action="/shorttrack/race/{{race_id}}/run/{{run.id}}/startlist/upload" enctype="multipart/form-data" method="post">
             <span class="btn btn-default btn-file">
                 Upload start list <input type="file" name="list" class="upload">
             </span>
         </form>
+        {% else %}
+            <a class="btn btn-default" href="/shorttrack/race/{{ race_id }}/runlist/build">Build start list</a>
+        {% endif %}
       </td>
       <td>
-        <a href="run/{{ run.id }}/edit">edit</a>
-        |
-        <a href="run/{{ run.id }}/del">del</a>
+        <a href="{{ run.id }}/orderlist" class="btn btn-primary">Order List</a>
+        <a href="{{ run.id }}/del" class="btn btn-danger">del</a>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-    <div class="row">
-      <div class="form-group  col-md-6 row">
-        <div class="col-sm-5">
-          <input type="text" class="form-control" id="new_run__name" placeholder="New run name">
-        </div>
-        <div class="col-sm-3">
-          <button type="button" class="form-control btn-info" id="new_run__add">Add</button>
-        </div>
-      </div>
+<div class="row">
+  <div class="form-group  col-md-6 row">
+    <div class="col-sm-5">
+      <input type="text" class="form-control" id="new_run__name" placeholder="New run name">
     </div>
-<a class="btn btn-default" href="{{ url_for('shorttrack.race_add') }}">Add</a>
+    <div class="col-sm-3">
+      <button type="button" class="form-control btn-info" id="new_run__add">Add</button>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 
