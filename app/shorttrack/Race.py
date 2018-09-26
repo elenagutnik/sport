@@ -167,11 +167,15 @@ def race_add_run(id):
     lastRun = RunInfo.query.filter(RunInfo.race_id == id).\
         order_by(RunInfo.number.desc()).\
         limit(1).first()
-    tm=request
+    if lastRun is None:
+        runNumber = 0
+    else:
+        runNumber = lastRun.number
+
     newRun = RunInfo(
         name=request.form.get("new_run__name"),
         race_id=id,
-        number=lastRun.number+1
+        number=runNumber
     )
     db.session.add(newRun)
     db.session.commit()

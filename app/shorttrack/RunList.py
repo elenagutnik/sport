@@ -31,7 +31,7 @@ class RunList:
             db.session.add(run)
             db.session.commit()
 
-        self.run=run
+        self.run = run
         reversed = False
         
         count = math.ceil(len(competitors_list)/4)
