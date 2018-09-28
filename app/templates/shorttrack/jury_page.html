@@ -89,7 +89,7 @@
                             <td>{{loop.index}}</td>
                             <td>{{item.ru_lastname}} {{item.ru_firstname}}</td>
                             <td>
-                                <a data-toggle="modal" title="Photofinish" class="open-PhotofinishModal btn btn-primary" href="#PhotofinishModal">test</a>
+                                <a data-toggle="modal" title="Photofinish" class="open-PhotofinishModal btn btn-primary" run_id="{{key}}" competitor_id="{{item.id}}" href="#PhotofinishModal">test</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -147,8 +147,13 @@
     });
 
     $(document).on("click", ".open-PhotofinishModal", function () {
-//     var myBookId = $(this).data('id');
-//     $(".modal-body #bookId").val( myBookId );
+      var run_id=$(this).attr("run_id");
+      var competitor_id=$(this).attr("competitor_id");
+      console.log("run_id",run_id);
+      console.log("competitor_id",competitor_id);
+
+     //var myBookId = $(this).id;
+     //$(".modal-body #bookId").val( myBookId );
      // As pointed out in comments,
      // it is superfluous to have to manually call the modal.
       $('#PhotofinishModal').modal('show');
