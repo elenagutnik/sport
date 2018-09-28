@@ -121,3 +121,5 @@ def load_data():
     if racehandler.isDataForSend:
         socketio.emit("STNewDataPoint", json.dumps(racehandler.resultView()))
     return '', 200
+
+

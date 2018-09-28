@@ -17,6 +17,7 @@ from .models import Competitor, Gender, Nation, Race
 @admin_required
 def index():
     db.create_all(bind='__all__')
+    JuryType.insert()
     return render_template('shorttrack/index.html')
 
 @shorttrack.route('/race/add/', methods=['GET', 'POST'])
@@ -260,3 +261,35 @@ def xcl_run_results(race_id, run_id):
         response.headers['Content-Disposition'] = 'inline; filename=xls_report.xls'
 
         return response
+
+
+@shorttrack.route('/race/<int:race_id>/jury/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def race_jury_list(race_id):
+    jury_list = db.session.query(Jury, JuryType).join(JuryType).filter(Jury.race_id == race_id).all()
+    return render_template('shorttrack/static-tab/jury_list.html',race_id=race_id, list=jury_list)
+
+
+@shorttrack.route('/race/<int:race_id>/jury/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def race_jury_add(race_id):
+    form = JuryBaseForm()
+    form.jury_type_ref.choices = [(item.id, item.type) for item in
+                               JuryType.query.all()]
+    if form.validate_on_submit():
+        jury = Jury(
+            race_id=race_id,
+            type_id=form.jury_type_ref.data,
+            event_code=form.event_code.data,
+            ru_lastname=form.ru_lastname.data,
+            ru_firstname=form.ru_firstname.data,
+            en_lastname=form.en_lastname.data,
+            en_firstname=form.en_firstname.data
+        )
+        db.session.add(jury)
+        db.session.commit()
+        flash('The jury has been updated.')
+        return redirect(url_for('.race_jury_list', race_id=race_id, _external=True))
+    return render_template('shorttrack/form_page.html', form=form, title='Add jury')

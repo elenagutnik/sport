@@ -78,24 +78,38 @@
                     <table style="width:25%; float:left">
                         <tr>
                             <th colspan="2">Группа - {{group}}</th>
-                            </tr> <tr>
-
+                        </tr>
+                        <tr>
                             <th>Order</th>
                             <th>Name</th>
+                            <th></th>
                         </tr>
                         {% for item in list %}
                         <tr>
                             <td>{{loop.index}}</td>
                             <td>{{item.ru_lastname}} {{item.ru_firstname}}</td>
+                            <td>
+                                <a data-toggle="modal" title="Photofinish" class="open-PhotofinishModal btn btn-primary" href="#PhotofinishModal">test</a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </table>
 
             {% endfor %}
         {% endfor %}
-
       </div>
+</div>
+
+<div class="modal hide" id="PhotofinishModal">
+ <div class="modal-header">
+    <button class="close" data-dismiss="modal">×</button>
+    <h3>Modal header</h3>
+  </div>
+    <div class="modal-body">
+        <p>some content</p>
     </div>
+</div>
+
 {% endblock %}
 {% block scripts %}
 {{ super() }}
@@ -127,6 +141,14 @@
                $( "tr[run_id='"+cid+"']").children('.finish__time').html(data);
             });
     });
+
+    $(document).on("click", ".open-PhotofinishModal", function () {
+//     var myBookId = $(this).data('id');
+//     $(".modal-body #bookId").val( myBookId );
+     // As pointed out in comments,
+     // it is superfluous to have to manually call the modal.
+      $('#PhotofinishModal').modal('show');
+});
 
 </script>
 {% endblock %}

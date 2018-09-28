@@ -126,7 +126,7 @@ class ResultApproved(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id', ondelete='CASCADE'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
-    # status = db.Column(db.Integer, db.ForeignKey('status.id', ondelete='CASCADE'))
+    status = db.Column(db.Integer, db.ForeignKey('status.id', ondelete='CASCADE'))
     diff = db.Column(db.BigInteger)
     time = db.Column(db.BigInteger)
     rank = db.Column(db.Integer)
@@ -156,3 +156,70 @@ class DataIn(db.Model):
     transponder = db.Column(db.String)
     src_dev = db.Column(db.String)
     time = db.Column(db.Time)
+
+class JuryType(db.Model):
+    __bind_key__ = 'shorttrack'
+    __tablename__ = 'jury_type'
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String)
+    description = db.Column(db.String)
+    @staticmethod
+    def insert():
+        Types = [
+            'Referee', 'Assistant Referee', 'Assistant Referee Video',
+             'Starter', 'Competitors Steward', 'Heat Box Steward',
+             'Photo Finish Judge', 'Lap Scorer', 'Lap Recorder',
+             'Announcer', 'Track steward', 'Technical Delegate',
+             'Chief Finish Line Judge', 'Finish Line Judge',
+             'Chief Timekeeper', 'Timekeeper'
+         ]
+        for t in Types:
+            type = JuryType.query.filter_by(type=t).first()
+            if type is None:
+                type = JuryType(type=t)
+            db.session.add(type)
+        db.session.commit()
+
+
+class Jury(db.Model):
+    __bind_key__ = 'shorttrack'
+    __tablename__ = 'jury'
+    id = db.Column(db.Integer, primary_key=True)
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
+    type_id = db.Column(db.Integer, db.ForeignKey('jury_type.id'))
+    ru_lastname = db.Column(db.String)
+    ru_firstname = db.Column(db.String)
+    en_lastname = db.Column(db.String)
+    en_firstname = db.Column(db.String)
+
+    event_code = db.Column(db.String)
+
+
+class Status(db.Model):
+    __tablename__ = 'status'
+    __bind_key__ = 'shorttrack'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    description = db.Column(db.String)
+
+    @staticmethod
+    def insert():
+        status = ['QLF', 'QLF-1', 'QLF-2', 'DQL', 'DQL-1', 'DQL-2']
+        for d in status:
+            stts = Status.query.filter_by(name=d).first()
+            if stts is None:
+                stts = Status(name=d, description=d)
+            db.session.add(stts)
+        db.session.commit()
+
+
+class PhotoFinishData(db.Model):
+    __bind_key__ = 'shorttrack'
+    __tablename__ = 'photo_finishdata'
+    id = db.Column(db.Integer, primary_key=True)
+    race_id = db.Column(db.Integer, db.ForeignKey('race.id', ondelete='CASCADE'))
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
+    competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id', ondelete='CASCADE'))
+    time = db.Column(db.Time)
+
+

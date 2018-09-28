@@ -1,5 +1,5 @@
 from . import db
-from .models import Competitor, RunOrder, RunInfo, RunGroup, Race, VirtualDevice, ResultDetail
+from .models import Competitor, RunOrder, RunInfo, RunGroup, Race, VirtualDevice, ResultDetail, Status
 import math
 import xlwt
 from .Race import timeConverter
@@ -95,9 +95,20 @@ class ExcelGenerator:
         self.ws.write(0, 3, 'time')
         self.ws.write(0, 4, 'diff')
         self.ws.write(0, 5, 'rank')
-        self.ws.write(0, 6, 'next run group')
-        self.ws.write(0, 7, 'order in group')
+        self.ws.write(0, 6, 'status')
+        self.ws.write(0, 7, 'next run group')
+        self.ws.write(0, 8, 'order in group')
+
+        self.ws.write(0, 10, 'status codes')
+        statusList = Status.query.all()
+
+        coll = 10
         self.row = 1
+        for index, item in enumerate(statusList):
+            self.ws.write(self.row+index, 10, item.name)
+
+
+
 
     def set_data(self, race_id, run_id):
         lastDevice = VirtualDevice.query.filter(VirtualDevice.race_id == race_id).\
@@ -125,5 +136,32 @@ class ExcelGenerator:
         self.wb.save(output)
         return output.getvalue()
 
-class ExcelLoader:
-    pass
+# class ExcelLoader:
+#     def race_run_startlist_upload(id, run_id):
+#         filename = request.files['list'].filename
+#         extension = filename.split(".")[-1]
+#         content = request.files['list'].read()
+#         sheet = pyexcel.get_sheet(file_type=extension, file_content=content)
+#         runList = RunGroup.query.filter(RunGroup.run_id == run_id).all()
+#         db.session.query(RunOrder).filter(RunOrder.run_id == run_id).delete()
+#         for item in sheet.to_array()[1:]:
+#             if item[6] != '':
+#                 group = next((itm for itm in runList if itm.number == item[6]), None)
+#                 if group is None:
+#                     group = RunGroup(
+#                         number=item[6],
+#                         run_id=run_id
+#                     )
+#                     db.session.add(group)
+#                     db.session.commit()
+#                     runList.append(group)
+#
+#                 runOrder = RunOrder(
+#                     group_id=group.id,
+#                     order=item[7],
+#                     competitor_id=item[0],
+#                     run_id=run_id
+#                 )
+#                 db.session.add(runOrder)
+#         db.session.commit()
+#         return redirect(url_for('.race_run_orderlist', race_id=id, run_id=run_id, _external=True))

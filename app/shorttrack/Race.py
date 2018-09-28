@@ -175,7 +175,7 @@ def race_add_run(id):
     newRun = RunInfo(
         name=request.form.get("new_run__name"),
         race_id=id,
-        number=runNumber
+        number=runNumber+1
     )
     db.session.add(newRun)
     db.session.commit()
@@ -233,14 +233,32 @@ def race_run_startlist_upload(id, run_id):
     extension = filename.split(".")[-1]
     content = request.files['list'].read()
     sheet = pyexcel.get_sheet(file_type=extension, file_content=content)
+
     runList = RunGroup.query.filter(RunGroup.run_id == run_id).all()
+
+    statusList = Status.query.all()
+
     db.session.query(RunOrder).filter(RunOrder.run_id == run_id).delete()
     for item in sheet.to_array()[1:]:
-        if item[6] != '':
-            group = next((itm for itm in runList if itm.number == item[6]), None)
+        status = next((itm for itm in runList if itm.number == item[6]), None)
+        if status != None:
+            resultApproved = ResultApproved.query.filter(ResultApproved.competitor_id == item[0],
+                                                         ResultApproved.run_id == run_id).first()
+            if resultApproved is None:
+                resultApproved = ResultApproved(
+                    competitor_id=item[0],
+                    run_id=run_id,
+                    status_id=status.id
+                )
+            else:
+                resultApproved.run_id = status.id
+            db.session.add(resultApproved)
+
+        if item[7] != '':
+            group = next((itm for itm in runList if itm.number == item[7]), None)
             if group is None:
                 group = RunGroup(
-                    number=item[6],
+                    number=item[7],
                     run_id=run_id
                 )
                 db.session.add(group)
@@ -249,7 +267,7 @@ def race_run_startlist_upload(id, run_id):
 
             runOrder = RunOrder(
                 group_id=group.id,
-                order=item[7],
+                order=item[8],
                 competitor_id=item[0],
                 run_id=run_id
             )
@@ -281,3 +299,16 @@ def createStartDeviceResults(race_id, run_id, group_id):
         db.session.add(resultDetailFirst)
     db.session.commit()
 
+
+
+
+
+
+@shorttrack.route('/race/<int:id>/run/<int:run_id>/photofinish', methods=['GET', 'POST'])
+def race_photofinish_data(id, run_id):
+    photoFinishData = PhotoFinishData(
+        competitor_id=request.form.get['competitor_id'],
+        run_id=run_id,
+        time=datetime.strptime(request.form.get[time], '%M:%S.%f').time()
+    )
+    return ''

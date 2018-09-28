@@ -18,3 +18,16 @@ class DeviceBaseForm(FlaskForm):
     src_dev = StringField('src_dev', validators=[InputRequired()])
     name = StringField('Device Name', validators=[InputRequired()])
     submit = SubmitField('Submit')
+
+
+class JuryBaseForm(FlaskForm):
+    ru_lastname = StringField('Lastname (Rus)', validators=[InputRequired()])
+    ru_firstname = StringField('Firstname (Rus)', validators=[InputRequired()])
+    en_lastname = StringField('Lastname (Eng)', validators=[InputRequired()])
+    en_firstname = StringField('Firstname (Eng)', validators=[InputRequired()])
+    jury_type_ref = SelectField('Jury type', coerce=int)
+    event_code = StringField('Event code (System)', validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
+
+
