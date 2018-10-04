@@ -25,6 +25,8 @@ def runList_view(data):
         result[item[2].course_id].append({
             'en_firstname': item[0].en_firstname,
             'en_lastname': item[0].en_lastname,
+            'ru_firstname': item[0].ru_firstname,
+            'ru_lastname': item[0].ru_lastname,
             'bib': item[1].bib,
             'order': item[2].order,
             'manual_order': item[2].manual_order,
