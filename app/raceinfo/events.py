@@ -154,7 +154,7 @@ def get_race_info(data):
         run_list = db.session.query(RunInfo, RunType, Discipline).\
             join(RunType, RunInfo.run_type_id == RunType.id). \
             join(Discipline, RunInfo.discipline_id == Discipline.id, isouter=True). \
-            filter(RunInfo.race_id == data['race_id']).all()
+            filter(RunInfo.race_id == data['race_id'], RunInfo.run_type_id != 3).all()
 
         race_info = {}
         for run in run_list:
