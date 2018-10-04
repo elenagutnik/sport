@@ -167,7 +167,10 @@ def get_race_info(data):
           else run[2].en_name),
                 'discipline_fiscode': (None if run[2] is None
                                else run[2].fiscode),
-                'courses': {}
+                'courses': {},
+                'run_list': runList_view(db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor).\
+                    join(RunOrder).filter(RunOrder.run_id == run[0].id).\
+                    order_by(RunOrder.order).all())
             }
             courses = db.session.query(Course).filter(Course.id == RunCourses.course_id,
                                                       RunCourses.run_id == run[0].id).all()

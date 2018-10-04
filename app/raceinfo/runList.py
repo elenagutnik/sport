@@ -18,7 +18,7 @@ def startlist_get(run_id):
     return json.dumps(runList_view(data))
 
 def runList_view(data):
-    result={}
+    result = {}
     for item in data:
         if item[2].course_id not in result.keys():
             result[item[2].course_id] = []
