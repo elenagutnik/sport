@@ -159,8 +159,8 @@ def get_race_info(data):
         race_info = {}
         for run in run_list:
             race_info[run[0].id] = {
-                'starttime': str(run[0].starttime),
-                'endtime': str(run[0].endtime),
+                'starttime': (None if run[0].starttime is None else str(run[0].starttime)),
+                'endtime': (None if run[0].endtime is None else str(run[0].endtime)),
                 'number': run[0].number,
                 'type': run[1].name,
                 'discipline': (None if run[2] is None
