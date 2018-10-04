@@ -103,14 +103,17 @@ def race_course_run_start(id, run_id):
 
         run_info = RunInfo.query.get_or_404(run_id)
         if is_combination.is_combination is True and run_info.discipline_id is None:
-            return 'fail', 200
+            return json.dumps({'success': False})
         run_info.starttime = datetime.now()
         db.session.add(run_info)
         db.session.commit()
     except:
-        return 'fail', 200
-    return json.dumps({'start_time': str(run_info.starttime)})
-#
+        return json.dumps({'success': False})
+    return json.dumps({'success': True,
+                       'starttime': str(run_info.starttime)
+                       })
+
+
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/stop', methods=['GET', 'POST'])
 @admin_required
 def race_course_run_stop(id,run_id):
