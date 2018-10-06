@@ -10,6 +10,7 @@ from .runList import race_order_buld, rebuild_startlist
 from sqlalchemy import cast, DATE
 from sqlalchemy import func
 
+from math import log2
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/del', methods=['GET', 'POST'])
 @admin_required
