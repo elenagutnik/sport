@@ -444,7 +444,7 @@ def race(id):
     race.category=Category.query.get(race.category_id)
     race.discipline=Discipline.query.get(race.discipline_id)
     race.nation=Nation.query.get(race.nation_id)
-    return render_template('raceinfo/race_view.html', race=race)
+    return render_template('raceinfo/race_view.html', race=race, discipline=race.discipline)
 
 @raceinfo.route('/race/<int:id>/del', methods=['GET', 'POST'])
 @admin_required

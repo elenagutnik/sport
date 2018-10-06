@@ -33,11 +33,6 @@
             <h4>{{ _('Order list') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/order_list/build">build</a></h4>
         </div>
     </div>
-{#    <h4>{{ _('Technical Delegates') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/td">edit</a></h4>#}
-{#    <table class="table table-striped">#}
-{#      <tbody>#}
-{#      </tbody>#}
-{#    </table>#}
     <div class="row">
         <div class="col-lg-6">
     {% if race.isTeam %}
@@ -58,11 +53,20 @@
             <h4>{{ _('Weather') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/weather">edit</a></h4>
         </div>
     </div>
-    <h4>{{ _('Course') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course">edit</a></h4>
-    <table class="table table-striped">
-      <tbody>
-      </tbody>
-    </table>
+    <div class="row">
+        <div class="col-lg-6">
+            <h4>{{ _('Course') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/course">edit</a></h4>
+            <table class="table table-striped">
+              <tbody>
+              </tbody>
+            </table>
+        </div>
+        <div class="col-lg-6">
+        {% if discipline.is_parallel %}
+            <h4>{{ _('Runs') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/runs/build">build</a></h4>
+        {% endif %}
+        </div>
+    </div>
     <h4>{{ _('Runs') }} <a class="btn btn-default" href="/raceinfo/race/{{ race.id }}/run">edit</a></h4>
     <table class="table table-striped">
       <tbody>
