@@ -163,6 +163,7 @@ def get_race_info(data):
                 'endtime': (None if run[0].endtime is None else str(run[0].endtime)),
                 'number': run[0].number,
                 'type': run[1].name,
+                'is_second': run[0].is_second,
                 'discipline': (None if run[2] is None
           else run[2].en_name),
                 'discipline_fiscode': (None if run[2] is None
