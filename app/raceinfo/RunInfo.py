@@ -134,13 +134,15 @@ def forerunner_run_create(id):
         RunInfo.number.asc()).first()
 
     if forerunner_runs is not None:
-        return 'Невозможно сформировать заезд. Заезд уже начат '
+        return json.dumps({'success': False,
+                           'msg': 'Невозможно сформировать заезд. Заезд уже начат '})
 
     try:
         next_run = db.session.query(RunInfo).filter(RunInfo.starttime == None, RunInfo.race_id == id).order_by(RunInfo.number.asc()).limit(1).one()
         run_courses_list = RunCourses.query.filter(RunCourses.run_id == next_run.id).all()
     except:
-        return 'Невозможно сформировать заезд'
+        return json.dumps({'success': False,
+                           'msg': 'Невозможно сформировать заезд'})
     run = RunInfo(
         race_id=id,
         run_type_id=db.session.query(RunType.id).filter(RunType.is_forerunner == True).scalar(),
@@ -192,7 +194,8 @@ def forerunner_run_create(id):
             'course_id': item.course_id,
 
         })
-    return json.dumps(response_start_list)
+    return json.dumps({'success': True,
+                       'data': response_start_list})
 
 
 @raceinfo.route('/race/<int:id>/run/forerunners/del', methods=['GET', 'POST'])

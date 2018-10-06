@@ -201,10 +201,15 @@ def get_race_info(data):
                 join(RunOrder).filter(RunOrder.run_id == forerunners_runs.id). \
                 order_by(RunOrder.order).all()
             results, manual, dql_list = TreeView(forerunners_runs.id)
-            socketio.emit('ForerunnersResults', json.dumps([
-                runList_view([[item[0], item[2], item[3]] for item in run_list]),
-                ConvertRunResults(results, manual, dql_list)
-            ]))
+            socketio.emit('ForerunnersResults', json.dumps(
+                {
+                    forerunners_runs.id:
+                    [
+                        runList_view([[item[0], item[2], item[3]] for item in run_list]),
+                        ConvertRunResults(results, manual, dql_list)
+                    ]
+                }
+            ))
 
 
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
