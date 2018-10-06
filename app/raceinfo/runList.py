@@ -19,6 +19,7 @@ def startlist_get(run_id):
 
 def runList_view(data):
     result = {}
+    # как нибудь обернуть в cource_id когда Лена будет готовв
     for item in data:
         if item[2].course_id not in result.keys():
             result[item[2].course_id] = []
@@ -31,7 +32,7 @@ def runList_view(data):
             'order': item[2].order,
             'manual_order': item[2].manual_order,
             'run_order_id': item[2].id,
-            'race_competitor_id': item[1].id,
+            'race_competitor_id': item[1].id
         })
     return result
 
@@ -69,25 +70,6 @@ def race_order_list(race_id):
     discipline = Discipline.query.filter(Discipline.id == race.discipline_id).first()
 
     if discipline.is_qualification or discipline.is_parallel:
-        if discipline.is_parallel:
-            RunInfo.query.filter(RunInfo.race_id== race_id).delete()
-            competitors_count = db.session.query(func.count(RaceCompetitor.id)).filter(RaceCompetitor.race_id == race_id).scalar()
-            runs_count = log2(competitors_count)+1
-            for i in range(runs_count):
-                first_info = RunInfo(
-                    race_id=race_id,
-                    number=i+1,
-                    run_type_id=1
-                )
-                db.session.add(first_info)
-                second_run = RunInfo(
-                    race_id=race_id,
-                    number=i + 1,
-                    run_type_id=1,
-                    is_second=True
-                )
-                db.session.add(second_run)
-            db.session.commit()
         try:
             run = RunInfo.query.filter_by(race_id=race_id, number=1, is_second=None).one()
         except:

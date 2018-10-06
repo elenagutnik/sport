@@ -440,11 +440,11 @@ def race_lis_get():
 @admin_required
 def race(id):
     race = Race.query.get_or_404(id)
-    race.gender=Gender.query.get(race.gender_id)
-    race.category=Category.query.get(race.category_id)
-    race.discipline=Discipline.query.get(race.discipline_id)
-    race.nation=Nation.query.get(race.nation_id)
-    return render_template('raceinfo/race_view.html', race=race)
+    race.gender = Gender.query.get(race.gender_id)
+    race.category = Category.query.get(race.category_id)
+    race.discipline = Discipline.query.get(race.discipline_id)
+    race.nation = Nation.query.get(race.nation_id)
+    return render_template('raceinfo/race_view.html', race=race, discipline=race.discipline)
 
 @raceinfo.route('/race/<int:id>/del', methods=['GET', 'POST'])
 @admin_required
