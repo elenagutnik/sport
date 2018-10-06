@@ -9,7 +9,7 @@ from . import jsonencoder
 from .runList import race_order_buld, rebuild_startlist
 from sqlalchemy import cast, DATE
 from sqlalchemy import func
-from math import log2
+
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/del', methods=['GET', 'POST'])
 @admin_required
@@ -124,37 +124,6 @@ def race_course_run_stop(id,run_id):
     race_order_buld(id, run_id, run_info.number)
 
     return json.dumps({'stop_time': str(run_info.endtime)})
-
-
-@raceinfo.route('/race/<int:race_id>/runs/build', methods=['GET', 'POST'])
-@admin_required
-def race_runs_build(race_id):
-    race = db.session.query(Race).filter(Race.id == race_id).first()
-    discipline = Discipline.query.filter(Discipline.id == race.discipline_id).first()
-    if discipline.is_parallel:
-        RunInfo.query.filter(RunInfo.race_id == race_id).delete()
-        competitors_count = db.session.query(func.count(RaceCompetitor.id)).filter(
-            RaceCompetitor.race_id == race_id).scalar()
-        runs_count = log2(competitors_count) + 1
-
-        for i in range(int(runs_count)):
-            first_info = RunInfo(
-                race_id=race_id,
-                number=i + 1,
-                run_type_id=1
-            )
-            db.session.add(first_info)
-            second_run = RunInfo(
-                race_id=race_id,
-                number=i + 1,
-                run_type_id=1,
-                is_second=True
-            )
-            db.session.add(second_run)
-        db.session.commit()
-        flash('Runs have been created')
-    return redirect(url_for('.race', id=race_id, _external=True))
-
 
 
 
