@@ -10,7 +10,7 @@ var device =  JSON.parse('{{ device | safe }}');
 var competitors =  JSON.parse('{{ competitors | safe }}');
 
 var circle_count = {{ circle_count }};
-
+ var starttime = 0;
 function tform(v){
     return moment(v).format('mm:ss.SSSS');
 }
@@ -22,15 +22,20 @@ function dtform(v){
 
 function run(){
     $.ajax({
-      url: "/shorttrack/race/"+{{ race_id }}+"/run/"+{{ run_id }}+"/group/start",
-      type: 'GET'
+      url: "/shorttrack/input/data",
+      type: 'POST',
+      contentType: 'application/json',
+      data:JSON.stringify({
+			  'EVENT_CODE': 'C0'
+      })
     }).done(function() {
-        reqSend(0,0);
+        reqSend(0);
     });
 
 }
 
-function reqSend(devnum,starttime){
+
+function reqSend(devnum){
 
 //	var t = new Date().getTime() ; // 12.850 - 12.859
 	if(starttime==0)
@@ -49,11 +54,11 @@ function reqSend(devnum,starttime){
 	}else{
 		devnum++;
 		//if(snum<=startlist.length-1)
-			setTimeout(reqSend, sectordelay+(Math.random()*1040),  devnum, starttime);
+			setTimeout(reqSend, sectordelay+(Math.random()*1040),  devnum);
 	}
 }
 function sendCompetitor(competitor, devnum, starttime) {
-    setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_1, devnum,starttime);
+    setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_1, devnum, starttime);
 	setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_2, devnum, starttime);
 }
 function sendLeg(i,transponder, devnum, starttime) {
@@ -68,7 +73,8 @@ function sendLeg(i,transponder, devnum, starttime) {
 		  data:JSON.stringify({
 			  'SRC_DEV':device['src_dev'],
 			  'TIME':tform(t-starttime),
-			  'TRANSPONDER':transponder
+			  'TRANSPONDER':transponder,
+			  'EVENT_CODE': 'C1'
 			  })
 		}).done(function() {
 //			  $( this ).addClass( "done" );
@@ -80,6 +86,22 @@ function randomDelay() {
     return rand;
   }
 
+
+function juryrun(eventcode){
+    var t = new Date().getTime()
+    t=tform(t-starttime);
+    $.ajax({
+      url: "/shorttrack/input/data",
+      type: 'POST',
+      contentType: 'application/json',
+      data:JSON.stringify({
+              'EVENT_CODE': eventcode,
+              'TIME': t
+      })
+    }).done(function() {
+        $('.'+eventcode).append(t);
+    });
+}
 </script>
 <!--
 <input type="button" onclick="clearInterval(intervalID);" value="stop"> |
@@ -109,4 +131,17 @@ function randomDelay() {
 <tr><td>#</td><td>delay</td><td>time s.ms</td></tr>
 </table>
  -->
+<HR>
+
+ <table id="data1" style="width:100%; float:left">
+{% for item in jury%}
+<tr>
+    <td>{{item[0].en_lastname}} {{item[0].en_firstname}}</td>
+    <td>{{item[0].event_code}}</td><td>{{item[1].type}}</td>
+    <td><input type="button" onclick="juryrun('{{item[0].event_code}}');" value="Хакуна Матата!"></td>
+    <td class="{{item[0].event_code}}"></td>
+</tr>
+{% endfor %}
+</table>
+
  </html>

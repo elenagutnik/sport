@@ -422,7 +422,7 @@ def td_del(id):
     td = TD.query.get_or_404(id)
     db.session.delete(td)
     flash(gettext('The td '+ td.ru_name +' has been deleted.'))
-    return redirect(url_for('.td_list',_external=True))
+    return redirect(url_for('.td_list', _external=True))
 
 @raceinfo.route('/race/', methods=['GET'])
 @admin_required

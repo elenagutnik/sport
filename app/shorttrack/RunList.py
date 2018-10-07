@@ -98,10 +98,8 @@ class ExcelGenerator:
         self.ws.write(0, 6, 'status')
         self.ws.write(0, 7, 'next run group')
         self.ws.write(0, 8, 'order in group')
-
         self.ws.write(0, 10, 'status codes')
         statusList = Status.query.all()
-
         coll = 10
         self.row = 1
         for index, item in enumerate(statusList):

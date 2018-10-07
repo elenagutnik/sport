@@ -222,4 +222,16 @@ class PhotoFinishData(db.Model):
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id', ondelete='CASCADE'))
     time = db.Column(db.Time)
 
+class JuryResult(db.Model):
+    __bind_key__ = 'shorttrack'
+    __tablename__ = 'jury_result'
+    id = db.Column(db.Integer, primary_key=True)
+    run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
+    group_id = db.Column(db.Integer, db.ForeignKey('run_group.id'))
+    jury_id = db.Column(db.Integer, db.ForeignKey('jury.id'))
+    competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
+    time = db.Column(db.Time)
+    rank = db.Column(db.Integer)
+
+
 

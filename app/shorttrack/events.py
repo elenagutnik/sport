@@ -8,8 +8,8 @@ from sqlalchemy import func
 from .models import *
 from .forms import *
 from .. import db_shorttrack as db
-from .Race import ShrortTrack, race_group_run_start
 
+from .Race import EventDefiner
 # For emulator
 import json
 from .models import *
@@ -61,16 +61,20 @@ def emulator(race_id):
                 'transponder_1': item[0].transponder_1,
                 'transponder_2': item[0].transponder_2
             })
+
+        jury_list = db.session.query(Jury, JuryType).join(JuryType, JuryType.id == Jury.type_id). \
+            filter(Jury.race_id == race_id).all()
+
         device = db.session.query(Device).filter(Device.race_id == race_id).one()
         circle_count = db.session.query(func.count(VirtualDevice.id)).filter(VirtualDevice.race_id == race_id).scalar()-1
         return render_template('timer_shorttrack.html',
                                competitors=json.dumps(competitors_list),
                                device=json.dumps(device, cls=AlchemyEncoder),
-                               circle_count=circle_count, race_id=race_id, run_id=current.id)
-
+                               circle_count=circle_count, race_id=race_id, run_id=current.id, jury=jury_list)
     except:
         emulator_clear(race_id)
         return 'Наверное нету активных заездов'
+
 @shorttrack.route('/emulation/<int:race_id>/clear', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -87,15 +91,16 @@ def emulator_clear(race_id):
 @login_required
 @admin_required
 def jury_page(race_id):
+    jury_list = db.session.query(Jury, JuryType).join(JuryType, JuryType.id == Jury.type_id).\
+        filter(Jury.race_id == race_id).all()
 
     Competitors_list = db.session.query(Competitor, RunOrder).\
-        join(RunOrder, RunOrder.competitor_id ==Competitor.id, isouter=True).\
-        filter(Competitor.race_id==race_id).\
+        join(RunOrder, RunOrder.competitor_id == Competitor.id).\
+        filter(Competitor.race_id == race_id).\
         order_by(RunOrder.group_id.asc(), RunOrder.order.asc()).all()
 
     treeView={}
     for item in Competitors_list:
-        print(item[1].run_id, item[1].group_id)
         if item[1].run_id not in treeView.keys():
             treeView[item[1].run_id] = {}
         if item[1].group_id not in treeView[item[1].run_id].keys():
@@ -103,23 +108,34 @@ def jury_page(race_id):
         treeView[item[1].run_id][item[1].group_id].append(item[0])
 
     runsList = db.session.query(RunInfo).filter(RunInfo.race_id == race_id).order_by(RunInfo.number.asc()).all()
+    run_groups = RunGroup.query.filter(RunGroup.run_id.in_([item.id for item in runsList])).order_by(RunGroup.number.asc()).all()
+    run_info = {}
+    for item in runsList:
+        run_info[item.number] = {
+            'id': item.id,
+            'starttime': item.starttime,
+            'endtime': item.endtime,
+            'name': item.name,
+            'groups': []
+        }
+        for group in run_groups:
+            if group.run_id == run_info[item.number]['id']:
+                run_info[item.number]['groups'].append(group)
+
     return render_template('shorttrack/jury_page.html',
                            competitors=treeView,
-                           runs=runsList, race_id=race_id)
+                           runs=runsList, race_id=race_id,
+                           jury=jury_list, run_info=run_info)
+
 @shorttrack.route('/input/data', methods=['POST', 'GET'])
 def load_data():
-    """
-        InputData json:
-        transponder
-        src_dev
-        time
-    """
     data = request.json
-    racehandler = ShrortTrack(data)
-    racehandler.setDataIn(data)
-    racehandler.getCirclesCount(data)
+    racehandler = EventDefiner(data)
+    racehandler.HandleData()
+    print(racehandler.EVENT_NAME)
     if racehandler.isDataForSend:
-        socketio.emit("STNewDataPoint", json.dumps(racehandler.resultView()))
+        socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+
     return '', 200
 
 

@@ -9,6 +9,7 @@
       <li id="li_tab_results"><a href="#tab_results" data-toggle="tab">Результаты</a></li>
       <li id="li_tab_runs"><a href="#tab_runs" data-toggle="tab">Заезды</a></li>
       <li id="li_tab_runlists"><a href="#tab_runlists" data-toggle="tab">Стартовые списки</a></li>
+      <li id="li_tab_jurydata"><a href="#tab_jurydata" data-toggle="tab">Данные жюри</a></li>
     </ul>
     <div class="tab-content">
       <div id="tab_results" class="tab-pane fade in active">
@@ -74,6 +75,7 @@
             <div class="row">
                 <h3>Заезд - {{key}}</h3>
             </div>
+            <div class="row">
             {% for group, list in groups.items() %}
                     <table style="width:25%; float:left">
                         <tr>
@@ -87,28 +89,83 @@
                         {% for item in list %}
                         <tr>
                             <td>{{loop.index}}</td>
-                            <td>{{item.ru_lastname}} {{item.ru_firstname}}</td>
+                            <td class="competitor_name" >{{item.ru_lastname}} {{item.ru_firstname}}</td>
                             <td>
-                                <a data-toggle="modal" title="Photofinish" class="open-PhotofinishModal btn btn-primary" run_id="{{key}}" competitor_id="{{item.id}}" href="#PhotofinishModal">test</a>
+                                <a data-toggle="modal" title="Photofinish" class="open-PhotofinishModal btn btn-primary" run_id="{{key}}" competitor_id="{{item.id}}" href="#PhotofinishModal">
+                                PhF</a>
                             </td>
                         </tr>
                         {% endfor %}
                     </table>
 
             {% endfor %}
+            </div>
+        {% endfor %}
+        <div class="row">
+<span class="glyphicons glyphicons-camera"></span>
+        </div>
+      </div>
+      <div id="tab_jurydata" class="tab-pane fade">
+        <div class="row">
+            <h2>Данные жюри</h2>
+        </div>
+        {% for run_number, run_item in run_info.items() %}
+            <div class="row">
+                <h3>Заезд - {{run_number}}</h3>
+            </div>
+            <div class="row">
+             <table style="width:100%;" class="run_list table table-bordered">
+                    <tr>
+                        <th rowspan="2">Juru name</th>
+                        <th rowspan="2">Type</th>
+                        {% for group in run_item.groups%}
+                            <th colspan="2">Group {{group.number}}</th>
+                        {% endfor%}
+                    </tr>
+                    <tr>
+                    {% for group in run_item.groups%}
+                            <th>1</th>
+                            <th>2</th>
+                    {% endfor%}
+                    </tr>
+               {% for item in jury %}
+                    <tr>
+                        <td>{{item[0].en_lastname}} {{item[0].en_firstname}}</td>
+                        <td>{{item[1].type}}</td>
+                        {% for group in run_item.groups%}
+                        <td id="jury_data__group_{{group.id}}_jury_{{item[0].id}}_data_1"></td>
+                        <td id="jury_data__group_{{group.id}}_jury_{{item[0].id}}_data_2"></td>
+                        {% endfor%}
+                    </tr>
+
+               {% endfor %}
+                </table>
+            </div>
         {% endfor %}
       </div>
-</div>
+    </div>
 
 <div class="modal fade" id="PhotofinishModal">
   <div class="modal-dialog">
     <div class="modal-content">
        <div class="modal-header">
           <button class="close" data-dismiss="modal">×</button>
-          <h3>Modal header</h3>
+          <h3>Photofinish</h3>
         </div>
         <div class="modal-body">
-            <p>some content</p>
+        <form class="form-inline" method="post" id="photofinish__form" action="shorttrack/photofinish">
+          <div class="form-group">
+            <label class="sr-only" for="exampleInputEmail3">Email address</label>
+            <input type="text" class="form-control"  id="competitors_name" placeholder="Competitors name" disabled>
+          </div>
+          <div class="form-group">
+            <label class="sr-only" for="exampleInputPassword3">Password</label>
+            <input type="text" class="form-control" name="photofinish_time" id="photofinish_time" placeholder="MM:SS.MS" required>
+          </div>
+          <input type="hidden" class="form-control" name="run_id" id="photofinish__run_id">
+          <input type="hidden" class="form-control" name="competitor_id" id="photofinish__competitor_id">
+          <button type="button" id="photofinish__submit" class="btn btn-default">Send</button>
+        </form>
         </div>
     </div>
   </div>
@@ -119,12 +176,28 @@
 {{ super() }}
 <script>
   var socket = io.connect('http://127.0.0.1:5000');
-  var race_id ={{race_id}};
-  var daa;
+  var race_id = {{race_id}};
+
     socket.on('STNewDataPoint', function(data) {
      data= JSON.parse(data);
      $("#Competitor-"+data.run_id+"-"+data.competitor_id).append("<tr><td>"+data.device_order+"</td><td>"+data.rank+"</td><td>"+data.time+"</td><td>"+data.diff+"</td></tr>");
     });
+
+
+    socket.on('STNewStartData', function(data) {
+     data= JSON.parse(data);
+
+     for (var i = 0; i < data.length; i++) {
+        $("#Competitor-"+data[i].run_id+"-"+data[i].competitor_id).append("<tr><td>"+data[i].device_order+"</td><td>"+data[i].rank+"</td><td>"+data[i].time+"</td><td>"+data[i].diff+"</td></tr>");
+     }
+
+    });
+    socket.on('STJuryData', function(data) {
+     data= JSON.parse(data);
+     $("#jury_data__group_"+data.group_id+"_jury_"+data.jury_id+"_data_"+data.rank).append(data.time);
+    });
+
+
     socket.emit('GetResults', {race_id: 8});
 
     socket.on('Results', function(data) {
@@ -145,19 +218,29 @@
                $( "tr[run_id='"+cid+"']").children('.finish__time').html(data);
             });
     });
+//    Модальное окно
 
     $(document).on("click", ".open-PhotofinishModal", function () {
-      var run_id=$(this).attr("run_id");
-      var competitor_id=$(this).attr("competitor_id");
-      console.log("run_id",run_id);
-      console.log("competitor_id",competitor_id);
+//      var run_id=$(this).attr("run_id");
+//      var competitor_id=$(this).attr("competitor_id");
+//      var name=$(this).closest('tr').children('.competitor_name').text();
 
-     //var myBookId = $(this).id;
-     //$(".modal-body #bookId").val( myBookId );
-     // As pointed out in comments,
-     // it is superfluous to have to manually call the modal.
+      $('#competitors_name').attr('placeholder',$(this).closest('tr').children('.competitor_name').text());
+      $('#photofinish__run_id').val($(this).attr("run_id"));
+      $('#photofinish__competitor_id').val($(this).attr("competitor_id"));
       $('#PhotofinishModal').modal('show');
-});
+
+    });
+
+     $('#photofinish__submit').click(function() {
+         $.post('/shorttrack/race/'+race_id+'/run/'+$('#photofinish__run_id').val()+'/photofinish',
+         {
+             time:$('#photofinish_time').val(),
+             competitor_id:$('#photofinish__competitor_id').val()
+         }).done(function(data) {
+           $('#PhotofinishModal').modal('hide');
+         });
+     });
 
 </script>
 {% endblock %}

@@ -5,7 +5,6 @@ from wtforms_components import TimeField
 
 from wtforms.validators import Required, Email, InputRequired, Optional, NumberRange, Regexp
 
-
 class RaceBaseForm(FlaskForm):
     eventname = StringField('Event Name (in FIS Calendar)', validators=[InputRequired()])
     racedate = DateTimeField('Race date', format='%d.%m.%Y %H:%M', render_kw={"class": "race_datepicker"})
@@ -19,7 +18,6 @@ class DeviceBaseForm(FlaskForm):
     name = StringField('Device Name', validators=[InputRequired()])
     submit = SubmitField('Submit')
 
-
 class JuryBaseForm(FlaskForm):
     ru_lastname = StringField('Lastname (Rus)', validators=[InputRequired()])
     ru_firstname = StringField('Firstname (Rus)', validators=[InputRequired()])
@@ -28,6 +26,3 @@ class JuryBaseForm(FlaskForm):
     jury_type_ref = SelectField('Jury type', coerce=int)
     event_code = StringField('Event code (System)', validators=[InputRequired()])
     submit = SubmitField('Submit')
-
-
-
