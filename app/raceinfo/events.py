@@ -30,8 +30,6 @@ def exectutiontime(message):
 @raceinfo.route('/migrate')
 def device_1get():
     return ''
-
-
 @raceinfo.route('/emulation/<int:race_id>/clear')
 def emulation_clear_results(race_id):
     db.engine.execute('delete from result_detail; ')
@@ -122,15 +120,7 @@ def manual_approve(data):
 @socketio.on('GetResults')
 def socket_get_results(data):
     # data = json.loads(json_data)
-    if 'run_id' in data.keys():
-        run = RunInfo.query.get(data['run_id'])
-        results, manual, dql_list = TreeView(data['run_id'])
-        socketio.emit('Results', json.dumps({
-            run.id: [
-                ConvertRunResults(results, manual, dql_list),
-                DataInView(run.id)
-            ]
-        }))
+    print('GetResults')
     if 'race_id' in data.keys():
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None, RunInfo.run_type_id!=3).all()
         result_list = {}
@@ -139,7 +129,16 @@ def socket_get_results(data):
             result_list[run.id] = [ConvertRunResults(results, manual, dql_list), DataInView(run.id)]
         socketio.emit('Results', json.dumps(result_list))
     else:
-        return
+        if 'run_id' in data.keys():
+            run = RunInfo.query.get(data['run_id'])
+            results, manual, dql_list = TreeView(data['run_id'])
+            socketio.emit('Results', json.dumps({
+                run.id: [
+                    ConvertRunResults(results, manual, dql_list),
+                    DataInView(run.id)
+                ]
+            }))
+    return
 
 @socketio.on('ScoreboardSendStartlist')
 def scoreboard_send_start_list(data):
@@ -308,7 +307,8 @@ def load_data_vol3():
                             {
                                 raceHandler.courseDevice.course_id: ConvertCompetitorStart(raceHandler.result,
                                                                                            raceHandler.courseDevice,
-                                                                           raceHandler.data_in)},
+                                                                           raceHandler.data_in)
+                            },
                                 ConvertCompetitorsRankList(result_details, raceHandler.courseDevice)
                         ]
 
