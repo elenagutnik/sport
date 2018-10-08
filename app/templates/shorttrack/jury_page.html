@@ -92,7 +92,8 @@
                             <td class="competitor_name" >{{item.ru_lastname}} {{item.ru_firstname}}</td>
                             <td>
                                 <a data-toggle="modal" title="Photofinish" class="open-PhotofinishModal btn btn-primary" run_id="{{key}}" competitor_id="{{item.id}}" href="#PhotofinishModal">
-                                PhF</a>
+                                  <span class="glyphicon glyphicon-camera" aria-hidden="true"></span>
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -116,25 +117,19 @@
             <div class="row">
              <table style="width:100%;" class="run_list table table-bordered">
                     <tr>
-                        <th rowspan="2">Juru name</th>
-                        <th rowspan="2">Type</th>
+                        <th>Juru name</th>
+                        <th>Type</th>
                         {% for group in run_item.groups%}
-                            <th colspan="2">Group {{group.number}}</th>
+                            <th>Group {{group.number}}</th>
                         {% endfor%}
-                    </tr>
-                    <tr>
-                    {% for group in run_item.groups%}
-                            <th>1</th>
-                            <th>2</th>
-                    {% endfor%}
                     </tr>
                {% for item in jury %}
                     <tr>
-                        <td>{{item[0].en_lastname}} {{item[0].en_firstname}}</td>
+                        <td class="jury_name">{{item[0].en_lastname}} {{item[0].en_firstname}}</td>
                         <td>{{item[1].type}}</td>
                         {% for group in run_item.groups%}
-                        <td id="jury_data__group_{{group.id}}_jury_{{item[0].id}}_data_1"></td>
-                        <td id="jury_data__group_{{group.id}}_jury_{{item[0].id}}_data_2"></td>
+                        <td id="jury_data__group_{{group.id}}_jury_{{item[0].id}}">
+                        </td>
                         {% endfor%}
                     </tr>
 
@@ -171,6 +166,38 @@
   </div>
 </div>
 
+<div class="modal fade" id="JuryDataModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+       <div class="modal-header">
+          <button class="close" data-dismiss="modal">×</button>
+          <h3>Jury data approve</h3>
+        </div>
+        <div class="modal-body">
+        <form class="" method="post" id="photofinish__form" action="shorttrack/photofinish">
+          <div class="form-group">
+            <label for="exampleFormControlSelect1">Jury</label>
+            <input type="text" class="form-control"  id="jurydata__competitors_name" placeholder="Jury name" disabled>
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlSelect1">Time</label>
+            <input type="text" class="form-control"  id="jurydata__time" placeholder="Time" disabled>
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlSelect1">Competitor</label>
+            <select class="form-control" name="competitor_id" id="jurydata__competitor_id">
+            </select>
+          </div>
+          <input type="hidden" class="form-control" name="result_id" id="jurydata__result_id">
+          <input type="hidden" class="form-control" name="group_id" id="jurydata__group_id">
+          <button type="button" id="jurydata__submit" class="btn btn-default">Send</button>
+        </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+
 {% endblock %}
 {% block scripts %}
 {{ super() }}
@@ -194,7 +221,7 @@
     });
     socket.on('STJuryData', function(data) {
      data= JSON.parse(data);
-     $("#jury_data__group_"+data.group_id+"_jury_"+data.jury_id+"_data_"+data.rank).append(data.time);
+     $("#jury_data__group_"+data.group_id+"_jury_"+data.jury_id).append("<div class='alert alert-info' role='alert'><button type='button' group_id='"+data.group_id+"' jury_result_id='"+data.id+"' jury_id='"+data.jury_id+"' class='open-JuryDataModal close'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></button><strong class='jury_time' >"+data.time+"</strong></div>");
     });
 
 
@@ -232,6 +259,33 @@
 
     });
 
+    $(document).on("click", ".open-JuryDataModal", function () {
+      var elem= $(this);
+      $.get('/shorttrack/competitorslist', {'group_id':$(this).attr("group_id")}).done(function(data) {
+            data=JSON.parse(data);
+            for(i=0; i<data.length;i++)
+                $('#jurydata__competitor_id').append('<option value="'+data[i].id+'">'+data[i].ru_lastname+' '+data[i].ru_firstname+'</option>');
+
+            $('#jurydata__competitors_name').val(elem.closest('td').siblings('.jury_name').text());
+            $('#jurydata__time').val(elem.siblings('strong').text());
+            $('#jurydata__result_id').val(elem.attr("jury_result_id"));
+            $('#JuryDataModal').modal('show');
+
+            $('#jurydata__submit').click(function() {
+             $.post('/shorttrack/jury_result/approve',
+             {
+                 jury_result_id:$('#jurydata__result_id').val(),
+                 competitor_id:$('#jurydata__competitor_id').val()
+             }).done(function(data) {
+               elem.closest('div').removeClass('alert-info').addClass('alert-success');
+               elem.remove();
+               $('#JuryDataModal').modal('hide');
+            });
+     });
+
+      });
+
+    });
      $('#photofinish__submit').click(function() {
          $.post('/shorttrack/race/'+race_id+'/run/'+$('#photofinish__run_id').val()+'/photofinish',
          {
@@ -241,6 +295,7 @@
            $('#PhotofinishModal').modal('hide');
          });
      });
+
 
 </script>
 {% endblock %}

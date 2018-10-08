@@ -1462,7 +1462,7 @@ def race_run(id):
     else:
         course_runs = (db.session.query(RunInfo, Course).join(Course, isouter=True).filter(RunInfo.race_id == id)).all()
 
-    return render_template('raceinfo/static-tab/run_list.html', is_combination=discipline.is_combination, race=race, course_runs=course_runs)
+    return render_template('raceinfo/static-tab/run_list.html', discipline=discipline, race=race, course_runs=course_runs)
 
 @raceinfo.route('/race/<int:id>/course/<int:course_id>/dev/add', methods=['GET', 'POST'])
 @admin_required

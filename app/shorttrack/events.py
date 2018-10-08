@@ -84,6 +84,7 @@ def emulator_clear(race_id):
     db.session.query(RunInfo).filter(RunInfo.race_id==race_id).update({"endtime": None,
                                                                        "starttime": None})
     db.session.query(RunGroup).update({"is_finish": None, "is_start": None})
+    db.session.query(JuryResult).delete()
     db.session.commit()
     return 'Подчищено!'
 
@@ -127,6 +128,23 @@ def jury_page(race_id):
                            runs=runsList, race_id=race_id,
                            jury=jury_list, run_info=run_info)
 
+@shorttrack.route('/competitorslist', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def competitors_get_by_group():
+    db_competitorsList=db.session.query(Competitor, RunOrder).join(RunOrder, RunOrder.competitor_id == Competitor.id).\
+        filter(RunOrder.group_id==request.args.get('group_id')).all()
+    result=[]
+    for item in db_competitorsList:
+        result.append({
+            'id': item[0].id,
+            'ru_lastname': item[0].ru_lastname,
+            'ru_firstname': item[0].ru_firstname,
+        })
+    return json.dumps(result)
+
+
+
 @shorttrack.route('/input/data', methods=['POST', 'GET'])
 def load_data():
     data = request.json
@@ -135,7 +153,6 @@ def load_data():
     print(racehandler.EVENT_NAME)
     if racehandler.isDataForSend:
         socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
-
     return '', 200
 
 

@@ -16,8 +16,11 @@
   <thead>
     <tr>
       <td>Number</td>
+      {% if discipline.is_parallel %}
+        <td></td>
+      {% endif %}
       <td>Course name</td>
-      {% if is_combination %}
+      {% if discipline.is_combination %}
         <td>Discipline</td>
       {% endif %}
       <td>Start time</td>
@@ -29,9 +32,26 @@
   <tbody>
     {% for run in course_runs %}
     <tr>
-      <td>{{ run[0].number }} </td>
-      <td>{{ run[1].en_name }}</td>
-      {% if is_combination %}
+     {% if discipline.is_parallel %}
+          {% if not run[0].is_second %}
+              <td rowspan="2">
+                {{ run[0].number }}
+              </td>
+              <td>
+            <span class="label label-info">First run</span>
+              </td>
+          {% else %}
+          <td>
+             <span class="label label-warning">Second run</span>
+          </td>
+          {% endif %}
+          <td>{{ run[1].en_name }}</td>
+      {% else %}
+        <td>
+            {{ run[0].number }}
+        </td>
+      {% endif %}
+      {% if discipline.is_combination %}
         <td>{{ run[2]}}</td>
       {% endif %}
       <td>{{ run[0].starttime }}</td>

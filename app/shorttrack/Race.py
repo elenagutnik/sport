@@ -196,6 +196,7 @@ class JuryEvent:
 
     def resultView(self):
         return {
+            'id': self.juryResult.id,
             'jury_id': self.jury.id,
             'time': timeConverter(self.juryResult.time),
             'rank': self.juryResult.rank,
@@ -398,5 +399,13 @@ def race_photofinish_data(id, run_id):
         time=datetime.strptime(request.form.get('time'), '%M:%S.%f').time()
     )
     db.session.add(photoFinishData)
+    db.session.commit()
+    return 'Good'
+
+@shorttrack.route('/jury_result/approve', methods=['GET', 'POST'])
+def race_jury_data():
+    juryResult = db.session.query(JuryResult).filter(JuryResult.id == request.form.get('jury_result_id')).first()
+    juryResult.competitor_id=request.form.get('competitor_id')
+    db.session.add(juryResult)
     db.session.commit()
     return 'Good'
