@@ -120,7 +120,7 @@ def manual_approve(data):
 @socketio.on('GetResults')
 def socket_get_results(data):
     # data = json.loads(json_data)
-    print('GetResults')
+    print('GetResults', json.dumps(data))
     if 'race_id' in data.keys():
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None, RunInfo.run_type_id!=3).all()
         result_list = {}
