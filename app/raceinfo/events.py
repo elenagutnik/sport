@@ -22,7 +22,7 @@ def exectutiontime(message):
             start = datetime.now()
             result = func(*args, **kwargs)
             end = datetime.now()
-            print(message, 'elapsed time:', (end-timedelta(hours=start.hour, minutes=start.minute,seconds=start.second,microseconds=start.microsecond)).time())
+            # print(message, 'elapsed time:', (end-timedelta(hours=start.hour, minutes=start.minute,seconds=start.second,microseconds=start.microsecond)).time())
             return result
         return wrapper
     return real_dec
@@ -74,7 +74,10 @@ def receiver_jury():
 @admin_required
 def jury_page():
     return render_template('jury_page.html')
-
+@raceinfo.route('/jury_page/tmp')
+@admin_required
+def jury_page_tmp():
+    return render_template('new_format_tester.html')
 @raceinfo.route('/run/get/', methods=['POST', 'GET'])
 def run_get():
     try:
@@ -248,6 +251,7 @@ def load_data_vol3():
         raceHandler.setDeviceDataInDB(data)
         raceHandler.competitor_get_current()
         if raceHandler.is_start():
+            print('NewDataStart', data, raceHandler.__class__.__name__, raceHandler.courseDeviceType.name)
             if raceHandler.competitor is None:
                 raceHandler.competitor_autostart()
             raceHandler.resultApprove.is_start = True
@@ -258,7 +262,7 @@ def load_data_vol3():
                                                                            raceHandler.courseDevice,
                                                                            raceHandler.data_in)}
             }))
-            print(str(raceHandler.get_competitor_info()))
+
             scoreboard = Scoreboard(raceHandler)
             scoreboard.started_competitor()
             scoreboard.send()
@@ -278,7 +282,7 @@ def load_data_vol3():
                     db.session.add(raceHandler.result)
                     db.session.commit()
                     tree_view, manual_list, dql_list = raceHandler.recalculate_run_results()
-
+                    print('NewDataFinish', data, raceHandler.__class__.__name__, raceHandler.courseDeviceType.name)
                     socketio.emit("NewDataFinish", json.dumps({
                         raceHandler.run.id: [
                             {
@@ -288,6 +292,7 @@ def load_data_vol3():
                             ConvertRunResults(tree_view, manual_list, dql_list)
                         ]
                     }))
+
                     scoreboard = Scoreboard(raceHandler)
                     if raceHandler.result.rank == 1:
                         scoreboard.new_best_time()
@@ -298,10 +303,9 @@ def load_data_vol3():
                     scoreboard.send()
 
                 else:
+                    print('NewDataPoint', data, raceHandler.__class__.__name__, raceHandler.courseDeviceType.name)
                     result_details = raceHandler.get_sector_results()
-                    print('Count ResultDetail', len(result_details))
                     raceHandler.calculate_common_sector_params(result_details)
-
                     socketio.emit("NewDataPoint", json.dumps({
                         raceHandler.run.id: [
                             {
@@ -313,6 +317,7 @@ def load_data_vol3():
                         ]
 
                     }))
+
                     db.session.add(raceHandler.result)
                     db.session.commit()
                     scoreboard = Scoreboard(raceHandler)

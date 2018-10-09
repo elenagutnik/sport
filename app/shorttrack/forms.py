@@ -11,6 +11,7 @@ class RaceBaseForm(FlaskForm):
     place = StringField('Place')
     distance = IntegerField('Distance')
     description = StringField('Description')
+    competitors_in_group = IntegerField('Competitors in group (1st run)', validators=[InputRequired()])
     submit = SubmitField('Submit')
 
 class DeviceBaseForm(FlaskForm):

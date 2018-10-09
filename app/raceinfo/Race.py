@@ -422,12 +422,9 @@ class ParallelRace(SummationTimeRace):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
         pass
 
-
-
     def get_sector_results(self):
-
         return db.session.query(ResultDetail).filter(self.runOrder.order==RunOrder.order,
-                                                     RunOrder.run_id==self.run.id,
+                                                     RunOrder.run_id == self.run.id,
                                                      ResultDetail.race_competitor_id==RunOrder.race_competitor_id,
                                                      ResultDetail.run_id == self.run.id,
                                                      ResultDetail.course_device_id == CourseDevice.id,
@@ -446,8 +443,8 @@ class ParallelRace(SummationTimeRace):
 
                 sectortime_item.sectordiff = sectortime_item.sectortime - сompetitors_list_ordered_sectortime[0].sectortime
                 time_item.diff = time_item.time - сompetitors_list_ordered_time[0].time
-
-
+                sectortime_item.sectorrank=index+1
+                time_item.rank = index + 1
         else:
             self.result.sectordiff = 0
             self.result.sectorrank = 1
@@ -462,7 +459,7 @@ class ParallelRace(SummationTimeRace):
     def recalculate_finished_results(self):
         finish_results = db.session.query(ResultApproved).filter(ResultApproved.race_competitor_id == RunOrder.race_competitor_id,
                                                                  ResultApproved.is_finish == True,
-                                                                 ResultApproved.run_id==self.run.id,
+                                                                 ResultApproved.run_id == self.run.id,
                                                                  RunOrder.order == self.runOrder.order,
                                                                  RunOrder.run_id == self.run.id).all()
         сompetitors_list = sorted(finish_results, key=lambda item: (item.time is None,

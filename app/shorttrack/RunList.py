@@ -9,24 +9,25 @@ CIRCLE_LENGHT = 111.12
 
 class RunList:
     def __init__(self, race_id):
-        self.race_id = race_id
-        self.run=None
+        self.race = Race.query.filter(Race.id == race_id).first()
+        self.run = None
         generateVirtualDevices(race_id)
 
     def builder_1st_run(self):
-        competitors_list = Competitor.query.filter(Competitor.race_id == self.race_id).all()
+        competitors_list = Competitor.query.filter(Competitor.race_id == self.race.id).all()
         competitors_list = sorted([item for item in competitors_list if item.points is not None],
                                    key=lambda item: item.points) + \
                            sorted([item for item in competitors_list if item.points is None],
                                    key=lambda item: item.best_season_time)
 
-        run = RunInfo.query.filter(RunInfo.race_id == self.race_id,
+        run = RunInfo.query.filter(RunInfo.race_id == self.race.id,
                                     RunInfo.number == 1).first()
-
+        RunOrder.query.filter(RunOrder.run_id == run.id).delete()
+        RunGroup.query.filter(RunGroup.run_id == run.id).delete()
         if run is None:
             run = RunInfo(
                 number=1,
-                race_id=self.race_id
+                race_id=self.race.id
             )
             db.session.add(run)
             db.session.commit()
@@ -34,7 +35,8 @@ class RunList:
         self.run = run
         reversed = False
         
-        count = math.ceil(len(competitors_list)/4)
+        count = math.ceil(len(competitors_list)/self.race.competitors_in_group)
+
         for index in range(int(count)):
             run_group = RunGroup(
                 run_id=run.id,
@@ -57,20 +59,21 @@ class RunList:
                 group_id=runGroupList[group_order-1].id
             )
             db.session.add(competitor_order)
+
+            
             if (index+1) % count == 0:
-                group_order += 1
                 reversed = not reversed
-            elif reversed:
-                order -= 1
-            else:
                 order += 1
+            elif reversed:
+                group_order -= 1
+            else:
+                # order += 1
+                group_order += 1
 
 def generateVirtualDevices(race_id):
     race = Race.query.get(race_id)
     db.session.query(VirtualDevice).filter(VirtualDevice.race_id == race.id).delete()
-    print(round(race.distance/CIRCLE_LENGHT))
     for index in range(round(race.distance/CIRCLE_LENGHT)+1):
-        print(index)
         virtualDevice = VirtualDevice(
             race_id=race.id,
             order=index

@@ -69,6 +69,7 @@ class Race(db.Model):
     racedate = db.Column(db.DateTime)
     distance = db.Column(db.Integer)
     description = db.Column(db.String)
+    competitors_in_group = db.Column(db.Integer)
 
 class RunInfo(db.Model):
     __tablename__ = 'run_info'

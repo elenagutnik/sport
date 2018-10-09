@@ -31,7 +31,8 @@ def race_add():
             place=form.place.data,
             racedate=form.racedate.data,
             description=form.description.data,
-            distance=form.distance.data
+            distance=form.distance.data,
+            competitors_in_group=form.competitors_in_group.data
         )
         db.session.add(race)
         db.session.commit()
