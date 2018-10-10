@@ -114,7 +114,7 @@ class BaseRace:
                 for item in next_passed_competitors_list:
                     item.manual_order -= 1
                     db.session.add(item)
-                self.runOrder.manual_order = 0
+            self.runOrder.manual_order = 0
 
             db.session.add(self.runOrder)
             ResultDetail.remove(competitor_id, self.run.id)
