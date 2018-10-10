@@ -207,8 +207,8 @@ def TreeView(run_id):
                     if item[0].race_competitor_id not in tree_view[item[2].course_id][item[2].order].keys():
                         tree_view[item[2].course_id][item[2].order][item[0].race_competitor_id] = item
             except:
-                if item[0].is_manual:
-                    if item[4].course_id not in dql_list.keys():
+                if item[0].is_manual and item[0].status_id == 1:
+                    if item[4].course_id not in manual_list.keys():
                         manual_list[item[4].course_id] = []
                     manual_list[item[4].course_id].append(item)
         return tree_view, manual_list, dql_list
