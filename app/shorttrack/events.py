@@ -42,38 +42,38 @@ class AlchemyEncoder(json.JSONEncoder):
 @login_required
 @admin_required
 def emulator(race_id):
-    try:
-        current = RunInfo.query.filter(RunInfo.endtime == None,
-                                       RunInfo.starttime < datetime.now(),
-                                       RunInfo.race_id == race_id).first()
-        last_run = db.session.query(RunGroup).filter(RunGroup.is_start == None,
-                                                     RunGroup.is_finish == None,
-                                                     RunGroup.run_id == current.id).\
-            order_by(RunGroup.number.asc()).limit(1).first()
-        competitors = db.session.query(Competitor, RunOrder).\
-            join(RunOrder, RunOrder.competitor_id == Competitor.id).\
-            filter(RunOrder.group_id == last_run.id).all()
+    # try:
+    current = RunInfo.query.filter(RunInfo.endtime == None,
+                                   RunInfo.starttime < datetime.now(),
+                                   RunInfo.race_id == race_id).first()
+    last_run = db.session.query(RunGroup).filter(RunGroup.is_start == None,
+                                                 RunGroup.is_finish == None,
+                                                 RunGroup.run_id == current.id).\
+        order_by(RunGroup.number.asc()).limit(1).first()
+    competitors = db.session.query(Competitor, RunOrder).\
+        join(RunOrder, RunOrder.competitor_id == Competitor.id).\
+        filter(RunOrder.group_id == last_run.id).all()
 
-        competitors_list = []
-        for item in competitors:
-            competitors_list.append({
-                'order': item[1].order,
-                'transponder_1': item[0].transponder_1,
-                'transponder_2': item[0].transponder_2
-            })
+    competitors_list = []
+    for item in competitors:
+        competitors_list.append({
+            'order': item[1].order,
+            'transponder_1': item[0].transponder_1,
+            'transponder_2': item[0].transponder_2
+        })
 
-        jury_list = db.session.query(Jury, JuryType).join(JuryType, JuryType.id == Jury.type_id). \
-            filter(Jury.race_id == race_id).all()
+    jury_list = db.session.query(Jury, JuryType).join(JuryType, JuryType.id == Jury.type_id). \
+        filter(Jury.race_id == race_id).all()
 
-        device = db.session.query(Device).filter(Device.race_id == race_id).one()
-        circle_count = db.session.query(func.count(VirtualDevice.id)).filter(VirtualDevice.race_id == race_id).scalar()-1
-        return render_template('timer_shorttrack.html',
-                               competitors=json.dumps(competitors_list),
-                               device=json.dumps(device, cls=AlchemyEncoder),
-                               circle_count=circle_count, race_id=race_id, run_id=current.id, jury=jury_list)
-    except:
-        emulator_clear(race_id)
-        return 'Наверное нету активных заездов'
+    device = db.session.query(Device).filter(Device.race_id == race_id).one()
+    circle_count = db.session.query(func.count(VirtualDevice.id)).filter(VirtualDevice.race_id == race_id).scalar()-1
+    return render_template('timer_shorttrack.html',
+                           competitors=json.dumps(competitors_list),
+                           device=json.dumps(device, cls=AlchemyEncoder),
+                           circle_count=circle_count, race_id=race_id, run_id=current.id, jury=jury_list)
+    # except:
+    #     emulator_clear(race_id)
+    #     return 'Наверное нету активных заездов'
 
 @shorttrack.route('/emulation/<int:race_id>/clear', methods=['GET', 'POST'])
 @login_required

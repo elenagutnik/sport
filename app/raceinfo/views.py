@@ -1460,7 +1460,8 @@ def race_run(id):
                        join(Discipline, Discipline.id == RunInfo.discipline_id, isouter=True).
                        filter(RunInfo.race_id == id)).all()
     else:
-        course_runs = (db.session.query(RunInfo, Course).join(Course, isouter=True).filter(RunInfo.race_id == id)).all()
+        course_runs = (db.session.query(RunInfo, Course).join(Course, isouter=True).filter(RunInfo.race_id == id)).\
+            order_by(RunInfo.number.asc()).all()
 
     return render_template('raceinfo/static-tab/run_list.html', discipline=discipline, race=race, course_runs=course_runs)
 

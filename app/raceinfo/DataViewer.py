@@ -1,4 +1,4 @@
-from.models import Race,RaceCompetitor, ResultApproved, ResultDetail,RunOrder, CourseDevice, CourseDeviceType, DataIn
+from.models import Race,RaceCompetitor, ResultApproved, ResultDetail,RunOrder, CourseDevice, CourseDeviceType, DataIn, RunCourses
 from .. import db
 from sqlalchemy import or_, and_, asc
 import datetime, json
@@ -132,30 +132,78 @@ def ConvertCompetitorsRankList(result_details, courseDevice):
 #         return tree_view, manual_list, []
 #     return {}, [], []
 
+# def TreeView(run_id):
+#     tree_view = {}
+#     manual_list = {}
+#     dql_list = {}
+#     data = db.session.query(ResultApproved, ResultDetail, CourseDevice, CourseDeviceType, RunOrder). \
+#         join(ResultDetail, and_(ResultApproved.race_competitor_id == ResultDetail.race_competitor_id, ResultDetail.run_id == run_id), isouter=True). \
+#         join(CourseDevice, CourseDevice.id == ResultDetail.course_device_id, isouter=True). \
+#         join(CourseDeviceType, CourseDevice.course_device_type_id == CourseDeviceType.id, isouter=True). \
+#         join(RunOrder, and_(RunOrder.race_competitor_id == ResultApproved.race_competitor_id, RunOrder.run_id == run_id), isouter=True). \
+#         filter(ResultApproved.run_id == run_id).\
+#         order_by(asc(CourseDevice.order)).\
+#         all()
+#     courses_devices = db.session.query(CourseDevice, RunCourses).join(RunCourses, RunCourses.course_id == CourseDevice.course_id).filter(RunCourses.run_id == run_id).all()
+#     for device in courses_devices:
+#
+#     if len(data) > 0:
+#         for item in data:
+#             try:
+#                 if item[0].is_manual and item[0].status_id !=1:
+#                     if item[4].course_id not in dql_list.keys():
+#                         dql_list[item[4].course_id] = []
+#                     dql_list[item[4].course_id].append(item)
+#                 else:
+#                     if item[2].course_id not in tree_view.keys():
+#                         tree_view[item[2].course_id] = {}
+#                     if item[2].order not in tree_view[item[2].course_id].keys():
+#                         tree_view[item[2].course_id][item[2].order] = {}
+#                     if item[0].race_competitor_id not in tree_view[item[2].course_id][item[2].order].keys():
+#                         tree_view[item[2].course_id][item[2].order][item[0].race_competitor_id] = item
+#             except:
+#                 if item[0].is_manual:
+#                     if item[4].course_id not in dql_list.keys():
+#                         manual_list[item[4].course_id] = []
+#                     manual_list[item[4].course_id].append(item)
+#         return tree_view, manual_list, dql_list
+#     return {}, [], []
 def TreeView(run_id):
     tree_view = {}
     manual_list = {}
     dql_list = {}
     data = db.session.query(ResultApproved, ResultDetail, CourseDevice, CourseDeviceType, RunOrder). \
-        join(ResultDetail, and_(ResultApproved.race_competitor_id == ResultDetail.race_competitor_id, ResultDetail.run_id == run_id), isouter=True). \
+        join(ResultDetail,
+             and_(ResultApproved.race_competitor_id == ResultDetail.race_competitor_id, ResultDetail.run_id == run_id),
+             isouter=True). \
         join(CourseDevice, CourseDevice.id == ResultDetail.course_device_id, isouter=True). \
         join(CourseDeviceType, CourseDevice.course_device_type_id == CourseDeviceType.id, isouter=True). \
-        join(RunOrder, and_(RunOrder.race_competitor_id == ResultApproved.race_competitor_id, RunOrder.run_id == run_id), isouter=True). \
-        filter(ResultApproved.run_id == run_id).\
-        order_by(asc(CourseDevice.order)).\
+        join(RunOrder,
+             and_(RunOrder.race_competitor_id == ResultApproved.race_competitor_id, RunOrder.run_id == run_id),
+             isouter=True). \
+        filter(ResultApproved.run_id == run_id). \
+        order_by(asc(CourseDevice.order)). \
         all()
+    courses_devices = db.session.query(CourseDevice, RunCourses).\
+        join(RunCourses, RunCourses.course_id == CourseDevice.course_id).\
+        filter(RunCourses.run_id == run_id).all()
+    for device in courses_devices:
+        if device[0].course_id not in tree_view.keys():
+            tree_view[device[0].course_id] = {}
+        if device[0].order not in tree_view[device[0].course_id].keys():
+            tree_view[device[0].course_id][device[0].order] = {}
     if len(data) > 0:
         for item in data:
             try:
-                if item[0].is_manual and item[0].status_id !=1:
+                if item[0].is_manual and item[0].status_id != 1:
                     if item[4].course_id not in dql_list.keys():
                         dql_list[item[4].course_id] = []
                     dql_list[item[4].course_id].append(item)
                 else:
-                    if item[2].course_id not in tree_view.keys():
-                        tree_view[item[2].course_id] = {}
-                    if item[2].order not in tree_view[item[2].course_id].keys():
-                        tree_view[item[2].course_id][item[2].order] = {}
+                    # if item[2].course_id not in tree_view.keys():
+                    #     tree_view[item[2].course_id] = {}
+                    # if item[2].order not in tree_view[item[2].course_id].keys():
+                    #     tree_view[item[2].course_id][item[2].order] = {}
                     if item[0].race_competitor_id not in tree_view[item[2].course_id][item[2].order].keys():
                         tree_view[item[2].course_id][item[2].order][item[0].race_competitor_id] = item
             except:
@@ -165,6 +213,7 @@ def TreeView(run_id):
                     manual_list[item[4].course_id].append(item)
         return tree_view, manual_list, dql_list
     return {}, [], []
+
 
 def TreeView2(run_id):
     tree_view = {}
@@ -216,6 +265,75 @@ def DataInView(run_id):
 
 
 
+# def ConvertRunResults(tree_view, manual_list, dql_list, run_id):
+#     courses_id = list(tree_view.keys())
+#     courses_devices=db.session.query(CourseDevice, RunCourses).join(RunCourses, RunCourses.course_id == CourseDevice.course_id).filter(RunCourses.run_id == run_id).all()
+#     for course_id in courses_id:
+#         keys = list(tree_view[course_id].keys())
+#         for device_number in keys[:-1]:
+#             for competitor_id in tree_view[course_id][device_number]:
+#                 result_item = {
+#                     'sectorrank': tree_view[course_id][device_number][competitor_id][1].sectorrank,
+#                     'sectortime': timeConverter(tree_view[course_id][device_number][competitor_id][1].sectortime),
+#                     'sectordiff': timeConverter(tree_view[course_id][device_number][competitor_id][1].sectordiff),
+#                     'rank': tree_view[course_id][device_number][competitor_id][1].rank,
+#                     'time': timeConverter(tree_view[course_id][device_number][competitor_id][1].time),
+#                     'diff': timeConverter(tree_view[course_id][device_number][competitor_id][1].diff),
+#                     'speed': speedConverter(tree_view[course_id][device_number][competitor_id][1].speed),
+#                     'absoluttime': timeConverter(tree_view[course_id][device_number][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
+#                 }
+#                 tree_view[course_id][device_number][competitor_id] = result_item
+#
+#         for competitor_id in tree_view[course_id][keys[-1]]:
+#             if tree_view[course_id][keys[-1]][competitor_id][0].is_finish is True:
+#                 result_item = {
+#                     'sectorrank': tree_view[course_id][keys[-1]][competitor_id][1].sectorrank,
+#                     'sectortime': timeConverter(tree_view[course_id][keys[-1]][competitor_id][1].sectortime),
+#                     'sectordiff': timeConverter(tree_view[course_id][keys[-1]][competitor_id][1].sectordiff),
+#                     'rank': tree_view[course_id][keys[-1]][competitor_id][0].rank,
+#                     'time': timeConverter(tree_view[course_id][keys[-1]][competitor_id][0].time+tree_view[course_id][keys[-1]][competitor_id][0].adder_time),
+#                     # 'diff': timeConverter(tree_view[course_id][keys[-1]][competitor_id][0].diff+tree_view[course_id][keys[-1]][competitor_id][0].adder_diff),
+#                     'speed': speedConverter(tree_view[course_id][keys[-1]][competitor_id][1].speed),
+#                     'absoluttime': timeConverter(tree_view[course_id][keys[-1]][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
+#                     'status_id': tree_view[course_id][keys[-1]][competitor_id][0].status_id
+#                 }
+#                 try:
+#                     result_item['diff'] = timeConverter(tree_view[course_id][keys[-1]][competitor_id][0].diff+tree_view[course_id][keys[-1]][competitor_id][0].adder_diff)
+#                 except:
+#                     result_item['diff'] = None
+#                 tree_view[course_id][keys[-1]][competitor_id] = result_item
+#             else:
+#                 tree_view[course_id][keys[-1]][competitor_id] = None
+#     for key in manual_list:
+#         keys_list = list(tree_view[key].keys())
+#
+#         for item in manual_list[key]:
+#
+#             tree_view[key][keys_list[0]][item[0].race_competitor_id] = {
+#                 'absoluttime': timeConverter(item[0].start_time, '%H:%M:%S.%f'),
+#                 'time': timeConverter(item[0].adder_time),
+#                 'diff': timeConverter(item[0].adder_diff),
+#             }
+#             pass
+#             tree_view[key][keys_list[-1]][item[0].race_competitor_id] = {
+#                 'time': timeConverter(item[0].time+item[0].adder_time),
+#                 'diff': timeConverter(item[0].diff+item[0].adder_diff),
+#                 'absoluttime': timeConverter(item[0].finish_time, '%H:%M:%S.%f'),
+#                 'status_id': item[0].status_id,
+#                 'rank': item[0].rank,
+#                 'is_manual': item[0].is_manual
+#             }
+#     for key in dql_list:
+#         keys_list = list(tree_view[key].keys())
+#         for item in dql_list[key]:
+#             tree_view[key][keys_list[-1]][item[0].race_competitor_id] = {
+#             'status_id': item[0].status_id,
+#             'is_manual': item[0].is_manual,
+#             'reason': item[0].reason,
+#             'gate': item[0].gate
+#             }
+#
+#     return tree_view
 def ConvertRunResults(tree_view, manual_list, dql_list):
     courses_id = list(tree_view.keys())
     for course_id in courses_id:
@@ -284,7 +402,6 @@ def ConvertRunResults(tree_view, manual_list, dql_list):
             }
 
     return tree_view
-
 
 def ConvertErrorData(dataIn):
     return {

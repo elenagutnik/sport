@@ -263,6 +263,7 @@
       var elem= $(this);
       $.get('/shorttrack/competitorslist', {'group_id':$(this).attr("group_id")}).done(function(data) {
             data=JSON.parse(data);
+            $("#jurydata__competitor_id").empty()
             for(i=0; i<data.length;i++)
                 $('#jurydata__competitor_id').append('<option value="'+data[i].id+'">'+data[i].ru_lastname+' '+data[i].ru_firstname+'</option>');
 

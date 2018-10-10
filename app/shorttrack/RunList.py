@@ -60,7 +60,7 @@ class RunList:
             )
             db.session.add(competitor_order)
 
-            
+
             if (index+1) % count == 0:
                 reversed = not reversed
                 order += 1

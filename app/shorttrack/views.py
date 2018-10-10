@@ -110,7 +110,6 @@ def race_competitors_edit(race_id):
 @login_required
 @admin_required
 def load_competitors(race_id):
-    Competitor.query.filter(Competitor.race_id == race_id).delete()
     filename = request.files['list'].filename
     extension = filename.split(".")[-1]
     content = request.files['list'].read()
@@ -118,6 +117,7 @@ def load_competitors(race_id):
     genders = Gender.query.all()
     nations = Nation.query.all()
 
+    Competitor.query.filter(Competitor.race_id == race_id).delete()
     gender = None
     nation = None
 

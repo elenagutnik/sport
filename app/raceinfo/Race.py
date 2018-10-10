@@ -280,7 +280,8 @@ class BaseRace:
                 if key == 1:
                     continue
                 else:
-                    self.recalculate_sector_results(item, tree_view[courses[0]][key - 1])
+                    if bool(item):
+                        self.recalculate_sector_results(item, tree_view[courses[0]][key - 1])
             self.recalculate_finished_results()
         return tree_view, manual_list, dql_list
 
@@ -322,19 +323,20 @@ class BaseRace:
         сompetitors_list = sorted(finish_results, key=lambda item: (item.time is None,
                                                                     item.status_id is None, item.status_id,
                                                                     item.finish_time - item.start_time+item.adder_time))
-        ResultApproved_min_time = min(сompetitors_list, key=lambda item:(item.time))
-        for index, item in enumerate(сompetitors_list):
-            try:
-                if item.status_id == 1:
-                    item.time = item.finish_time - item.start_time
-                    item.diff = item.time - ResultApproved_min_time.time
-                    item.rank = index + 1
-                else:
+        if сompetitors_list:
+            ResultApproved_min_time = min(сompetitors_list, key=lambda item:(item.time))
+            for index, item in enumerate(сompetitors_list):
+                try:
+                    if item.status_id == 1:
+                        item.time = item.finish_time - item.start_time
+                        item.diff = item.time - ResultApproved_min_time.time
+                        item.rank = index + 1
+                    else:
+                        item.diff = None
+                        item.rank = None
+                except:
                     item.diff = None
                     item.rank = None
-            except:
-                item.diff = None
-                item.rank = None
 
     def is_start(self):
         if self.courseDeviceType.name == 'Start':

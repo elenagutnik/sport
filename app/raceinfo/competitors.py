@@ -1,9 +1,9 @@
 import pyexcel
 import psycopg2
 from .. import db
-from . import jsonencoder, raceinfo
+from . import raceinfo
 from datetime import datetime
-from flask import request, render_template, redirect,url_for, flash
+from flask import request, render_template, redirect, url_for, flash
 from .models import Competitor, RaceCompetitor, Gender, Category, Nation, Race, FisPoints, RaceCompetitorFisPoints
 
 @raceinfo.route('/race/<int:race_id>/competitors/upload', methods=['POST'])
