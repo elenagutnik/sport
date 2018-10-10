@@ -108,7 +108,7 @@ class BaseRace:
         self.runOrder = RunOrder.get(competitor_id, self.run.id)
 
         if self.runOrder.manual_order is not None:
-            next_passed_competitors_list = RunOrder.query.filter(RunOrder.manual_order > competitor_order.manual_order,
+            next_passed_competitors_list = RunOrder.query.filter(RunOrder.manual_order > self.runOrder.manual_order,
                                                      RunOrder.run_id == self.run.id).all()
             if len(next_passed_competitors_list) > 0:
                 for item in next_passed_competitors_list:
