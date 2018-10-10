@@ -155,15 +155,15 @@ class BaseRace:
         resultApproved.is_manual = True
         resultApproved.approve_time = datetime.now()
         resultApproved.status_id = status_id
+        self.runOrder = RunOrder.query.filter(RunOrder.race_competitor_id == competitor_id,
+                                              RunOrder.run_id == self.run.id). \
+            first()
         try:
             if resultApproved.status_id == '1':
                 if self.race.result_function == 1 and self.run.number > 1:
                     resultApproved.set_competitor_adder(self.run.number)
 
                 if resultApproved.is_start == False:
-                    self.runOrder= RunOrder.query.filter(RunOrder.race_competitor_id ==competitor_id,
-                                                            RunOrder.run_id == self.run.id). \
-                        first()
                     self.runOrder.manual_order = 0
                     db.session.add(self.runOrder)
                     db.session.commit()
