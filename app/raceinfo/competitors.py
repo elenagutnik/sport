@@ -1,5 +1,4 @@
 import pyexcel
-import psycopg2
 from .. import db
 from . import raceinfo
 from datetime import datetime

@@ -279,6 +279,7 @@
                  competitor_id:$('#jurydata__competitor_id').val()
              }).done(function(data) {
                elem.closest('div').removeClass('alert-info').addClass('alert-success');
+               elem.closest('div').append($("#jurydata__competitor_id option:selected").text());
                elem.remove();
                $('#JuryDataModal').modal('hide');
             });

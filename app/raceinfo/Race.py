@@ -105,18 +105,18 @@ class BaseRace:
         return competitor_Approve
 
     def competitor_clear(self, competitor_id):
-        competitor_order = RunOrder.get(competitor_id, self.run.id)
+        self.runOrder = RunOrder.get(competitor_id, self.run.id)
 
-        if competitor_order.manual_order is not None:
+        if self.runOrder.manual_order is not None:
             next_passed_competitors_list = RunOrder.query.filter(RunOrder.manual_order > competitor_order.manual_order,
                                                      RunOrder.run_id == self.run.id).all()
             if len(next_passed_competitors_list) > 0:
                 for item in next_passed_competitors_list:
                     item.manual_order -= 1
                     db.session.add(item)
-            competitor_order.manual_order = 0
+                self.runOrder.manual_order = 0
 
-            db.session.add(competitor_order)
+            db.session.add(self.runOrder)
             ResultDetail.remove(competitor_id, self.run.id)
 
         ResultApproved.remove(competitor_id, self.run.id)
@@ -161,11 +161,11 @@ class BaseRace:
                     resultApproved.set_competitor_adder(self.run.number)
 
                 if resultApproved.is_start == False:
-                    competitorOrder = RunOrder.query.filter(RunOrder.race_competitor_id ==competitor_id,
+                    self.runOrder= RunOrder.query.filter(RunOrder.race_competitor_id ==competitor_id,
                                                             RunOrder.run_id == self.run.id). \
                         first()
-                    competitorOrder.manual_order = 0
-                    db.session.add(competitorOrder)
+                    self.runOrder.manual_order = 0
+                    db.session.add(self.runOrder)
                     db.session.commit()
                 if finish_time != '':
                     finish_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType). \

@@ -112,7 +112,8 @@ def manual_approve(data):
                     [
                         {
                             'is_manual': True,
-                            'race_competitor_id': data['competitor_id']
+                            'race_competitor_id': data['competitor_id'],
+                            'manual_order': raceHandler.runOrder.manual_order
                         },
                         ConvertRunResults(tree_view, manual_list, dql_list)
                 ]
@@ -222,7 +223,11 @@ def competitor_clear():
     raceHandler = RaceGetter.getRaceByRunid(run_id=request.args.get('run_id'))
     raceHandler.competitor_clear(competitor_id=request.args.get('competitor_id'))
     raceHandler.recalculate_run_results()
-    socketio.emit('removeResult', json.dumps(dict(removed_competitor=request.args.get('competitor_id'))))
+    socketio.emit('removeResult', json.dumps(
+        {
+            'removed_competitor': request.args.get('competitor_id'),
+            'manual_order': raceHandler.runOrder.manual_order
+         }))
     return 'OK'
 
 
