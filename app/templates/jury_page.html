@@ -11,13 +11,15 @@
 #table_raceresults thead th {text-align:center;vertical-align: middle; border-bottom-width: 1px;}
 #tab_summarytable table  th.row1 {padding:0; margin:0;border-bottom-width: 1px;}
 #tab_summarytable table  th.row1 div {float:left; border-right:1px solid #ddd; padding:5px 10px;height:37px;}
-#tab_summarytable table  th.row1  div.bib { width:7%;}
-#tab_summarytable table  th.row1  div.name { width:55%;}
-#tab_summarytable table  th.row1  div.rank { width:7%;}
-#tab_summarytable table  th.row1  div.time { width:14%;}
-#tab_summarytable table  th.row1  div.status {float:left; border:none; width:8%;}
+#tab_summarytable table  th.row1  div.bib { width:7%; line-height: 2em;}
+#tab_summarytable table  th.row1  div.name { width:55%; line-height: 2em;}
+#tab_summarytable table  th.row1  div.rank { width:7%; line-height: 2em;}
+#tab_summarytable table  th.row1  div.time { width:14%; line-height: 2em;}
+#tab_summarytable table  th.row1  div.status {float:left; width:8%; line-height: 2em;}
+#tab_summarytable table  th.row1  div.manual {float:left; border:none; width:1%; line-height: 2em;}
 #tab_summarytable table  th.row1  div.btns {margin:0;float:right; border: none;}
 #tab_summarytable table  th.row1  div.btns button {float:right; min-width:5%; margin:0;}
+#tab_summarytable table  th.row1  div.btns .btn-sm { padding: 3px 5px;}
 #tab_summarytable table td {width:auto;}
 
 #tab_startlist table tbody tr.disabled td{color:#bbbbbb}
@@ -499,12 +501,15 @@
 
 
     function create_cells(run, course, arr){ //arr = devices with competitors data
+      console.log("create_cells",arr);
       var d = arr[Object.keys(arr)[objlen(arr)-1]];
       var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
+      var devcols=objlen(race_info.run_list[run].courses[course].devices);//количество девайсов на трассе
 
       console.log("race_info.run_list",race_info.run_list);
       console.log("run",run);
       console.log("course",course);
+
       var comp_sorted_tmp=race_info.run_list[run].start_list[course];
       var comp_sorted=Array();
       comp_sorted_tmp.sort(function(a,b){return a['manual_order'] == b['manual_order'] ? a > b : a['manual_order'] > b['manual_order']}); // сортируем спортсменов
@@ -512,40 +517,54 @@
           if(comp_sorted_tmp[id].manual_order!==null)
           comp_sorted.push(comp_sorted_tmp[id]);
       }
-      console.log("comp_sorted",comp_sorted);
 
       for(var id in comp_sorted){
         var comp_obj=comp_sorted[id];
         var name = getCompName(comp_sorted[id]);
         var comp=comp_sorted[id].race_competitor_id;
         var val=d[comp];
+
         var status_name = val.status_id?getObjById(status_list,"id",val.status_id).name:"N/A";
         $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody").append("\
           <tr class='comp_"+comp+"'>\
-            <th class='row1' colspan="+(objlen(race_info.run_list[run].courses[course].devices)+1)+">\
+            <th class='row1' colspan="+(devcols+1)+">\
               <div class='bib'>"+comp_obj.bib+"</div>\
               <div class='name'>"+name+"</div>\
               <div class='rank'>"+(val.rank?val.rank:"N/A")+"</div>\
               <div class='time'>"+(val.time?val.time:"N/A")+"</div>\
-              <div class='status'>"+status_name+"</div>\
+              <div class='status' status_id='"+val.status_id+"'>"+status_name+"</div>\
+              <div class='manual' val='"+val.is_manual+"'>"+(val.is_manual?"<span class='glyphicon glyphicon-pencil' title='Manual Input'></span>":"")+"</div>\
               <div class='btns'>\
                 <button type=button class='showhide_comp_results btn btn-sm' run='"+run+"' competitor='"+comp+"' value='+'>\
                   <span class='glyphicon glyphicon-chevron-down' aria-hidden='true'></span>\
                 </button>\
               </div>\
             </th>\
-          </tr>\
+          </tr>");
+        if(val.status_id!=1){
+          $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody").append("\
           <tr class='row2 comp_"+comp+"_thead'>\
-            <th>Parameter</th>"+thead[run][course]+"\
-          </tr>\
-          ");
-        for(var i=0;i<fields.length;i++){
-            $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody").append("<tr class='comp_"+comp+"_"+fields[i]+"'><th class='title'>"+fields[i]+"</th></tr>");
-            console.log("race_info.run_list[run].courses[course].devices",race_info.run_list[run].courses[course].devices);
-            $.each(race_info.run_list[run].courses[course].devices, function(idx, dev){
-              $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]).append("<td class='dev_"+dev.id+"'></td>");
-            });
-            $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+val.course_device_id).html(val[fields[i]]);
+          <th colspan="+(devcols+1)+">\
+            Reason: <span class='reason'>"+val.reason+"</span>\
+            Gate: <span class='gate'>"+val.gate+"</span>\
+          </th>\
+          </tr>");
+        }else{
+          $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody").append("\
+            <tr class='row2 comp_"+comp+"_thead'>\
+              <th>Parameter</th>"+thead[run][course]+"\
+            </tr>\
+            ");
+          console.log("val",val);
+          for(var i=0;i<fields.length;i++){
+              $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody").append("<tr class='comp_"+comp+"_"+fields[i]+"'><th class='title'>"+fields[i]+"</th></tr>");
+              console.log("race_info.run_list[run].courses[course].devices",race_info.run_list[run].courses[course].devices);
+              $.each(race_info.run_list[run].courses[course].devices, function(idx, dev){
+                $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]).append("<td class='dev_"+dev.id+"'>==="+((arr[dev.order][comp]&&arr[dev.order][comp][fields[i]])?arr[dev.order][comp][fields[i]]:"")+"</td>");
+              });
+              //console.log("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+val.course_device_id, "==="+val[fields[i]]);
+              //$("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+val.course_device_id).html("==="+val[fields[i]]);
+          }
         }
         hidedetails(run,comp);
         tab_summarytable_set_status(run,comp,status_name,val.status_id);
@@ -1142,13 +1161,13 @@
                   </td>");
                 $.each(race_info.run_list[id].start_list[course], function(value){
                   var competitor_id=this.race_competitor_id;
-                  var btn_start="<button class='btn btn-primary btn-sm btn_start' competitor_id='"+competitor_id+"' run_id='"+id+"'>Start</button>";
+                  var btn_start="<button class='btn btn-primary btn-sm btn_start' competitor_id='"+competitor_id+"' course_id='"+course+"' run_id='"+id+"'>Start</button>";
                   var btn_finish="";//"<button class='btn btn-success btn-sm btn_finish' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Finish</button>";
 
                   var btn_approveqlf="";//<button class='btn btn-defaul btn-sm btn_approveqlf' competitor_id='"+competitor_id+"' run_id='"+run.id+"'>Approve QLF</button>";
-                  var btn_editresult="<button class='btn btn-defaul btn-sm btn_editresult' competitor_id='"+competitor_id+"' run_id='"+id+"'>Edit</button>";
+                  var btn_editresult="<button class='btn btn-defaul btn-sm btn_editresult' competitor_id='"+competitor_id+"' course_id='"+course+"' run_id='"+id+"'>Edit</button>";
 
-                  var btn_clearresult="<button class='btn btn-danger btn-sm btn_clear' competitor_id='"+competitor_id+"' run_id='"+id+"'>Clear</button>";
+                  var btn_clearresult="<button class='btn btn-danger btn-sm btn_clear' competitor_id='"+competitor_id+"' course_id='"+course+"' run_id='"+id+"'>Clear</button>";
 
                   $("#tab_manualcontrol tbody table.tab_run"+id+"_course"+course+" tbody").append("\
                       <tr class='tr_"+competitor_id+"'>\
@@ -1691,18 +1710,33 @@ $(document).ready(function () {
     });
     $("body").on("click", ".btn_editresult", function () {
       var run_id=$(this).attr('run_id');
+      var course_id=$(this).attr('course_id');
       var competitor_id=$(this).attr('competitor_id');
+      var dev_arr=race_info.run_list[run_id].courses[course_id].devices;
+
+      var dev_start=dev_arr[0].id;
+      var dev_finish=dev_arr[dev_arr.length-1].id;
+
+      var start_time=$("#tab_summarytable table.run"+run_id+"_course"+course_id+" tr.comp_"+competitor_id+"_absoluttime td.dev_"+dev_start).html();
+      var finish_time=$("#tab_summarytable table.run"+run_id+"_course"+course_id+" tr.comp_"+competitor_id+"_absoluttime td.dev_"+dev_finish).html();
+
+      var reason=$("#tab_summarytable table.run"+run_id+"_course"+course_id+" tr.comp_"+competitor_id+"_dsq .reason").html();
+      var gate = $("#tab_summarytable table.run"+run_id+"_course"+course_id+" tr.comp_"+competitor_id+"_dsq .gate").html();
+      var status_id=$("#tab_summarytable table.run"+run_id+"_course"+course_id+" tr.comp_"+competitor_id+" div.status").attr("status_id");
+
       $("#form_txt_competitor").html(competitor_id);
-      $("#form_txt_run").html(run_list[run_list_ids["id"+run_id]].number);
+      $("#form_txt_run").html(race_info.run_list[run_id].number);
 
       $("#form_run_id").val(run_id);
       $("#form_competitor_id").val(competitor_id);
-      if(glob_arr["run"+run_id]&&glob_arr["run"+run_id]["comp_"+competitor_id]){
-        $("#form_status").val(glob_arr["run"+run_id]["comp_"+competitor_id].status_id);
-        $("#form_reason").val(glob_arr["run"+run_id]["comp_"+competitor_id].reason);
-        $("#form_gate").val(glob_arr["run"+run_id]["comp_"+competitor_id].gate);
-        $("#form_starttime").val(glob_arr["run"+run_id]["comp_"+competitor_id].start_time);
-        $("#form_finishtime").val(glob_arr["run"+run_id]["comp_"+competitor_id].finish_time);
+
+
+      if($("#tab_summarytable table.run"+run_id+"_course"+course_id+" tr.comp_"+competitor_id).length){
+        $("#form_status").val(status_id);
+        $("#form_reason").val(reason);
+        $("#form_gate").val(gate);
+        $("#form_starttime").val(start_time);
+        $("#form_finishtime").val(finish_time);
       }else{
         $("#form_status").val(1);
         $("#form_reason").val("");
