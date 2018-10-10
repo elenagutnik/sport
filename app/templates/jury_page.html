@@ -368,7 +368,7 @@
     */
     function hidedetails(run,comp){
       if($("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+" div.status").html!="N/A"){
-        var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed", "thead");
+        var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed", "thead", "dsq");
 
         for(var i=0;i<fields.length;i++){
           $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+fields[i]).hide();
@@ -543,10 +543,10 @@
           </tr>");
         if(val.status_id!=1){
           $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody").append("\
-          <tr class='row2 comp_"+comp+"_thead'>\
+          <tr class='row2 comp_"+comp+"_dsq'>\
           <th colspan="+(devcols+1)+">\
-            Reason: <span class='reason'>"+val.reason+"</span>\
-            Gate: <span class='gate'>"+val.gate+"</span>\
+            <div class='div_reason'>Reason: <span class='reason'>"+val.reason+"</span></div>\
+            <div class='div_gate'>Gate: <span class='gate'>"+val.gate+"</span></div>\
           </th>\
           </tr>");
         }else{
@@ -560,14 +560,14 @@
               $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody").append("<tr class='comp_"+comp+"_"+fields[i]+"'><th class='title'>"+fields[i]+"</th></tr>");
               console.log("race_info.run_list[run].courses[course].devices",race_info.run_list[run].courses[course].devices);
               $.each(race_info.run_list[run].courses[course].devices, function(idx, dev){
-                $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]).append("<td class='dev_"+dev.id+"'>==="+((arr[dev.order][comp]&&arr[dev.order][comp][fields[i]])?arr[dev.order][comp][fields[i]]:"")+"</td>");
+                $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]).append("<td class='dev_"+dev.id+"'>"+((arr[dev.order][comp]&&arr[dev.order][comp][fields[i]])?arr[dev.order][comp][fields[i]]:"")+"</td>");
               });
               //console.log("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+val.course_device_id, "==="+val[fields[i]]);
               //$("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]+" td.dev_"+val.course_device_id).html("==="+val[fields[i]]);
           }
         }
         hidedetails(run,comp);
-        tab_summarytable_set_status(run,comp,status_name,val.status_id);
+        tab_summarytable_set_status(run,course,comp,status_name,val.status_id);
 
       }
 
@@ -592,6 +592,7 @@
         $.each(arr[0], function(course,arr){
           console.log("course="+course);
           create_cells(run,course,arr); // создание ячеек
+          /*
           $.each(arr, function(dev,allcomps){
             var dev_id=race_info.run_list[run].courses[course].devices[dev-1].id;
             console.log("#576 dev_id="+dev_id);
@@ -606,6 +607,7 @@
               tab_summarytable_set_status(run,course,comp,status_name,val.status_id);
             });
           });
+          */
         });
       });
     }
@@ -652,7 +654,15 @@
     // обработка кнопки сохранения и апрува для ручного ввода результата
     socket.on('NewDataManual', function(data){
       var data=JSON.parse(data);
-      console.log("data", data);
+      $("#popup_editresult").modal('hide');
+      console.log("NewDataManual",data);
+      $.each(data, function(run,arr){
+        $("#tab_summarytable .div_run"+run+" tbody").html("");
+        $.each(arr, function(course,arr){
+          console.log("course="+course);
+          create_cells(run,course,arr[1][course]); // создание ячеек //course&&&
+        });
+      });
     });
     function err2log(code){
     err_log.push(code);
@@ -1814,7 +1824,7 @@ $(document).ready(function () {
       var val=this.value;
       var run=$(this).attr('run');
       var comp=$(this).attr('competitor');
-      var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed", "thead");
+      var fields=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed", "thead", "dsq");
       if(val=="+"){
         for(var i=0;i<fields.length;i++){
           $("#tab_summarytable .div_run"+run+" tbody tr.comp_"+comp+"_"+fields[i]).show();
