@@ -630,9 +630,9 @@ class ResultApproved(db.Model):
             run_id=run_id).one()
 
     @staticmethod
-    def remove(competitor_id,run_id):
+    def remove(competitor_id, run_id):
         ResultApproved.query.filter(
-            ResultApproved.race_competitor_id ==competitor_id,
+            ResultApproved.race_competitor_id == competitor_id,
             ResultApproved.run_id == run_id
         ).delete()
 
