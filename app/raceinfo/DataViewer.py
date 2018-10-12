@@ -348,7 +348,7 @@ def ConvertRunResults(tree_view, manual_list, dql_list):
                     'time': timeConverter(tree_view[course_id][device_number][competitor_id][1].time),
                     'diff': timeConverter(tree_view[course_id][device_number][competitor_id][1].diff),
                     'speed': speedConverter(tree_view[course_id][device_number][competitor_id][1].speed),
-                    'absoluttime': timeConverter(tree_view[course_id][device_number][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
+                    'absoluttime': timeConverter(tree_view[course_id][device_number][competitor_id][1].absolut_time, '%H:%M:%S.%f')
                 }
                 tree_view[course_id][device_number][competitor_id] = result_item
 
@@ -363,7 +363,8 @@ def ConvertRunResults(tree_view, manual_list, dql_list):
                     # 'diff': timeConverter(tree_view[course_id][keys[-1]][competitor_id][0].diff+tree_view[course_id][keys[-1]][competitor_id][0].adder_diff),
                     'speed': speedConverter(tree_view[course_id][keys[-1]][competitor_id][1].speed),
                     'absoluttime': timeConverter(tree_view[course_id][keys[-1]][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
-                    'status_id': tree_view[course_id][keys[-1]][competitor_id][0].status_id
+                    'status_id': tree_view[course_id][keys[-1]][competitor_id][0].status_id,
+                    'is_manual': tree_view[course_id][keys[-1]][competitor_id][0].is_manual
                 }
                 try:
                     result_item['diff'] = timeConverter(tree_view[course_id][keys[-1]][competitor_id][0].diff+tree_view[course_id][keys[-1]][competitor_id][0].adder_diff)

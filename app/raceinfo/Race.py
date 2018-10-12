@@ -110,7 +110,7 @@ class BaseRace:
         if self.runOrder.manual_order is not None:
             next_passed_competitors_list = RunOrder.query.filter(RunOrder.manual_order > self.runOrder.manual_order,
                                                      RunOrder.run_id == self.run.id).all()
-            if len(next_passed_competitors_list) > 0:
+            if len(next_passed_competitors_list) > 0 and self.runOrder.manual_order != 0:
                 for item in next_passed_competitors_list:
                     item.manual_order -= 1
                     db.session.add(item)
@@ -158,14 +158,14 @@ class BaseRace:
                                               RunOrder.run_id == self.run.id). \
             first()
         try:
+            if resultApproved.is_start == False or resultApproved.is_start == None:
+                self.runOrder.manual_order = 0
+                db.session.add(self.runOrder)
+                db.session.commit()
             if resultApproved.status_id == '1':
                 if self.race.result_function == 1 and self.run.number > 1:
                     resultApproved.set_competitor_adder(self.run.number)
 
-                if resultApproved.is_start == False:
-                    self.runOrder.manual_order = 0
-                    db.session.add(self.runOrder)
-                    db.session.commit()
                 if finish_time != '':
                     finish_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType). \
                         join(CourseDevice). \
