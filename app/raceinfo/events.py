@@ -215,6 +215,51 @@ def get_race_info(data):
                 }
             ))
 
+@raceinfo.route('/raceinfo/<int:race_id>', methods=['GET', 'POST'])
+def get_race_info2(race_id):
+
+    run_list = db.session.query(RunInfo, RunType, Discipline).\
+        join(RunType, RunInfo.run_type_id == RunType.id). \
+        join(Discipline, RunInfo.discipline_id == Discipline.id, isouter=True). \
+        filter(RunInfo.race_id == race_id, RunInfo.run_type_id != 3).all()
+
+    race_info = {}
+    for run in run_list:
+        race_info[run[0].id] = {
+            'starttime': (None if run[0].starttime is None else str(run[0].starttime)),
+            'endtime': (None if run[0].endtime is None else str(run[0].endtime)),
+            'number': run[0].number,
+            'type': run[1].name,
+            'is_second': run[0].is_second,
+            'discipline': (None if run[2] is None
+      else run[2].en_name),
+            'discipline_fiscode': (None if run[2] is None
+                           else run[2].fiscode),
+            'courses': {},
+            'start_list': runList_view(db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor).\
+                join(RunOrder).filter(RunOrder.run_id == run[0].id).\
+                order_by(RunOrder.order.asc()).all())
+        }
+        courses = db.session.query(Course).filter(Course.id == RunCourses.course_id,
+                                                  RunCourses.run_id == run[0].id).all()
+        for course in courses:
+            race_info[run[0].id]['courses'][course.id] = {
+                'name': course.en_name,
+                'devices': []
+            }
+            devices = db.session.query(CourseDevice, CourseDeviceType).\
+                join(CourseDeviceType, CourseDevice.course_device_type_id == CourseDeviceType.id).\
+                filter(CourseDevice.course_id == course.id).all()
+            for device in devices:
+                race_info[run[0].id]['courses'][course.id]['devices'].append({
+                    'id': device[0].id,
+                    'order': device[0].order,
+                    'distance': device[0].distance,
+                    'type': device[1].name,
+                })
+    return json.dumps({'run_list': race_info})
+
+
 
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
 @login_required
