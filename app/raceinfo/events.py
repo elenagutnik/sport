@@ -193,7 +193,7 @@ def get_race_info(data):
                         'distance': device[0].distance,
                         'type': device[1].name,
                     })
-        socketio.emit('RaceInfo', json.dumps({'run_list': race_info}))
+        socketio.emit('RaceInfo', {'run_list': race_info})
 
         forerunners_runs = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None,
                                                 RunInfo.run_type_id == 3).first()
