@@ -583,7 +583,6 @@ def race_editbase(id):
     form.category_ref.choices = [(item.id, item.name + ' - ' + item.description) for item in Category.query.all()]
     form.result_method_ref.choices = [(item.id, item.name) for item in ResultFunction.query.all()]
     form.run_order_method_ref.choices = [(item.id, item.name) for item in RunOrderFunction.query.all()]
-
     if form.validate_on_submit():
         race.eventname = form.eventname.data
         race.racedate = form.racedate.data
@@ -595,22 +594,25 @@ def race_editbase(id):
         race.season = form.season.data
         race.codex = form.codex.data
         race.speedcodex = form.speedcodex.data
-
         race.result_function = form.result_method_ref.data
-
+        race.run_order_function = form.run_order_method_ref.data
         db.session.add(race)
         flash('The Race has been changed.')
         return redirect(url_for('.race', id=id,_external=True))
     form.eventname.data = race.eventname
     form.racedate.data=race.racedate
     form.place.data =race.place
-    form.gender_ref.data= race.gender_id
-    form.nation_ref.data =race.nation_id
-    form.category_ref.data= race.category_id
-    form.discipline_ref.data=race.discipline_id
-    form.season.data= race.season
-    form.codex.data =race.codex
+
+    form.gender_ref.data = race.gender_id
+    form.nation_ref.data = race.nation_id
+    form.category_ref.data = race.category_id
+    form.discipline_ref.data = race.discipline_id
+    form.result_method_ref.data = race.run_order_function
+    form.run_order_method_ref.data = race.run_order_function
+    form.season.data = race.season
+    form.codex.data = race.codex
     form.speedcodex.data = race.speedcodex
+
     return render_template('raceinfo/static-tab/simpleform.html', form=form, race=race, title=gettext('Edit Race - General properties'))
 
 @raceinfo.route('/race/<int:id>/jury', methods=['GET', 'POST'])

@@ -2,7 +2,7 @@ from .models import *
 from .DataViewer import TreeView
 from sqlalchemy import cast, DATE, func, asc, and_, sql
 
-from datetime import datetime
+from datetime import datetime, time
 
 class BaseRace:
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
@@ -177,8 +177,11 @@ class BaseRace:
                         finish_device[0].data_in_id = None
                         finish_device[0].absolute_time = finish_time
                         db.session.add(finish_device)
-                    resultApproved.finish_time = finish_time
-                    resultApproved.is_finish=True
+                    finish_time_obj = datetime.strptime(finish_time, '%M:%S.%f').time()
+                    curent_date = datetime.now().date()
+                    resultApproved.finish_time = int((datetime.combine(curent_date, finish_time_obj).timestamp())*1000)
+
+                    resultApproved.is_finish = True
                 if start_time != '':
                     start_device = db.session.query(ResultDetail, CourseDevice, CourseDeviceType). \
                         join(CourseDevice). \
@@ -190,7 +193,10 @@ class BaseRace:
                         start_device[0].data_in_id = None
                         start_device[0].absolute_time = start_time
                         db.session.add(start_device)
-                    resultApproved.start_time = start_time
+
+                    start_time_obj = datetime.strptime(start_time, '%M:%S.%f').time()
+                    curent_date = datetime.now().date()
+                    resultApproved.start_time = int((datetime.combine(curent_date, start_time_obj).timestamp())*1000)
 
                 resultApproved.time = int(resultApproved.finish_time) - int(resultApproved.start_time)
             else:
@@ -489,7 +495,6 @@ class ParallelRace(SummationTimeRace):
                         item.rank = last_rank-index-1
                         db.session.add(item)
                         db.session.commit()
-
             except:
                 item.diff = None
                 item.rank = None

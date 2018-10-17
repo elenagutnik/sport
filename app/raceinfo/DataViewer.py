@@ -61,8 +61,6 @@ def speedConverter(speed):
     # return time
 
 
-
-
 def ConvertCompetitorStart(resultDetail, courseDevice, dataIn):
     return {
         resultDetail.race_competitor_id:
