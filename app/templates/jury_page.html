@@ -219,6 +219,9 @@
 
             <input type="hidden" id="form_competitor_id" name="competitor_id" value="">
             <input type="hidden" id="form_run_id" name="run_id" value="">
+            <input type="hidden" id="form_course_id" name="course_id" value="">
+            <input type="hidden" id="form_startlist_key" name="startlist_key" value="">
+
 
           </div>
         </form>
@@ -325,17 +328,14 @@
               }
             });
           });
-          $.each(arr[1], function(course,arr){
-            console.log("arr[1]",arr);
-            $.each(arr, function(dev,allcomps){
+          $.each(arr[1], function(dev,allcomps){
               console.log("$.each(arr, function(dev,allcomps)",allcomps);
               $.each(allcomps, function(comp,val){
                 console.log("$.each(allcomps, function(comp,val)",val);
                 for(var i=0;i<fields_all.length;i++){
-                  $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields_all[i]+" td.dev_"+dev).html(val[fields_all[i]]);
+                  $("#tab_summarytable .div_run"+run+" table tbody tr.comp_"+comp+"_"+fields_all[i]+" td.dev_"+dev).html(val[fields_all[i]]);
                 }
               });
-            });
           });
     //        });
       });
@@ -499,7 +499,19 @@
       //RefreshResults(data);
     });
 
-
+    function sort_startlist(startlist){
+      var comp_sorted=Array();
+      startlist.sort(function(a,b){return a['manual_order'] == b['manual_order'] ? a > b : a['manual_order'] > b['manual_order']}); // сортируем спортсменов
+      for(var id in startlist){
+          if(startlist[id].manual_order!==null){
+            //console.log("SORT - "+startlist[id].manual_order,startlist[id]);
+            comp_sorted.push(startlist[id]);
+          }else{
+            //console.log("SORT - "+startlist[id].manual_order,startlist[id].race_competitor_id);
+          }
+      }
+      return comp_sorted;
+    }
     function create_cells(run, course, arr){ //arr = devices with competitors data
       console.log("create_cells",arr);
       var d = arr[Object.keys(arr)[objlen(arr)-1]];
@@ -510,13 +522,7 @@
       console.log("run",run);
       console.log("course",course);
 
-      var comp_sorted_tmp=race_info.run_list[run].start_list[course];
-      var comp_sorted=Array();
-      comp_sorted_tmp.sort(function(a,b){return a['manual_order'] == b['manual_order'] ? a > b : a['manual_order'] > b['manual_order']}); // сортируем спортсменов
-      for(var id in comp_sorted_tmp){
-          if(comp_sorted_tmp[id].manual_order!==null)
-          comp_sorted.push(comp_sorted_tmp[id]);
-      }
+      var comp_sorted=sort_startlist(race_info.run_list[run].start_list[course]);
 
       console.log("comp_sorted",comp_sorted);
       for(var id in comp_sorted){
@@ -558,10 +564,10 @@
                   <th>Parameter</th>"+thead[run][course]+"\
                 </tr>\
                 ");
-              console.log("val",val);
+              //console.log("val",val);
               for(var i=0;i<fields.length;i++){
                   $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody").append("<tr class='comp_"+comp+"_"+fields[i]+"'><th class='title'>"+fields[i]+"</th></tr>");
-                  console.log("race_info.run_list[run].courses[course].devices",race_info.run_list[run].courses[course].devices);
+                  //console.log("race_info.run_list[run].courses[course].devices",race_info.run_list[run].courses[course].devices);
                   $.each(race_info.run_list[run].courses[course].devices, function(idx, dev){
                     $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields[i]).append("<td class='dev_"+dev.id+"'>"+((arr[dev.order][comp]&&arr[dev.order][comp][fields[i]])?arr[dev.order][comp][fields[i]]:"")+"</td>");
                   });
@@ -616,10 +622,14 @@
     }
 
     socket.on('RaceInfo', function(data) {
-      //race_info=JSON.parse(data);
-      race_info=data;
-      //var qwe123=data;
-      //console.log("socket.on('RaceInfo')", qwe123);
+      race_info=JSON.parse(data);
+/*      var check=race_info;
+      console.log("check.run_list[2].start_list[1][0]", check.run_list[2].start_list[1][0]);
+      console.log("check.run_list[2].start_list[1]", check.run_list[2].start_list[1]);
+      for(var i in check.run_list[2].start_list[1]){
+        console.log(i,check.run_list[2].start_list[1][i].order);
+      }
+*/
       run=get_active_run(race_info.run_list);
       console.log("init run:",run);
       Promise.all([
@@ -817,7 +827,7 @@
             .done(function(data){
                 var start_list=JSON.parse(data);
                 race_info.run_list[run_id].start_list=start_list;
-                console.log("END FUNC: get_startlist (run.id="+run_id+")");
+                console.log("END FUNC: get_startlist (run.id="+run_id+")",start_list);
                 return start_list;
             });
         }
@@ -848,8 +858,8 @@
           var j=0;
           for(var cid in run.start_list[course]){
             var comp=run.start_list[course][cid];
-            console.log('run.start_list[course][cid]',comp);
-            console.log("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody");
+            //console.log('run.start_list[course][cid]',comp);
+            //console.log("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody");
             $("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody").append('\
               <tr class="racecompetitor_'+comp.id+' '+(comp.is_participate?'':'disabled')+'">\
                 <td>'+(j+1)+'</td>\
@@ -1021,15 +1031,17 @@
       return true;
     }
     function refresh_status(run_id,comp_id,status_id){
-      console.log("START: refresh_status "+"#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" td.status");
-      $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" td.status").html(getObjById(status_list,"id",status_id).name);
+      var tr="#tab_manualcontrol tr.tr_run"+run_id+"_courses table tbody tr.tr_"+comp_id;
+      console.log("START: refresh_status ",tr);
+      $(tr+" td.status").html(status_id?getObjById(status_list,"id",status_id).name:"");
       if(status_id){
-        if(status_id==1)$("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")).removeClass("danger").addClass("success");
-        else $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")).removeClass("danger").addClass("warning");
-
-        $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" button.btn_start").hide();
+        if(status_id==1)$(tr).removeClass("danger").addClass("success");
+        else $(tr).removeClass("danger").addClass("warning");
+        $(tr+" button.btn_start").hide();
+        console.log('$(tr+" button.btn_start").hide();');
       }else{
-        $("#tab_manualcontrol tr.tr_"+run_id.replace("run","")+"_"+comp_id.replace("comp_","")+" button.btn_start").show();
+        $(tr+" button.btn_start").show();
+        console.log('$(tr+" button.btn_start").show();');
       }
     }
     function set_current_data(){
@@ -1138,7 +1150,7 @@
           return true;
     }
     function set_list_for_manualcontrol(){
-      console.log("START FUNC: set_list_for_manualcontrol");
+      console.log("START FUNC: set_list_for_manualcontrol",race_info.run_list);
       var flag_started_run=false; //флаг, указывающий, что у нас есть хотя бы 1 начатый заезд
 
 
@@ -1153,12 +1165,12 @@
             if(race_info.run_list[id].start_list && objlen(race_info.run_list[id].start_list)){
               $("#tab_manualcontrol tbody tr.empty_run").remove();
               $("#tab_manualcontrol tbody").append("\
-                <tr class='tr_"+id+"'>\
+                <tr class='tr_run"+id+"'>\
                   <td colspan='"+(objlen(race_info.run_list[id].start_list))+"'>Run: "+race_info.run_list[id].number+" (#"+id+")"+"</td>\
                 </tr>\
-                <tr class='courses'></tr>");
+                <tr class='tr_run"+id+"_courses'></tr>");
               for(var course in race_info.run_list[id].start_list){
-                $("#tab_manualcontrol tbody tr.courses").append("\
+                $("#tab_manualcontrol tbody tr.tr_run"+id+"_courses").append("\
                   <td class='run"+id+"_course"+course+"'>\
                     Course: "+race_info.run_list[id].courses[course].name+" (#"+course+")"+"\
                     <table class='tab_run"+id+"_course"+course+" table table-hover'>\
@@ -1265,11 +1277,11 @@
     }
     // формирует строку с именами спортсменров
     function getCompName(obj){
-      console.log("obj",obj);
+      //console.log("obj",obj);
       return obj.en_firstname+" "+obj.en_lastname+" / "+obj.ru_lastname+" "+obj.ru_firstname +"(#"+obj.race_competitor_id+")";
     }
     function getCompNameBR(obj){
-      console.log("obj",obj);
+      //console.log("obj",obj);
       return obj.en_firstname+" "+obj.en_lastname+"</br>"+obj.ru_lastname+" "+obj.ru_firstname +"<br>(#"+obj.race_competitor_id+")";
     }
 
@@ -1439,9 +1451,14 @@ $(document).ready(function () {
             $("#run_list_tbody tr.tr"+cid+" td.btns .run_start").hide();
             $("#run_list_tbody tr.tr"+cid+" td.btns .run_finish").hide();
 
+            Promise.all([get_startlist(next_run)])
+            .then(result=>set_html_startlist(next_run))
+            .then(result=>set_list_for_manualcontrol());
 
+//            socket_emit('GetRaceInfo',{'race_id': race_id});//socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
             // меняем статус заезда во вкладке "стартовые листы"
             $("#tab_startlist_run"+cid+" .status").html("завершен");
+
           }else{
             add_error({"msg":"При остановке заезда сервер вернул false","data":data});
           }
@@ -1465,7 +1482,7 @@ $(document).ready(function () {
             run.number=race_info.run_list[cid].number;
 
             // меняем данные для заезда в объекте гонки
-            race_info.run_list[cid].start_time=data.starttime;
+            race_info.run_list[cid].starttime=data.starttime;
             console.log("#run_list_tbody .tr"+cid+" .starttime",data.starttime);
             // меняем данные для заезда в таблице заездов
             $("#run_list_tbody .tr"+cid+" .starttime").html(data.starttime);
@@ -1474,13 +1491,16 @@ $(document).ready(function () {
 
             // меняем статус заезда во вкладке "стартовые листы"
             $("#tab_startlist_run"+cid+" .status").html("Активен");
+            set_list_for_manualcontrol();
           }else{
             add_error({"msg":"При остановке заезда сервер вернул false","data":data});
           }
 
-          Promise.all([get_startlist(cid)])
-          .then(result=>startlist_tab_prepare(cid))
+        /*  Promise.all([get_startlist(cid)])
+          .then(result=>set_html_startlist(cid))
           .then(result=>set_list_for_manualcontrol());
+        */
+
 
           /*
           Promise.all([get_runs_list()])
@@ -1508,9 +1528,15 @@ $(document).ready(function () {
     });
 
     $("body").on("click", ".editform_approve", function () {
+        var run_id=$("#form_run_id").val();
+        var course_id=$("#form_course_id").val();
+        var competitor_id=$("#form_competitor_id").val();
+        var startlist_key=$("#form_startlist_key").val();
+
         var obj={
-          'run_id' : $("#form_run_id").val(),
-          'competitor_id' : $("#form_competitor_id").val(),
+          'run_id' : run_id,
+          'course_id' : course_id,
+          'competitor_id' : competitor_id,
           'status_id' : $("#form_status").val(),
           'finish_time' : $("#form_finishtime").val()?$("#form_finishtime").val():false,
           'start_time' : $("#form_starttime").val()?$("#form_starttime").val():false,
@@ -1519,6 +1545,10 @@ $(document).ready(function () {
           //'course_id': race_info.run_list[$("#form_run_id").val()].courses[].course_id
         };
         console.log("CompetitorManualApprove obj",obj);
+        if(race_info.run_list[run_id].start_list[course_id][startlist_key].manual_order===null) // если у нас значилось, что спортсмен не стартовал (manual_order==null), то при установке результатов вручную, ставим 0 в manual order
+          race_info.run_list[run_id].start_list[course_id][startlist_key].manual_order=0;
+
+//        race_info.run_list[$("#form_run_id").val()].start_list[$("#form_course_id").val()];
         socket.emit('CompetitorManualApprove', obj);
         /*
         $.ajax({
@@ -1746,10 +1776,9 @@ $(document).ready(function () {
       $("#form_txt_run").html(race_info.run_list[run_id].number);
 
       $("#form_run_id").val(run_id);
+      $("#form_course_id").val(course_id);
       $("#form_competitor_id").val(competitor_id);
-
-      if(race_info.run_list[run_id].start_list[course_id][startlist_key].manual_order===null) // если у нас значилось, что спортсмен не стартовал (manual_order==null), то при установке результатов вручную, ставим 0 в manual order
-        race_info.run_list[run_id].start_list[course_id][startlist_key].manual_order=0;
+      $("#form_startlist_key").val(startlist_key);
 
       if($("#tab_summarytable table.run"+run_id+"_course"+course_id+" tr.comp_"+competitor_id).length){
         $("#form_status").val(status_id);
@@ -1782,18 +1811,18 @@ $(document).ready(function () {
           race_info.run_list[run_id].start_list[course_id][startlist_key].manual_order=null;
 
           if(set_comp_status(competitor_id, "clear" ,run_id)){
-            console.log('clear competitor - run:'+run_id+' competitor:'+competitor_id);
-            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html("cleared");
-            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("danger");
-            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("warning");
-            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id).removeClass("success");
+            console.log('clear competitor - run:'+run_id+' competitor:'+competitor_id, "#tab_manualcontrol tr.tr_run"+run_id+"_courses table.tab_run"+run_id+"_course"+course_id+" tr_"+competitor_id);
+            $("#tab_manualcontrol tr.tr_run"+run_id+"_courses table.tab_run"+run_id+"_course"+course_id+" .tr_"+competitor_id+" .status").html("cleared");
+            $("#tab_manualcontrol tr.tr_run"+run_id+"_courses table.tab_run"+run_id+"_course"+course_id+" .tr_"+competitor_id).removeClass("danger");
+            $("#tab_manualcontrol tr.tr_run"+run_id+"_courses table.tab_run"+run_id+"_course"+course_id+" .tr_"+competitor_id).removeClass("warning");
+            $("#tab_manualcontrol tr.tr_run"+run_id+"_courses table.tab_run"+run_id+"_course"+course_id+" .tr_"+competitor_id).removeClass("success");
             //$("#tab_manualcontrol .btn").prop('disabled',false);
             //$("#tab_manualcontrol .btn_finish").prop('disabled',true);
 
           }
           //glob_arr["run"+run_id]["comp_"+competitor_id]=null;
-          socket_emit();
-          refresh_status("run"+run_id,"comp_"+competitor_id);
+          socket_emit('GetResults',{'race_id':race_id});
+          refresh_status(run_id,competitor_id);
           console.log("after socket.emit('get/results'...");
 
           //get_current_data(race_id).then(refresh_status(run_id,competitor_id));

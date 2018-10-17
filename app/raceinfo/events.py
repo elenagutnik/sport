@@ -130,7 +130,8 @@ def socket_get_results(data):
         result_list = {}
         for run in run_list:
             results, manual, dql_list = TreeView(run.id)
-            result_list[run.id] = [ConvertRunResults(results, manual, dql_list), DataInView(run.id)]
+            result_list[run.id] = [ConvertRunResults(results, manual, dql_list), json.loads(DataInView(run.id))]
+            #result_list[run.id] = [ConvertRunResults(results, manual, dql_list), DataInView(run.id)]
         socketio.emit('Results', json.dumps(result_list))
     else:
         if 'run_id' in data.keys():
@@ -193,7 +194,7 @@ def get_race_info(data):
                         'distance': device[0].distance,
                         'type': device[1].name,
                     })
-        socketio.emit('RaceInfo', {'run_list': race_info})
+        socketio.emit('RaceInfo', json.dumps({'run_list': race_info}))
 
         forerunners_runs = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None,
                                                 RunInfo.run_type_id == 3).first()

@@ -98,13 +98,16 @@ def ConvertCompetitorFinish(resultDetail, courseDevice, resultApproved, dataIn):
     }
 
 def ConvertCompetitorsRankList(result_details, courseDevice):
-    rank_list = {}
-    for item in result_details:
-        rank_list[item.race_competitor_id] = {
-            'sectorrank': item.sectorrank,
-            'rank': item.rank,
-        }
-    return {courseDevice.id: rank_list}
+   rank_list = {}
+   for item in result_details:
+       if item.course_device_id not in rank_list.keys():
+           rank_list[item.course_device_id] = {}
+       rank_list[item.course_device_id][item.race_competitor_id] = {
+           'sectorrank': item.sectorrank,
+           'rank': item.rank,
+       }
+   return rank_list
+
 
 # def TreeView(run_id):
 #     tree_view = {}
@@ -337,7 +340,8 @@ def DataInView(run_id):
 def ConvertRunResults(tree_view, manual_list, dql_list):
     courses_id = list(tree_view.keys())
     for course_id in courses_id:
-        keys = list(tree_view[course_id].keys())
+        keys = sorted(list(tree_view[course_id].keys()))
+        #keys = list(tree_view[course_id].keys())
         for device_number in keys[:-1]:
             for competitor_id in tree_view[course_id][device_number]:
                 result_item = {
