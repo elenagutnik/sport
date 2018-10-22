@@ -229,8 +229,8 @@ def forerunner_run_create(id):
         {
             run.id:
                 {
-                     'starttime': (None if run[0].starttime is None else str(run.starttime)),
-                     'endtime': (None if run[0].endtime is None else str(run.endtime)),
+                     'starttime': (None if run.starttime is None else str(run.starttime)),
+                     'endtime': (None if run.endtime is None else str(run.endtime)),
                      'number': run.number,
                      'courses': {},
                      'start_list': response_start_list

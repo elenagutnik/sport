@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/Race.py" afterPath="$PROJECT_DIR$/app/raceinfo/Race.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/RunInfo.py" afterPath="$PROJECT_DIR$/app/raceinfo/RunInfo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/raceinfo/events.py" afterPath="$PROJECT_DIR$/app/raceinfo/events.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -26,14 +23,14 @@
     <favorites_list name="sport" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.657082">
+    <splitter split-orientation="horizontal" split-proportion="0.48296058">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="RunInfo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/raceinfo/RunInfo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="915">
-                  <caret line="258" column="4" lean-forward="false" selection-start-line="258" selection-start-column="4" selection-end-line="258" selection-end-column="4" />
+                <state relative-caret-position="510">
+                  <caret line="231" column="46" lean-forward="false" selection-start-line="231" selection-start-column="46" selection-end-line="231" selection-end-column="46" />
                   <folding />
                 </state>
               </provider>
@@ -104,8 +101,8 @@
           <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="560">
-                  <caret line="195" column="22" lean-forward="true" selection-start-line="179" selection-start-column="12" selection-end-line="195" selection-end-column="22" />
+                <state relative-caret-position="392">
+                  <caret line="195" column="22" lean-forward="true" selection-start-line="195" selection-start-column="22" selection-end-line="195" selection-end-column="22" />
                   <folding>
                     <marker date="1539784782963" expanded="true" signature="1264:1289" ph="delete from " />
                     <marker date="1539784782963" expanded="true" signature="1317:1336" ph="delete from " />
@@ -1205,8 +1202,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/events.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="560">
-          <caret line="195" column="22" lean-forward="true" selection-start-line="179" selection-start-column="12" selection-end-line="195" selection-end-column="22" />
+        <state relative-caret-position="392">
+          <caret line="195" column="22" lean-forward="true" selection-start-line="195" selection-start-column="22" selection-end-line="195" selection-end-column="22" />
           <folding>
             <marker date="1539784782963" expanded="true" signature="1264:1289" ph="delete from " />
             <marker date="1539784782963" expanded="true" signature="1317:1336" ph="delete from " />
@@ -1222,8 +1219,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/RunInfo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="915">
-          <caret line="258" column="4" lean-forward="false" selection-start-line="258" selection-start-column="4" selection-end-line="258" selection-end-column="4" />
+        <state relative-caret-position="510">
+          <caret line="231" column="46" lean-forward="false" selection-start-line="231" selection-start-column="46" selection-end-line="231" selection-end-column="46" />
           <folding />
         </state>
       </provider>
