@@ -49,6 +49,7 @@
       <li id="li_tab_device"><a href="#tab_device" data-toggle="tab">Устройства</a></li>
       <li id="li_tab_raceresults"><a href="#tab_raceresults" data-toggle="tab">Результаты</a></li>
       <li id="li_tab_reports"><a href="#tab_reports" data-toggle="tab">Отчеты</a></li>
+      <li id="li_tab_errors"><a href="#tab_errors" data-toggle="tab">Ошибки</a></li>
     </ul>
     <div class="tab-content">
         <div id="tab_races" class="tab-pane fade in active">
@@ -126,6 +127,19 @@
           <table style='width:100%;' class='table table-bordered' id="table_raceresults">
           </table>
         </div>
+        <div id="tab_errors" class="tab-pane fade">
+          <table style='width:100%;' class='table table-bordered' id="table_errors">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Message</th>
+                <th>CODE</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
         <div id="tab_reports" class="tab-pane fade">
             <h2>Отчеты</h2>
             Отчеты формируются по сформированным на данный момент результатам.
@@ -164,6 +178,7 @@
             <button type="button" class="btn btn-primary btn_report" data-dismiss="modal" name="results_C73C">#C73C - Official Results (After Run 2)</button>
 
         </div>
+
     <!-- HTML-код модального окна -->
     <div id="popup_editresult" class="modal fade">
       <div class="modal-dialog">
@@ -257,6 +272,15 @@
     var thead={};
 
     var socket = io.connect('http://127.0.0.1:5000');
+
+    var msg_err=new Map([
+      ["error_getting_status_list", "Error: can't get the status list"],
+      ["runs_have_to_be_closed",    "All runs have to be closed before starting forerunners"],
+      ["frunners_started", "Forerunners run has been already started"]
+    ]);
+    var msg_event=new Map([
+      ["forerunners_started",       "Forerunners run has been started"]
+    ]);
 
     socket.on('errorData', function(data) {
       var data=JSON.parse(data);
@@ -631,7 +655,7 @@
       }
 */
       run=get_active_run(race_info.run_list);
-      console.log("init run:",run);
+      //console.log("init run:",run);
       Promise.all([
         set_html_runlist(),
         set_select_bib(),
@@ -1228,7 +1252,7 @@
         if(race_list[id].starttime && !race_list[id].endtime)
           return {"id":id, "number":race_list[id].number};
       }
-      return {"id":null,"number":null};
+      return {"id":false,"number":false};
     }
     //форматирование чисел
     function nform(v){
@@ -1347,14 +1371,31 @@
       document.cookie = updatedCookie;
     }
 
-
+    function set_err(data){
+      $("#table_errors tbody").append("\
+        <tr class='error danger'>\
+          <td>"+moment().format('MMMM Do YYYY, hh:mm:sss')+"</td>\
+          <td>"+(data.code?msg_err.get(data.code):data.msg)+"</td>\
+          <td>"+(data.code?data.code:"-")+"</td>\
+        </tr>\
+      ");
+    }
+    function set_event(data){
+      $("#table_errors tbody").append("\
+        <tr class='event'>\
+          <td>"+moment().format('MMMM Do YYYY, hh:mm:sss')+"</td>\
+          <td>"+(data.code?msg_event.get(data.code):data.msg)+"</td>\
+          <td>"+(data.code?data.code:"-")+"</td>\
+        </tr>\
+      ");
+    }
 ///////////////////////
 $(document).ready(function () {
 
     Promise.all([get_race_list()])
     .then(
           result=>get_status_list(),
-          error=>alert("[eqyz]")
+          error=>set_err({"code":"error_getting_status_list"})
     ).then(
           result=>socket_emit('GetRaceInfo',{'race_id': race_id})//socket.emit('get/results', {run_id: 1}) //result=>get_current_data(race_id)
     );
@@ -1363,30 +1404,61 @@ $(document).ready(function () {
       document.cookie = "tab="+$(this).id;
     });
     $("body").on("click","#btn_frunners_start",function(){
-      $.ajax({
-        url:"/raceinfo/race/"+race_id+"/run/forerunners/build",
-        success: function(data) {
-            data = JSON.parse(data);
-            console.log(data);
-            alert('success: '+data);
-        },
-        error: function(data) {
-            data = JSON.parse(data);
-            console.log(data);
-            alert('error: '+data);
-        }
-      });
+      if(get_active_run(race_info.run_list).id){
+        set_err({"code":"runs_have_to_be_closed"});
+      }else{
+        console.log("get_active_run(race_info.run_list).id",get_active_run(race_info.run_list).id);
+        $.ajax({
+          url:"/raceinfo/race/"+race_id+"/run/forerunners/build",
+          success: function(data) {
+              data = JSON.parse(data);
+              console.log(data);
+              if(data.success){
+                var fid=Object.keys(data.data)[0];
+                race_info.run_list[fid]={"type":"forerunners","starttime":"forerunners - "+moment().format('MMMM Do YYYY, hh:mm:sss'),"start_list":data.data[fid]};
+                // run - текущий активный заезд
+                run.id=fid;
+                run.number=0;
+
+                // меняем данные для заезда в объекте гонки
+//                race_info.run_list[cid].starttime=data.starttime;
+//                console.log("#run_list_tbody .tr"+cid+" .starttime",data.starttime);
+                // меняем данные для заезда в таблице заездов
+//                $("#run_list_tbody .tr"+cid+" .starttime").html(data.starttime);
+                //$("#run_list_tbody .tr"+cid+" td.btns .run_start").hide();
+                //$("#run_list_tbody .tr"+cid+" td.btns .run_finish").show();
+
+                // меняем статус заезда во вкладке "стартовые листы"
+                //$("#tab_startlist_run"+fid+" .status").html("Активен");
+
+                Promise.all([set_html_startlist(fid)])
+                .then(result=>set_list_for_manualcontrol());
+
+                set_event({"code":"forerunners_started"});
+              }else{
+                set_err({"code":"frunners_started"});
+              }
+
+          },
+          error: function(data) {
+              data = JSON.parse(data);
+              console.log(data);
+              set_err({"msg":data});
+          }
+        });
+      }
     });
     $("body").on("click","#btn_frunners_stop",function(){
       $.ajax({
         url:"/raceinfo/race/"+race_id+"/run/forerunners/del",
         success: function(data) {
             console.log(data);
-            alert('success: '+data);
+            set_event({"msg":data});
         },
         error: function(data) {
           console.log(data);
-            alert('error: '+data);
+          set_err({"msg":data});
+          alert('error: '+data);
         }
       });
     });
