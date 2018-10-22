@@ -265,8 +265,7 @@ def forerunner_run_delete(id):
     db.session.query(RunInfo).filter(RunInfo.race_id == id, RunInfo.run_type_id == 3).delete()
     db.session.commit()
     return {
-        'success':true|false,
-        'msg':'message'
+        'success': True
     }
 
 

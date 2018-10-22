@@ -122,8 +122,8 @@
           <file leaf-file-name="RunInfo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/raceinfo/RunInfo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="244">
-                  <caret line="218" column="50" lean-forward="false" selection-start-line="218" selection-start-column="50" selection-end-line="218" selection-end-column="50" />
+                <state relative-caret-position="950">
+                  <caret line="270" column="0" lean-forward="true" selection-start-line="270" selection-start-column="0" selection-end-line="270" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -1231,8 +1231,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/raceinfo/RunInfo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="244">
-          <caret line="218" column="50" lean-forward="false" selection-start-line="218" selection-start-column="50" selection-end-line="218" selection-end-column="50" />
+        <state relative-caret-position="950">
+          <caret line="270" column="0" lean-forward="true" selection-start-line="270" selection-start-column="0" selection-end-line="270" selection-end-column="0" />
           <folding />
         </state>
       </provider>
