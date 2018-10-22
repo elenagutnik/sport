@@ -400,7 +400,15 @@ class BaseRace:
         return db.session.query(ResultDetail).\
             filter(ResultDetail.course_device_id == self.courseDevice.id,
                    ResultDetail.run_id == self.run.id).all()
+    def check_race(self):
+        """
+        Для  комбинации проверить наличие дисциплин для  заездов
+        Сформированный стартовый список на первый заезд
+        Привязка заездов к трассе
+        Проверить расстановку девайсов стартовый в начале, контрольные точки, финиш
+        Наличие forerunners
 
+        """
 class ClassicRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)

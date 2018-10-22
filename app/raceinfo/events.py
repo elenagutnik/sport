@@ -492,3 +492,4 @@ def get_start_finish_device(run_id):
     for item in data:
         dict_view[item[0]] = item[1]
     return dict_view
+

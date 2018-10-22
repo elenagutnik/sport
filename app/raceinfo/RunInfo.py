@@ -223,10 +223,40 @@ def forerunner_run_create(id):
             'course_id': item.course_id,
 
         })
-    return json.dumps({'success': True,
-                       'data': response_start_list})
-
-
+    courses = db.session.query(Course).filter(Course.id == RunCourses.course_id,
+                                              RunCourses.run_id == run.id).all()
+    result =\
+        {
+            run.id:
+                {
+                     'starttime': (None if run[0].starttime is None else str(run.starttime)),
+                     'endtime': (None if run[0].endtime is None else str(run.endtime)),
+                     'number': run.number,
+                     'courses': {},
+                     'start_list': response_start_list
+                }
+        }
+    for course in courses:
+        result[run.id]['courses'][course.id] = {
+            'name': course.en_name,
+            'devices': []
+        }
+        devices = db.session.query(CourseDevice, CourseDeviceType). \
+            join(CourseDeviceType, CourseDevice.course_device_type_id == CourseDeviceType.id). \
+            filter(CourseDevice.course_id == course.id).all()
+        for device in devices:
+            result[run.id]['courses'][course.id]['devices'].append({
+                'id': device[0].id,
+                'order': device[0].order,
+                'distance': device[0].distance,
+                'type': device[1].name,
+            })
+    return json.dumps(
+        {
+            'success': True,
+            'data': result
+        }
+    )
 @raceinfo.route('/race/<int:id>/run/forerunners/del', methods=['GET', 'POST'])
 @admin_required
 def forerunner_run_delete(id):
