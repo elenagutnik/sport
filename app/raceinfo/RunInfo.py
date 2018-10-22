@@ -213,9 +213,11 @@ def forerunner_run_create(id):
                RunOrder.race_competitor_id == RaceCompetitor.id,
                RaceCompetitor.forerunner_id == CourseForerunner.id,
                CourseForerunner.forerunner_id == Forerunner.id).all()
-    response_start_list = []
+    response_start_list = {}
     for item in start_list:
-        response_start_list.append({
+        if item.course_id not in response_start_list.keys():
+            response_start_list[item.course_id] = []
+        response_start_list[item.course_id].append({
             'id': item.id,
             'en_lastname': item.en_lastname,
             'en_firstname': item.en_firstname,
@@ -262,6 +264,9 @@ def forerunner_run_create(id):
 def forerunner_run_delete(id):
     db.session.query(RunInfo).filter(RunInfo.race_id == id, RunInfo.run_type_id == 3).delete()
     db.session.commit()
-    return '0'
+    return {
+        'success':true|false,
+        'msg':'message'
+    }
 
 
