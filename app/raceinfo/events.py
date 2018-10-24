@@ -206,15 +206,41 @@ def get_race_info(data):
                 join(RunOrder).filter(RunOrder.run_id == forerunners_runs.id). \
                 order_by(RunOrder.order).all()
             results, manual, dql_list = TreeView(forerunners_runs.id)
-            socketio.emit('ForerunnersResults', json.dumps(
+
+            courses = db.session.query(Course).filter(Course.id == RunCourses.course_id,
+                                                      RunCourses.run_id == forerunners_runs.id).all()
+
+            result = \
                 {
                     forerunners_runs.id:
                     [
-                        runList_view([[item[0], item[2], item[3]] for item in run_list]),
+                        {
+                            'starttime': (None if forerunners_runs.starttime is None else str(forerunners_runs.starttime)),
+                            'endtime': (None if forerunners_runs.endtime is None else str(forerunners_runs.endtime)),
+                            'number': forerunners_runs.number,
+                            'courses': {},
+                            'start_list': runList_view([[item[0], item[2], item[3]] for item in run_list])
+                        },
                         ConvertRunResults(results, manual, dql_list)
                     ]
                 }
-            ))
+            for course in courses:
+                result[forerunners_runs.id][0]['courses'][course.id] = {
+                    'name': course.en_name,
+                    'devices': []
+                }
+                devices = db.session.query(CourseDevice, CourseDeviceType). \
+                    join(CourseDeviceType, CourseDevice.course_device_type_id == CourseDeviceType.id). \
+                    filter(CourseDevice.course_id == course.id).all()
+                for device in devices:
+                    result[forerunners_runs.id][0]['courses'][course.id]['devices'].append({
+                        'id': device[0].id,
+                        'order': device[0].order,
+                        'distance': device[0].distance,
+                        'type': device[1].name,
+                    })
+
+            socketio.emit('ForerunnersResults', json.dumps(result))
 
 @raceinfo.route('/raceinfo/<int:race_id>', methods=['GET', 'POST'])
 def get_race_info2(race_id):
