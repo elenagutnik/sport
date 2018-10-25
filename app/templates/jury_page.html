@@ -1010,9 +1010,9 @@
             //console.log("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody");
             $("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody").append('\
               <tr class="racecompetitor_'+comp.race_competitor_id+' '+(comp.is_participate?'':'disabled')+'">\
-                <td>'+(j+1)+'</td>\
+                <td>'+comp.order+'</td>\
                 <td class="edit">\
-                  <input type="text" name="'+comp.race_competitor_id+'" value="'+(j+1)+'" style="width:30px;">\
+                  <input type="text" name="'+comp.race_competitor_id+'" value="'+comp.order+'" style="width:30px;">\
                   <input type="checkbox" \
                     id="participate_'+run_id+'_'+comp.race_competitor_id+'" \
                     class="participate" data-toggle="toggle" data-size="mini" \
