@@ -1007,11 +1007,15 @@ $(document).ready(function () {
             //console.log('run.start_list[course][cid]',comp);
             //console.log("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody");
             $("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody").append('\
-              <tr class="racecompetitor_'+comp.id+' '+(comp.is_participate?'':'disabled')+'">\
+              <tr class="racecompetitor_'+comp.race_competitor_id+' '+(comp.is_participate?'':'disabled')+'">\
                 <td>'+(j+1)+'</td>\
                 <td class="edit">\
-                  <input type="text" name="'+comp.id+'" value="'+(j+1)+'" style="width:30px;">\
-                  <input type="checkbox" id="participate_'+run_id+'_'+comp.id+'" class="participate" data-toggle="toggle" data-size="mini" name="'+comp.id+'" '+(comp.is_participate?'checked':'')+'>\
+                  <input type="text" name="'+comp.race_competitor_id+'" value="'+(j+1)+'" style="width:30px;">\
+                  <input type="checkbox" \
+                    id="participate_'+run_id+'_'+comp.race_competitor_id+'" \
+                    class="participate" data-toggle="toggle" data-size="mini" \
+                    name="'+comp.race_competitor_id+'" \
+                    '+(comp.is_participate?'checked':'')+'>\
                 </td>\
                 <td>'+comp.bib+'</td>\
                 <td>'+comp.ru_lastname+' '+ comp.ru_firstname+' / '+comp.en_lastname+' '+ comp.en_firstname+'</td>\
@@ -1040,8 +1044,8 @@ $(document).ready(function () {
                 <button value='45' class='btn btn-default btn-sm btn_startlist_on' run_id='"+run_id+"'>45</button>\
                 <br><hr>\
                 </div>\
-                <button value='' class='btn btn-danger btn-sm btn_save_startlist' run_id='"+run_id+"'>save</button>\
-                <button value='' class='btn btn-defaul btn-sm btn_canceledit_startlist' run_id='"+run_id+"'>cancel</button>\
+                <button value='' class='btn btn-danger btn-sm btn_save_startlist' run_id='"+run_id+"' course_id='"+course+"'>save</button>\
+                <button value='' class='btn btn-defaul btn-sm btn_canceledit_startlist' run_id='"+run_id+"' course_id='"+course+"'>cancel</button>\
                 ");
               $("#tab_startlist #tab_startlist_run"+run_id+" .edit_btns").hide();
               $("#tab_startlist #tab_startlist_run"+run_id+" .btn_save_startlist").hide();
@@ -1968,6 +1972,7 @@ $(document).ready(function () {
             data: {
               data: JSON.stringify({
                 'run_id': r,
+                'course_id': $(this).attr('course_id'),
                 'order_list': arr
               })
             },
