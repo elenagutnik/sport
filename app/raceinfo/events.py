@@ -209,7 +209,6 @@ def get_race_info(data):
 
             courses = db.session.query(Course).filter(Course.id == RunCourses.course_id,
                                                       RunCourses.run_id == forerunners_runs.id).all()
-
             result = \
                 {
                     forerunners_runs.id:

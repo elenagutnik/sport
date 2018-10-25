@@ -152,15 +152,26 @@ def race_order_list(race_id):
 @admin_required
 def race_order_list_edit():
     data = json.loads(request.args['data'])
+
+    startList = db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor). \
+        join(RunOrder).filter(RunOrder.run_id == data['run_id']). \
+        order_by(RunOrder.order).all()
+
     new_order = data['order_list']
     for order in new_order:
-        runOrder = RunOrder.query.filter(RunOrder.run_id == data['run_id'],
-                              RunOrder.id == order[0]).first()
-        runOrder.order = order[1]
-        runOrder.is_participate = order[2]
-        db.session.add(runOrder)
+        runOrder = next(item for item in startList if item[1].id == int(order[0]))
+        runOrder[2].is_participate = order[2]
+        runOrder[2].order = order[1]
+        db.session.add(runOrder[2])
+    start_list = sorted(startList, key=lambda item: not item[2].is_participate)
+    for index, item in enumerate(start_list):
+        if item[2].is_participate:
+            item[2].order = index+1
+        else:
+            item[2].order = 0
     db.session.commit()
-    return '', 200
+
+    return json.dumps(runList_view(start_list))
 
 
 def next_run_list_classical(race_id, current_run_id, current_run_number):
