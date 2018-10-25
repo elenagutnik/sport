@@ -365,7 +365,16 @@ def revers_first_15(race_id,run_id):
             item.order = index + 1
             db.session.add(item)
         db.session.commit()
-        return json.dumps(order_list, cls=jsonencoder.AlchemyEncoder)
+
+        data = db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor). \
+            join(RunOrder).filter(RunOrder.run_id == run_id). \
+            order_by(RunOrder.order).all()
+        return json.dumps(
+            {
+                'success': True,
+                'data': runList_view(data)
+            }
+        )
     return json.dumps(dict([('error', "Недопустимый заезд")]))
 
 
