@@ -6,7 +6,7 @@ from .forms import *
 import json
 from .models import *
 from . import jsonencoder
-from .runList import race_order_buld, rebuild_startlist
+from .runList import race_order_buld, rebuild_startlist, runList_view
 from sqlalchemy import cast, DATE
 from sqlalchemy import func
 
@@ -108,11 +108,19 @@ def race_course_run_start(id, run_id):
         run_info.starttime = datetime.now()
         db.session.add(run_info)
         db.session.commit()
+        data = db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor). \
+            join(RunOrder).filter(RunOrder.run_id == run_id). \
+            order_by(RunOrder.order).all()
+
     except:
         return json.dumps({'success': False})
-    return json.dumps({'success': True,
-                       'starttime': str(run_info.starttime)
-                       })
+    return json.dumps(
+        {
+            'success': True,
+            'starttime': str(run_info.starttime),
+            'startlist': runList_view(data)
+        }
+    )
 
 
 @raceinfo.route('/race/<int:id>/run/<int:run_id>/stop', methods=['GET', 'POST'])

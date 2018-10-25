@@ -163,7 +163,7 @@ def race_order_list_edit():
         runOrder[2].is_participate = order[2]
         runOrder[2].order = order[1]
         db.session.add(runOrder[2])
-    start_list = sorted(startList, key=lambda item: not item[2].is_participate)
+    start_list = sorted(startList, key=lambda item: (not item[2].is_participate, item[2].order))
     for index, item in enumerate(start_list):
         if item[2].is_participate:
             item[2].order = index+1
@@ -171,8 +171,12 @@ def race_order_list_edit():
             item[2].order = 0
     db.session.commit()
 
-    return json.dumps(runList_view(start_list))
-
+    return json.dumps(
+        {
+            'success': True,
+            'data': runList_view(start_list)
+        }
+    )
 
 def next_run_list_classical(race_id, current_run_id, current_run_number):
     try:
@@ -365,13 +369,8 @@ def revers_first_15(race_id,run_id):
 
 
 def rebuild_startlist(run_id):
-    # run_courses = RunCourses.query.filter(RunCourses.run_id==run_id).all()
-    # RunOrder.query.filter(RunOrder.run_id == run_id, RunOrder.is_participate == False).delete()
-    # for course in run_courses:
-    #     start_list = RunOrder.query.filter(RunOrder.run_id == course.run_id).order_by(RunOrder.order.asc()).all()
-    #     for index, item in enumerate(start_list):
-    #         item.order = index+1
-    pass
+    run_courses = RunCourses.query.filter(RunCourses.run_id==run_id).all()
+    RunOrder.query.filter(RunOrder.run_id == run_id, RunOrder.is_participate == False).delete()
 
 def final_next_run_list(current_run, run):
     competitors_list = db.session.query(ResultApproved, RaceCompetitor).\
@@ -396,9 +395,8 @@ def final_next_run_list(current_run, run):
             build_final_runlist([item for item in competitors_list if item[0].diff != 0], run, run_courses)
             return
 
-
-    first_path=competitors_list[:int(len(competitors_list)/2)]
-    second_path=competitors_list[int(len(competitors_list)/2):]
+    first_path = competitors_list[:int(len(competitors_list)/2)]
+    second_path = competitors_list[int(len(competitors_list)/2):]
 
     for index, (odd_item, even_item) in enumerate(itertools.zip_longest(first_path, second_path[::-1])):
         if odd_item is not None:
@@ -418,7 +416,6 @@ def final_next_run_list(current_run, run):
             )
             db.session.add(second_course_order)
     db.session.commit()
-
 
 def build_final_runlist(list, run, courses):
     first_course_order = RunOrder(
