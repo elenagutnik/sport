@@ -109,7 +109,7 @@ class Scoreboard:
          state = System.query.filter(System.key == "Scoreboard").first()
          is_connected = System.query.filter(System.key == "ScoreboardConnect").first()
          socketio.emit('ScoreboardStatus', json.dumps({'is_active': strtobool(state.value),
-                                                       'is_connected': is_connected.value}))
+                                                       'is_connected': strtobool(is_connected.value)}))
 
 
      def send_start_list(self):
@@ -197,4 +197,3 @@ class Scoreboard:
                  is_connected = System.query.filter(System.key == "ScoreboardConnect").first()
                  is_connected.value = False
                  Scoreboard.status()
-
