@@ -32,6 +32,7 @@ def runList_view(data):
             'manual_order': item[2].manual_order,
             'run_order_id': item[2].id,
             'race_competitor_id': item[1].id,
+            'is_participate': item[2].is_participate
         })
     return result
 
