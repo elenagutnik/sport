@@ -256,7 +256,7 @@
     {% block scripts %}
     {{ super() }}
 
-    <script type="text/javascript">
+<script type="text/javascript">
     var err_critical=null;
     var err_log=new Array();
 
@@ -307,7 +307,7 @@
       ["forerunners_stopped", "Forerunners run has been stopped"],
       ["scoreboard_init",   "Set ScoreBoard status:"],
     ]);
-$(document).ready(function () {
+//$(document).ready(function () {
     function set_err(data,obj="", type="danger"){
       $("#table_errors tbody").append("\
         <tr class='error "+type+"' id='err_'>\
@@ -976,6 +976,7 @@ $(document).ready(function () {
             });
         }
     }
+
     function set_html_startlist(run_id){
     console.log("START FUNC: set_html_startlist");
     var j;
@@ -986,6 +987,7 @@ $(document).ready(function () {
           startlist_tab_prepare_run(run_id,true);
         }
         for(var course in run.start_list){
+          $("#tab_startlist_run"+run_id+" table.course"+course).remove();
           $("#tab_startlist_run"+run_id).append("\
                 <table  style='width:100%;' class='course"+course+" table table-bordered'>\
                   <thead>\
@@ -1018,7 +1020,7 @@ $(document).ready(function () {
                     '+(comp.is_participate?'checked':'')+'>\
                 </td>\
                 <td>'+comp.bib+'</td>\
-                <td>'+comp.ru_lastname+' '+ comp.ru_firstname+' / '+comp.en_lastname+' '+ comp.en_firstname+'</td>\
+                <td>'+getCompName(comp)+'</td>\
               </tr>\
               ');
               j++;
@@ -1589,7 +1591,7 @@ $(document).ready(function () {
 
 
 ///////////////////////
-//$(document).ready(function () {
+$(document).ready(function () {
     $("div.navbar-inverse").addClass("navbar-fixed-top");
     $("div.container").addClass("container-fluid");
     $("div.container").removeClass("container");
@@ -1977,6 +1979,9 @@ $(document).ready(function () {
               })
             },
             success:function(data) {
+              var data=JSON.parse(data);
+              console.log("/raceinfo/race/order_list/edit", data);
+              race_info.run_list[r]=data;
             //  startlist_get(r);
               //alert("Start list has been changed ");
               $("#tab_startlist_run"+r+" table .edit").hide();
@@ -1985,9 +1990,9 @@ $(document).ready(function () {
               $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
               $("#tab_startlist_run"+r+" .edit_btns").hide();
               $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
-              Promise.all([get_startlist(r)]).then(
+              /*Promise.all([get_startlist(r)]).then(
                     result=>get_startlist(r)
-              );
+              );*/
               //console.log("set_html_startlist("+r+");");
             },
             error: function (error) {
