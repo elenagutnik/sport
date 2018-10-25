@@ -175,7 +175,7 @@ def get_race_info(data):
                 'courses': {},
                 'start_list': runList_view(db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor).\
                     join(RunOrder).filter(RunOrder.run_id == run[0].id).\
-                    order_by(RunOrder.order.asc()).all())
+                    order_by(RunOrder.is_participate.desc(), RunOrder.order.asc()).all())
             }
             courses = db.session.query(Course).filter(Course.id == RunCourses.course_id,
                                                       RunCourses.run_id == run[0].id).all()
