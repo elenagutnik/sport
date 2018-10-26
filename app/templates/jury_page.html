@@ -282,7 +282,8 @@
 
     var msg_err=new Map([
       ["error_getting_status_list", "Error: can't get the status list"],
-      ["startlist_save_ajax", "(AJAX) Can't save start list for run:"],
+      ["startlist_save_ajax", "(AJAX) Can't save startlist for run:"],
+      ["startlist_save_srv", "(SERVER) Can't save startlist for run:"],
       ["start_competitor_ajax", "(AJAX) Can't start competitor"],
       ["clear_competitor_ajax", "(AJAX) Can't clear competitors results"],
       ["get_results","(AJAX) Can't get results"],
@@ -306,6 +307,7 @@
       ["forerunners_started", "Forerunners run has been started"],
       ["forerunners_stopped", "Forerunners run has been stopped"],
       ["scoreboard_init",   "Set ScoreBoard status:"],
+      ["startlist_saved", "Startlist has been changed"],
     ]);
 //$(document).ready(function () {
     function set_err(data,obj="", type="danger"){
@@ -987,8 +989,9 @@
           startlist_tab_prepare_run(run_id,true);
         }
         for(var course in run.start_list){
-          $("#tab_startlist_run"+run_id+" table.course"+course).remove();
-          $("#tab_startlist_run"+run_id).append("\
+          console.log("for(var course in run.start_list)");
+          $("#tab_startlist_run"+run_id+" div.tab_startlist_run_content").html("");
+          $("#tab_startlist_run"+run_id+" div.tab_startlist_run_content").append("\
                 <table  style='width:100%;' class='course"+course+" table table-bordered'>\
                   <thead>\
                     <tr><th colspan='4'>Course: "+(run.courses?run.courses[course].name:"")+"</th></tr>\
@@ -1008,7 +1011,7 @@
             var comp=run.start_list[course][cid];
             //console.log('run.start_list[course][cid]',comp);
             //console.log("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody");
-            $("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody").append('\
+            $("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content table.course"+course+" tbody").append('\
               <tr class="racecompetitor_'+comp.race_competitor_id+' '+(comp.is_participate?'':'disabled')+'">\
                 <td>'+comp.order+'</td>\
                 <td class="edit">\
@@ -1026,16 +1029,16 @@
               j++;
           }
           $(function() {
-              $("#tab_startlist #tab_startlist_run"+run_id+" table.course"+course+" tbody tr td.edit .participate").bootstrapToggle();
+              $("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content table.course"+course+" tbody tr td.edit .participate").bootstrapToggle();
           })
           //кнопка редактирования стартового списка
-          if(!$("#tab_startlist #tab_startlist_run"+run_id+" .btn_edit_startlist").length){
-              $("#tab_startlist #tab_startlist_run"+run_id).append("<button value='' class='btn btn-primary btn-sm btn_edit_startlist' run_id='"+run_id+"'>edit</button>");
+          if(!$("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content .btn_edit_startlist").length){
+              $("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content").append("<button value='' class='btn btn-primary btn-sm btn_edit_startlist' run_id='"+run_id+"'>edit</button>");
 
               if(run.number&&run.number>1)
-                $("#tab_startlist #tab_startlist_run"+run_id).append("<button value='' class='btn btn-primary btn-sm btn_reverse_startlist' run_id='"+run_id+"'>reverse top 15</button>");
+                $("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content").append("<button value='' class='btn btn-primary btn-sm btn_reverse_startlist' run_id='"+run_id+"'>reverse top 15</button>");
 
-              $("#tab_startlist #tab_startlist_run"+run_id).append("\
+              $("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content").append("\
                 <div class='edit_btns'>\
                 All:\
                 <button value='all' class='btn btn-info btn-sm btn_startlist_on' run_id='"+run_id+"'>On</button>\
@@ -1049,11 +1052,13 @@
                 <button value='' class='btn btn-danger btn-sm btn_save_startlist' run_id='"+run_id+"' course_id='"+course+"'>save</button>\
                 <button value='' class='btn btn-defaul btn-sm btn_canceledit_startlist' run_id='"+run_id+"' course_id='"+course+"'>cancel</button>\
                 ");
-              $("#tab_startlist #tab_startlist_run"+run_id+" .edit_btns").hide();
-              $("#tab_startlist #tab_startlist_run"+run_id+" .btn_save_startlist").hide();
-              $("#tab_startlist #tab_startlist_run"+run_id+" .btn_canceledit_startlist").hide();
+              $("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content .edit_btns").hide();
+              $("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content .btn_save_startlist").hide();
+              $("#tab_startlist #tab_startlist_run"+run_id+" div.tab_startlist_run_content .btn_canceledit_startlist").hide();
           }
         }
+      }else{
+        console.log("// WARNING: function set_html_startlist("+run_id+") - empty startlist",run.start_list);
       }
     $("#tab_startlist #tab_startlist_run"+run_id+" table .edit").hide();
 
@@ -1071,7 +1076,8 @@
         $("#tab_startlist").append("<h2>Start lists</h2>");
         for(id in race_info.run_list){
           //$.each(race_info.run_list, function(value){
-          startlist_tab_prepare_run(id)
+          startlist_tab_prepare_run(id);
+          set_html_startlist(id);
         }
         if(!run.id && !race_info.run_list[Object.keys(race_info.run_list)[0]].starttime){ // если нет активного рана, и первый ран еще не был начат
             console.log("set_html_startlist(null);");
@@ -1091,10 +1097,12 @@
           $("#tab_startlist_run"+id).append("<b>Статус: <span class='status'>активен</span></b><br>");
       else
           $("#tab_startlist_run"+id).append("<b>Статус: <span class='status'>завершен</span></b><br>");
-      if(race_info.run_list[id].starttime && !forerunners){
+      $("#tab_startlist_run"+id).append("<div class='tab_startlist_run_content'></div>");
+/*      if(race_info.run_list[id].starttime && !forerunners){
         console.log("set_html_startlist(id);",id);
         set_html_startlist(id);
       }
+*/
     }
     // получение и внесение информации для вкладки "Устройства на трассах" (#tab_device)
     function courselist_tab_prepare(){
@@ -1981,15 +1989,24 @@ $(document).ready(function () {
             success:function(data) {
               var data=JSON.parse(data);
               console.log("/raceinfo/race/order_list/edit", data);
-              race_info.run_list[r]=data;
-            //  startlist_get(r);
-              //alert("Start list has been changed ");
-              $("#tab_startlist_run"+r+" table .edit").hide();
+              if(data.success){
+                race_info.run_list[r].start_list=data.data;
+              //  startlist_get(r);
+                //alert("Start list has been changed ");
+                $("#tab_startlist_run"+r+" table .edit").hide();
 
-              $("#tab_startlist_run"+r+" .btn_edit_startlist").show();
-              $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
-              $("#tab_startlist_run"+r+" .edit_btns").hide();
-              $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
+                $("#tab_startlist_run"+r+" .btn_edit_startlist").show();
+                $("#tab_startlist_run"+r+" .btn_save_startlist").hide();
+                $("#tab_startlist_run"+r+" .edit_btns").hide();
+                $("#tab_startlist_run"+r+" .btn_canceledit_startlist").hide();
+
+                set_html_startlist(r);
+                set_event({"code":"startlist_saved"});
+
+              }else{
+                set_err({"code":"startlist_save_srv"},data.msg);
+              }
+
               /*Promise.all([get_startlist(r)]).then(
                     result=>get_startlist(r)
               );*/
