@@ -400,24 +400,62 @@ class BaseRace:
         return db.session.query(ResultDetail).\
             filter(ResultDetail.course_device_id == self.courseDevice.id,
                    ResultDetail.run_id == self.run.id).all()
-    def check_race(self):
-        """
-        Для  комбинации проверить наличие дисциплин для  заездов
-        Сформированный стартовый список на первый заезд
-        Привязка заездов к трассе
-        Проверить расстановку девайсов стартовый в начале, контрольные точки, финиш
-        Наличие forerunners
+    def checkRace(self):
+        error_list = {
+            'errors': [],
+            'notice': []
+        }
+        courses = db.session.query(Course).filter(Course.race_id == self.race.id).all()
+        if not courses:
+            error_list['errors'].append("Race doesn't have any courses")
 
-        """
+        for course in courses:
+            devices = db.session.query(CourseDevice, CourseDeviceType).\
+                join(CourseDeviceType, CourseDevice.course_device_type_id == CourseDeviceType.id).\
+                filter(CourseDevice.course_id == course.id).\
+                order_by(CourseDevice.order.asc()).all()
+            if devices[0][1].id != 1:
+                error_list['errors'].append("Start device doesn't have type 'Start'")
+            if sum(1 for x in devices if x[1].id == 1) == 1:
+                error_list['errors'].append("Course has more than one start device")
+            if devices[-1][1].id == 2:
+                error_list['errors'].append("Finish device doesn't have type 'Finish'")
+            if sum(1 for x in devices if x[1].id == 2) == 1:
+                error_list['errors'].append("Course has more than one finish device")
+        return error_list
+
+
 class ClassicRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
         pass
+    def checkRace(self):
+        error_list = super().checkRace()
+        runList = db.session.query(RunInfo).filter(RunInfo.race_id == self.race.id).order_by().all()
+        for run in runList:
+            runCourses = db.session.query(RunCourses).filter(RunCourses.run_id == run.id).all()
+            if not runCourses:
+                error_list['errors'].append("For run number " + str(run.number) + " course is missing")
+            elif len(runCourses) > 1:
+                error_list['errors'].append("For run number " + str(run.number) + " set several  courses")
+        return error_list
 
 class Combination(ClassicRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__( race, runInfo, runType, discipline, courseDevice, courseDeviceType)
         pass
+    def checkRace(self):
+        error_list = super().checkRace()
+        runList = db.session.query(RunInfo).filter(RunInfo.race_id == self.race.id).order_by().all()
+        for run in runList:
+            if run.discipline_id == None:
+                error_list['errors'].append("For run number "+run.number+" discipline is missing ")
+            runCourses = db.session.query(RunCourses).filter(RunCourses.run_id == run.id).all()
+            if not runCourses:
+                error_list['errors'].append("For run number " + str(run.number) + " course is missing")
+            elif len(runCourses) > 1:
+                error_list['errors'].append("For run number " + str(run.number) + " set several  courses")
+        return error_list
 
 class SummationTimeRace(ClassicRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
@@ -432,6 +470,16 @@ class SummationTimeRace(ClassicRace):
         super().competitor_manualstart(competitor_id)
         self.resultApprove.set_competitor_adder(self.run.number)
 
+    def checkRace(self):
+        error_list = super().checkRace()
+        runList = db.session.query(RunInfo).filter(RunInfo.race_id == self.race.id).order_by().all()
+        for run in runList:
+            runCourses = db.session.query(RunCourses).filter(RunCourses.run_id == run.id).all()
+            if not runCourses:
+                error_list['errors'].append("For run number " + str(run.number) + " course is missing")
+            elif len(runCourses) > 1:
+                error_list['errors'].append("For run number " + str(run.number) + " set several  courses")
+        return error_list
 class ParallelRace(SummationTimeRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
@@ -508,6 +556,18 @@ class ParallelRace(SummationTimeRace):
                 item.rank = None
 
 
+    def checkRace(self):
+        error_list = super().checkRace()
+        runList = db.session.query(RunInfo).filter(RunInfo.race_id == self.race.id).order_by().all()
+        for run in runList:
+            runCourses = db.session.query(RunCourses).filter(RunCourses.run_id == run.id).all()
+            if not runCourses:
+                error_list['errors'].append("For run number " + str(run.number) + " course is missing")
+            elif len(runCourses) == 1:
+                error_list['errors'].append("For run number " + str(run.number) + " missing one course")
+            elif len(runCourses) > 2:
+                error_list['errors'].append("For run number " + str(run.number) + " set several  courses")
+        return error_list
 class QualificationRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
@@ -535,6 +595,18 @@ class QualificationRace(BaseRace):
                 self.recalculate_finished_results()
         return tree_view, manual, dql_list
 
+    def checkRace(self):
+        error_list = super().checkRace()
+        runList = db.session.query(RunInfo).filter(RunInfo.race_id == self.race.id).order_by().all()
+        for run in runList:
+            runCourses = db.session.query(RunCourses).filter(RunCourses.run_id == run.id).all()
+            if not runCourses:
+                error_list['errors'].append("For run number " + run.number + " course is missing")
+            elif len(runCourses) == 1:
+                error_list['errors'].append("For run number " + run.number + " missing one course")
+            elif len(runCourses) > 2:
+                error_list['errors'].append("For run number " + run.number + " set several  courses")
+        return error_list
 class ForerunnerRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
@@ -706,3 +778,31 @@ class RaceGetter:
                                runInfo=race_info[0],
                                runType=race_info[1],
                                discipline=race_info[3])
+    @staticmethod
+    def getRaceByid(Race_id=None):
+        """
+        :param device_data:
+        :return: BaseRace object
+        """
+        race_info = db.session.query(Race, Discipline).filter(
+            Race.discipline_id == Discipline.id, Race.id == Race_id).one()
+        if race_info[1].is_parallel:
+            print('ParallelRace')
+            return ParallelRace(race=race_info[0],
+                                discipline=race_info[1])
+        elif race_info[1].is_qualification:
+            print('QualificationRace')
+            return QualificationRace(race=race_info[0],
+                                     discipline=race_info[1])
+        elif race_info[1].is_combination:
+            print('Combination')
+            return Combination(race=race_info[0],
+                               discipline=race_info[1])
+        elif race_info[0].result_function == 1:
+            print('SummationTimeRace')
+            return SummationTimeRace(race=race_info[0],
+                                     discipline=race_info[1])
+        else:
+            print('ClassicRace')
+            return ClassicRace(race=race_info[0],
+                               discipline=race_info[1])

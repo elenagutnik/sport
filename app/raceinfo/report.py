@@ -740,8 +740,8 @@ class RaceInformation:
                 RunInfo.query.filter(RunInfo.race_id == race_id,
                                      RunInfo.number.in_([1, 2])).all()]
 
-def time_convertor(timestamp):
 
+def time_convertor(timestamp):
     if timestamp == None or timestamp == "None":
         return None
     sss = int(timestamp) % 1000

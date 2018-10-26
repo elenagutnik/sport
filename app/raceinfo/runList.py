@@ -13,8 +13,8 @@ from math import log2
 @raceinfo.route('/startlist/run/<int:run_id>/get/', methods=['POST', 'GET'])
 def startlist_get(run_id):
     data = db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor).\
-        join(RunOrder).filter(RunOrder.run_id == run_id).\
-        order_by(RunOrder.order).all()
+        join(RunOrder).filter(RunOrder.run_id == run_id). \
+        order_by(RunOrder.is_participate.desc(), RunOrder.order.asc()).all()
     return json.dumps(runList_view(data))
 
 def runList_view(data):
@@ -368,7 +368,7 @@ def revers_first_15(race_id,run_id):
 
         data = db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor). \
             join(RunOrder).filter(RunOrder.run_id == run_id). \
-            order_by(RunOrder.order).all()
+            order_by(RunOrder.is_participate.desc(), RunOrder.order.asc()).all()
         return json.dumps(
             {
                 'success': True,

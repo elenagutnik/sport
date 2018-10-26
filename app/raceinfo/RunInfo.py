@@ -110,7 +110,7 @@ def race_course_run_start(id, run_id):
         db.session.commit()
         data = db.session.query(Competitor, RaceCompetitor, RunOrder).join(RaceCompetitor). \
             join(RunOrder).filter(RunOrder.run_id == run_id). \
-            order_by(RunOrder.order).all()
+            order_by(RunOrder.is_participate.desc(), RunOrder.order.asc()).all()
 
     except:
         return json.dumps({'success': False})

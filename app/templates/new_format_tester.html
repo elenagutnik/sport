@@ -9,35 +9,21 @@
 {% endblock %}
 
 {% block page_content %}
-<div id="mount-point"></div>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-<script type="text/jsx">
-class Runlist_item extends React.Component {
-  render() {
-    return <tr>
-        <td>{this.props.order}</td>
-        <td>{this.props.bib}</td>
-        <td>{this.props.name}</td>
-    </tr>;
-  }
-}
-
-React.render(<Runlist_item order='1' bib='1' name="Sasha"/>, document.getElementById('mount-point'));
-</script>
-
 <script type="text/javascript" charset="utf-8">
+    var tmp=[];
     var socket = io.connect('http://127.0.0.1:5000');
     socket.on('connect', function() {
         socket.emit('my event', {data: 'I\'m connected!'});
     });
-    socket.on('NewDataStart', function(data) {
-      console.log('StartDevice', JSON.parse(data));
+    socket.on('RaceStatus', function(data) {
+        tmp+=data;
     });
-    socket.on('NewDataPoint', function(data) {
-      console.log('PointDevice',JSON.parse(data));
-    });
-    socket.on('NewDataFinish', function(data) {
-      console.log('FinishDevice', JSON.parse(data));
-    });
+    socket.emit('GetRaceStatus', {race_id: 1});
+    socket.emit('GetRaceStatus', {race_id: 7});
+    socket.emit('GetRaceStatus', {race_id: 8});
+    socket.emit('GetRaceStatus', {race_id: 9});
+    socket.emit('GetRaceStatus', {race_id: 11});
+
 </script>
 {% endblock %}
