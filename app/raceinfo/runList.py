@@ -135,7 +135,8 @@ def race_order_list(race_id):
                 race_competitor_id=item[0].id,
                 run_id=run.id,
                 order=index+1,
-                course_id=course.course_id
+                course_id=course.course_id,
+                is_participate=True
             )
             db.session.add(run_order)
         db.session.commit()
@@ -199,7 +200,8 @@ def next_run_list_classical(race_id, current_run_id, current_run_number):
                 race_competitor_id=race_competitors[i][0].id,
                 run_id=news_run.id,
                 order=i + 1,
-                course_id=course.course_id
+                course_id=course.course_id,
+                is_participate=True
             )
             db.session.add(run_order)
         db.session.commit()
@@ -229,7 +231,8 @@ def next_run_list_drop_out(race_id, current_run_id, current_run_number):
                 race_competitor_id=race_competitors[i][0].id,
                 run_id=news_run.id,
                 order=i + 1,
-                course_id=course.course_id
+                course_id=course.course_id,
+                is_participate=True
             )
             db.session.add(run_order)
         db.session.commit()
@@ -262,7 +265,8 @@ def next_run_list_combination(race_id, current_run_id, current_run_number):
                 race_competitor_id=item[0].id,
                 run_id=news_run.id,
                 order=index + 1,
-                course_id=course.course_id
+                course_id=course.course_id,
+                is_participate=True
             )
             db.session.add(run_order)
         db.session.commit()
@@ -292,7 +296,8 @@ def qualification_start_list(run):
                         race_competitor_id=odd_item.id,
                         run_id=run_courses[0].run_id,
                         order=index + 1,
-                        course_id=run_courses[0].course_id
+                        course_id=run_courses[0].course_id,
+                        is_participate=True
                     )
                     db.session.add(first_course_order)
                 if even_item is not None:
@@ -300,7 +305,8 @@ def qualification_start_list(run):
                         race_competitor_id=even_item.id,
                         run_id=run_courses[0].run_id,
                         order=index + 1,
-                        course_id=run_courses[1].course_id
+                        course_id=run_courses[1].course_id,
+                        is_participate=True
                     )
                     db.session.add(second_course_order)
             db.session.commit()
@@ -336,7 +342,9 @@ def second_run_list_reverse(current_run, run):
                 RunOrder(
                     race_competitor_id=first_item[0].race_competitor_id,
                     run_id=run.id,
-                    course_id=run_courses[1].course_id)
+                    course_id=run_courses[1].course_id,
+                    is_participate=True)
+
             )
 
         if second_item is not None and second_item[1] is not None:
@@ -344,7 +352,8 @@ def second_run_list_reverse(current_run, run):
                 RunOrder(
                     race_competitor_id=second_item[0].race_competitor_id,
                     run_id=run.id,
-                    course_id=run_courses[0].course_id)
+                    course_id=run_courses[0].course_id,
+                    is_participate=True)
             )
         if len(temp_item) != 0:
             run__list.append(temp_item)
@@ -375,7 +384,7 @@ def revers_first_15(race_id,run_id):
                 'data': runList_view(data)
             }
         )
-    return json.dumps(dict([('error', "Недопустимый заезд")]))
+    return json.dumps({'success': False, 'msg': "Недопустимый заезд"})
 
 
 def rebuild_startlist(run_id):
@@ -414,7 +423,8 @@ def final_next_run_list(current_run, run):
                 race_competitor_id=odd_item[1].id,
                 run_id=run_courses[0].run_id,
                 order=index + 1,
-                course_id=run_courses[0].course_id
+                course_id=run_courses[0].course_id,
+                is_participate=True
             )
             db.session.add(first_course_order)
         if even_item is not None:
@@ -422,7 +432,8 @@ def final_next_run_list(current_run, run):
                 race_competitor_id=even_item[1].id,
                 run_id=run_courses[0].run_id,
                 order=index + 1,
-                course_id=run_courses[1].course_id
+                course_id=run_courses[1].course_id,
+                is_participate=True
             )
             db.session.add(second_course_order)
     db.session.commit()
@@ -432,7 +443,8 @@ def build_final_runlist(list, run, courses):
         race_competitor_id=list[0][1].id,
         run_id=run.id,
         order=1,
-        course_id=courses[0].course_id
+        course_id=courses[0].course_id,
+        is_participate=True
     )
     db.session.add(first_course_order)
     second_course_order = RunOrder(
@@ -440,5 +452,6 @@ def build_final_runlist(list, run, courses):
         run_id=run.id,
         course_id=courses[1].course_id,
         order=1,
+        is_participate=True
     )
     db.session.add(second_course_order)

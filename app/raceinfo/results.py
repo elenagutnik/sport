@@ -2,7 +2,9 @@ from . import raceinfo, jsonencoder
 from .models import Race, Discipline, RunInfo, RaceCompetitor, ResultApproved, Competitor, Status
 from .. import db
 from sqlalchemy import func
+from .DataViewer import timeConverter
 import json
+
 
 
 @raceinfo.route('/race/<int:race_id>/results')
@@ -169,7 +171,7 @@ def get_results(race_id, competitorList = None):
         result_item =dict([
             ('global_rank', item[0].rank),
             ('race_competitor_id', item[0].id),
-            ('diff', str(item[0].diff)),
+            ('diff', timeConverter(item[0].diff)),
             ('status_id', item[0].status_id),
             ('bib', item[0].bib),
             ('ru_firstname', item[1].ru_firstname),
@@ -179,7 +181,7 @@ def get_results(race_id, competitorList = None):
         ])
         result_item['status']=next((item.name for item in statuses if item.id == result_item['status_id']), None)
         if item[0].time is not None:
-            result_item['result_time'] = int(item[0].time)
+            result_item['result_time'] = timeConverter(item[0].time)
         else:
             result_item['result_time'] = None
         approve__result_item = []
@@ -192,7 +194,7 @@ def get_results(race_id, competitorList = None):
                         ('rank', approve[0].rank),
                         ('gate', approve[0].gate),
                         ('status_id', approve[0].status_id),
-                        ('time', approve[0].time),
+                        ('time', timeConverter(approve[0].time)),
                         ('status', next((item.name for item in statuses if item.id == approve[0].status_id), None))
                     ])
                 )
@@ -200,5 +202,10 @@ def get_results(race_id, competitorList = None):
         result_item['results'] = approve__result_item
         result.append(result_item)
     result = sorted(result, key=lambda item: (item['global_rank'] is None, item['global_rank']))
-    return json.dumps(result)
+    return json.dumps(
+        {
+            'success': True,
+            'data': result
+        }
+    )
 
