@@ -139,8 +139,7 @@ def load_competitors(race_id):
                 nation_id=nation.id,
                 club=item[8],
                 transponder_1=item[9],
-                transponder_2=item[10],
-                points=item[11],
+                transponder_2=item[10]
 
             )
             if len(item[12]) != 0:
@@ -151,6 +150,10 @@ def load_competitors(race_id):
                 competitor.bib = None
             else:
                 competitor.bib = item[0]
+            if item[11] == '':
+                competitor.points = None
+            else:
+                competitor.points = item[11]
             db.session.add(competitor)
             db.session.commit()
 
@@ -228,7 +231,6 @@ def race_run_orderlist(race_id, run_id):
 
     treeView = {}
     for item in сompetitors_list:
-        print(item[1].run_id, item[1].group_id)
         if item[1].group_id not in treeView.keys():
             treeView[item[1].group_id] = []
         treeView[item[1].group_id].append(item)

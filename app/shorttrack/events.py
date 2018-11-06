@@ -1,23 +1,19 @@
 from flask import request, render_template
-from .models import Competitor, RunOrder, RunInfo
+
 from datetime import datetime
 from flask_login import login_required
 from . import shorttrack
 from ..decorators import admin_required
 from sqlalchemy import func
-from .models import *
-from .forms import *
-from .. import db_shorttrack as db
 
-from .Race import EventDefiner
+from .Race import EventDefiner, PhotofinishEvent
 # For emulator
 import json
 from .models import *
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
-
+from .deviceDataHandler import dataHandler
 from .. import socketio
-
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -81,7 +77,8 @@ def emulator(race_id):
 def emulator_clear(race_id):
 
     db.session.query(ResultDetail).delete()
-    db.session.query(RunInfo).filter(RunInfo.race_id==race_id).update({"endtime": None,
+    db.session.query(ResultApproved).delete()
+    db.session.query(RunInfo).filter(RunInfo.race_id == race_id).update({"endtime": None,
                                                                        "starttime": None})
     db.session.query(RunGroup).update({"is_finish": None, "is_start": None})
     db.session.query(JuryResult).delete()
@@ -133,8 +130,8 @@ def jury_page(race_id):
 @admin_required
 def competitors_get_by_group():
     db_competitorsList=db.session.query(Competitor, RunOrder).join(RunOrder, RunOrder.competitor_id == Competitor.id).\
-        filter(RunOrder.group_id==request.args.get('group_id')).all()
-    result=[]
+        filter(RunOrder.group_id == request.args.get('group_id')).all()
+    result = []
     for item in db_competitorsList:
         result.append({
             'id': item[0].id,
@@ -148,11 +145,27 @@ def competitors_get_by_group():
 @shorttrack.route('/input/data', methods=['POST', 'GET'])
 def load_data():
     data = request.json
-    racehandler = EventDefiner(data)
-    racehandler.HandleData()
-    print(racehandler.EVENT_NAME)
-    if racehandler.isDataForSend:
-        socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+    dataHandler.delay(data=data)
+    # racehandler = EventDefiner(data)
+    # racehandler.HandleData()
+    # print(racehandler.EVENT_NAME)
+    # if racehandler.isDataForSend:
+    #     socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
     return '', 200
 
 
+
+@shorttrack.route('/race/<int:id>/run/<int:run_id>/photofinish', methods=['GET', 'POST'])
+def race_photofinish_data(id, run_id):
+    data = db.session.query(RunInfo, Race).join(Race, Race.id == RunInfo.race_id).filter(RunInfo.id == run_id).first()
+    photofinishHandler = PhotofinishEvent(data[0], data[1], Competitor.query.get(request.form.get('competitor_id')), datetime.strptime(request.form.get('time'), '%M:%S.%f').time())
+    photofinishHandler.HandleData()
+    return json.dumps(photofinishHandler.resultView())
+    # photoFinishData = PhotoFinishData(
+    #     competitor_id=request.form.get('competitor_id'),
+    #     run_id=run_id,
+    #     time=datetime.strptime(request.form.get('time'), '%M:%S.%f').time()
+    # )
+    # db.session.add(photoFinishData)
+    # db.session.commit()
+    # return 'Good'

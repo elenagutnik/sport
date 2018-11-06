@@ -105,7 +105,7 @@ class ResultDetail(db.Model):
     __bind_key__ = 'shorttrack'
 
     id = db.Column(db.Integer, primary_key=True)
-    virtual_device_id = db.Column(db.Integer, db.ForeignKey('virtual_devices.id'))
+    virtual_device_id = db.Column(db.Integer, db.ForeignKey('virtual_devices.id', ondelete='CASCADE' ))
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id', ondelete='CASCADE'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
     group_id = db.Column(db.Integer, db.ForeignKey('run_group.id', ondelete='CASCADE'))
@@ -127,10 +127,12 @@ class ResultApproved(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id', ondelete='CASCADE'))
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id', ondelete='CASCADE'))
+    group_id = db.Column(db.Integer, db.ForeignKey('run_group.id', ondelete='CASCADE'))
     status = db.Column(db.Integer, db.ForeignKey('status.id', ondelete='CASCADE'))
-    diff = db.Column(db.BigInteger)
-    time = db.Column(db.BigInteger)
+    diff = db.Column(db.Time)
+    time = db.Column(db.Time)
     rank = db.Column(db.Integer)
+    is_photoinish = db.Column(db.Boolean)
 
 class Device(db.Model):
     __bind_key__ = 'shorttrack'
@@ -230,7 +232,7 @@ class JuryResult(db.Model):
     run_id = db.Column(db.Integer, db.ForeignKey('run_info.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('run_group.id'))
     jury_id = db.Column(db.Integer, db.ForeignKey('jury.id'))
-    competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id'))
+    competitor_id = db.Column(db.Integer, db.ForeignKey('competitor.id',  ondelete='CASCADE'))
     time = db.Column(db.Time)
     rank = db.Column(db.Integer)
 

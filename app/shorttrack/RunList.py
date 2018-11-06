@@ -79,6 +79,8 @@ def generateVirtualDevices(race_id):
             order=index
         )
         db.session.add(virtualDevice)
+        if index == round(race.distance/CIRCLE_LENGHT):
+            virtualDevice.is_finish = True
     db.session.commit()
 
 

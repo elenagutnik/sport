@@ -8,3 +8,4 @@ from . import models
 from . import RunList
 from . import events
 from . import Race
+from . import deviceDataHandler

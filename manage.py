@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import os
-from app import create_app, socketio, db, db_shorttrack
+from app import create_app, socketio, db, db_shorttrack, celery
 from flask_script import Manager, Server as _Server, Option
 from flask_migrate import Migrate, MigrateCommand
+
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 

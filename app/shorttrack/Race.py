@@ -2,7 +2,7 @@ from .models import *
 from . import shorttrack
 from .. import db_shorttrack as db
 from datetime import timedelta, datetime, time, date
-from sqlalchemy import or_, func, distinct
+from sqlalchemy import or_, func, distinct, and_
 import json
 import pyexcel
 
@@ -46,6 +46,9 @@ class ShrortTrack:
 
         self.resultDetail = None
         self.resultDetailList = None
+
+        self.resultApprove = ResultApproved.query.filter(ResultApproved.run_id == self.runInfo.id,
+                                                         ResultApproved.competitor_id == self.competitor.id).first()
 
     def setDataIn(self):
         self.dataIn = DataIn(
@@ -135,6 +138,7 @@ class ShrortTrack:
                     self.setResultDetail(self.virtualDevice.id)
                     self.FirstLeg()
                     self.calculateRanks()
+                    self.finishDevice()
                 else:
                     self.isDataForSend = False
                     self.setResultDetail(previousResults[0].virtual_device_id)
@@ -144,6 +148,7 @@ class ShrortTrack:
                 self.setResultDetail(self.virtualDevice.id)
                 self.FirstLeg()
                 self.calculateRanks()
+                self.finishDevice()
         else:
             if (datetime.min + TIME_DELTA).time() < (datetime.strptime(self.device_data['TIME'], '%M:%S.%f')).time():
 
@@ -153,6 +158,21 @@ class ShrortTrack:
                 self.calculateRanks()
             else:
                 self.isDataForSend = False
+
+    def finishDevice(self):
+        print(self.virtualDevice.is_finish)
+        if self.virtualDevice.is_finish:
+            if self.resultApprove is None:
+                self.resultApprove = ResultApproved(
+                    competitor_id=self.competitor.id,
+                    run_id=self.runInfo.id
+                )
+                db.session.add(self.resultApprove)
+            self.resultApprove.diff = self.resultDetail.diff
+            self.resultApprove.time = self.resultDetail.time
+            self.resultApprove.rank = self.resultDetail.rank
+            self.resultApprove.group_id = self.runGroup.id
+            db.session.commit()
 
     def resultView(self):
         return {
@@ -272,6 +292,63 @@ class StartEvent:
     def resultView(self):
         return self.resultViewData
 
+class PhotofinishEvent:
+    EVENT_NAME = 'STPhotofinishEvent'
+
+    def __init__(self, runInfo, race, competitor, time):
+        self.runInfo = runInfo
+        self.competitor = competitor
+        self.race = race
+        self.time = time
+        self.runOrder = db.session.query(RunOrder).filter(RunOrder.competitor_id == self.competitor.id,
+                                                          RunOrder.run_id == self.runInfo.id).first()
+
+
+        self.photoFinishData = None
+        self.resultApproveList = None
+        self.resultApprove = ResultApproved.query.filter(ResultApproved.run_id == self.runInfo.id,
+                                                         ResultApproved.competitor_id == self.competitor.id).first()
+
+    def HandleData(self):
+        self.setPhotofinish()
+        self.resetResultApprove()
+
+
+    def setPhotofinish(self):
+        self.photoFinishData = PhotoFinishData(
+            competitor_id=self.competitor.id,
+            run_id=self.runInfo.id,
+            time=self.time
+        )
+        db.session.add(self.photoFinishData)
+        db.session.commit()
+
+    def recalulateResults(self):
+        self.resultApproveList = db.session.query(ResultApproved).\
+            filter(ResultApproved.group_id == self.runOrder.group_id).filter(ResultApproved.time.asc()).all()
+
+        bestTime = datetime.combine(date.min, self.resultApproveList[0].time) - datetime.min
+        for index, item in enumerate(self.resultApproveList):
+            item.diff = (datetime.combine(date.min, item.time) - bestTime).time()
+            item.rank = index + 1
+
+    def resetResultApprove(self):
+        self.resultApprove.time = self.time
+        self.resultApprove.is_photoinish = True
+
+    def resultView(self):
+        resultView = []
+        for item in self.resultApproveList:
+            resultView.append(
+                {
+                    'competitor_id': item.competitor_id,
+                    'rank': item.rank,
+                    'diff': item.diff,
+                    'time': item.time
+                }
+            )
+        return resultView
+
 def timeConverter(time, format='%M:%S.%f'):
     try:
         return time.strftime(format)[:-3]
@@ -389,18 +466,6 @@ def race_run_startlist_upload(id, run_id):
     db.session.commit()
     return redirect(url_for('.race_run_orderlist',race_id=id, run_id=run_id, _external=True))
 
-
-
-@shorttrack.route('/race/<int:id>/run/<int:run_id>/photofinish', methods=['GET', 'POST'])
-def race_photofinish_data(id, run_id):
-    photoFinishData = PhotoFinishData(
-        competitor_id=request.form.get('competitor_id'),
-        run_id=run_id,
-        time=datetime.strptime(request.form.get('time'), '%M:%S.%f').time()
-    )
-    db.session.add(photoFinishData)
-    db.session.commit()
-    return 'Good'
 
 @shorttrack.route('/jury_result/approve', methods=['GET', 'POST'])
 def race_jury_data():

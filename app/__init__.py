@@ -12,6 +12,8 @@ from flask_socketio import SocketIO
 from .momentjs import momentjs
 from .TCPClient import DataSender
 
+from celery import Celery
+
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -21,7 +23,13 @@ db_shorttrack = SQLAlchemy()
 
 babel = Babel()
 dtb = DebugToolbarExtension()
-socketio = SocketIO()
+# socketio = SocketIO(message_queue='redis://localhost:6379/0')
+# socketio = SocketIO(message_queue='redis://')
+
+socketio = SocketIO(message_queue='amqp:///socketio')
+# celery = Celery('deviceDataHandler', broker='redis://localhost:6379/0')
+
+celery = Celery('deviceDataHandler', broker='amqp://')
 ScoreboardSender = DataSender()
 migrate = Migrate()
 migrate_shorttrack = Migrate()
@@ -29,6 +37,7 @@ migrate_shorttrack = Migrate()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
+
 
 
 def create_app(config_name):
