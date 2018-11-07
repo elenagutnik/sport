@@ -14,6 +14,9 @@ from .TCPClient import DataSender
 
 from celery import Celery
 
+import eventlet
+
+eventlet.monkey_patch(socket=True)
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -24,12 +27,14 @@ db_shorttrack = SQLAlchemy()
 babel = Babel()
 dtb = DebugToolbarExtension()
 # socketio = SocketIO(message_queue='redis://localhost:6379/0')
+socketio = SocketIO(async_mode='eventlet')
 # socketio = SocketIO(message_queue='redis://')
+# socketio = socketio(message_queue='redis://')
 
-socketio = SocketIO(message_queue='amqp:///socketio')
-# celery = Celery('deviceDataHandler', broker='redis://localhost:6379/0')
+# socketio = SocketIO(message_queue='amqp:///socketio')
+celery = Celery('deviceDataHandler', broker='redis://')
 
-celery = Celery('deviceDataHandler', broker='amqp://')
+# celery = Celery('deviceDataHandler', broker='amqp://')
 ScoreboardSender = DataSender()
 migrate = Migrate()
 migrate_shorttrack = Migrate()
@@ -56,7 +61,7 @@ def create_app(config_name):
     db_shorttrack.init_app(app)
     login_manager.init_app(app)
     dtb.init_app(app)
-    socketio.init_app(app)
+    socketio.init_app(app, message_queue='redis://')
 
     # migrate.init_app(app, db)
     migrate_shorttrack.init_app(app, db_shorttrack)
