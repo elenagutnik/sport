@@ -38,19 +38,28 @@ class AlchemyEncoder(json.JSONEncoder):
 @login_required
 @admin_required
 def emulator(race_id):
-    # try:
-    current = RunInfo.query.filter(RunInfo.endtime == None,
-                                   RunInfo.starttime < datetime.now(),
-                                   RunInfo.race_id == race_id).first()
-    last_run = db.session.query(RunGroup).filter(RunGroup.is_start == None,
-                                                 RunGroup.is_finish == None,
-                                                 RunGroup.run_id == current.id).\
-        order_by(RunGroup.number.asc()).limit(1).first()
+    try:
+        current = RunInfo.query.filter(RunInfo.endtime == None,
+                                       RunInfo.starttime < datetime.now(),
+                                       RunInfo.race_id == race_id).one()
+    except:
+        emulator_clear(race_id)
+        return 'Нет активных заездов'
+    try:
+        last_run = db.session.query(RunGroup).filter(RunGroup.is_start == None,
+                                                     RunGroup.is_finish == None,
+                                                     RunGroup.run_id == current.id).\
+            order_by(RunGroup.number.asc()).limit(1).first()
+    except:
+        emulator_clear(race_id)
+        return 'Нет группы для старта'
+
     competitors = db.session.query(Competitor, RunOrder).\
         join(RunOrder, RunOrder.competitor_id == Competitor.id).\
         filter(RunOrder.group_id == last_run.id).all()
 
     competitors_list = []
+
     for item in competitors:
         competitors_list.append({
             'order': item[1].order,
@@ -67,9 +76,6 @@ def emulator(race_id):
                            competitors=json.dumps(competitors_list),
                            device=json.dumps(device, cls=AlchemyEncoder),
                            circle_count=circle_count, race_id=race_id, run_id=current.id, jury=jury_list)
-    # except:
-    #     emulator_clear(race_id)
-    #     return 'Наверное нету активных заездов'
 
 @shorttrack.route('/emulation/<int:race_id>/clear', methods=['GET', 'POST'])
 @login_required
