@@ -10,6 +10,7 @@
       <li id="li_tab_runs"><a href="#tab_runs" data-toggle="tab">Заезды</a></li>
       <li id="li_tab_runlists"><a href="#tab_runlists" data-toggle="tab">Стартовые списки</a></li>
       <li id="li_tab_jurydata"><a href="#tab_jurydata" data-toggle="tab">Данные жюри</a></li>
+      <li id="li_tab_finalresults"><a href="#tab_finalresults" data-toggle="tab">Финишные результаты</a></li>
     </ul>
     <div class="tab-content">
       <div id="tab_results" class="tab-pane fade in active">
@@ -28,7 +29,7 @@
                 {% for item in list %}
                     <table id="Competitor-{{key}}-{{item.id}}" style="width:19%; float:left">
                         <tr>
-                            <th colspan="3">{{item.ru_lastname}} {{item.ru_firstname}}</th>
+                            <th colspan="3">{{item.ru_lastname}} {{item.ru_firstname}} </th>
                         </tr>
                         <tr>
                             <th>Circle</th>
@@ -36,6 +37,14 @@
                             <th>Time</th>
                             <th>Diff</th>
                         </tr>
+                        {% for result in result_list[key][item.id] %}
+                            <tr>
+                                <td>{{result.device_order}}</td>
+                                <td>{{result.rank}}</td>
+                                <td>{{result.time}}</td>
+                                <td>{{result.diff}}</td>
+                            </tr>
+                        {% endfor %}
                     </table>
                 {% endfor %}
                 </div>
@@ -138,6 +147,11 @@
             </div>
         {% endfor %}
       </div>
+      <div id="tab_finalresults" class="tab-pane fade">
+        <div class="row">
+            <h2>Финишные результаты</h2>
+        </div>
+      </div>
     </div>
 
 <div class="modal fade" id="PhotofinishModal">
@@ -225,7 +239,7 @@
     });
 
 
-    socket.emit('GetResults', {race_id: 8});
+//    socket.emit('GetResults', {race_id: 8});
 
     socket.on('Results', function(data) {
       console.log('Results', JSON.parse(data));

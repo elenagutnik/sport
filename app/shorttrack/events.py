@@ -14,7 +14,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from .deviceDataHandler import dataHandler
 from .. import socketio
-
+from .Race import  timeConverter
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
@@ -103,7 +103,27 @@ def jury_page(race_id):
         filter(Competitor.race_id == race_id).\
         order_by(RunOrder.group_id.asc(), RunOrder.order.asc()).all()
 
-    treeView={}
+    runsList = db.session.query(RunInfo).filter(RunInfo.race_id == race_id).order_by(RunInfo.number.asc()).all()
+
+    resultList = db.session.query(ResultDetail, VirtualDevice).join(VirtualDevice, VirtualDevice.id == ResultDetail.virtual_device_id).filter(ResultDetail.run_id.in_([item.id for item in runsList]),
+                                                                                                                                              ResultDetail.is_first==True).all()
+    treeViewResult = {}
+
+    for item in resultList:
+        if item[0].run_id not in treeViewResult.keys():
+            treeViewResult[item[0].run_id] = {}
+        if item[0].competitor_id not in treeViewResult[item[0].run_id].keys():
+            treeViewResult[item[0].run_id][item[0].competitor_id] = []
+        treeViewResult[item[0].run_id][item[0].competitor_id].append(
+            {
+                'time': timeConverter(item[0].time),
+                'diff': timeConverter(item[0].diff),
+                'rank': item[0].grouprank,
+                'device_order': item[1].order
+            }
+        )
+    print(treeViewResult)
+    treeView = {}
     for item in Competitors_list:
         if item[1].run_id not in treeView.keys():
             treeView[item[1].run_id] = {}
@@ -111,8 +131,8 @@ def jury_page(race_id):
             treeView[item[1].run_id][item[1].group_id] = []
         treeView[item[1].run_id][item[1].group_id].append(item[0])
 
-    runsList = db.session.query(RunInfo).filter(RunInfo.race_id == race_id).order_by(RunInfo.number.asc()).all()
     run_groups = RunGroup.query.filter(RunGroup.run_id.in_([item.id for item in runsList])).order_by(RunGroup.number.asc()).all()
+
     run_info = {}
     for item in runsList:
         run_info[item.number] = {
@@ -129,7 +149,7 @@ def jury_page(race_id):
     return render_template('shorttrack/jury_page.html',
                            competitors=treeView,
                            runs=runsList, race_id=race_id,
-                           jury=jury_list, run_info=run_info)
+                           jury=jury_list, run_info=run_info, result_list=treeViewResult)
 
 @shorttrack.route('/competitorslist', methods=['GET', 'POST'])
 @login_required

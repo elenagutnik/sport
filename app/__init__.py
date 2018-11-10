@@ -28,7 +28,7 @@ babel = Babel()
 dtb = DebugToolbarExtension()
 # socketio = SocketIO(message_queue='redis://localhost:6379/0')
 socketio = SocketIO(async_mode='eventlet')
-# socketio = SocketIO(message_queue='redis://')
+# socketio = SocketIO()
 # socketio = socketio(message_queue='redis://')
 
 # socketio = SocketIO(message_queue='amqp:///socketio')
