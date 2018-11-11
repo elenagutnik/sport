@@ -37,6 +37,7 @@
                             <th>Time</th>
                             <th>Diff</th>
                         </tr>
+                        {% if result_list.key and result_list[key][item.id] %}
                         {% for result in result_list[key][item.id] %}
                             <tr>
                                 <td>{{result.device_order}}</td>
@@ -45,6 +46,7 @@
                                 <td>{{result.diff}}</td>
                             </tr>
                         {% endfor %}
+                        {% endif %}
                     </table>
                 {% endfor %}
                 </div>
