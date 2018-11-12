@@ -105,8 +105,10 @@ def jury_page(race_id):
 
     runsList = db.session.query(RunInfo).filter(RunInfo.race_id == race_id).order_by(RunInfo.number.asc()).all()
 
-    resultList = db.session.query(ResultDetail, VirtualDevice).join(VirtualDevice, VirtualDevice.id == ResultDetail.virtual_device_id).filter(ResultDetail.run_id.in_([item.id for item in runsList]),
-                                                                                                                                              ResultDetail.is_first==True).all()
+    resultList = db.session.query(ResultDetail, VirtualDevice).\
+        join(VirtualDevice, VirtualDevice.id == ResultDetail.virtual_device_id).\
+        filter(ResultDetail.run_id.in_([item.id for item in runsList]),
+               ResultDetail.is_first == True).order_by(VirtualDevice.order.asc()).all()
     treeViewResult = {}
 
     for item in resultList:

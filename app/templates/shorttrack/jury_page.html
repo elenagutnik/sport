@@ -37,7 +37,7 @@
                             <th>Time</th>
                             <th>Diff</th>
                         </tr>
-                        {% if result_list.key and result_list[key][item.id] %}
+                        {% if result_list[key] and result_list[key][item.id] %}
                         {% for result in result_list[key][item.id] %}
                             <tr>
                                 <td>{{result.device_order}}</td>
@@ -218,7 +218,7 @@
 {% block scripts %}
 {{ super() }}
 <script>
-  var socket = io.connect('http://127.0.0.1:5000');
+  var socket = io.connect('http://' + document.domain + ':' + location.port);
   var race_id = {{race_id}};
 
     socket.on('STNewDataPoint', function(data) {
