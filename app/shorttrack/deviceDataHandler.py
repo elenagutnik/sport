@@ -11,10 +11,6 @@ import eventlet
 
 eventlet.monkey_patch()
 
-def send_message(EVENT_NAME, DATA):
-    print('Socket')
-    socketio.emit(EVENT_NAME, json.dumps(DATA))
-
 @celery.task
 def dataHandler(data):
     # have_lock = False
@@ -29,7 +25,7 @@ def dataHandler(data):
         print('racehandler.isDataForSend ', racehandler.isDataForSend)
         if racehandler.isDataForSend:
             print('socket data ', racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
-            socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+            socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()), room=racehandler.getRoom())
     return None, None
     # finally:
     #     if have_lock:

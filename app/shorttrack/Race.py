@@ -6,7 +6,7 @@ from sqlalchemy import or_, func, distinct, and_
 import json
 import pyexcel
 
-from  flask import request, flash, redirect,url_for
+from flask import request, flash, redirect, url_for
 
 TIME_DELTA = timedelta(seconds=4)
 
@@ -165,7 +165,8 @@ class ShrortTrack:
             if self.resultApprove is None:
                 self.resultApprove = ResultApproved(
                     competitor_id=self.competitor.id,
-                    run_id=self.runInfo.id
+                    run_id=self.runInfo.id,
+                    status=1
                 )
                 db.session.add(self.resultApprove)
             self.resultApprove.diff = self.resultDetail.diff
@@ -183,6 +184,8 @@ class ShrortTrack:
             'run_id': self.runInfo.id,
             'device_order': self.virtualDevice.order
         }
+    def getRoom(self):
+        return 'shorttrack-'+ self.race.id
 
 class JuryEvent:
     EVENT_NAME = 'STJuryData'
@@ -223,6 +226,8 @@ class JuryEvent:
             'run_id': self.runInfo.id,
             'group_id': self.runGroup.id
         }
+    def getRoom(self):
+        return 'shorttrack-' + self.race.id
 
 class StartEvent:
     EVENT_NAME = 'STNewStartData'
@@ -266,7 +271,8 @@ class StartEvent:
                 diff=time(0, 0),
                 run_id=run_id,
                 virtual_device_id=virtualStartDevice.id,
-                is_first=True
+                is_first=True,
+                group_id=self.runGroup.id
             )
 
             resultDetail = ResultDetail(
@@ -274,7 +280,8 @@ class StartEvent:
                 time=time(0, 0),
                 diff=time(0, 0),
                 run_id=run_id,
-                virtual_device_id=virtualStartDevice.id
+                virtual_device_id=virtualStartDevice.id,
+                group_id=self.runGroup.id
             )
             db.session.add(resultDetail)
             db.session.add(resultDetailFirst)
@@ -291,6 +298,9 @@ class StartEvent:
         }
     def resultView(self):
         return self.resultViewData
+
+    def getRoom(self):
+        return 'shorttrack-' + self.race.id
 
 class PhotofinishEvent:
     EVENT_NAME = 'STPhotofinishEvent'
@@ -312,6 +322,7 @@ class PhotofinishEvent:
     def HandleData(self):
         self.setPhotofinish()
         self.resetResultApprove()
+        self.recalulateResults()
 
 
     def setPhotofinish(self):
@@ -325,7 +336,7 @@ class PhotofinishEvent:
 
     def recalulateResults(self):
         self.resultApproveList = db.session.query(ResultApproved).\
-            filter(ResultApproved.group_id == self.runOrder.group_id).filter(ResultApproved.time.asc()).all()
+            filter(ResultApproved.group_id == self.runOrder.group_id, ResultApproved.status == 1).order_by(ResultApproved.time.asc()).all()
 
         bestTime = datetime.combine(date.min, self.resultApproveList[0].time) - datetime.min
         for index, item in enumerate(self.resultApproveList):
@@ -343,11 +354,52 @@ class PhotofinishEvent:
                 {
                     'competitor_id': item.competitor_id,
                     'rank': item.rank,
-                    'diff': item.diff,
-                    'time': item.time
+                    'diff': timeConverter(item.diff),
+                    'time': timeConverter(item.time)
                 }
             )
         return resultView
+
+    def getRoom(self):
+        return 'shorttrack-' + self.race.id
+
+
+class RaceManager:
+    def __init__(self, group_id):
+        self.runGroup = RunGroup.query.get(group_id)
+        self.runInfo = RunInfo.query.get(self.runGroup.run_id)
+        self.race = Race.query.get(self.runInfo.race_id)
+
+    def falseStart(self):
+        try:
+            self.runGroup.is_start = None
+            self.runGroup.is_finish = None
+
+            ResultDetail.query.filter(ResultDetail.group_id == self.runGroup.id).delete()
+            ResultApproved.query.filter(ResultApproved.group_id == self.runGroup.id).delete()
+            return {'success': True}
+        except:
+            return {'success': False}
+
+    def competitorApprove(self, competitor_id, status_id):
+        try:
+            resultApprove = db.session.query(ResultApproved).filter(ResultApproved.group_id == self.runGroup.id,
+                                                                    ResultApproved.competitor_id == competitor_id).first()
+            if resultApprove is None:
+                resultApprove = ResultApproved(
+                    run_id=self.runInfo.id,
+                    group_id=self.runGroup.id,
+                    competitor_id=competitor_id
+                )
+
+            resultApprove.status = status_id
+            db.session.add(resultApprove)
+            return {'success': True}
+        except:
+            return {'success': False}
+
+
+
 
 def timeConverter(time, format='%M:%S.%f'):
     try:

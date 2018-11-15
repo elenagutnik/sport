@@ -218,9 +218,9 @@
 {% block scripts %}
 {{ super() }}
 <script>
-  var socket = io.connect('http://' + document.domain + ':' + location.port);
   var race_id = {{race_id}};
-
+  var socket = io.connect('http://' + document.domain + ':' + location.port);
+    socket.emit('join', {room: 'shorttrack-' + race_id});
     socket.on('STNewDataPoint', function(data) {
      data= JSON.parse(data);
      $("#Competitor-"+data.run_id+"-"+data.competitor_id).append("<tr><td>"+data.device_order+"</td><td>"+data.rank+"</td><td>"+data.time+"</td><td>"+data.diff+"</td></tr>");
@@ -315,5 +315,28 @@
      });
 
 
+
+
+    socket.emit('FalseStart',
+          {
+              'group_id':268,
+              'competitor_id':0,
+              'status_id':1
+              },
+          function(confirmation)
+          {
+              console.log(confirmation);
+          }
+    );
+
+    socket.emit('FalseStart',
+          {'group_id':268},
+          function(confirmation)
+          {
+              console.log(confirmation);
+          }
+    );
+
 </script>
 {% endblock %}
+-

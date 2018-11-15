@@ -6,7 +6,7 @@ from . import shorttrack
 from ..decorators import admin_required
 from sqlalchemy import func
 
-from .Race import EventDefiner, PhotofinishEvent
+from .Race import EventDefiner, PhotofinishEvent, timeConverter, RaceManager
 # For emulator
 import json
 from .models import *
@@ -14,7 +14,11 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from .deviceDataHandler import dataHandler
 from .. import socketio
-from .Race import  timeConverter
+
+from flask_socketio import join_room, leave_room, send, emit
+
+
+
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
@@ -110,7 +114,6 @@ def jury_page(race_id):
         filter(ResultDetail.run_id.in_([item.id for item in runsList]),
                ResultDetail.is_first == True).order_by(VirtualDevice.order.asc()).all()
     treeViewResult = {}
-
     for item in resultList:
         if item[0].run_id not in treeViewResult.keys():
             treeViewResult[item[0].run_id] = {}
@@ -124,7 +127,6 @@ def jury_page(race_id):
                 'device_order': item[1].order
             }
         )
-    print(treeViewResult)
     treeView = {}
     for item in Competitors_list:
         if item[1].run_id not in treeView.keys():
@@ -197,3 +199,25 @@ def race_photofinish_data(id, run_id):
     # db.session.add(photoFinishData)
     # db.session.commit()
     # return 'Good'
+
+@socketio.on('join')
+def on_join(data):
+    join_room(data['room'])
+
+@socketio.on('CompetitorApprove')
+def onCompetitorApprove(data):
+    raceHandler = RaceManager(group_id=data['group_id'])
+    return json.dumps(
+        raceHandler.competitorApprove(data['competitor_id'], data['status_id'])
+    )
+
+@socketio.on('FalseStart')
+def onFalseStart(data):
+    raceHandler = RaceManager(group_id=data['group_id'])
+    return json.dumps(
+        raceHandler.falseStart()
+    )
+
+        # @socketio.on('disconnect')
+# def test_disconnect():
+#     pass
