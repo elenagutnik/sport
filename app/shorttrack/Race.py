@@ -185,7 +185,7 @@ class ShrortTrack:
             'device_order': self.virtualDevice.order
         }
     def getRoom(self):
-        return 'shorttrack-'+ self.race.id
+        return 'shorttrack-'+ str(self.race.id)
 
 class JuryEvent:
     EVENT_NAME = 'STJuryData'
@@ -227,7 +227,7 @@ class JuryEvent:
             'group_id': self.runGroup.id
         }
     def getRoom(self):
-        return 'shorttrack-' + self.race.id
+        return 'shorttrack-' + str(self.race.id)
 
 class StartEvent:
     EVENT_NAME = 'STNewStartData'
@@ -300,7 +300,7 @@ class StartEvent:
         return self.resultViewData
 
     def getRoom(self):
-        return 'shorttrack-' + self.race.id
+        return 'shorttrack-' + str(self.race.id)
 
 class PhotofinishEvent:
     EVENT_NAME = 'STPhotofinishEvent'
@@ -361,7 +361,7 @@ class PhotofinishEvent:
         return resultView
 
     def getRoom(self):
-        return 'shorttrack-' + self.race.id
+        return 'shorttrack-' + str(self.race.id)
 
 
 class RaceManager:
