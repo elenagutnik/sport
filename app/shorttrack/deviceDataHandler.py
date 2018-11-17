@@ -25,6 +25,7 @@ def dataHandler(data):
         print('racehandler.isDataForSend ', racehandler.isDataForSend)
         if racehandler.isDataForSend:
             print('socket data ', racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+            print('room: ', racehandler.getRoom())
             socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()), room=racehandler.getRoom())
     return None, None
     # finally:

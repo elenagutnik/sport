@@ -15,7 +15,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from .deviceDataHandler import dataHandler
 from .. import socketio
 
-from flask_socketio import join_room, leave_room, send, emit
+from flask_socketio import join_room, leave_room, send, emit, rooms
 
 
 
@@ -202,7 +202,9 @@ def race_photofinish_data(id, run_id):
 
 @socketio.on('join')
 def on_join(data):
+    print(data['room'])
     join_room(data['room'])
+    print(rooms())
 
 @socketio.on('CompetitorApprove')
 def onCompetitorApprove(data):

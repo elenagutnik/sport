@@ -220,7 +220,9 @@
 <script>
   var race_id = {{race_id}};
   var socket = io.connect('http://' + document.domain + ':' + location.port);
-    socket.emit('join', {room: 'shorttrack-' + race_id});
+
+  socket.emit('join', {room: 'shorttrack-' + race_id});
+
     socket.on('STNewDataPoint', function(data) {
      data= JSON.parse(data);
      $("#Competitor-"+data.run_id+"-"+data.competitor_id).append("<tr><td>"+data.device_order+"</td><td>"+data.rank+"</td><td>"+data.time+"</td><td>"+data.diff+"</td></tr>");
