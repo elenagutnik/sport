@@ -136,7 +136,7 @@ def jury_page(race_id):
         treeView[item[1].run_id][item[1].group_id].append(item[0])
 
     run_groups = RunGroup.query.filter(RunGroup.run_id.in_([item.id for item in runsList])).order_by(RunGroup.number.asc()).all()
-
+    virtual_devices = VirtualDevice.query.filter(VirtualDevice.race_id == race_id).all()
     run_info = {}
     for item in runsList:
         run_info[item.number] = {
@@ -153,7 +153,7 @@ def jury_page(race_id):
     return render_template('shorttrack/jury_page.html',
                            competitors=treeView,
                            runs=runsList, race_id=race_id,
-                           jury=jury_list, run_info=run_info, result_list=treeViewResult)
+                           jury=jury_list, run_info=run_info, result_list=treeViewResult, virtual_devices=virtual_devices)
 
 @shorttrack.route('/competitorslist', methods=['GET', 'POST'])
 @login_required
