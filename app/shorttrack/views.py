@@ -224,13 +224,13 @@ def race_device_del(race_id, device_id):
 @login_required
 @admin_required
 def race_run_orderlist(race_id, run_id):
-    сompetitors_list = db.session.query(Competitor, RunOrder). \
+    competitors_list = db.session.query(Competitor, RunOrder). \
         join(RunOrder, RunOrder.competitor_id == Competitor.id, isouter=True). \
         filter(RunOrder.run_id == run_id, ). \
         order_by(RunOrder.group_id.asc(), RunOrder.order.asc()).all()
 
     treeView = {}
-    for item in сompetitors_list:
+    for item in competitors_list:
         if item[1].group_id not in treeView.keys():
             treeView[item[1].group_id] = []
         treeView[item[1].group_id].append(item)
@@ -253,7 +253,7 @@ def race_runlist_build(race_id):
 def xcl_run_results(race_id, run_id):
     required_run = RunInfo.query.filter(RunInfo.id == run_id).first()
     if required_run.endtime == None:
-        flash('Невозможно сформировать результаты. Заезд не завершен ')
+        flash('Невозможно cформировать результаты. Заезд не завершен ')
         return redirect(url_for('.race_runs', race_id=race_id, _external=True))
     else:
         wb = ExcelGenerator('results')

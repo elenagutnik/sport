@@ -42,18 +42,18 @@ class BaseRace:
             filter(RunOrder.run_id == self.run.id, RunOrder.course_id == self.courseDevice.course_id).order_by(RunOrder.order.asc()).all()
         order = sum(item[1].manual_order is not None and item[1].manual_order != 0 for item in race_competitors)
 
-        сompetitor = next(item for item in race_competitors if item[1].manual_order is None)
-        сompetitor[1].manual_order = order + 1
+        competitor = next(item for item in race_competitors if item[1].manual_order is None)
+        competitor[1].manual_order = order + 1
 
         competitor_Approve = ResultApproved(run_id=self.run.id,
                                          is_start=True,
-                                         race_competitor_id=сompetitor[0].id)
-        db.session.add(сompetitor[1])
+                                         race_competitor_id=competitor[0].id)
+        db.session.add(competitor[1])
         db.session.add(competitor_Approve)
         db.session.commit()
         self.resultApprove = competitor_Approve
-        self.competitor = сompetitor[0]
-        self.runOrder = сompetitor[1]
+        self.competitor = competitor[0]
+        self.runOrder = competitor[1]
 
     def competitor_manualstart(self, competitor_id):
         competitor_Approve = ResultApproved(
@@ -256,19 +256,19 @@ class BaseRace:
 
     def calculate_common_sector_params(self, competitors_list):
         if len(competitors_list) != 0:
-            min_сompetitor_sectortime = min(competitors_list, key=lambda item: item.sectortime)
-            min_сompetitor_time = min(competitors_list, key=lambda item: item.time)
+            min_competitor_sectortime = min(competitors_list, key=lambda item: item.sectortime)
+            min_competitor_time = min(competitors_list, key=lambda item: item.time)
 
-            self.result.diff = self.result.time - min_сompetitor_time.time
-            self.result.sectordiff = self.result.sectortime - min_сompetitor_sectortime.sectortime
+            self.result.diff = self.result.time - min_competitor_time.time
+            self.result.sectordiff = self.result.sectortime - min_competitor_sectortime.sectortime
 
-            сompetitors_list_ordered_sectortime = sorted([self.result] + competitors_list,
+            competitors_list_ordered_sectortime = sorted([self.result] + competitors_list,
                                                          key=lambda item: item.sectortime)
-            сompetitors_list_ordered_time = sorted([self.result] + competitors_list,
+            competitors_list_ordered_time = sorted([self.result] + competitors_list,
                                                    key=lambda item: item.time)
 
-            for index, (sectortime_item,  time_item) in enumerate(zip(сompetitors_list_ordered_sectortime,
-                                                                      сompetitors_list_ordered_time)):
+            for index, (sectortime_item,  time_item) in enumerate(zip(competitors_list_ordered_sectortime,
+                                                                      competitors_list_ordered_time)):
                 sectortime_item.sectorrank = index+1
                 time_item.rank = index + 1
         else:
@@ -291,7 +291,7 @@ class BaseRace:
         return tree_view, manual_list, dql_list
 
     def recalculate_sector_results(self, current_results=None, previous_results=None):
-        #  пересчитать  параметры speed, sectortime, time
+        #  переcчитать  параметры speed, sectortime, time
         for competitor_id, current_result_item in current_results.items():
             try:
                 current_result_item[1].sectortime = current_result_item[1].absolut_time - previous_results[competitor_id][1].absolut_time
@@ -303,15 +303,15 @@ class BaseRace:
                 current_result_item[1].speed = None
                 current_result_item[1].time = None
 
-        сompetitors_list_ordered_sectortime = sorted(list(current_results.values()),
+        competitors_list_ordered_sectortime = sorted(list(current_results.values()),
                                                      key=lambda item: (item[1].sectortime is None, item[1].sectortime))
-        сompetitors_list_ordered_time = sorted(list(current_results.values()),
+        competitors_list_ordered_time = sorted(list(current_results.values()),
                                                      key=lambda item: (item[1].time is None, item[1].time))
 
-        sectortime_min_item = next(item for item in сompetitors_list_ordered_sectortime if item[0].status_id == 1)
-        time_min_item = next(item for item in сompetitors_list_ordered_time if item[0].status_id == 1)
+        sectortime_min_item = next(item for item in competitors_list_ordered_sectortime if item[0].status_id == 1)
+        time_min_item = next(item for item in competitors_list_ordered_time if item[0].status_id == 1)
 
-        for index, (sectortime_item, time_item) in enumerate(zip(сompetitors_list_ordered_sectortime, сompetitors_list_ordered_time)):
+        for index, (sectortime_item, time_item) in enumerate(zip(competitors_list_ordered_sectortime, competitors_list_ordered_time)):
             try:
                 sectortime_item[1].sectordiff = sectortime_item[1].sectortime - sectortime_min_item[1].sectortime
                 sectortime_item[1].sectorrank = index + 1
@@ -325,12 +325,12 @@ class BaseRace:
 
     def recalculate_finished_results(self):
         finish_results = ResultApproved.query.filter(ResultApproved.run_id == self.run.id, ResultApproved.is_finish==True).all()
-        сompetitors_list = sorted(finish_results, key=lambda item: (item.time is None,
+        competitors_list = sorted(finish_results, key=lambda item: (item.time is None,
                                                                     item.status_id is None, item.status_id,
                                                                     item.finish_time - item.start_time+item.adder_time))
-        if сompetitors_list:
-            ResultApproved_min_time = min(сompetitors_list, key=lambda item:(item.time))
-            for index, item in enumerate(сompetitors_list):
+        if competitors_list:
+            ResultApproved_min_time = min(competitors_list, key=lambda item:(item.time))
+            for index, item in enumerate(competitors_list):
                 try:
                     if item.status_id == 1:
                         item.time = item.finish_time - item.start_time
@@ -495,17 +495,17 @@ class ParallelRace(SummationTimeRace):
 
     def calculate_common_sector_params(self, competitors_list):
         if len(competitors_list) != 0:
-            сompetitors_list_ordered_sectortime = sorted([self.result] + competitors_list,
+            competitors_list_ordered_sectortime = sorted([self.result] + competitors_list,
                                                          key=lambda item: item.sectortime)
-            сompetitors_list_ordered_time = sorted([self.result] + competitors_list,
+            competitors_list_ordered_time = sorted([self.result] + competitors_list,
                                                    key=lambda item: item.time)
 
 
-            for index, (sectortime_item,  time_item) in enumerate(zip(сompetitors_list_ordered_sectortime,
-                                                                      сompetitors_list_ordered_time)):
+            for index, (sectortime_item,  time_item) in enumerate(zip(competitors_list_ordered_sectortime,
+                                                                      competitors_list_ordered_time)):
 
-                sectortime_item.sectordiff = sectortime_item.sectortime - сompetitors_list_ordered_sectortime[0].sectortime
-                time_item.diff = time_item.time - сompetitors_list_ordered_time[0].time
+                sectortime_item.sectordiff = sectortime_item.sectortime - competitors_list_ordered_sectortime[0].sectortime
+                time_item.diff = time_item.time - competitors_list_ordered_time[0].time
                 sectortime_item.sectorrank=index+1
                 time_item.rank = index + 1
         else:
@@ -525,12 +525,12 @@ class ParallelRace(SummationTimeRace):
                                                                  ResultApproved.run_id == self.run.id,
                                                                  RunOrder.order == self.runOrder.order,
                                                                  RunOrder.run_id == self.run.id).all()
-        сompetitors_list = sorted(finish_results, key=lambda item: (item.time is None,
+        competitors_list = sorted(finish_results, key=lambda item: (item.time is None,
                                                                     item.status_id is None, item.status_id,
                                                                     item.finish_time - item.start_time+item.adder_time))
-        сompetitors_list.reverse()
-        ResultApproved_min_time = min(сompetitors_list, key=lambda item:(item.time))
-        for index, item in enumerate(сompetitors_list):
+        competitors_list.reverse()
+        ResultApproved_min_time = min(competitors_list, key=lambda item:(item.time))
+        for index, item in enumerate(competitors_list):
             try:
                 if item.status_id == 1:
                     item.time = item.finish_time - item.start_time
