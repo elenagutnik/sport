@@ -287,7 +287,7 @@
 
     var thead={};
 
-    var socket = io.connect('http://127.0.0.1:5000');
+    var socket = io.connect('ws://' + document.domain + ':' + location.port, {transports:['websocket']});
 
     var msg_err=new Map([
       ["error_getting_status_list", "Error: can't get the status list"],
