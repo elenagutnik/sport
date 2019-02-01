@@ -1,5 +1,5 @@
-from . import raceinfo
-from .. import ScoreboardSender
+from ..rabbit import get_scroreboard_queue
+
 from .models import *
 from . DataViewer import timeConverter
 from distutils.util import strtobool
@@ -68,8 +68,6 @@ class Scoreboard:
          status = System.query.filter(System.key == "ScoreboardConnect").first()
          if status is None:
              status = System(key='ScoreboardConnect')
-         if ScoreboardSender.connect():
-             status.value = 'True'
          else:
              status.value = 'False'
          db.session.add(status)
@@ -80,7 +78,7 @@ class Scoreboard:
      @staticmethod
      @socketio.on('ScoreboardDisconnect')
      def close():
-         ScoreboardSender.close()
+         # ScoreboardSender.close()
          status = System.query.filter(System.key == "ScoreboardConnect").first()
          if status is None:
              status = System(key='ScoreboardConnect')
@@ -190,9 +188,14 @@ class Scoreboard:
 
      def send(self):
          # print(self.message)
-         if self.is_active and self.is_connected:
+         # if self.is_active and self.is_connected:
              try:
-                 ScoreboardSender.send(self.message.encode())
+                 q = get_scroreboard_queue()
+                 q.basic_publish(
+                     exchange='',
+                     routing_key='scoreboard',
+                     body=self.message.encode(),
+                 )
              except:
                  is_connected = System.query.filter(System.key == "ScoreboardConnect").first()
                  is_connected.value = False

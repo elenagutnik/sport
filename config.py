@@ -18,6 +18,9 @@ class Config:
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     SCOREBOARD_HOST = '127.0.0.1'
     SCOREBOARD_PORT = 7001
+
+    RABBITMQ_HOST = 'localhost'
+
     LANGUAGES = {
         'en': 'English',
         'ru': 'Русский'
