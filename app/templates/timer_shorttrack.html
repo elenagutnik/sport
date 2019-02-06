@@ -65,9 +65,11 @@ function sendLeg(i,transponder, devnum, starttime) {
     var t = new Date().getTime() ; // 12.850 - 12.859
     console.log(i,transponder, t);
     $("#data"+i).append("<tr><td>"+i+"</td><td>"+devnum+"</td><td>"+transponder+"</td><td>"+tform(t-starttime)+"</td></tr>");
+    console.log("send:", t);
   	$.ajax({
 		  url: "/shorttrack/input/data",
 		  dataType: 'json',
+		  async: false,
 		  type: 'POST',
 		  contentType: 'application/json',
 		  data:JSON.stringify({
@@ -77,6 +79,7 @@ function sendLeg(i,transponder, devnum, starttime) {
 			  'EVENT_CODE': 'C1'
 			  })
 		}).done(function() {
+			console.log("done:", t);			
 //			  $( this ).addClass( "done" );
 		});
 }
