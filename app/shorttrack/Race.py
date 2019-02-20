@@ -239,7 +239,6 @@ class StartEvent:
         self.device_data = device_data
         self.virtualDevice = VirtualDevice.query.filter(VirtualDevice.race_id==self.race.id,
                                                         VirtualDevice.order==0).first()
-
         self.runGroup = None
         self.isDataForSend = True
         self.resultViewData = []
