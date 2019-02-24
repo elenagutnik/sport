@@ -23,7 +23,8 @@ function dtform(v){
 function run(){
     $.ajax({
       url: "/shorttrack/input/data",
-      type: 'POST',
+	  async: false,
+	  type: 'POST',
       contentType: 'application/json',
       data:JSON.stringify({
 			  'EVENT_CODE': 'C0'
@@ -47,7 +48,7 @@ function reqSend(devnum){
 	    }
 //	$("#data"+course).append("<tr><td>"+startlist[snum]+"</td><td>"+devlist[devnum].src_dev+"</td><td>"+devlist[devnum].src_sys+"</td><td>"+(t-starttime)+"</td><td>"+tform(t-starttime)+"</td><td>"+t+"</td><td>"+dtform(t)+"</td></tr>");
 	var sectordelay=6000; //1sec
-	if(devnum==circle_count){
+	if(devnum==circle_count-1){
 		devnum=0;
 		starttime=0;
 //		$("#data"+course).append("<tr><td colspan=7><hr><!--<button class='btn' onclick='setTimeout(reqSend, 100+(Math.random()*1840), "+snum+", "+devnum+",0)'>Next competitor</button>--></td></tr>");
@@ -63,7 +64,7 @@ function sendCompetitor(competitor, devnum, starttime) {
 }
 function sendLeg(i,transponder, devnum, starttime) {
     var t = new Date().getTime() ; // 12.850 - 12.859
-    console.log(i,transponder, t);
+    console.log(i,transponder, t, (tform(t-starttime)));
     $("#data"+i).append("<tr><td>"+i+"</td><td>"+devnum+"</td><td>"+transponder+"</td><td>"+tform(t-starttime)+"</td></tr>");
     console.log("send:", t);
   	$.ajax({
