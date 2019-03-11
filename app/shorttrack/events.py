@@ -15,9 +15,11 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from .deviceDataHandler import dataHandler
 from .. import socketio
 
+# замена Celery
+from .. import lock
+# ----->
+
 from flask_socketio import join_room, leave_room, send, emit, rooms
-
-
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -175,12 +177,18 @@ def competitors_get_by_group():
 @shorttrack.route('/input/data', methods=['POST', 'GET'])
 def load_data():
     data = request.json
-    dataHandler.delay(data=data)
-    # racehandler = EventDefiner(data)
-    # racehandler.HandleData()
-    # print(racehandler.EVENT_NAME)
-    # if racehandler.isDataForSend:
-    #     socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+    print(data)
+
+    lock.acquire()
+    try:
+        # dataHandler.delay(data=data)
+        racehandler = EventDefiner(data)
+        racehandler.HandleData()
+        print(racehandler.EVENT_NAME)
+        if racehandler.isDataForSend:
+            socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+    finally:
+        lock.release()
     return '', 200
 
 

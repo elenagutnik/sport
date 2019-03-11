@@ -16,6 +16,11 @@ from celery import Celery
 
 import eventlet
 
+# Замена celery, сработает ли?
+from multiprocessing import Lock
+
+lock = Lock()
+# ------>
 eventlet.monkey_patch(socket=True)
 
 bootstrap = Bootstrap()
@@ -27,8 +32,8 @@ db_shorttrack = SQLAlchemy()
 babel = Babel()
 dtb = DebugToolbarExtension()
 # socketio = SocketIO(message_queue='redis://localhost:6379/0')
-socketio = SocketIO(async_mode='eventlet')
-# socketio = SocketIO()
+# socketio = SocketIO(async_mode='eventlet') используется
+socketio = SocketIO()
 # socketio = socketio(message_queue='redis://')
 
 # socketio = SocketIO(message_queue='amqp:///socketio')
