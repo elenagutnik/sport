@@ -1,0 +1,44 @@
+{% extends "shorttrack/base.html" %}
+{% import "_user.html" as macros %}
+
+{% block title %} Получатель{% endblock %}
+{% block scripts %}
+{{ super() }}
+<style>
+	#tab_results .name {width:250px;}
+	#tab_results .val {width:50px;}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+
+<script>
+  var race_id = {{race_id}};
+//  var socket = io.connect('ws://' + document.domain + ':' + location.port,{transports:['websocket']});
+  const socket = io(document.domain + ':' + location.port);
+  socket.emit('join', {room: 'shorttrack-' + race_id});
+
+    socket.on('STNewDataPoint', function(data) {
+     data= JSON.parse(data);
+     console.log("STNewDataPoint",data);
+    });
+
+
+    socket.on('STNewStartData', function(data) {
+     data= JSON.parse(data);
+     console.log("STNewStartData",data);
+     });
+
+    socket.on('STJuryData', function(data) {
+     data= JSON.parse(data);
+     console.log("STJuryData",data);
+     $("#jury_data__group_"+data.group_id+"_jury_"+data.jury_id).append("<div class='alert alert-info' role='alert'><button type='button' group_id='"+data.group_id+"' jury_result_id='"+data.id+"' jury_id='"+data.jury_id+"' class='open-JuryDataModal close'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></button><strong class='jury_time' >"+data.time+"</strong></div>");
+    });
+
+    socket.on('Results', function(data) {
+      console.log('Results', JSON.parse(data));
+    });
+socket.on('connection', function(socket){console.log('connected');});
+socket.on('disconnect', function(){console.log('disconnect');});
+
+</script>
+{% endblock %}
+-

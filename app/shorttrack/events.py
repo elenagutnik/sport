@@ -56,6 +56,14 @@ class AlchemyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+
+@shorttrack.route('/emulation/test/<int:race_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def emulator_test(race_id):
+    return render_template('shorttrack/test_page.html', race_id=race_id)
+
+
 @shorttrack.route('/emulation/<int:race_id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -203,9 +211,9 @@ def load_data():
         # dataHandler.delay(data=data)
         racehandler = EventDefiner(data)
         racehandler.HandleData()
-        print(racehandler.EVENT_NAME)
         if racehandler.isDataForSend:
             socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+            print(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
     finally:
         lock.release()
     return '', 200

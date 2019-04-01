@@ -80,7 +80,8 @@ function sendLeg(i,transponder, devnum, starttime, id) {
 			  'EVENT_CODE': 'C1'
 			  })
 		}).done(function() {
-			console.log("done:", dtform(t));
+		    var ft = new Date().getTime();
+			console.log("done:", dtform(ft));
 //			  $( this ).addClass( "done" );
 		});
 }
