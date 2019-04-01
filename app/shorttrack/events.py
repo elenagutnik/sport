@@ -1,6 +1,6 @@
 from flask import request, render_template
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_login import login_required
 from . import shorttrack
 from ..decorators import admin_required
@@ -18,6 +18,22 @@ from .. import socketio
 # замена Celery
 from .. import lock
 # ----->
+
+from functools import wraps
+
+def exectutiontime(message):
+    def real_dec(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = datetime.now()
+            result = func(*args, **kwargs)
+            end = datetime.now()
+            print(message, 'elapsed time:', (end-timedelta(hours=start.hour, minutes=start.minute,seconds=start.second,microseconds=start.microsecond)).time())
+            return result
+        return wrapper
+    return real_dec
+
+
 
 from flask_socketio import join_room, leave_room, send, emit, rooms
 
@@ -175,7 +191,9 @@ def competitors_get_by_group():
 
 
 @shorttrack.route('/input/data', methods=['POST', 'GET'])
+@exectutiontime('Full time')
 def load_data():
+    print('input time', datetime.now().isoformat())
     data = request.json
     print(data)
 
