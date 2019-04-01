@@ -59,12 +59,12 @@ function reqSend(devnum){
 	}
 }
 function sendCompetitor(competitor, devnum, starttime) {
-    setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_1, devnum, starttime);
-	setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_2, devnum, starttime);
+    setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_1, devnum, starttime, competitor.id);
+	setTimeout(sendLeg, randomDelay(),competitor.order, competitor.transponder_2, devnum, starttime, competitor.id);
 }
-function sendLeg(i,transponder, devnum, starttime) {
+function sendLeg(i,transponder, devnum, starttime, id) {
     var t = new Date().getTime() ; // 12.850 - 12.859
-    console.log(i,transponder, t, (tform(t-starttime)));
+    console.log(id ,i,transponder, t, (tform(t-starttime)));
     $("#data"+i).append("<tr><td>"+i+"</td><td>"+devnum+"</td><td>"+transponder+"</td><td>"+tform(t-starttime)+"</td></tr>");
     console.log("send:", dtform(t));
   	$.ajax({
