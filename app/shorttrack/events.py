@@ -28,7 +28,7 @@ def exectutiontime(message):
             start = datetime.now()
             result = func(*args, **kwargs)
             end = datetime.now()
-            print(message, 'elapsed time:', (end-timedelta(hours=start.hour, minutes=start.minute,seconds=start.second,microseconds=start.microsecond)).time())
+            # print(message, 'elapsed time:', (end-timedelta(hours=start.hour, minutes=start.minute,seconds=start.second,microseconds=start.microsecond)).time())
             return result
         return wrapper
     return real_dec
@@ -202,9 +202,9 @@ def competitors_get_by_group():
 @shorttrack.route('/input/data', methods=['POST', 'GET'])
 @exectutiontime('Full time')
 def load_data():
-    print('input time', datetime.now().isoformat())
+    # print('input time', datetime.now().isoformat())
     data = request.json
-    print(data)
+    # print(data)
 
     lock.acquire()
     try:
@@ -213,7 +213,7 @@ def load_data():
         racehandler.HandleData()
         if racehandler.isDataForSend:
             socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
-            print(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+            print('Sended data', racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
     finally:
         lock.release()
     return '', 200

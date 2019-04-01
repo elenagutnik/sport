@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d960826-bf0c-429a-8f9c-c2613decf3a4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/shorttrack/Race.py" afterPath="$PROJECT_DIR$/app/shorttrack/Race.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/shorttrack/events.py" afterPath="$PROJECT_DIR$/app/shorttrack/events.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/shorttrack/jury_page.html" afterPath="$PROJECT_DIR$/app/templates/shorttrack/jury_page.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/shorttrack/test_page.html" afterPath="$PROJECT_DIR$/app/templates/shorttrack/test_page.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -27,11 +24,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="events.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="events.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/shorttrack/events.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="242" column="33" lean-forward="true" selection-start-line="242" selection-start-column="33" selection-end-line="242" selection-end-column="33" />
+            <state relative-caret-position="-2846">
+              <caret line="31" column="25" lean-forward="true" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
               <folding>
                 <element signature="e#0#42#0" expanded="true" />
               </folding>
@@ -43,7 +40,7 @@
         <entry file="file://$PROJECT_DIR$/app/shorttrack/Race.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-476">
-              <caret line="378" column="55" lean-forward="true" selection-start-line="378" selection-start-column="55" selection-end-line="378" selection-end-column="55" />
+              <caret line="378" column="55" lean-forward="false" selection-start-line="378" selection-start-column="55" selection-end-line="378" selection-end-column="55" />
               <folding>
                 <element signature="e#17026#17531#0" expanded="false" />
                 <element signature="e#17649#17833#0" expanded="false" />
@@ -79,13 +76,13 @@
         <entry file="file://$PROJECT_DIR$/app/templates/timer_shorttrack.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="523">
-              <caret line="153" column="8" lean-forward="true" selection-start-line="153" selection-start-column="8" selection-end-line="153" selection-end-column="8" />
+              <caret line="153" column="8" lean-forward="false" selection-start-line="153" selection-start-column="8" selection-end-line="153" selection-end-column="8" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="jury_page.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="jury_page.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/templates/shorttrack/jury_page.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="105">
@@ -199,9 +196,9 @@
         <option value="$PROJECT_DIR$/app/__init__.py" />
         <option value="$PROJECT_DIR$/app/templates/timer_shorttrack.html" />
         <option value="$PROJECT_DIR$/app/shorttrack/Race.py" />
-        <option value="$PROJECT_DIR$/app/shorttrack/events.py" />
         <option value="$PROJECT_DIR$/app/templates/shorttrack/test_page.html" />
         <option value="$PROJECT_DIR$/app/templates/shorttrack/jury_page.html" />
+        <option value="$PROJECT_DIR$/app/shorttrack/events.py" />
       </list>
     </option>
   </component>
@@ -1113,25 +1110,15 @@
     <entry file="file://$PROJECT_DIR$/app/templates/timer_shorttrack.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="523">
-          <caret line="153" column="8" lean-forward="true" selection-start-line="153" selection-start-column="8" selection-end-line="153" selection-end-column="8" />
+          <caret line="153" column="8" lean-forward="false" selection-start-line="153" selection-start-column="8" selection-end-line="153" selection-end-column="8" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/shorttrack/events.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="242" column="33" lean-forward="true" selection-start-line="242" selection-start-column="33" selection-end-line="242" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#42#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/shorttrack/Race.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-476">
-          <caret line="378" column="55" lean-forward="true" selection-start-line="378" selection-start-column="55" selection-end-line="378" selection-end-column="55" />
+          <caret line="378" column="55" lean-forward="false" selection-start-line="378" selection-start-column="55" selection-end-line="378" selection-end-column="55" />
           <folding>
             <element signature="e#17026#17531#0" expanded="false" />
             <element signature="e#17649#17833#0" expanded="false" />
@@ -1163,6 +1150,16 @@
         <state relative-caret-position="105">
           <caret line="7" column="41" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="41" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/shorttrack/events.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2846">
+          <caret line="31" column="25" lean-forward="true" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
