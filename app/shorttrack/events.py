@@ -205,15 +205,17 @@ def load_data():
     # print('input time', datetime.now().isoformat())
     data = request.json
     # print(data)
-
+    def emitcallback(data):
+        print('emit [+], data:', data)
     lock.acquire()
     try:
         # dataHandler.delay(data=data)
         racehandler = EventDefiner(data)
         racehandler.HandleData()
         if racehandler.isDataForSend:
-            socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
-            print('Sended data', racehandler.EVENT_NAME, json.dumps(racehandler.resultView()))
+            socketio.emit(racehandler.EVENT_NAME, json.dumps(racehandler.resultView()),
+                          room=racehandler.getRoom(),
+                          callback=emitcallback(json.dumps(racehandler.resultView())))
     finally:
         lock.release()
     return '', 200
