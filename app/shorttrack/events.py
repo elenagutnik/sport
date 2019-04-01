@@ -240,6 +240,7 @@ def on_join(data):
     print(data['room'])
     join_room(data['room'])
     print(rooms())
+    return 'room has been joined'
 
 @socketio.on('CompetitorApprove')
 def onCompetitorApprove(data):

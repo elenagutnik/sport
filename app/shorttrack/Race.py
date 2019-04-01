@@ -364,6 +364,7 @@ class PhotofinishEvent:
 
 
 class RaceManager:
+    # check
     def __init__(self, group_id):
         self.runGroup = RunGroup.query.get(group_id)
         self.runInfo = RunInfo.query.get(self.runGroup.run_id)

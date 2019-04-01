@@ -12,9 +12,12 @@
 
 <script>
   var race_id = {{race_id}};
-//  var socket = io.connect('ws://' + document.domain + ':' + location.port,{transports:['websocket']});
-  const socket = io(document.domain + ':' + location.port);
-  socket.emit('join', {room: 'shorttrack-' + race_id});
+  const socket = io('ws://' + document.domain + ':' + location.port,{transports:['websocket']});
+    socket.emit('join', {room: 'shorttrack-' + race_id},
+          function(confirmation)
+          {
+              console.log(confirmation);
+          });
 
     socket.on('STNewDataPoint', function(data) {
      data= JSON.parse(data);
