@@ -85,6 +85,7 @@ def emulator(race_id):
     for item in competitors:
         competitors_list.append({
             'order': item[1].order,
+            'id': item[0].id,
             'transponder_1': item[0].transponder_1,
             'transponder_2': item[0].transponder_2
         })
