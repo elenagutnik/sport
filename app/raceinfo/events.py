@@ -15,6 +15,10 @@ from .Scoreboard import Scoreboard
 
 from .Race import RaceGetter
 from .runList import runList_view
+
+
+from .. import lock
+
 def exectutiontime(message):
     def real_dec(func):
         @wraps(func)
@@ -296,7 +300,6 @@ def get_race_info2(race_id):
     return json.dumps({'run_list': race_info})
 
 
-
 @raceinfo.route('/run/competitor/clear', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -329,9 +332,14 @@ def load_data_vol3():
         NewDataPoint (Текущий спортсмен + список пересчитанных рангов (sectorrank, rank) на текущем устройсве)
         NewDataFinish (Полный набор данных для всего заезда)
     """
+    def emitcallback(data):
+        print('emit [+], data:', data)
+
 
     data = request.json
     data['TIME'] = int(datetime.strptime(data['TIME'], '%d.%m.%Y %H:%M:%S.%f').timestamp()*1000)
+    lock.acquire()
+
     try:
         raceHandler = RaceGetter.getRace(data)
         raceHandler.setDeviceDataInDB(data)
@@ -419,7 +427,8 @@ def load_data_vol3():
         db.session.add(data_in)
         db.session.commit()
         socketio.emit("ErrorData", ConvertErrorData(data_in))
-
+    finally:
+        lock.release()
     return '', 200
 
 @socketio.on('DataInChangeCompetitors')
