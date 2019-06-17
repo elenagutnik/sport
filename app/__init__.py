@@ -17,9 +17,10 @@ from celery import Celery
 import eventlet
 
 # Замена celery, сработает ли?
-from multiprocessing import Lock
+from multiprocessing import Lock, Semaphore
 
 lock = Lock()
+semaphore = Semaphore()
 # ------>
 eventlet.monkey_patch(socket=True)
 

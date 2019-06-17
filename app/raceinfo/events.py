@@ -17,7 +17,7 @@ from .Race import RaceGetter
 from .runList import runList_view
 
 
-from .. import lock
+from .. import semaphore, lock
 
 def exectutiontime(message):
     def real_dec(func):
@@ -332,18 +332,19 @@ def load_data_vol3():
         NewDataPoint (Текущий спортсмен + список пересчитанных рангов (sectorrank, rank) на текущем устройсве)
         NewDataFinish (Полный набор данных для всего заезда)
     """
+    semaphore.acquire()
+    print('locked')
     def emitcallback(data):
         print('emit [+], data:', data)
-
-
-    data = request.json
-    data['TIME'] = int(datetime.strptime(data['TIME'], '%d.%m.%Y %H:%M:%S.%f').timestamp()*1000)
-    lock.acquire()
-
     try:
+
+
+        data = request.json
+        data['TIME'] = int(datetime.strptime(data['TIME'], '%d.%m.%Y %H:%M:%S.%f').timestamp()*1000)
         raceHandler = RaceGetter.getRace(data)
         raceHandler.setDeviceDataInDB(data)
         raceHandler.competitor_get_current()
+        print(1)
         if raceHandler.is_start():
             print('NewDataStart', data, raceHandler.__class__.__name__, raceHandler.courseDeviceType.name)
             if raceHandler.competitor is None:
@@ -427,7 +428,8 @@ def load_data_vol3():
         db.session.commit()
         socketio.emit("ErrorData", ConvertErrorData(data_in))
     finally:
-        lock.release()
+        semaphore.release()
+        print('released')
     return '', 200
 
 @socketio.on('DataInChangeCompetitors')
