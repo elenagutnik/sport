@@ -350,7 +350,6 @@ def load_data_vol3():
                 raceHandler.competitor_autostart()
             raceHandler.resultApprove.is_start = True
             raceHandler.set_start_result_detail()
-
             socketio.emit("NewDataStart", json.dumps({raceHandler.run.id: {
                 raceHandler.courseDevice.course_id: ConvertCompetitorStart(raceHandler.result,
                                                                            raceHandler.courseDevice,

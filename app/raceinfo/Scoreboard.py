@@ -107,9 +107,7 @@ class Scoreboard:
          state = System.query.filter(System.key == "Scoreboard").first()
          is_connected = System.query.filter(System.key == "ScoreboardConnect").first()
          socketio.emit('ScoreboardStatus', json.dumps({'is_active': strtobool(state.value),
-                                                       'is_connected': strtobool(is_connected.value)}))
-
-
+                                                       'is_connected': (strtobool(is_connected.value) if isinstance(is_connected.value, str) else is_connected.value)}))
      def send_start_list(self):
          pass
      def new_best_time(self):
