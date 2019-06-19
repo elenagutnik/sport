@@ -414,6 +414,6 @@ def ConvertErrorData(dataIn):
         'src_dev': dataIn.src_dev,
         'event_code': dataIn.event_code,
         'time': dataIn.time,
-        'cource_device_id': dataIn.cource_device_id
+        'course_device_id': dataIn.cource_device_id
 
     }

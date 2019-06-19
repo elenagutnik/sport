@@ -10,8 +10,8 @@
     socket.on('connect', function() {
         socket.emit('my event', {data: 'I\'m connected!'});
     });
-    socket.on('newData', function(data) {
-        alert(data);
+    socket.on('ErrorData', function(data) {
+        console.log(data);
     });
 </script>
 {% endblock %}

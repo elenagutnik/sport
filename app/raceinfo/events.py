@@ -334,7 +334,7 @@ def load_data_vol3():
         NewDataFinish (Полный набор данных для всего заезда)
     """
     # semaphore.acquire()
-
+    #
     try:
         data = request.json
         data['TIME'] = int(datetime.strptime(data['TIME'], '%d.%m.%Y %H:%M:%S.%f').timestamp()*1000)
@@ -416,6 +416,8 @@ def load_data_vol3():
                         scoreboard = Scoreboard(raceHandler)
                         scoreboard.crossed_device()
                         scoreboard.send()
+                else:
+                    raise Exception("Competitor is not found")
     except:
         data_in = DataIn(
             src_sys=data['SRC_SYS'],
@@ -423,10 +425,11 @@ def load_data_vol3():
             event_code=data['EVENT_CODE'],
             time=data['TIME'],
         )
-        print(data)
         db.session.add(data_in)
         db.session.commit()
+        print('ErrorData', ConvertErrorData(data_in))
         socketio.emit("ErrorData", ConvertErrorData(data_in))
+
     # finally:
     #     semaphore.release()
     #     print('released')
