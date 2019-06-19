@@ -644,7 +644,6 @@ class ForerunnerRace(BaseRace):
 
 
 class RaceGetter:
-
     @staticmethod
     def getRace(device_data=None, run_id=None):
         """
@@ -653,7 +652,8 @@ class RaceGetter:
         """
 
         # print(device_data)
-        race_info = db.session.query(RunInfo,
+        try:
+            race_info = db.session.query(RunInfo,
                                      CourseDeviceType,
                                      CourseDevice,
                                      Course,
@@ -661,7 +661,7 @@ class RaceGetter:
                                      Race,
                                      Discipline,
                                      ).filter(
-            Device.src_dev == device_data['SRC_DEV'],
+            Device.src_dev == str(device_data['SRC_DEV']),
             Device.id == CourseDevice.device_id,
             CourseDevice.course_device_type_id == CourseDeviceType.id,
             CourseDevice.course_id == RunCourses.course_id,
@@ -671,8 +671,9 @@ class RaceGetter:
             RunInfo.endtime == None,
             RunInfo.run_type_id == RunType.id,
             RunInfo.race_id == Race.id,
-            Race.discipline_id == Discipline.id
-        ).one()
+            Race.discipline_id == Discipline.id).one()
+        except:
+            return None
         if race_info[4].is_forerunner:
             # print('ForerunnerRace')
             return ForerunnerRace(race=race_info[5],

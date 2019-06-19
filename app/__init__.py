@@ -33,9 +33,10 @@ db_shorttrack = SQLAlchemy()
 babel = Babel()
 dtb = DebugToolbarExtension()
 # socketio = SocketIO(message_queue='redis://localhost:6379/0')
-# socketio = SocketIO(async_mode='eventlet')
+socketio = SocketIO(async_mode='eventlet')
+
 # socketio = SocketIO()
-socketio = socketio(message_queue='redis://')
+# socketio = socketio(message_queue='redis://')
 
 # socketio = SocketIO(message_queue='amqp:///socketio')
 celery = Celery('deviceDataHandler', broker='redis://')
@@ -68,8 +69,7 @@ def create_app(config_name):
     login_manager.init_app(app)
     dtb.init_app(app)
     socketio.init_app(app, message_queue='redis://')
-    socketio.init_app(app)
-
+   # socketio.init_app(app)
     # migrate.init_app(app, db)
     migrate_shorttrack.init_app(app, db_shorttrack)
 
