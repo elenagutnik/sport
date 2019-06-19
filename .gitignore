@@ -45,3 +45,4 @@ app/templates/receiver_jury.html
 migrations/
 
 .idea/workspace.xml
+config.py
