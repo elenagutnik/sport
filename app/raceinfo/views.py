@@ -879,6 +879,29 @@ def edit_race_competitor(id):
 
     discipline = Discipline.query.get(race.discipline_id)
 
+    if discipline.is_combination:
+
+        fis_points = db.session.query(RaceCompetitorFisPoints.fispoint.label('fispoint'),
+                                      RaceCompetitorFisPoints.race_competitor_id.label('id'),
+                                      Discipline.fiscode.label('fiscode')
+                                      ).filter(RaceCompetitorFisPoints.discipline_id.in_(db.session.query(RunInfo.discipline_id).
+                                                                                         filter(RunInfo.race_id==id).
+                                                                                         all()),
+                                               RaceCompetitorFisPoints.discipline_id == Discipline.id,
+                                               RaceCompetitorFisPoints.race_competitor_id.in_(
+                                                   [item.id for item in race_competitors]
+                                                          )).all()
+
+    else:
+        fis_points = db.session.query(RaceCompetitorFisPoints.fispoint.label('fispoint'),
+                                      RaceCompetitorFisPoints.race_competitor_id.label('id'),
+                                      Discipline.fiscode.label('fiscode')
+                                      ).filter(RaceCompetitorFisPoints.discipline_id==discipline.id,
+                                               RaceCompetitorFisPoints.discipline_id==Discipline.id,
+                                                          RaceCompetitorFisPoints.race_competitor_id.in_(
+                                                              [item.id for item in race_competitors]
+                                                          )). all()
+
     if form.validate_on_submit():
         # selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
         fisPoints= FisPoints.query.filter(FisPoints.competitor_id==form.competitor_ref.data,
@@ -903,30 +926,19 @@ def edit_race_competitor(id):
                                     fispoint=fisPoints.fispoint)
             db.session.add(raceCompetitorFisPoints)
             db.session.commit()
+            competitor = Competitor.query.filter(Competitor.id==raceCompetitor.competitor_id).first()
+            race_competitors.append({
+                'bib': raceCompetitor.bib,
+                'fiscode': competitor.fiscode,
+                'en_firstname': competitor.en_firstname,
+                'ru_firstname': competitor.ru_firstname,
+                'en_lastname': competitor.en_lastname,
+                'ru_lastname': competitor.ru_lastname,
+                'id': raceCompetitor.id
+            })
         flash('The competitor has been added')
+        return redirect(url_for('.edit_race_competitor', id=id,_external=True))
 
-    if discipline.is_combination:
-
-        fis_points = db.session.query(RaceCompetitorFisPoints.fispoint.label('fispoint'),
-                                      RaceCompetitorFisPoints.race_competitor_id.label('id'),
-                                      Discipline.fiscode.label('fiscode')
-                                      ).filter(RaceCompetitorFisPoints.discipline_id.in_(db.session.query(RunInfo.discipline_id).
-                                                                                         filter(RunInfo.race_id==id).
-                                                                                         all()),
-                                               RaceCompetitorFisPoints.discipline_id == Discipline.id,
-                                               RaceCompetitorFisPoints.race_competitor_id.in_(
-                                                   [item.id for item in race_competitors]
-                                                          )).all()
-
-    else:
-        fis_points = db.session.query(RaceCompetitorFisPoints.fispoint.label('fispoint'),
-                                      RaceCompetitorFisPoints.race_competitor_id.label('id'),
-                                      Discipline.fiscode.label('fiscode')
-                                      ).filter(RaceCompetitorFisPoints.discipline_id==discipline.id,
-                                               RaceCompetitorFisPoints.discipline_id==Discipline.id,
-                                                          RaceCompetitorFisPoints.race_competitor_id.in_(
-                                                              [item.id for item in race_competitors]
-                                                          )). all()
     competitor_list=[]
     for item in race_competitors:
         temp = item._asdict()
