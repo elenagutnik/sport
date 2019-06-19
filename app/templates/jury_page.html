@@ -790,6 +790,7 @@
 
     socket.on('RaceInfo', function(data) {
       race_info=JSON.parse(data);
+      console.log("race_info",race_info);
 /*      var check=race_info;
       console.log("check.run_list[2].start_list[1][0]", check.run_list[2].start_list[1][0]);
       console.log("check.run_list[2].start_list[1]", check.run_list[2].start_list[1]);
