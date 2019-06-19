@@ -748,12 +748,12 @@ def competitor_add():
                                 Category.query.all()]
     if form.validate_on_submit():
         competitor = Competitor(
-            fiscode = form.fis_code.data,
-            ru_firstname = form.ru_firstname.data,
-            en_firstname = form.en_firstname.data,
-            ru_lastname = form.ru_lastname.data,
-            en_lastname = form.en_lastname.data,
-            gender_id = form.gender_ref.data,
+            fiscode=form.fis_code.data,
+            ru_firstname=form.ru_firstname.data,
+            en_firstname=form.en_firstname.data,
+            ru_lastname=form.ru_lastname.data,
+            en_lastname=form.en_lastname.data,
+            gender_id=form.gender_ref.data,
             birth=form.birth.data,
             nation_code_id=form.nation_code_ref.data,
             national_code=form.national_code.data,
@@ -878,6 +878,33 @@ def edit_race_competitor(id):
                                 Category.query.all()]
 
     discipline = Discipline.query.get(race.discipline_id)
+
+    if form.validate_on_submit():
+        # selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
+        fisPoints= FisPoints.query.filter(FisPoints.competitor_id==form.competitor_ref.data,
+                                          FisPoints.discipline_id==race.discipline_id).first()
+        if fisPoints is None:
+            flash("The competitor doesn't have fis points for  race discipline")
+        else:
+            raceCompetitor = RaceCompetitor(
+                competitor_id= form.competitor_ref.data,
+                race_id = id,
+                age_class =form.age_class.data,
+                transponder_1 = form.transponder_1.data,
+                transponder_2=form.transponder_2.data,
+                bib = form.bib.data
+            )
+            if race.isTeam:
+                raceCompetitor.team_id = form.team_ref.data
+            db.session.add(raceCompetitor)
+            db.session.commit()
+            raceCompetitorFisPoints=RaceCompetitorFisPoints(discipline_id=fisPoints.discipline_id,
+                                    race_competitor_id=raceCompetitor.id,
+                                    fispoint=fisPoints.fispoint)
+            db.session.add(raceCompetitorFisPoints)
+            db.session.commit()
+        flash('The competitor has been added')
+
     if discipline.is_combination:
 
         fis_points = db.session.query(RaceCompetitorFisPoints.fispoint.label('fispoint'),
@@ -908,26 +935,6 @@ def edit_race_competitor(id):
         for fis in gen:
             temp['fispoints'][str(fis.fiscode)] = fis.fispoint
         competitor_list.append(temp)
-
-    if form.validate_on_submit():
-        # selected_competitor = Competitor.query.filter_by(id=form.competitor_ref.data).one()
-        fisPoints= FisPoints.query.filter(FisPoints.competitor_id==form.competitor_ref.data,
-                                          FisPoints.discipline_id==race.discipline_id).first()
-        raceCompetitor = RaceCompetitor(
-            competitor_id= form.competitor_ref.data,
-            race_id = id,
-            age_class =form.age_class.data,
-            transponder_1 = form.transponder_1.data,
-            transponder_2=form.transponder_2.data,
-            bib = form.bib.data
-        )
-        if fisPoints is not None:
-            raceCompetitor.fis_points = fisPoints.fispoint
-        if race.isTeam:
-            raceCompetitor.team_id = form.team_ref.data
-        db.session.add(raceCompetitor)
-        db.session.commit()
-        flash('The competitor has been added')
 
     return render_template('raceinfo/static-tab/competitors_race.html', form=form, competitors=competitor_list, competitor_form=add_competitor_form, race_id=id)
 

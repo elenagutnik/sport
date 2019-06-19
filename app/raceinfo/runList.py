@@ -66,10 +66,10 @@ def race_order_buld(race_id, current_run_id, current_run_number):
 @admin_required
 def race_order_list(race_id):
     race = Race.query.filter_by(id=race_id).one()
-
+    print('race_id', race.id)
     discipline = Discipline.query.filter(Discipline.id == race.discipline_id).first()
-
     if discipline.is_qualification or discipline.is_parallel:
+        print('discipline.is_qualification or discipline.is_parallel')
         # if discipline.is_parallel:
         #     RunInfo.query.filter(RunInfo.race_id== race_id).delete()
         #     competitors_count = db.session.query(func.count(RaceCompetitor.id)).filter(RaceCompetitor.race_id == race_id).scalar()
@@ -97,6 +97,7 @@ def race_order_list(race_id):
         RunOrder.query.filter(RunOrder.run_id == run.id).delete()
         qualification_start_list(run)
     else:
+        print('else')
         try:
             run = RunInfo.query.filter_by(race_id=race_id, number=1).one()
         except:
@@ -110,12 +111,18 @@ def race_order_list(race_id):
             flash('Не указана трасса для заезда, невозможно сформировать стартовый список')
             return redirect(url_for('.race', id=race_id, _external=True))
         if discipline.is_combination == None:
+            print('if discipline.is_combination == None:')
             race_competitors = db.session.query(RaceCompetitor, RaceCompetitorFisPoints).\
                 join(RaceCompetitorFisPoints, RaceCompetitorFisPoints.race_competitor_id == RaceCompetitor.id).\
                 filter(RaceCompetitor.race_id == race_id, RaceCompetitorFisPoints.discipline_id == race.discipline_id).\
                 order_by(RaceCompetitorFisPoints.fispoint.desc()).all()
+            print(db.session.query(RaceCompetitor, RaceCompetitorFisPoints).\
+                join(RaceCompetitorFisPoints, RaceCompetitorFisPoints.race_competitor_id == RaceCompetitor.id).\
+                filter(RaceCompetitor.race_id == race_id, RaceCompetitorFisPoints.discipline_id == race.discipline_id).\
+                order_by(RaceCompetitorFisPoints.fispoint.desc()))
 
         else:
+            print('else')
             if run.discipline_id is None:
                 flash("Ошибка формирования стартового листа: Не указана дисциплина для заезда", "error")
                 return render_template('raceinfo/static-tab/order_list.html', race=race, run=run, competitors=[])
@@ -129,8 +136,10 @@ def race_order_list(race_id):
                 .all()
 
             race_competitors = sorted(race_competitors, key=lambda item: (item[4] is None, item[4]))
-
+            print(race_competitors.__dict__)
+        print('for index, item in enumerate(race_competitors):')
         for index, item in enumerate(race_competitors):
+            print(item[0].__dict__)
             run_order = RunOrder(
                 race_competitor_id=item[0].id,
                 run_id=run.id,
