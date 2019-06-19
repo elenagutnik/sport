@@ -451,6 +451,7 @@
       var data=JSON.parse(data);
       //console.log("NewDataPoint", data);
       NewDataPoint(data);
+      add2datasrc(data);
     });
     function NewDataPoint(data){
       var fields_current=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
@@ -462,6 +463,12 @@
               for(var i=0;i<fields_current.length;i++){
                   $("#tab_summarytable .div_run"+run+" table.run"+run+"_course"+course+" tbody tr.comp_"+comp+"_"+fields_current[i]+" td.dev_"+val.course_device_id).html(val[fields_current[i]]);
               }
+              var comp_obj=getObjById(race_info.run_list[run].start_list[course],"race_competitor_id",comp);
+              comp_obj.name=getCompName(comp_obj);              
+              var dev_obj=getObjById(race_info.run_list[run].courses[course].devices,"id",val.course_device_id);
+
+              $("#tab_data_src tbody").append("<tr class='datasrc_"+val.data_in_id+"'><td>"+run+"</td><td>"+course+"</td><td>#"+dev_obj.order+" "+dev_obj.type+" "+dev_obj.distance+"</td><td>"+val.absoluttime+"</td><td class='bib'>"+comp_obj.bib+"</td><td class='name'>"+comp_obj.name+"</td><td class='act'><div class='div_select_bib_"+val.data_in_id+"'></div></td></tr>");
+              
             });
           });
           $.each(arr[1], function(dev,allcomps){
@@ -1273,8 +1280,10 @@
       //      $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+"'><td>"+data[3].course_id+"</td><td>"+data[3].device_id+(data[3].is_start?" - start":" -"+data[3].distance)+"</td><td>"+data[0].absolut_time+"</td><td>"+data[0].time+"</td><td>"+data[1].bib+"</td><td>"+data[2].en_firstname+" "+data[2].en_lastname +" / " + data[2].ru_lastname+" "+data[2].ru_firstname+"</td><td class='act'></td></tr>")
       console.log("add2datasrc");
       //console.log("data[0].id="+data[0].id);
-      console.log(data);
-      var name_str=(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"");
+      console.log(data);    
+      //var name_str=(data[3]?data[3].en_firstname+" "+data[3].en_lastname +" / " + data[3].ru_lastname+" "+data[3].ru_firstname:"");
+//      var name_str=race_info.run_list;
+      
       if ($("#tab_data_src tbody tr.datasrc_"+data[0].id).length == 0) {
         //Add it to the dom
         $("#tab_data_src tbody").append("<tr class='datasrc_"+data[0].id+(data[2]?"":" warning")+"'><td>"+data[0].run_id+"</td><td>"+data[4].course_id+"</td><td>"+data[4].device_id+"</td><td>"+dtform(data[0].time)+"</td><td class='bib'>"+(data[2]?data[2].bib:"")+"</td><td class='name'>"+name_str+"</td><td class='act'><div class='div_select_bib_"+((data[1])?data[1].id:null)+"'></div></td></tr>");
@@ -2062,6 +2071,7 @@ $(document).ready(function () {
     //---------------------------------
     $("body").on("click", ".btn_start", function () {
       var run_id=$(this).attr('run_id');
+      var course_id=$(this).attr('course_id');
       var competitor_id=$(this).attr('competitor_id');
       $.ajax({
         type: "GET",
@@ -2073,9 +2083,10 @@ $(document).ready(function () {
         success:function(data) {
           if(set_comp_status(competitor_id, "start" ,run_id)){
             var status_name = "On Start";
-            console.log('start competitor - run:'+run_id+' competitor:'+competitor_id);
+            console.log('start competitor - run:'+run_id+' competitor:'+competitor_id+' course:'+course_id);
             tab_summarytable_set_status(run_id,competitor_id,status_name,false);
-            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html(status_name);
+//            $("#tab_manualcontrol tr.tr_"+run_id+"_"+competitor_id+" .status").html(status_name);
+            $("#tab_manualcontrol table.tab_run"+run_id+"_course"+course_id+" tr.tr_"+competitor_id+" .status").html(status_name);
           }
         },
         error: function(error) {
