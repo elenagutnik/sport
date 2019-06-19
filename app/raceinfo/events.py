@@ -168,6 +168,7 @@ def get_race_status(data):
 
 @socketio.on('GetRaceInfo')
 def get_race_info(data):
+    print(data)
     if 'race_id' in data.keys():
         run_list = db.session.query(RunInfo, RunType, Discipline).\
             join(RunType, RunInfo.run_type_id == RunType.id). \
@@ -209,7 +210,7 @@ def get_race_info(data):
                         'type': device[1].name,
                     })
         socketio.emit('RaceInfo', json.dumps({'run_list': race_info}))
-
+        print(json.dumps({'run_list': race_info}))
         forerunners_runs = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None,
                                                 RunInfo.run_type_id == 3).first()
         if forerunners_runs is not None:
@@ -332,19 +333,16 @@ def load_data_vol3():
         NewDataPoint (Текущий спортсмен + список пересчитанных рангов (sectorrank, rank) на текущем устройсве)
         NewDataFinish (Полный набор данных для всего заезда)
     """
-    semaphore.acquire()
+    # semaphore.acquire()
     print('locked')
     def emitcallback(data):
         print('emit [+], data:', data)
     try:
-
-
         data = request.json
         data['TIME'] = int(datetime.strptime(data['TIME'], '%d.%m.%Y %H:%M:%S.%f').timestamp()*1000)
         raceHandler = RaceGetter.getRace(data)
         raceHandler.setDeviceDataInDB(data)
         raceHandler.competitor_get_current()
-        print(1)
         if raceHandler.is_start():
             print('NewDataStart', data, raceHandler.__class__.__name__, raceHandler.courseDeviceType.name)
             if raceHandler.competitor is None:
@@ -427,9 +425,9 @@ def load_data_vol3():
         db.session.add(data_in)
         db.session.commit()
         socketio.emit("ErrorData", ConvertErrorData(data_in))
-    finally:
-        semaphore.release()
-        print('released')
+    # finally:
+    #     semaphore.release()
+    #     print('released')
     return '', 200
 
 @socketio.on('DataInChangeCompetitors')
