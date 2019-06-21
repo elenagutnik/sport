@@ -186,21 +186,21 @@ def manual_approve(data):
 def socket_get_results(data):
     # data = json.loads(json_data)
     print('[SOCKET] GetResults, [INPUT DATA] ', json.dumps(data))
-    result_list = []
+    result_list = {}
     if 'race_id' in data.keys():
         race_results = {}
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None, RunInfo.run_type_id!=3).all()
         for run in run_list:
             results, manual, dql_list = TreeView(run.id)
             race_results[run.id] = ConvertRunResults(results, manual, dql_list)
-        result_list.append(race_results)
-        result_list.append(ErrorDataInView(data['race_id']))
+        result_list['results'] = race_results
+        result_list['errors_data'] = ErrorDataInView(data['race_id'])
 
     else:
         if 'run_id' in data.keys():
             run = RunInfo.query.get(data['run_id'])
             results, manual, dql_list = TreeView(data['run_id'])
-            result_list.append(json.dumps({
+            result_list['results'] = (json.dumps({
                 run.id: [
                     ConvertRunResults(results, manual, dql_list)
                 ]
