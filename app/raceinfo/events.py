@@ -192,7 +192,7 @@ def socket_get_results(data):
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None, RunInfo.run_type_id!=3).all()
         for run in run_list:
             results, manual, dql_list = TreeView(run.id)
-            race_results[run.id] = [ConvertRunResults(results, manual, dql_list)]
+            race_results[run.id] = ConvertRunResults(results, manual, dql_list)
         result_list.append(race_results)
         result_list.append(ErrorDataInView(data['race_id']))
 
