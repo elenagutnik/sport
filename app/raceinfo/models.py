@@ -1,8 +1,8 @@
 from datetime import datetime
 from flask import current_app
 from .. import db
-from sqlalchemy import func
-
+from sqlalchemy import func, or_, and_
+from .errors import BibRepeat
 class Gender(db.Model):
     __tablename__ = 'gender'
     id = db.Column(db.Integer, primary_key=True)
@@ -233,6 +233,45 @@ class Competitor(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))#справочник
     points = db.Column(db.Float)
 
+    @staticmethod
+    def add(fiscode=None,
+            en_firstname=None, en_lastname=None,
+            ru_firstname=None, ru_lastname=None,
+            gender_id=None, birth=None,
+            nation_code_id=None, NSA=None,
+            category_id=None, national_code=None):
+        competitor = Competitor.query.filter(
+            or_(
+                Competitor.fiscode == str(fiscode),
+                and_(
+                    Competitor.en_firstname == en_firstname,
+                    Competitor.en_lastname == en_lastname),
+                    Competitor.birth == birth
+                )
+        ).first()
+        if competitor is None:
+            competitor = Competitor(
+                fiscode=fiscode,
+                en_firstname=en_firstname,
+                en_lastname=en_lastname,
+                ru_firstname=ru_firstname,
+                ru_lastname=ru_lastname,
+                gender_id=gender_id,
+                birth=birth,
+                nation_code_id=nation_code_id,
+                NSA=NSA,
+                category_id=category_id,
+                national_code=national_code
+            )
+            db.session.add(competitor)
+            db.session.commit()
+            return competitor
+        else:
+             return competitor
+
+
+
+
 
 class RaceCompetitor(db.Model):
     __tablename__ = 'race_competitor'
@@ -261,6 +300,35 @@ class RaceCompetitor(db.Model):
 
     club = db.Column(db.String)
     diff = db.Column(db.BigInteger)
+
+    @staticmethod
+    def add(competitor_id=None, race_id=None,
+            bib=None, club=None, transponder_1=None, transponder_2=None, age_class=None, team_id=None):
+        race_competitor = RaceCompetitor.query.filter(RaceCompetitor.competitor_id == competitor_id,
+                                                      RaceCompetitor.race_id == race_id).first()
+        current_bib = RaceCompetitor.query.filter(RaceCompetitor.bib==bib, RaceCompetitor.race_id==race_id).first()
+        if current_bib is not None:
+            competitor = Competitor.query.get(current_bib.competitor_id)
+            raise BibRepeat((competitor.en_lastname+' '+competitor.en_firstname), bib)
+        if race_competitor is None:
+            race_competitor = RaceCompetitor(
+                competitor_id=competitor_id,
+                race_id=race_id,
+                bib=bib,
+                club=club,
+                transponder_1=transponder_1,
+                transponder_2=transponder_2,
+                age_class=age_class,
+                team_id=team_id
+            )
+        else:
+            race_competitor.bib = bib
+            race_competitor.club = club
+            race_competitor.transponder_1 = transponder_1
+            race_competitor.transponder_2 = transponder_2
+        db.session.add(race_competitor)
+        db.session.commit()
+        return race_competitor
 
 class ResultFunction(db.Model):
     __tablename__ = 'result_function'
@@ -551,6 +619,21 @@ class DataIn(db.Model):
     event_code = db.Column(db.String)
     time = db.Column(db.BigInteger)
     reserved = db.Column(db.String)
+
+    @staticmethod
+    def set(SRC_SYS,SRC_DEV, TIME, EVENT_CODE, bib=None, run_id=None, cource_device_id=None):
+        dataIn = DataIn(
+            src_sys=SRC_SYS,
+            src_dev=SRC_DEV,
+            event_code=EVENT_CODE,
+            time=TIME,
+            run_id=run_id,
+            cource_device_id=cource_device_id,
+            bib=bib
+        )
+        db.session.add(dataIn)
+        db.session.commit()
+        return dataIn
 
 class ResultDetail(db.Model):
     __tablename__ = 'result_detail'

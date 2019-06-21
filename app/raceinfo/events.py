@@ -5,11 +5,11 @@ from . import jsonencoder, raceinfo
 import json
 from distutils.util import strtobool
 from functools import wraps
-from sqlalchemy import cast, DATE, func, asc, and_
+from sqlalchemy import cast, DATE
 from flask_login import login_required
 from .DataViewer import ConvertRunResults, ConvertCompetitorStart, ConvertCompetitorsRankList, ConvertCompetitorFinish, \
-    TreeView, ConvertErrorData, DataInView
-from datetime import datetime, timedelta
+    TreeView, ConvertErrorData, DataInView, ErrorDataInView
+from datetime import datetime, date
 from flask import request, render_template
 from .Scoreboard import Scoreboard
 
@@ -17,7 +17,7 @@ from .Race import RaceGetter
 from .runList import runList_view
 
 
-# from .. import semaphore, lock
+from .. import semaphore, lock
 
 def exectutiontime(message):
     def real_dec(func):
@@ -124,29 +124,90 @@ def manual_approve(data):
             }
         }))
 
+#
+# @socketio.on('GetResults')
+# def socket_get_results(data):
+#     # data = json.loads(json_data)
+#     print('[SOCKET] GetResults, [INPUT DATA] ', json.dumps(data))
+#     result_list = {}
+#     if 'race_id' in data.keys():
+#         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None, RunInfo.run_type_id!=3).all()
+#         for run in run_list:
+#             results, manual, dql_list = TreeView(run.id)
+#             result_list[run.id] = [ConvertRunResults(results, manual, dql_list), json.loads(DataInView(run.id))]
+#             #result_list[run.id] = [ConvertRunResults(results, manual, dql_list), DataInView(run.id)]
+#     else:
+#         if 'run_id' in data.keys():
+#             run = RunInfo.query.get(data['run_id'])
+#             results, manual, dql_list = TreeView(data['run_id'])
+#             result_list = json.dumps({
+#                 run.id: [
+#                     ConvertRunResults(results, manual, dql_list),
+#                     DataInView(run.id)
+#                 ]
+#             })
+#     if bool(result_list):
+#         socketio.emit('Results', json.dumps(result_list))
+#         print('[SOCKET] GetResults, [OUTPUT DATA] ', json.dumps(result_list))
+#     return
 
+
+# # Старый рабочий метод
+# # <========================
+# @socketio.on('GetResults')
+# def socket_get_results(data):
+#     # data = json.loads(json_data)
+#     print('[SOCKET] GetResults, [INPUT DATA] ', json.dumps(data))
+#     result_list = {}
+#     if 'race_id' in data.keys():
+#         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None, RunInfo.run_type_id!=3).all()
+#         for run in run_list:
+#             results, manual, dql_list = TreeView(run.id)
+#             result_list[run.id] = [ConvertRunResults(results, manual, dql_list), DataInView(run.id)]
+#
+#     else:
+#         if 'run_id' in data.keys():
+#             run = RunInfo.query.get(data['run_id'])
+#             results, manual, dql_list = TreeView(data['run_id'])
+#             result_list = json.dumps({
+#                 run.id: [
+#                     ConvertRunResults(results, manual, dql_list),
+#                     DataInView(run.id)
+#                 ]
+#             })
+#     if bool(result_list):
+#         socketio.emit('Results', json.dumps(result_list))
+#         print('[SOCKET] GetResults, [OUTPUT DATA] ', json.dumps(result_list))
+#     return
+
+# Новый метод с  добавлением ошибочных данных
+# <========================
 @socketio.on('GetResults')
 def socket_get_results(data):
     # data = json.loads(json_data)
-    print('GetResults', json.dumps(data))
+    print('[SOCKET] GetResults, [INPUT DATA] ', json.dumps(data))
+    result_list = []
     if 'race_id' in data.keys():
+        race_results = {}
         run_list = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None, RunInfo.run_type_id!=3).all()
-        result_list = {}
         for run in run_list:
             results, manual, dql_list = TreeView(run.id)
-            result_list[run.id] = [ConvertRunResults(results, manual, dql_list), json.loads(DataInView(run.id))]
-            #result_list[run.id] = [ConvertRunResults(results, manual, dql_list), DataInView(run.id)]
-        socketio.emit('Results', json.dumps(result_list))
+            race_results[run.id] = [ConvertRunResults(results, manual, dql_list)]
+        result_list.append(race_results)
+        result_list.append(ErrorDataInView(data['race_id']))
+
     else:
         if 'run_id' in data.keys():
             run = RunInfo.query.get(data['run_id'])
             results, manual, dql_list = TreeView(data['run_id'])
-            socketio.emit('Results', json.dumps({
+            result_list.append(json.dumps({
                 run.id: [
-                    ConvertRunResults(results, manual, dql_list),
-                    DataInView(run.id)
+                    ConvertRunResults(results, manual, dql_list)
                 ]
             }))
+    if bool(result_list):
+        socketio.emit('Results', json.dumps(result_list))
+        print('[SOCKET] GetResults, [OUTPUT DATA] ', json.dumps(result_list))
     return
 
 @socketio.on('ScoreboardSendStartlist')
@@ -159,16 +220,15 @@ def scoreboard_send_start_list(data):
 @socketio.on('GetRaceStatus')
 def get_race_status(data):
     raceHandler = RaceGetter.getRaceByid(data['race_id'])
-    print('RaceStatus')
-    tmp = json.dumps(raceHandler.checkRace())
-    print(tmp)
+    raceStatus = json.dumps(raceHandler.checkRace())
     # socketio.emit('RaceStatus', json.dumps(raceHandler.checkRace()))
-    socketio.emit('RaceStatus', raceHandler.checkRace())
+    socketio.emit('RaceStatus', raceStatus)
+    print('[SOCKET] GetRaceStatus, [INPUT DATA] ', data, '[OUTPUT DATA] ', raceStatus)
 
 
 @socketio.on('GetRaceInfo')
 def get_race_info(data):
-    print(data)
+    print('[SOCKET] GetRaceInfo, [INPUT DATA] ', data)
     if 'race_id' in data.keys():
         run_list = db.session.query(RunInfo, RunType, Discipline).\
             join(RunType, RunInfo.run_type_id == RunType.id). \
@@ -210,7 +270,7 @@ def get_race_info(data):
                         'type': device[1].name,
                     })
         socketio.emit('RaceInfo', json.dumps({'run_list': race_info}))
-        print(json.dumps({'run_list': race_info}))
+        print('[SOCKET] GetRaceInfo, [OUTPUT DATA] ', json.dumps({'run_list': race_info}))
         forerunners_runs = RunInfo.query.filter(RunInfo.race_id == data['race_id'], RunInfo.starttime != None,
                                                 RunInfo.run_type_id == 3).first()
         if forerunners_runs is not None:
@@ -255,6 +315,7 @@ def get_race_info(data):
                     })
 
             socketio.emit('ForerunnersResults', json.dumps(result))
+            print('[SOCKET] GetRaceInfo [END]')
 
 @raceinfo.route('/raceinfo/<int:race_id>', methods=['GET', 'POST'])
 def get_race_info2(race_id):
@@ -333,10 +394,10 @@ def load_data_vol3():
         NewDataPoint (Текущий спортсмен + список пересчитанных рангов (sectorrank, rank) на текущем устройсве)
         NewDataFinish (Полный набор данных для всего заезда)
     """
-    # semaphore.acquire()
-    #
+    semaphore.acquire()
+    data = request.json
     try:
-        data = request.json
+        print('[HTTP REQUEST] /input/data [INPUT DATA]', data)
         data['TIME'] = int(datetime.strptime(data['TIME'], '%d.%m.%Y %H:%M:%S.%f').timestamp()*1000)
         raceHandler = RaceGetter.getRace(data)
         if raceHandler is None:
@@ -419,20 +480,20 @@ def load_data_vol3():
                 else:
                     raise Exception("Competitor is not found")
     except:
-        data_in = DataIn(
-            src_sys=data['SRC_SYS'],
-            src_dev=data['SRC_DEV'],
-            event_code=data['EVENT_CODE'],
-            time=data['TIME'],
+        RaceHandler = RaceGetter.getRaceByDeviceAndTime(data['SRC_DEV'], date.today())
+        data_in = DataIn.set(
+            data['SRC_SYS'], data['SRC_DEV'],
+            data['TIME'], data['EVENT_CODE']
         )
-        db.session.add(data_in)
-        db.session.commit()
-        print('ErrorData', ConvertErrorData(data_in))
-        socketio.emit("ErrorData", ConvertErrorData(data_in))
-
-    # finally:
-    #     semaphore.release()
-    #     print('released')
+        if RaceHandler:
+            print('ErrorData', ConvertErrorData(data_in, RaceHandler.courseDevice.id))
+            socketio.emit("ErrorData", ConvertErrorData(data_in, RaceHandler.courseDevice.id))
+        else:
+            print('ErrorData', ConvertErrorData(data_in))
+            socketio.emit("ErrorData", ConvertErrorData(data_in))
+    finally:
+        semaphore.release()
+        print('[HTTP REQUEST] /input/data [END]')
     return '', 200
 
 @socketio.on('DataInChangeCompetitors')

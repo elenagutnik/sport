@@ -7,6 +7,8 @@ from flask_babel import gettext
 import json
 from .models import *
 from . import jsonencoder
+from .errors import BibRepeat
+
 from .runList import race_order_buld
 from .competitors import calculate_age_class
 
@@ -747,7 +749,7 @@ def competitor_add():
     form.category_ref.choices = [(item.id, item.name) for item in
                                 Category.query.all()]
     if form.validate_on_submit():
-        competitor = Competitor(
+        competitor = Competitor.add(
             fiscode=form.fis_code.data,
             ru_firstname=form.ru_firstname.data,
             en_firstname=form.en_firstname.data,
@@ -758,6 +760,7 @@ def competitor_add():
             nation_code_id=form.nation_code_ref.data,
             national_code=form.national_code.data,
             category_id=form.category_ref.data,
+            NSA=form.NSA.data if form.NSA.data != "" else None
         )
         if form.NSA.data != "":
             competitor.NSA = form.NSA.data
@@ -858,18 +861,28 @@ def edit_race_competitor(id):
         race_competitors = db.session.query(RaceCompetitor.bib.label('bib'), Competitor.fiscode.label('fiscode'),
                                             Competitor.en_firstname.label('en_firstname'), Competitor.en_lastname.label('en_lastname'),
                                             Competitor.ru_firstname.label('ru_firstname'), Competitor.ru_lastname.label('ru_lastname'),
-                                            RaceCompetitor.id.label('id')). \
+                                            RaceCompetitor.id.label('id'), Competitor.id.label('competitor_id')). \
             outerjoin(Competitor, RaceCompetitor.competitor_id == Competitor.id). \
             filter(RaceCompetitor.race_id == id).all()
 
     if current_user.lang =='ru':
-        form.competitor_ref.choices = [(item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Competitor.query.all()]
+        form.competitor_ref.choices = [
+            (item.id, item.ru_lastname + ' ' + item.ru_firstname) for item in Competitor.query.filter(Competitor.id.notin_(
+                [
+                    item.competitor_id for item in race_competitors
+                ])
+                ).all()]
         add_competitor_form.nation_code_ref.choices = [(item.id, item.name + ' - ' + item.ru_description) for item in
                                                   Nation.query.all()]
         add_competitor_form.gender_ref.choices = [(item.id, item.ru_name) for item in
                                    Gender.query.all()]
     else:
-        form.competitor_ref.choices = [(item.id, item.en_lastname + ' ' + item.en_firstname) for item in Competitor.query.all()]
+        form.competitor_ref.choices = [
+            (item.id, item.en_lastname + ' ' + item.en_firstname) for item in Competitor.query.filter(Competitor.id.notin_(
+                [
+                    item.competitor_id for item in race_competitors
+                ])
+                ).all()]
         add_competitor_form.nation_code_ref.choices = [(item.id, item.name + ' - ' + item.en_description) for item in
                                                   Nation.query.all()]
         add_competitor_form.gender_ref.choices = [(item.id, item.en_name) for item in
@@ -909,35 +922,26 @@ def edit_race_competitor(id):
         if fisPoints is None:
             flash("The competitor doesn't have fis points for  race discipline")
         else:
-            raceCompetitor = RaceCompetitor(
-                competitor_id= form.competitor_ref.data,
-                race_id = id,
-                age_class =form.age_class.data,
-                transponder_1 = form.transponder_1.data,
-                transponder_2=form.transponder_2.data,
-                bib = form.bib.data
-            )
-            if race.isTeam:
-                raceCompetitor.team_id = form.team_ref.data
-            db.session.add(raceCompetitor)
-            db.session.commit()
-            raceCompetitorFisPoints=RaceCompetitorFisPoints(discipline_id=fisPoints.discipline_id,
-                                    race_competitor_id=raceCompetitor.id,
-                                    fispoint=fisPoints.fispoint)
+            try:
+                raceCompetitor = RaceCompetitor.add(
+                    competitor_id= form.competitor_ref.data,
+                    race_id = id,
+                    age_class =form.age_class.data,
+                    transponder_1 = form.transponder_1.data,
+                    transponder_2=form.transponder_2.data,
+                    bib = form.bib.data,
+                    team_id=form.team_ref.data if race.isTeam else None
+                )
+            except BibRepeat as e:
+                flash(e.__str__(), 'error')
+                return redirect(url_for('.edit_race_competitor', id=id, _external=True))
+            raceCompetitorFisPoints = RaceCompetitorFisPoints(discipline_id=fisPoints.discipline_id,
+                                                              race_competitor_id=raceCompetitor.id,
+                                                              fispoint=fisPoints.fispoint)
             db.session.add(raceCompetitorFisPoints)
             db.session.commit()
-            competitor = Competitor.query.filter(Competitor.id==raceCompetitor.competitor_id).first()
-            race_competitors.append({
-                'bib': raceCompetitor.bib,
-                'fiscode': competitor.fiscode,
-                'en_firstname': competitor.en_firstname,
-                'ru_firstname': competitor.ru_firstname,
-                'en_lastname': competitor.en_lastname,
-                'ru_lastname': competitor.ru_lastname,
-                'id': raceCompetitor.id
-            })
         flash('The competitor has been added')
-        return redirect(url_for('.edit_race_competitor', id=id,_external=True))
+        return redirect(url_for('.edit_race_competitor', id=id, _external=True))
 
     competitor_list=[]
     for item in race_competitors:

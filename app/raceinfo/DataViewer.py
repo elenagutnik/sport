@@ -1,4 +1,4 @@
-from.models import Race,RaceCompetitor, ResultApproved, ResultDetail,RunOrder, CourseDevice, CourseDeviceType, DataIn, RunCourses
+from.models import Race, ResultApproved, ResultDetail,RunOrder, CourseDevice, CourseDeviceType, DataIn, RunCourses, Device, Course
 from .. import db
 from sqlalchemy import or_, and_, asc
 import datetime, json
@@ -50,6 +50,12 @@ def timeConverter(time, format='%M:%S.%f'):
         dt = datetime.datetime(2018, 1, 1)
         dt.timestamp()
         return (datetime.datetime.fromtimestamp(dt.timestamp()+time/1000)).strftime(format)[:-3]
+    except:
+        return None
+
+def fromtimestamp(time):
+    try:
+        return datetime.datetime.fromtimestamp(time / 1000)
     except:
         return None
     # return time
@@ -173,7 +179,7 @@ def TreeView(run_id):
     tree_view = {}
     manual_list = {}
     dql_list = {}
-    data = db.session.query(ResultApproved, ResultDetail, CourseDevice, CourseDeviceType, RunOrder). \
+    data = db.session.query(ResultApproved, ResultDetail, CourseDevice, CourseDeviceType, RunOrder, DataIn). \
         join(ResultDetail,
              and_(ResultApproved.race_competitor_id == ResultDetail.race_competitor_id, ResultDetail.run_id == run_id),
              isouter=True). \
@@ -182,6 +188,7 @@ def TreeView(run_id):
         join(RunOrder,
              and_(RunOrder.race_competitor_id == ResultApproved.race_competitor_id, RunOrder.run_id == run_id),
              isouter=True). \
+        join(DataIn, DataIn.id == ResultDetail.data_in_id, isouter=True). \
         filter(ResultApproved.run_id == run_id). \
         order_by(asc(CourseDevice.order)). \
         all()
@@ -259,10 +266,37 @@ def DataInView(run_id):
     for item in result:
         result_converted.append({
             'data_in_id':item.data_in_id,
-            'time':item.time,
-            'race_competitor_id':item.race_competitor_id
+            'time': item.time,
+            'race_competitor_id': item.race_competitor_id
         })
-    return json.dumps(result_converted)
+    return result_converted
+
+def ErrorDataInView(race_id):
+    race = Race.query.get(race_id)
+    # race_devices = db.session.query(Device.src_dev).filter(Device.id == CourseDevice.device_id, CourseDevice.course_id == Course.id, Course.race_id == race.id).all()
+
+    race_devices = db.session.query(CourseDevice.id).filter(Device.id == CourseDevice.device_id,
+                                                           CourseDevice.course_id == Course.id,
+                                                           Course.race_id == race.id).all()
+    dataIn = db.session.query(DataIn.id.label('data_in_id'), DataIn.time.label('time'), CourseDevice.id.label('course_device_id'))\
+        .filter(DataIn.src_dev == Device.src_dev,
+                Device.id == CourseDevice.device_id,
+                CourseDevice.id.in_(race_devices),
+                DataIn.run_id == None,
+                DataIn.cource_device_id == None
+                )\
+        .all()
+    result_converted = []
+    for item in dataIn:
+        if fromtimestamp(item.time).date() == race.racedate.date():
+            result_converted.append({
+                'data_in_id': item.data_in_id,
+                'time': timeConverter(item.time),
+                'course_device_id': item.course_device_id
+            })
+
+    return result_converted
+
 
 
 
@@ -350,7 +384,8 @@ def ConvertRunResults(tree_view, manual_list, dql_list):
                     'time': timeConverter(tree_view[course_id][device_number][competitor_id][1].time),
                     'diff': timeConverter(tree_view[course_id][device_number][competitor_id][1].diff),
                     'speed': speedConverter(tree_view[course_id][device_number][competitor_id][1].speed),
-                    'absoluttime': timeConverter(tree_view[course_id][device_number][competitor_id][1].absolut_time, '%H:%M:%S.%f')
+                    'absoluttime': timeConverter(tree_view[course_id][device_number][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
+                    'data_in_id': tree_view[course_id][device_number][competitor_id][5].id
                 }
                 tree_view[course_id][device_number][competitor_id] = result_item
 
@@ -366,7 +401,8 @@ def ConvertRunResults(tree_view, manual_list, dql_list):
                     'speed': speedConverter(tree_view[course_id][keys[-1]][competitor_id][1].speed),
                     'absoluttime': timeConverter(tree_view[course_id][keys[-1]][competitor_id][1].absolut_time, '%H:%M:%S.%f'),
                     'status_id': tree_view[course_id][keys[-1]][competitor_id][0].status_id,
-                    'is_manual': tree_view[course_id][keys[-1]][competitor_id][0].is_manual
+                    'is_manual': tree_view[course_id][keys[-1]][competitor_id][0].is_manual,
+                    'data_in_id': tree_view[course_id][keys[-1]][competitor_id][5].id
                 }
                 try:
                     result_item['diff'] = timeConverter(tree_view[course_id][keys[-1]][competitor_id][0].diff+tree_view[course_id][keys[-1]][competitor_id][0].adder_diff)
@@ -403,10 +439,9 @@ def ConvertRunResults(tree_view, manual_list, dql_list):
             'reason': item[0].reason,
             'gate': item[0].gate
             }
-
     return tree_view
 
-def ConvertErrorData(dataIn):
+def ConvertErrorData(dataIn, courseDevice_id = None):
     return {
         'id': dataIn.id,
         'run_id': dataIn.run_id,
@@ -414,6 +449,5 @@ def ConvertErrorData(dataIn):
         'src_dev': dataIn.src_dev,
         'event_code': dataIn.event_code,
         'time': dataIn.time,
-        'course_device_id': dataIn.cource_device_id
-
+        'course_device_id': courseDevice_id
     }

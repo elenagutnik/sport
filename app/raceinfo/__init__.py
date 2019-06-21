@@ -15,7 +15,7 @@ from . import report
 
 from . import RunInfo
 
-
+from . import errors
 from . import Race
 from . import FisLiveTiming
 

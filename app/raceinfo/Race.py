@@ -1,8 +1,8 @@
 from .models import *
 from .DataViewer import TreeView
-from sqlalchemy import cast, DATE, func, asc, and_, sql
+from sqlalchemy import cast, func, and_, sql, Date
 
-from datetime import datetime, time
+from datetime import datetime
 
 class BaseRace:
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
@@ -20,21 +20,15 @@ class BaseRace:
 
 
     def setDeviceDataInDB(self, data):
-        self.data_in=DataIn(
-            src_sys=data['SRC_SYS'],
-            src_dev=data['SRC_DEV'],
-            event_code=data['EVENT_CODE'],
-            time=data['TIME'],
+        self.data_in = DataIn.set(
+            SRC_SYS=data['SRC_SYS'],
+            SRC_DEV=data['SRC_DEV'],
+            EVENT_CODE=data['EVENT_CODE'],
+            TIME=data['TIME'],
+            bib=data['BIB'] if 'BIB' in data else None,
+            run_id=self.run.id if self.run is not None else None,
+            cource_device_id=self.courseDevice.id if self.courseDevice is not None else None
         )
-        if 'BIB' in data:
-            self.data_in.bib = data['BIB']
-        if self.run is not None:
-            self.data_in.run_id = self.run.id
-        if self.courseDevice is not None:
-            self.data_in.cource_device_id = self.courseDevice.id
-        db.session.add(self.data_in)
-        db.session.commit()
-
 
     def competitor_autostart(self):
         race_competitors = db.session.query(RaceCompetitor, RunOrder). \
@@ -424,7 +418,6 @@ class BaseRace:
                 error_list['errors'].append("Course has more than one finish device")
         return error_list
 
-
 class ClassicRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
@@ -480,10 +473,10 @@ class SummationTimeRace(ClassicRace):
             elif len(runCourses) > 1:
                 error_list['errors'].append("For run number " + str(run.number) + " set several  courses")
         return error_list
+
 class ParallelRace(SummationTimeRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
-        pass
 
     def get_sector_results(self):
         return db.session.query(ResultDetail).filter(self.runOrder.order==RunOrder.order,
@@ -568,6 +561,7 @@ class ParallelRace(SummationTimeRace):
             elif len(runCourses) > 2:
                 error_list['errors'].append("For run number " + str(run.number) + " set several  courses")
         return error_list
+
 class QualificationRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
@@ -607,6 +601,7 @@ class QualificationRace(BaseRace):
             elif len(runCourses) > 2:
                 error_list['errors'].append("For run number " + run.number + " set several  courses")
         return error_list
+
 class ForerunnerRace(BaseRace):
     def __init__(self, race=None, runInfo=None, runType=None, discipline=None, courseDevice=None, courseDeviceType=None):
         super().__init__(race, runInfo, runType, discipline, courseDevice, courseDeviceType)
@@ -743,42 +738,37 @@ class RaceGetter:
         ).one()
 
         if race_info[0].run_type_id == 3:
-            print('ForerunnerRace')
             return ForerunnerRace(race=race_info[2],
                                   runInfo=race_info[0],
                                   runType=race_info[1],
                                   discipline=race_info[3])
 
         elif race_info[3].is_parallel:
-            print('ParallelRace')
             return ParallelRace(race=race_info[2],
                                 runInfo=race_info[0],
                                 runType=race_info[1],
                                 discipline=race_info[3])
         elif race_info[3].is_qualification:
-            print('QualificationRace')
             return QualificationRace(race=race_info[2],
                                      runInfo=race_info[0],
                                      runType=race_info[1],
                                      discipline=race_info[3])
         elif race_info[3].is_combination:
-            print('Combination')
             return Combination(race=race_info[2],
                                runInfo=race_info[0],
                                runType=race_info[1],
                                discipline=race_info[3])
         elif race_info[2].result_function == 1:
-            print('SummationTimeRace')
             return SummationTimeRace(race=race_info[2],
                                      runInfo=race_info[0],
                                      runType=race_info[1],
                                      discipline=race_info[3])
         else:
-            print('ClassicRace')
             return ClassicRace(race=race_info[1],
                                runInfo=race_info[0],
                                runType=race_info[1],
                                discipline=race_info[3])
+
     @staticmethod
     def getRaceByid(Race_id=None):
         """
@@ -788,22 +778,57 @@ class RaceGetter:
         race_info = db.session.query(Race, Discipline).filter(
             Race.discipline_id == Discipline.id, Race.id == Race_id).one()
         if race_info[1].is_parallel:
-            print('ParallelRace')
             return ParallelRace(race=race_info[0],
                                 discipline=race_info[1])
         elif race_info[1].is_qualification:
-            print('QualificationRace')
             return QualificationRace(race=race_info[0],
                                      discipline=race_info[1])
         elif race_info[1].is_combination:
-            print('Combination')
             return Combination(race=race_info[0],
                                discipline=race_info[1])
         elif race_info[0].result_function == 1:
-            print('SummationTimeRace')
             return SummationTimeRace(race=race_info[0],
                                      discipline=race_info[1])
         else:
-            print('ClassicRace')
             return ClassicRace(race=race_info[0],
                                discipline=race_info[1])
+
+    @staticmethod
+    def getRaceByDeviceAndTime(src_dev, date):
+        """
+        :param device_data:
+        :return: BaseRace object
+        """
+        race_info = db.session.query(Race, Discipline, Course, CourseDevice, Device).filter(
+            Race.discipline_id == Discipline.id,
+            Race.id == Course.race_id,
+            Course.id == CourseDevice.course_id,
+            CourseDevice.device_id == Device.id,
+            Device.src_dev == src_dev,
+            cast(Race.racedate, Date) == date
+        ).all()
+
+        if len(race_info) == 1:
+            race_info = race_info[0]
+            if race_info[1].is_parallel:
+                return ParallelRace(race=race_info[0],
+                                    discipline=race_info[1],
+                                    courseDevice=race_info[3])
+            elif race_info[1].is_qualification:
+                return QualificationRace(race=race_info[0],
+                                         discipline=race_info[1],
+                                         courseDevice=race_info[3])
+            elif race_info[1].is_combination:
+                return Combination(race=race_info[0],
+                                   discipline=race_info[1],
+                                   courseDevice=race_info[3])
+            elif race_info[0].result_function == 1:
+                return SummationTimeRace(race=race_info[0],
+                                         discipline=race_info[1],
+                                         courseDevice=race_info[3])
+            else:
+                return ClassicRace(race=race_info[0],
+                                   discipline=race_info[1],
+                                   courseDevice=race_info[3])
+        else:
+            return None
