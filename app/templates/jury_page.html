@@ -451,7 +451,7 @@
       var data=JSON.parse(data);
       //console.log("NewDataPoint", data);
       NewDataPoint(data);
-      add2datasrc(data);
+     // add2datasrc(data);
     });
     function NewDataPoint(data){
       var fields_current=Array("absoluttime", "time", "rank", "diff", "sectortime", "sectorrank", "sectordiff", "speed");
@@ -466,9 +466,14 @@
               var comp_obj=getObjById(race_info.run_list[run].start_list[course],"race_competitor_id",comp);
               comp_obj.name=getCompName(comp_obj);              
               var dev_obj=getObjById(race_info.run_list[run].courses[course].devices,"id",val.course_device_id);
-
-              $("#tab_data_src tbody").append("<tr class='datasrc_"+val.data_in_id+"'><td>"+run+"</td><td>"+course+"</td><td>#"+dev_obj.order+" "+dev_obj.type+" "+dev_obj.distance+"</td><td>"+val.absoluttime+"</td><td class='bib'>"+comp_obj.bib+"</td><td class='name'>"+comp_obj.name+"</td><td class='act'><div class='div_select_bib_"+val.data_in_id+"'></div></td></tr>");
-              
+              $("#tab_data_src tbody").append("<tr class='datasrc_"+val.data_in_id+"_"+(comp?comp:null)+"'><td>"+run+"</td><td>"+course+"</td><td>#"+dev_obj.order+" "+dev_obj.type+" "+dev_obj.distance+"</td><td>"+val.absoluttime+"</td><td class='bib'>"+comp_obj.bib+"</td><td class='name'>"+comp_obj.name+"</td><td class='act'><div class='div_select_bib_"+val.data_in_id+"_"+(comp?comp:null)+"'></div></td></tr>");
+              $("#src_select_bib").clone()
+//                            .attr({"id": "src_select_bib_"+data[0].id+"_"+((data[1])?data[1].id:null),
+	              .attr({"id": "src_select_bib_"+val.data_in_id+"_"+(comp?comp:null),
+                     "result_detail_id": null, //my
+                     "data_in_id": val.data_in_id,
+                     "run_id": run})
+              .appendTo("tr.datasrc_"+val.data_in_id+"_"+(comp?comp:null)+" td.act div.div_select_bib_"+val.data_in_id+"_"+(comp?comp:null));              
             });
           });
           $.each(arr[1], function(dev,allcomps){
@@ -673,6 +678,7 @@
     });
 
     function sort_startlist(startlist){
+      console.log("sort_startlist", startlist);
       var comp_sorted=Array();
       startlist.sort(function(a,b){return a['manual_order'] == b['manual_order'] ? a > b : a['manual_order'] > b['manual_order']}); // сортируем спортсменов
       for(var id in startlist){
@@ -680,7 +686,8 @@
             //console.log("SORT - "+startlist[id].manual_order,startlist[id]);
             comp_sorted.push(startlist[id]);
           }else{
-            //console.log("SORT - "+startlist[id].manual_order,startlist[id].race_competitor_id);
+            //2019-06-24 - почему с manual_order==null мы не складываем в массив результатов
+        	//console.log("SORT - "+startlist[id].manual_order,startlist[id].race_competitor_id);
           }
       }
       return comp_sorted;
@@ -766,13 +773,13 @@
       */
 
       console.log("RefreshResults", data);
-      $.each(data, function(run,arr){
+      $.each(data.results, function(run,arr){
         console.log("run="+run);
         if(!$("#tab_summarytable .div_run"+run) || !$("#tab_summarytable .div_run"+run).length){
           prepare_result_tables_for_run(run,arr);
         }
         $("#tab_summarytable .div_run"+run+" tbody").html("");
-        $.each(arr[0], function(course,arr){
+        $.each(arr, function(course,arr){
           console.log("course="+course);
           create_cells(run,course,arr); // создание ячеек
           /*
@@ -931,23 +938,23 @@
         })
     }
     function set_select_bib(){
-    /*
-    if(!run_list[0].start_list.length)
-    alert("func set_select_bib: run_list[0].start_list is empty");
-    else
-    alert("func set_select_bib: run_list[0].start_list.length="+run_list[0].start_list.length);
-    */
-    var start_list=race_info.run_list[getObjIDByField(race_info.run_list, "number", 1)].start_list;
-    for(var course_id in start_list){ //xxxxxxxxxxxxx
-    for(var id in start_list[course_id]){ //xxxxxxxxxxxxx
-      $("#src_select_bib").append($('<option>', {
-      value: start_list[course_id][id].race_competitor_id,
-      text: start_list[course_id][id].bib+" - "+(start_list[course_id][id].ru_lastname?start_list[course_id][id].ru_lastname:start_list[course_id][id].en_lastname)
-      }));
-    }
-    }
-    $("#tab_datasrc").append("<button id='btn_src_save' class='btn btn-primary btn-sm'>Save data</button>");
-    return true;
+	    /*
+	    if(!run_list[0].start_list.length)
+	    alert("func set_select_bib: run_list[0].start_list is empty");
+	    else
+	    alert("func set_select_bib: run_list[0].start_list.length="+run_list[0].start_list.length);
+	    */
+	    var start_list=race_info.run_list[getObjIDByField(race_info.run_list, "number", 1)].start_list;
+	    for(var course_id in start_list){ //xxxxxxxxxxxxx
+		    for(var id in start_list[course_id]){ //xxxxxxxxxxxxx
+		      $("#src_select_bib").append($('<option>', {
+		      value: start_list[course_id][id].race_competitor_id,
+		      text: start_list[course_id][id].bib+" - "+(start_list[course_id][id].ru_lastname?start_list[course_id][id].ru_lastname:start_list[course_id][id].en_lastname)
+		      }));
+		    }
+	    }
+	    $("#tab_datasrc").append("<button id='btn_src_save' class='btn btn-primary btn-sm'>Save data</button>");
+	    return true;
     }
     function set_html_runlist(){
       if(!objlen(race_info.run_list)){
@@ -2235,7 +2242,7 @@ $(document).ready(function () {
           data.push({"run_id":$(el).attr("run_id"), "data_in_id":$(el).attr("data_in_id"), "race_competitor_id":(el.value?el.value:null), "result_detail_id":($(el).attr("result_detail_id")?$(el).attr("result_detail_id"):null)});
         }
       });
-      socket.emit('change/data_in/competitors', JSON.stringify(data));
+      socket.emit('DataInChangeCompetitors', JSON.stringify(data));
       console.log("btn_src_save:");
       console.log(JSON.stringify(data));
     });
