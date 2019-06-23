@@ -495,6 +495,85 @@ def load_data_vol3():
         semaphore.release()
         print('[HTTP REQUEST] /input/data [END]')
     return '', 200
+#
+# @socketio.on('DataInChangeCompetitors')
+# def edit_competitor(json_data):
+#     error_list = []
+#     data = json.loads(json_data)
+#     tree_view = {}
+#     # Причведение данных к удобночитаемому формату
+#     for item in data:
+#         if item['run_id'] not in tree_view.keys():
+#             tree_view[item['run_id']] = {}
+#
+#         if item['race_competitor_id'] not in tree_view[item['run_id']].keys():
+#             tree_view[item['run_id']][item['race_competitor_id']] = []
+#         tree_view[item['run_id']][item['race_competitor_id']].append({'result_detail_id': item['result_detail_id'],
+#                                                                       'data_in_id': item['data_in_id']})
+#     for run_id, competitors_list in tree_view.items():
+#         devices = get_start_finish_device(run_id)
+#         for competitor_id, data_list in competitors_list.items():
+#             if competitor_id == '-1':
+#                 for item in data_list:
+#                     resultCleared = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
+#                     if resultCleared.course_device_id in list(devices.keys()):
+#                         clear_approve(devices, resultCleared)
+#                     resultCleared.reset()
+#                     db.session.add(resultCleared)
+#             elif competitor_id == '-2':
+#                  for item in data_list:
+#                     ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).delete()
+#             else:
+#                 for item in data_list:
+#                     result_approved = ResultApproved.query.filter(ResultApproved.run_id == run_id,
+#                                                                       ResultApproved.race_competitor_id == competitor_id).first()
+#                     if result_approved is None:
+#                         error = {'error': "Competitor doesn't start", 'competitor': competitor_id}
+#                         error_list.append(error)
+#                         break
+#                     else:
+#                         dataIn = DataIn.query.filter(DataIn.id == item['data_in_id']).one()
+#                         isDataSet = ResultDetail.query.filter(ResultDetail.data_in_id == dataIn.id).count()
+#                         if isDataSet > 0:
+#                             error = {'error': "Double data", 'data_in_od': item['data_in_id']}
+#                             error_list.append(error)
+#
+#                         competitor_result_detail = ResultDetail.query.filter(ResultDetail.run_id == run_id,
+#                                                                              ResultDetail.course_device_id == dataIn.cource_device_id,
+#                                                                              ResultDetail.race_competitor_id == competitor_id).first()
+#                         if competitor_result_detail is not None:
+#                             competitor_result_detail.data_in_id = dataIn.id
+#                             competitor_result_detail.absolut_time = dataIn.time
+#                         else:
+#                             competitor_result_detail = ResultDetail(
+#                                 course_device_id=dataIn.cource_device_id,
+#                                 run_id=run_id,
+#                                 data_in_id=dataIn.id,
+#                                 race_competitor_id=competitor_id,
+#                                 absolut_time=dataIn.time
+#                             )
+#                         if competitor_result_detail.course_device_id in list(devices.keys()):
+#                             resultApproved = ResultApproved.query.filter(ResultApproved.run_id == run_id,
+#                                                                          ResultApproved.race_competitor_id == competitor_id).first()
+#                             if devices[competitor_result_detail.course_device_id] == 1:
+#                                 resultApproved.start_time = dataIn.time
+#                             else:
+#                                 resultApproved.finish_time = dataIn.time
+#                             resultApproved.diff = None
+#                             resultApproved.rank = None
+#                             resultApproved.time = None
+#                             resultApproved.status_id = None
+#                         db.session.add(competitor_result_detail)
+#                         db.session.commit()
+#         raceHandler = RaceGetter.getRaceByRunid(run_id)
+#         if raceHandler is None:
+#             socketio.emit('change/data_in/error', 'Ошибка получения гонки')
+#         else:
+#             raceHandler.recalculate_run_results(run_id)
+#             socketio.emit('change/data_in/error', json.dumps(error_list))
+#     socket_get_results(json.dumps(list(tree_view.keys())))
+#
+
 
 @socketio.on('DataInChangeCompetitors')
 def edit_competitor(json_data):
@@ -508,21 +587,21 @@ def edit_competitor(json_data):
 
         if item['race_competitor_id'] not in tree_view[item['run_id']].keys():
             tree_view[item['run_id']][item['race_competitor_id']] = []
-        tree_view[item['run_id']][item['race_competitor_id']].append({'result_detail_id': item['result_detail_id'],
-                                                                      'data_in_id': item['data_in_id']})
+        tree_view[item['run_id']][item['race_competitor_id']].append({'data_in_id': item['data_in_id']})
     for run_id, competitors_list in tree_view.items():
         devices = get_start_finish_device(run_id)
         for competitor_id, data_list in competitors_list.items():
             if competitor_id == '-1':
                 for item in data_list:
-                    resultCleared = ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).one()
+                    resultCleared = ResultDetail.query.filter(ResultDetail.data_in_id == item['data_in_id']).one()
                     if resultCleared.course_device_id in list(devices.keys()):
                         clear_approve(devices, resultCleared)
                     resultCleared.reset()
                     db.session.add(resultCleared)
             elif competitor_id == '-2':
                  for item in data_list:
-                    ResultDetail.query.filter(ResultDetail.id == item['result_detail_id']).delete()
+
+                    ResultDetail.query.filter(ResultDetail.data_in_id == item['data_in_id']).delete()
             else:
                 for item in data_list:
                     result_approved = ResultApproved.query.filter(ResultApproved.run_id == run_id,
@@ -572,6 +651,7 @@ def edit_competitor(json_data):
             raceHandler.recalculate_run_results(run_id)
             socketio.emit('change/data_in/error', json.dumps(error_list))
     socket_get_results(json.dumps(list(tree_view.keys())))
+
 
 
 def clear_approve(devices, resultDetail, resultApproved=None):
